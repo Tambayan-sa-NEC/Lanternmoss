@@ -23,7 +23,7 @@ export function resetCooldowns(abilities) {
 }
 
 export function tryCast(id) {
-  const player = ctx.player, s = kit()[id]; if (!ctx.started || ctx.transitioning || player.dead || !s) return;
+  const player = ctx.player, s = kit()[id]; if (!ctx.started || ctx.transitioning || ctx.inventoryOpen || player.dead || !s) return;
   if (spellState.gcd > 0 || spellState.cd[id] > 0) {
     if (Math.max(spellState.gcd, spellState.cd[id]) <= COMBAT.inputBuffer) { spellState.queued = id; spellState.queuedT = COMBAT.inputBuffer; }
     else if (!s.repeat) { audio.fizzle(); flashSlot(id, 'deny'); }

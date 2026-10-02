@@ -5,6 +5,8 @@ import { BUFFS, PLAYER } from '../../config/game.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buffs } from '../../gameplay/buffs.js';
+import { INVENTORY } from '../../config/items.js';
+import { Inventory } from '../../inventory/Inventory.js';
 import { HERO_BUILDERS } from '../../models/heroes.js';
 import { addDyn } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
@@ -34,6 +36,7 @@ export class Player extends Walker {
     // combat
     Object.assign(this, { charId: 'witch', stats: COMBAT.player, hp: COMBAT.player.maxHp, mana: COMBAT.player.maxMana, invuln: 0, hurtT: 0,
       dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, ...KNIGHT_TIMERS });
+    this.inventory = new Inventory(INVENTORY.slots);   // the hero's bag (kept across planets and fainting; emptied on a new adventure)
   }
 
   /** Replaces the visible model; every part key the old build added is removed first. */

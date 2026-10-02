@@ -6,11 +6,13 @@ import { ctx } from '../core/context.js';
 import { nearestNPC } from '../entities/npc/NPC.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { buffs } from '../gameplay/buffs.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
 import { camera } from '../render/scene.js';
 import { Dialog } from './Dialog.js';
 import { dom } from './dom.js';
 
 const _tv = new THREE.Vector3();
+const TREATS = itemRegistry.all().filter(d => d.tags.includes('treat')).map(d => d.id);
 let chipsT = 0;
 
 function updatePrompt() {
@@ -27,7 +29,8 @@ function updatePrompt() {
 function updateChips(dt) {
   if ((chipsT -= dt) >= 0) return;
   chipsT = 0.25; let h = `<div class="chip" style="background:#e8eeff">Planet ${ctx.planet + 1}/${PLANETS.length} · ${PLANETS[ctx.planet].name}</div>`;
-  if (buffs.buns) h += `<div class="chip">Treats: ${buffs.buns}</div>`;
+  const treats = TREATS.reduce((n, id) => n + ctx.player.inventory.count(id), 0);
+  if (treats) h += `<div class="chip">Treats: ${treats}</div>`;
   const cleared = Challenges.clearedCount();
   if (cleared) h += `<div class="chip" style="background:#fff0c8">Challenges: ${cleared} / ${Object.keys(CHALLENGES).length}</div>`;
   if (buffs.moon > 0) h += `<div class="chip" style="background:#e6ddff">Moon-Hop ${Math.ceil(buffs.moon)}s</div>`;

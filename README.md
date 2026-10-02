@@ -31,6 +31,7 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 | `Shift` | sprint |
 | `Space` | jump (hold for a floatier rise) |
 | `E` / `X` | talk, advance, accept / decline |
+| `I` or `Tab` (`Esc` closes) | open / close the bag |
 | `1-4`, `Q R F`, click | abilities (`1` / click can be held to repeat) |
 | drag / wheel | rotate / zoom camera |
 | `M` | mute |
@@ -50,7 +51,8 @@ src/
 │   ├── game.js            planet radius, world seed, movement, buff multipliers, camera
 │   ├── render.js          pixel ratio, fog, bloom, outline width
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, owl
-│   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss
+│   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
+│   ├── items.js           item definitions, categories, rarities, effects, bag size and pickup settings
 │   ├── characters.js      the two playable heroes (stats, abilities, texts)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
@@ -83,8 +85,10 @@ src/
 │   ├── scatter.js         pond decoration, trees, rocks, flowers, grass
 │   ├── water.js           pond water shader
 │   └── sky.js             sky dome, clouds, fireflies
-├── models/                procedural character art (swap a builder to use real assets)
+├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js  monsters.js
+├── items/                 ItemRegistry (validated item catalogue) and itemActions (what each category does)
+├── inventory/             Inventory: slot storage, stacking, capacity, moving / swapping, events (pure)
 ├── entities/              things that live and move in the world
 │   ├── player/            Player (movement, model swap, placement) and pose animation
 │   ├── enemies/           Enemy (melee / ranged / hopper AI), shared AI states, and behaviors/ for the newer AIs:
@@ -92,7 +96,8 @@ src/
 │   ├── companions/        Owl (witch) and Wolf (knight)
 │   ├── npc/               NPC behaviour and the villager definitions (dialogue, homes)
 │   ├── wildlife/          critters, birds, pond fish and their spawning
-│   └── Projectile.js      surface-hugging projectiles
+│   ├── Projectile.js      surface-hugging projectiles
+│   └── WorldItem.js       an item stack lying on the ground
 ├── combat/
 │   ├── CombatSystem.js    per-frame combat update order
 │   ├── casting.js         cooldowns, input buffering, hold-to-repeat, ability dispatch
@@ -109,10 +114,13 @@ src/
 ├── gameplay/
 │   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
 │   ├── characters.js      switching heroes (model, stats, abilities, companion)
-│   ├── buffs.js           Moon-Hop / Feather-Step timers and treats
+│   ├── buffs.js           Moon-Hop / Feather-Step timers
+│   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
+│   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings and damage numbers
 ├── ui/                    DOM side: element lookups, HUD (incl. boss bar), dialogue, challenge panel, banner + travel fade,
+│                          InventoryUI + itemTooltip (the bag window), itemNotices (item toasts),
 │                          overlay (planet chip), toast, character select
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
 ```
@@ -155,7 +163,8 @@ select always restarts on planet 1.
 A new enemy type = stats in `COMBAT.enemies`, a model in `models/monsters.js`, and (for new behaviour) a module there.
 
 **Console:** `window.LANTERNMOSS` exposes the player, enemies, projectiles, NPCs, camera, dialogue, challenges and
-helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet` and `goToPlanet(1)`.
+helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToPlanet(1)`, `inventory` and
+`spawnItem('moonberry', 5)`.
 
 ## Tuning
 
@@ -166,11 +175,41 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet` and `go
 | Boss health, attacks (damage, warning times, cooldowns), phases | `src/config/combat.js` → `enemies.gloomcap` |
 | Planets: order, rosters / spawn counts, difficulty scale, boss, colours | `src/config/planets.js` |
 | Victory / fade timings, heal on arrival | `src/config/planets.js` → `TRANSITION` |
+| Items (stats, stack sizes, effects, icons), bag size, keys, pickup radius | `src/config/items.js` |
+| What lies around each planet | `src/config/planets.js` → `forage` |
 | Hero stats and abilities | `src/config/characters.js` |
 | XP curve, level cap, stat / damage growth | `src/config/leveling.js` |
 | Challenges and their dialogue | `src/config/challenges.js` |
 | Villager dialogue | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
+
+## Items and the bag
+
+**Definitions vs. state.** `config/items.js` lists what each item *is* (id, name, description, category, icon, stack
+size, rarity, value, use effects, tags). `items/ItemRegistry.js` validates them at load: unknown categories or effects
+and duplicate ids are reported and skipped. The bag (`inventory/Inventory.js`, `player.inventory`) only stores what you
+*have*: slots that are `null` or `{ itemId, quantity, props }`, where `props` holds per-copy data (durability, rolls)
+and keeps differing copies from stacking. Reads return copies; every change goes through methods that validate it and
+emit `change`, `itemadded`, `itemremoved`, `full` or `itemused`.
+
+**Stacking and capacity.** `add` tops up compatible stacks first, then fills empty slots, one stack at a time, and
+returns `{ added, remaining }`. Whatever doesn't fit is reported, never lost. `remove` is all-or-nothing, and emptied
+stacks free their slot. `move` merges into a matching stack (any overflow stays behind) or swaps.
+
+**Getting items.** Walk over items lying in the world (each planet's `forage`, or anything dropped). The world item only
+shrinks by what the bag accepted, so with a full bag it stays put. Pim hands out buns and tarts, challenge "treats" are
+Honey-moss Buns, and each boss leaves its crown. Gifts that don't fit are set down at your feet.
+
+**Using items.** `I` opens the bag. Movement still works, but abilities and talking pause. Click an item to select it,
+click another slot to move, merge or swap, and double-click or **Use** to use it. Behaviour comes from the category
+(`items/itemActions.js`): consumables are used (effects in `gameplay/itemUse.js`, never wasted when they'd do nothing),
+materials are kept, quest items are inspected and can't be dropped, and equipment / weapons are reserved for an equip
+system. **Drop** sets a stack on the ground.
+
+**Extending it.** A new item = an entry in `ITEM_DEFINITIONS`. A new effect = a key in `ITEM_EFFECTS` plus a handler in
+`itemUse.js`. A new item source (enemy drops, chests, shops) calls `spawnWorldItem` or `grantItem`. Equipment would
+add an action handler plus slots of its own, using `Inventory.move`. Save / load can use `inventory.toJSON()` and
+`inventory.load()`. The bag is kept across planets and fainting, and emptied on a new adventure (there is no save system).
 
 ## Monsters and bosses
 

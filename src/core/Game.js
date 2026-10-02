@@ -16,6 +16,11 @@ import { updateEmotes } from '../fx/emotes.js';
 import { createSparkles, sparkles } from '../fx/sparkles.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { buffs, resetBuffs, updateBuffs } from '../gameplay/buffs.js';
+import { useItemInSlot } from '../gameplay/itemUse.js';
+import { dropFromSlot, spawnWorldItem, updateWorldItems } from '../gameplay/pickups.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
+import { InventoryUI } from '../ui/InventoryUI.js';
+import { installItemNotices } from '../ui/itemNotices.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { PlanetProgression } from '../gameplay/PlanetProgression.js';
 import { PLANETS } from '../config/planets.js';
@@ -62,6 +67,9 @@ export class Game {
     Dialog.init();
     Dialog.lineProvider = npc => Challenges.lineFor(npc);
     installLevelFeedback();
+    const bag = ctx.player.inventory;
+    installItemNotices(bag);
+    InventoryUI.init(bag, { use: slot => useItemInSlot(bag, slot), drop: slot => dropFromSlot(slot) });
     CharacterSelect.init({ onPick: applyCharacter, onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
     addEventListener('resize', () => this.renderSystem.resize()); this.renderSystem.resize();
@@ -79,6 +87,7 @@ export class Game {
     for (const b of ctx.birds) b.update(dt);
     updatePonds(dt);
     for (const n of ctx.npcs) n.update(dt);
+    updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
     Challenges.update(dt);
@@ -103,7 +112,7 @@ export class Game {
   /** Back to a fresh adventure: clears everything the previous character left behind. */
   resetRun() {
     const P = ctx.player, world = this.world;
-    Dialog.close();
+    Dialog.close(); InventoryUI.close();
     Challenges.reset();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs();
@@ -113,7 +122,7 @@ export class Game {
     if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
     this.planets.reset();                                          // back to the first planet (and its boss)
     Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, stats: CHARACTERS[P.charId].stats });   // a fresh adventure starts back at level 1
-    P.clearTimers();
+    P.clearTimers(); P.inventory.clear();
     const fwd = P.placeAt(world.spawnDir);
     P.root.visible = true; snapCamera(world.spawnDir, fwd);
     world.resetSun();
@@ -126,6 +135,8 @@ export class Game {
     return { Challenges, CHALLENGES, Dialog, buffs, cam, keys, CharacterSelect, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
+      get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,
+      spawnItem: (id, qty = 1, arc = 2) => spawnWorldItem(id, qty, offsetDir(ctx.player.up, Math.random() * 6.28, arc)),
       get planet() { return ctx.planet; }, get boss() { return ctx.boss; }, planets: game.planets, PLANETS,
       goToPlanet: i => { game.planets.load(i); game.planets.announceArrival(); },
       begin: () => game.beginGame(), update: dt => game.update(dt),

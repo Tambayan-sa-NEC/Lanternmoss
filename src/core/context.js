@@ -5,6 +5,7 @@ export const ctx = {
   started: false,     // false while the character-select screen is open
   planet: 0,          // index into PLANETS (config/planets.js)
   transitioning: false,  // true while fading between planets (input is locked)
+  inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
   player: null,       // Player
   companion: null,    // Owl (witch) or Wolf (knight), created when a hero is picked
   npcs: [],
@@ -13,4 +14,5 @@ export const ctx = {
   enemies: [],
   boss: null,         // this planet's boss (also listed in enemies)
   projectiles: [],
+  worldItems: [],     // WorldItem pickups lying on the planet
 };

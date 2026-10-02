@@ -51,9 +51,9 @@ function lairSpot(world) {
   return offsetDir(spawnDir, rand() * 6.28, 95);
 }
 
-/** boss: PLANETS[i].boss, i.e. { type, ...overrides of that enemy's stats such as name or colours }.
+/** boss: PLANETS[i].boss, i.e. { type, trophy, ...overrides of that enemy's stats such as name or colours }.
     lair defaults to a new far-side spot; pass the previous one to bring the boss back to the same place. */
-export function spawnBoss(world, { type, ...overrides }, lair = lairSpot(world)) {
+export function spawnBoss(world, { type, trophy: _trophy, ...overrides }, lair = lairSpot(world)) {
   const e = new Enemy(type, lair, { ...enemyDef(type), ...overrides });
   ctx.enemies.push(e); ctx.boss = e;
   return e;

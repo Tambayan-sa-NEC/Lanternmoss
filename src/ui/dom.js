@@ -13,6 +13,10 @@ export const dom = {
   // challenges, banner, boss, planet travel
   challenge: $('challenge'), challengeResult: $('cresult'),
   bossBar: $('bossbar'), bossName: document.querySelector('#bossbar .bn'), bossFill: document.querySelector('#bossbar .bb i'), fade: $('fade'),
+  // inventory
+  inventory: $('inventory'), invGrid: document.querySelector('#inventory .inv-grid'), invDetail: document.querySelector('#inventory .inv-detail'),
+  invCount: document.querySelector('#inventory .inv-count'), invUse: document.querySelector('#inventory .inv-use'),
+  invDrop: document.querySelector('#inventory .inv-drop'), invClose: document.querySelector('#inventory .inv-close'), invMsg: document.querySelector('#inventory .inv-msg'),
   // character select
   start: $('start'), cards: $('cards'), go: $('go'),
 };

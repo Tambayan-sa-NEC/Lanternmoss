@@ -3,7 +3,7 @@
    giver      = NPC name (from NPC_DEFS)        kind   = activity in CHALLENGE_KINDS (collect / race / defeat)
    params     = settings for that kind          timeLimit / maxRange = fail if out of time / you walk this far away
    repeatable = can be won more than once       cooldown / declineCooldown = seconds before it's offered again
-   reward / repeatReward = REWARDS keys (treats, buff: [kind, secs], restore). unlockLines join the NPC's chatter after the first win.
+   reward / repeatReward = REWARDS keys (treats = Honey-moss Buns into the bag, buff: [kind, secs], restore). unlockLines join the NPC's chatter after the first win.
    text keys: offer, offerAgain, accept, decline, active, success, fail (+ optional timeout / left / fainted / abandoned)
    placeholders: {progress} {best} {time} {wins}
    --------------------------------------------------------------------- */

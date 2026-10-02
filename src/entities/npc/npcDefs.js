@@ -5,7 +5,8 @@ import * as THREE from 'three';
 import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
 import { burstAt, sparkles } from '../../fx/sparkles.js';
-import { buff, giveBun } from '../../gameplay/buffs.js';
+import { buff } from '../../gameplay/buffs.js';
+import { giftItem } from '../../gameplay/pickups.js';
 import { buildBaker, buildBard, buildSprite, buildWizard } from '../../models/villagers.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { cam } from '../../systems/CameraSystem.js';
@@ -43,14 +44,14 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1 }) {
     { name: 'Pim', title: 'Baker', color: '#f2915f', build: buildBaker, height: 2.25, radius: 0.62, gesture: 'wave',
       dir: dirAlong(cottage.door, new V3().crossVectors(cottage.fwd, cottage.door).normalize(), 1.9),
       lines: [
-        { t: "Fresh from the oven! Here, take a honey-moss bun. Careful, it's still warm.", a: n => giveBun(n, 'Honey-moss bun') },
+        { t: "Fresh from the oven! Here, take a honey-moss bun. Careful, it's still warm.", a: n => giftItem(n, 'honeyBun') },
         { t: 'The secret ingredient is a pinch of starlight. And butter. Mostly butter.' },
         { t: 'Dough needs patience. So do cats who keep stealing the dough.' },
         { t: "If you smell cinnamon on the breeze, that's me. Or the fox. Honestly, hard to say." },
         { t: 'I leave the window open so the birds can smell breakfast. They leave reviews. Chirpy ones.' },
         { t: "*humming* La la la... oh! I didn't see you there! Hello, hello!", a: n => { emote(n, '!', '#ff8a3d'); n.vy = 4; n.grounded = false; } },
         { t: "A warm loaf for a warm heart. That's my motto this week. Last week it was 'no crumbs in bed'." },
-        { t: 'Try a moonberry tart! The crows gave it four stars.', a: n => giveBun(n, 'Moonberry tart') },
+        { t: 'Try a moonberry tart! The crows gave it four stars.', a: n => giftItem(n, 'moonberryTart') },
       ] },
     { name: 'Lio', title: 'Wandering Bard', color: '#5fae55', build: buildBard, height: 2.15, radius: 0.55, wander: 14,
       dir: offsetDir(spawnDir, 1.3, 5),
