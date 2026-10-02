@@ -2,7 +2,8 @@
 import { CHARACTERS } from '../config/characters.js';
 import { INVENTORY } from '../config/items.js';
 import { ctx } from './context.js';
-import { kit, tryCast } from '../combat/casting.js';
+import { confirmAim, kit, tryCast } from '../combat/casting.js';
+import { cancelAim, isAiming } from '../combat/aiming.js';
 import { nearestNPC } from '../entities/npc/NPC.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
@@ -21,6 +22,7 @@ function onKey(code) {
   if (ctx.transitioning) return;                       // travelling between planets
   if (INVENTORY.keys.includes(code)) { if (Dialog.open) Dialog.close(); InventoryUI.toggle(); return; }
   if (code === 'Escape' && InventoryUI.isOpen) { InventoryUI.close(); return; }
+  if (code === 'Escape' && isAiming()) { cancelAim(); return; }
   if (code === 'Space' && !player.dead) player.jumpBuf = 0.14;
   if (code === 'KeyM') toast(audio.toggle() ? 'Sound off' : 'Sound on');
   if (code === 'KeyC') CharacterSelect.requestMenu();
@@ -31,8 +33,12 @@ function onKey(code) {
   if (code === 'Escape' && Dialog.open) Dialog.close();
 }
 
-/** Clicking casts the active hero's mouse ability. */
-function onClick() { if (ctx.inventoryOpen) return; for (const id in kit()) if (kit()[id].mouse) tryCast(id); }
+/** Clicking casts the active hero's mouse ability, or the area ability being aimed. */
+function onClick() {
+  if (ctx.inventoryOpen) return;
+  if (isAiming()) { confirmAim(); return; }
+  for (const id in kit()) if (kit()[id].mouse) tryCast(id);
+}
 
 export function initControls(canvas) {
   initInput(canvas, {
@@ -40,6 +46,7 @@ export function initControls(canvas) {
     isActive: () => ctx.started,
     onMenuKey: code => CharacterSelect.key(code),
     onKey, onClick,
+    onCancel: cancelAim,
     onDrag: dragCamera,
     onZoom: zoomCamera,
   });

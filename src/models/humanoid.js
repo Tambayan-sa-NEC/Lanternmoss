@@ -1,4 +1,5 @@
-/* Shared chibi humanoid rig (legs, torso, arms, big head) and the anime face used by heroes, villagers and goblins. */
+/* Shared chibi humanoid rig (legs, torso, arms, big head), the anime face used by heroes, villagers and goblins,
+   and the flared-tube slice that coats, skirts and capes are cut from. */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
 
@@ -20,6 +21,12 @@ export function buildHumanoid(c) {
   for (const sx of [-1, 1]) { const sh = new THREE.Group(); sh.position.set(sx * (0.29 * w + 0.05), 1.04, 0); sh.rotation.z = sx * 0.08; body.add(sh);
     addTo(sh, part(G.box(0.13, 0.38, 0.14), c.sleeve || c.top), [0, -0.17, 0]); addTo(sh, part(G.ico(0.085, 0), c.skin), [0, -0.4, 0]); arms.push(sh); }
   const head = new THREE.Group(); head.position.set(0, 1.42, 0); body.add(head);
-  addTo(head, part(G.ico(0.36, 1), c.skin), [0, 0, 0]); addFace(head, c.face || {});
+  addTo(head, part(G.ico(0.36, 1), c.skin), [0, 0, 0]); if (c.face !== false) addFace(head, c.face || {});   // face: false = the model draws its own
   return { root, body, head, legL: legs[0], legR: legs[1], armL: arms[0], armR: arms[1] };
+}
+/** A slice of a flared tube around the body (angle 0 = front, PI/2 = +X), with a darker inside so the opening never shows through. */
+export function addSkirt(parent, rTop, rBot, height, from, span, color, inner, at = [0, 0, 0]) {
+  addTo(parent, part(new THREE.CylinderGeometry(rTop, rBot, height, 7, 1, true, from, span), color), at);
+  const lining = new THREE.CylinderGeometry(rTop, rBot, height, 7, 1, true, -from - span, span).scale(-0.97, 1, 0.97);   // mirrored => faces inward
+  addTo(parent, part(lining, inner, { outline: false }), at);
 }

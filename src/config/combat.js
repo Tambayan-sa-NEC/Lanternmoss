@@ -1,4 +1,6 @@
-/* COMBAT TUNING: every balance number for spells, enemies and the owl. */
+/* COMBAT TUNING: every balance number for spells, enemies and the owl.
+   Rough power ladder per hit: basic attack ~10  <  ability ~20-30  <  ultimate ~70-110 (long cooldown, aimed)
+   <  a boss's big telegraphed blow (the Demon Lord's Doom Blade is lethal). */
 
 export const COMBAT = {
   player: { maxHp: 100, maxMana: 100, manaRegen: 11, hpRegen: 5, hpRegenDelay: 6, invuln: 0.7, respawnTime: 2.5,
@@ -16,7 +18,11 @@ export const COMBAT = {
     nova:     { name: 'Frost Nova', label: '3/R', keys: ['Digit3', 'KeyR'], color: 0x9fe8ff,
                 cost: 28, cooldown: 8, damage: 12, radius: 4.5, slow: 0.55, slowTime: 3.5, knockback: 4 },
     blink:    { name: 'Blink', label: '4/F', keys: ['Digit4', 'KeyF'], color: 0xbff4ff,
-                cost: 15, cooldown: 5, distance: 6.5, invuln: 0.35 },
+                cost: 15, cooldown: 3, distance: 6.5, invuln: 0.35 },            // evasion: was 5 s
+    // ultimate (src/combat/abilities/ultimates.js): aim a spot (target: 'ground'), the meteor lands `delay` s later
+    meteor:   { name: 'Meteor', label: '5/G', keys: ['Digit5', 'KeyG'], color: 0xff7a3a, ult: true, target: 'ground',
+                cost: 40, cooldown: 30, damage: 110, range: 18, radius: 5.5, delay: 1.1, falloff: 0.35, knockback: 9,
+                burn: { duration: 3, tick: 0.5, damage: 5 } },                   // the crater keeps burning for a moment
   },
   owl: { damage: 4, cooldown: 4, range: 11, swoopSpeed: 15, followHeight: 2.4,
          markTime: 4, markBonus: 0.25,   // owl-marked enemies take +25% spell damage
@@ -46,8 +52,14 @@ export const COMBAT = {
     hexlantern:{ ai: 'support', color: 0x8fffc0, hp: 40, speed: 3.6, radius: 0.4, height: 1.0, hover: 1.4, aggro: 15, leash: 22,
                  keepDistance: 10, healRadius: 9, heal: 18, healCooldown: 2.5, shieldTime: 4, shieldReduction: 0.5, shieldCooldown: 6,
                  cooldown: 1, respawn: 50, xp: 20 },
-    // ---- planet bosses (src/entities/enemies/behaviors/boss.js) ----
-    gloomcap:  { ai: 'boss', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6, hp: 900, speed: 2.6, radius: 1.3, height: 4.6,
+    // ---- planet bosses: ai 'boss' + behavior = their own AI kit (src/entities/enemies/behaviors/boss/) ----
+    // attacks: windup = warning time; recover = pause after (the punish window); cooldown = extra wait before the next
+    // move; reuse = seconds before that same move can be picked again. phases: the last whose `below` (fraction of max HP)
+    // is >= current HP is active; title shows on the boss bar, enraged/flying are read by the kit.
+    // stunResist = share of a stun shrugged off (bosses are only stunned between attacks); tallHitbox = hit along the body column.
+    gloomcap:  { ai: 'boss', behavior: 'gloomcap', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6,   // planet 1: the introduction
+                 look: { skin: 0x6a4a7a, armor: 0x2e2638, cape: 0x2a1838, horn: 0xe8dcc4, trim: 0xffd36b, eye: 0xffe066, motif: 'moss' },   // src/models/bosses.js
+                 hp: 900, speed: 2.6, radius: 1.3, height: 4.6,
                  aggro: 16, leash: 30, turnRate: 3, knockResist: 1, slowResist: 0.8, staggerImmune: true, stunnedDamageBonus: 0.5,
                  telegraph: true, respawn: 0, xp: 250, cooldown: 1.6,
                  attacks: {   // windup = warning time; recover = pause after; cooldown = extra wait before the next attack
@@ -61,6 +73,49 @@ export const COMBAT = {
                    { below: 1.0,  attacks: ['slam', 'charge', 'volley'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.6,  attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon'], speedMul: 1.15, cooldownMul: 0.85 },
                    { below: 0.25, attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon'], speedMul: 1.35, cooldownMul: 0.6 },   // enraged
+                 ] },
+    pyrrhax:   { ai: 'boss', behavior: 'dragon', name: 'Pyrrhax, the Red Wyrm', color: 0xe0482a, capColor: 0xff8a3a,                 // planet 2
+                 look: { scale: 1.25, body: 0xc0392b, belly: 0xf0b060, dark: 0x7a1f1a, horn: 0xf3e6c8, membrane: 0x8a2420, eye: 0xffe066 },   // src/models/dragon.js
+                 hp: 1000, speed: 3.2, radius: 1.9, height: 3.6, tallHitbox: true,
+                 aggro: 18, leash: 32, turnRate: 2.2, knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.5,
+                 telegraph: true, respawn: 0, xp: 320, cooldown: 1.2,
+                 attacks: {
+                   bite:      { windup: 0.55, range: 4.6, arc: 80, damage: 20, knockback: 8, recover: 0.5, cooldown: 0.6 },
+                   tail:      { windup: 0.85, radius: 6, spinTime: 0.4, damage: 18, knockback: 12, recover: 0.8, cooldown: 0.8, reuse: 4 },   // jump over it
+                   breath:    { windup: 1.1, minRange: 3, maxRange: 14, length: 13, arc: 46, sweep: 60, sweepEnraged: 95, time: 1.8, tick: 0.3,
+                                damage: 9, recover: 1.0, cooldown: 1.2, reuse: 7 },
+                   fireballs: { windup: 0.8, minRange: 6, count: 3, countEnraged: 5, gap: 0.4, flight: 1.1, radius: 2.6, spread: 3, damage: 18, knockback: 6,
+                                pool: { duration: 3, tick: 0.5, damage: 6 }, recover: 0.8, cooldown: 1.2, reuse: 6 },
+                   leap:      { windup: 0.8, minRange: 9, maxRange: 24, height: 7, time: 1.2, radius: 5, damage: 26, knockback: 12, recover: 1.4, cooldown: 1.0, reuse: 8 },
+                 },
+                 phases: [
+                   { below: 1.0, attacks: ['bite', 'tail', 'breath', 'fireballs', 'leap'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Inferno', enraged: true, attacks: ['bite', 'tail', 'breath', 'fireballs', 'leap'], speedMul: 1.15, cooldownMul: 0.75 },
+                 ] },
+    malgrath:  { ai: 'boss', behavior: 'demonLord', name: 'Malgrath, the Winged Demon Lord', color: 0xd0305a, capColor: 0xff3a5a,   // planet 3: the finale
+                 look: { skin: 0x3a2030, armor: 0x1e1420, cape: 0x2a0e18, horn: 0x2a1a22, trim: 0xd8a040, eye: 0xff4040,
+                         motif: 'infernal', weapon: 'greatsword', wings: 0x3a1420, scale: 3.4 },                                         // src/models/bosses.js
+                 hp: 1050, speed: 3.0, radius: 1.5, height: 5.4, tallHitbox: true,
+                 aggro: 18, leash: 34, turnRate: 3.5, knockResist: 1, slowResist: 0.85, staggerImmune: true, stunResist: 0.7, stunnedDamageBonus: 0.35,
+                 telegraph: true, respawn: 0, xp: 450, cooldown: 1.0,
+                 flight: { hover: 2.4, high: 7.5, speed: 6.5, orbit: 10 },                   // phase 2 altitude (2.4 is still in reach), dive height, circling
+                 transition: { time: 3.2, burstAt: 1.3, radius: 9, push: 14, damage: 8 },   // immune while it lasts; the burst throws the hero clear
+                 attacks: {
+                   // phase 1, grounded
+                   combo:    { windup: 0.55, range: 5, radius: 4.4, arc: 140, reach: 2.2, slamRadius: 3.2, gap: 0.5, damage: 14, finisherDamage: 22, knockback: 6,
+                               recover: 0.9, cooldown: 0.8 },
+                   fissure:  { windup: 0.9, length: 16, width: 2.4, speed: 18, damage: 20, knockback: 10, recover: 0.8, cooldown: 1.2, reuse: 5 },
+                   hellfire: { windup: 0.7, count: 4, radius: 2.6, delay: 1.2, stagger: 0.25, damage: 20, knockback: 6, recover: 0.6, cooldown: 1.2, reuse: 6 },
+                   doom:     { windup: 2.0, maxRange: 10, reach: 2.5, radius: 6.5, damage: 999, lethal: true, recover: 2.2, cooldown: 1.2, reuse: 14 },   // ONE-HIT KILL: leave the circle
+                   // phase 2, flying
+                   dive:     { windup: 1.0, radius: 4.2, time: 0.45, damage: 34, knockback: 14, grounded: 1.6, recover: 0.4, cooldown: 0.9, reuse: 4 },
+                   barrage:  { windup: 0.7, waves: 3, count: 5, spread: 60, gap: 0.45, speed: 12, homing: 0.9, damage: 12, recover: 0.6, cooldown: 1.0, reuse: 5 },
+                   rain:     { windup: 0.8, count: 9, radius: 2.4, delay: 1.1, stagger: 0.18, scatter: 7, damage: 22, knockback: 5, recover: 0.6, cooldown: 1.2, reuse: 8 },
+                   strafe:   { windup: 1.0, length: 22, width: 3, speed: 22, trail: 7, trailDelay: 0.5, damage: 24, knockback: 9, recover: 0.6, cooldown: 1.0, reuse: 7 },
+                 },
+                 phases: [
+                   { below: 1.0, title: 'Grounded', attacks: ['combo', 'fissure', 'hellfire', 'doom'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Ascended', flying: true, enraged: true, attacks: ['dive', 'barrage', 'rain', 'strafe'], speedMul: 1.2, cooldownMul: 0.8 },
                  ] },
   },
 };

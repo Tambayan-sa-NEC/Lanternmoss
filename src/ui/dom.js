@@ -6,7 +6,7 @@ export const dom = {
   hud: $('hud'), prompt: $('prompt'), toast: $('toast'),
   // combat HUD
   hpBar: document.querySelector('.bar.hp'), mpBar: document.querySelector('.bar.mp'), xpBar: document.querySelector('.bar.xp'),
-  spells: $('spells'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'),
+  spells: $('spells'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'), aimHint: $('aimhint'),
   // dialogue
   dialog: $('dialog'), dlgName: $('dlg-name'), dlgText: $('dlg-text'), dlgNext: $('dlg-next'),
   choices: $('dlg-choices'), yes: document.querySelector('#dlg-choices .yes'), no: document.querySelector('#dlg-choices .no'),

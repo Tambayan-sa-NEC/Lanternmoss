@@ -1,8 +1,10 @@
-/* Combat HUD: HP / mana / XP bars, the ability bar, floating enemy health bars and the lock-on reticle. */
+/* Combat HUD: HP / mana / XP bars, the ability bar (cooldown sweep + seconds left, a flash when a move is ready again,
+   the ultimate in its own gold slot), floating enemy health bars, the boss bar and the lock-on reticle. */
 import * as THREE from 'three';
 import { CHARACTERS } from '../config/characters.js';
 import { PLANET_RADIUS as R } from '../config/game.js';
 import { ctx } from '../core/context.js';
+import { aim } from '../combat/aiming.js';
 import { ENGAGED } from '../entities/enemies/states.js';
 import { xpToNext } from '../progression/leveling.js';
 import { camera } from '../render/scene.js';
@@ -16,10 +18,10 @@ let slots = {};
 export function buildSpellBar(abilities) {
   dom.spells.innerHTML = ''; slots = {};
   for (const [id, s] of Object.entries(abilities)) {
-    const el = document.createElement('div'); el.className = 'slot';
+    const el = document.createElement('div'); el.className = s.ult ? 'slot ult' : 'slot';
     el.innerHTML = `<kbd>${s.label}</kbd><div class="ico" style="background:#${new THREE.Color(s.color).getHexString()}"></div>` +
-      `<div class="nm">${s.name}</div><div class="mc">${s.cost}</div><div class="cd"></div>`;
-    dom.spells.appendChild(el); slots[id] = { el, cd: el.querySelector('.cd') };
+      `<div class="nm">${s.name}</div><div class="mc">${s.cost}</div><div class="cd"></div><div class="cdt"></div>`;
+    dom.spells.appendChild(el); slots[id] = { el, cd: el.querySelector('.cd'), cdt: el.querySelector('.cdt'), was: 0, text: '' };
   }
 }
 export function setSkillHint(html) { dom.hintSkills.innerHTML = html; }
@@ -49,7 +51,8 @@ function updateBossBar() {
   const b = ctx.boss, show = !!b && b.alive && (ENGAGED.has(b.state) || b.pos.distanceTo(ctx.player.pos) < 24);
   dom.bossBar.style.display = show ? 'block' : 'none';
   if (!show) return;
-  dom.bossName.textContent = b.def.name;
+  const phase = b.def.phases[b.bossPhase]?.title;
+  dom.bossName.textContent = phase ? `${b.def.name} · ${phase}` : b.def.name;
   dom.bossFill.style.transform = `scaleX(${Math.max(0, b.hp / b.def.hp)})`;
   dom.bossBar.classList.toggle('enraged', b.bossPhase >= b.def.phases.length - 1);
 }
@@ -61,8 +64,12 @@ export function updateCombatHud(spellState, aimTarget) {
   const need = xpToNext(P.level);
   bars.xp.fill.style.transform = `scaleX(${need ? P.xp / need : 1})`; bars.xp.text.textContent = need ? `LV ${P.level} · XP ${P.xp} / ${need}` : `LV ${P.level} · MAX`;
   for (const [id, s] of Object.entries(abilities)) {
-    const sl = slots[id];
-    sl.cd.style.transform = `scaleY(${spellState.cd[id] / s.cooldown})`; sl.el.classList.toggle('nomana', P.mana < s.cost);
+    const sl = slots[id], left = spellState.cd[id];
+    sl.cd.style.transform = `scaleY(${left / s.cooldown})`; sl.el.classList.toggle('nomana', P.mana < s.cost);
+    const text = left > 0.05 && s.cooldown >= 1.5 ? (left < 1 ? left.toFixed(1) : `${Math.ceil(left)}`) : '';
+    if (text !== sl.text) { sl.text = text; sl.cdt.textContent = text; }
+    if (sl.was > 0 && left <= 0 && s.cooldown >= 1.5) flashEl(sl.el, 'ready');      // back off cooldown
+    sl.was = left; sl.el.classList.toggle('aiming', aim.id === id);
   }
   for (const e of ctx.enemies) {
     let show = e.alive && !e.hidden && e !== ctx.boss && (e.hp < e.def.hp || ENGAGED.has(e.state)) && e.pos.distanceTo(camera.position) < 32;

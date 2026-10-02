@@ -2,6 +2,8 @@
    (legs/arms, body/core/ring, mound...). */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { buildDemonLord } from './bosses.js';
+import { buildDragon } from './dragon.js';
 import { buildHumanoid } from './humanoid.js';
 
 export function buildGoblin() {
@@ -47,7 +49,7 @@ export function buildSlime(scale = 1) {
   root.scale.setScalar(scale); return { root, body };
 }
 
-// ---- later-planet monsters and bosses (procedural PLACEHOLDER art, same toon + outline style) ----
+// ---- later-planet monsters (procedural PLACEHOLDER art, same toon + outline style); bosses live in ./bosses.js ----
 
 /** Puffcap: an angry puffball mushroom with a lit fuse. Parts: body (swells on the fuse). */
 export function buildPuffcap() {
@@ -106,25 +108,7 @@ export function buildHexlantern() {
   return { root, body, core };
 }
 
-/** Gloomcap (and its per-planet variants): a giant mushroom king with a lantern staff.
-    def.capColor tints the cap and lantern. Parts: humanoid rig + core (lantern glow). */
-export function buildGloomcap(def = {}) {
-  const cap = def.capColor ?? 0x9b6ad6;
-  const h = buildHumanoid({ skin: 0xe8dcc4, top: 0x5f7f52, hem: 0x4f6a44, pants: 0x6a5a48, shoes: 0x4a3a2a, belt: 0x8a6a3a, sleeve: 0x5f7f52, w: 1.3,
-    face: { blush: 0xd8a0a0, big: 0.9 } });
-  addTo(h.head, part(G.hemi(0.78, 10, 4), cap), [0, 0.16, 0], [0, 0, 0], [1, 0.7, 1]);
-  addTo(h.head, part(G.cyl(0.76, 0.62, 0.08, 10), 0xf2e6f8), [0, 0.15, 0]);
-  for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; addTo(h.head, part(G.ico(0.09, 0), 0xffffff, { outline: false }), [Math.cos(a) * 0.48, 0.5, Math.sin(a) * 0.48]); }
-  for (let i = -1; i <= 1; i++) addTo(h.head, part(G.cone(0.07, 0.22, 4), 0xffd36b), [i * 0.16, 0.74, 0], [0, 0, -i * 0.3]);       // crown
-  for (const sx of [-1, 1]) addTo(h.head, part(G.box(0.09, 0.05, 0.03), 0xffe066, { glow: true, intensity: 3 }), [sx * 0.13, 0.02, 0.37]);   // glowing eyes
-  addTo(h.head, part(G.cone(0.26, 0.5, 6), 0x6f9a5a), [0, -0.38, 0.16], [Math.PI + 0.25, 0, 0]);                                   // mossy beard
-  const staff = new THREE.Group(); staff.position.set(0, -0.42, 0.05); h.armR.add(staff);
-  addTo(staff, part(G.cyl(0.05, 0.06, 1.6, 6), 0x6a4a3a), [0, 0, 0.6], [Math.PI / 2, 0, 0]);
-  const core = addTo(staff, part(G.ico(0.18, 1), cap, { glow: true, intensity: 2.8 }), [0, 0, 1.45]);
-  h.root.scale.setScalar(2.9);
-  return { ...h, core };
-}
-
 /** COMBAT.enemies key -> builder (called with the enemy's stats, which most builders ignore). */
 export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buildWisp, slime: () => buildSlime(1), slimeling: () => buildSlime(0.55),
-  puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern, gloomcap: buildGloomcap };
+  puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern,
+  gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord };

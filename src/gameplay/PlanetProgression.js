@@ -7,6 +7,7 @@
 import { PLANETS, TRANSITION } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { encounterEvents } from '../combat/events.js';
+import { clearHazards } from '../combat/hazards.js';
 import { clearEnemies, spawnBoss, spawnRoster } from '../combat/spawning.js';
 import { clearTargets } from '../combat/targeting.js';
 import { createNpcDefs } from '../entities/npc/npcDefs.js';
@@ -77,6 +78,7 @@ export class PlanetProgression {
     Challenges.cancel();
     for (const e of ctx.enemies) if (e !== boss) e.vanish();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
+    clearHazards();
     showBanner(`${boss.def.name.split(',')[0]} defeated!`, next ? `The lanterns of ${next.name} are calling...` : 'Every planet shines again. Thank you, hero!');
     audio.melody();
     if (this.planet.boss.trophy) grantItem(this.planet.boss.trophy);
@@ -88,6 +90,7 @@ export class PlanetProgression {
     ctx.planet = index;
     Dialog.close(); Challenges.cancel();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
+    clearHazards();
     clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems();
     world.dispose(); world.generate(this.planet);
     Object.assign(P, { dead: false, deadT: 0, vy: 0 }); P.clearTimers();

@@ -7,12 +7,13 @@ export const ctx = {
   transitioning: false,  // true while fading between planets (input is locked)
   inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
   player: null,       // Player
-  companion: null,    // Owl (witch) or Wolf (knight), created when a hero is picked
+  companion: null,    // Owl (witch, ranger) or Wolf (knight), created when a hero is picked
   npcs: [],
   critters: [],
   birds: [],
   enemies: [],
   boss: null,         // this planet's boss (also listed in enemies)
   projectiles: [],
+  hitStop: 0,         // seconds of slow motion left after a heavy impact (fx/combatFx.js hitStop)
   worldItems: [],     // WorldItem pickups lying on the planet
 };

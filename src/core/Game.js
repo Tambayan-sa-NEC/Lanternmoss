@@ -7,6 +7,7 @@ import { resetCooldowns, tryCast } from '../combat/casting.js';
 import { updateCombat } from '../combat/CombatSystem.js';
 import { updateKnight } from '../combat/abilities/knight.js';
 import { addEnemy, resetEnemies } from '../combat/spawning.js';
+import { clearHazards } from '../combat/hazards.js';
 import { clearTargets } from '../combat/targeting.js';
 import { NPC } from '../entities/npc/NPC.js';
 import { createNpcDefs } from '../entities/npc/npcDefs.js';
@@ -81,6 +82,7 @@ export class Game {
 
   /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
   update(dt) {
+    if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning });
     for (const c of ctx.critters) c.update(dt);
@@ -117,6 +119,7 @@ export class Game {
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
+    clearHazards(); ctx.hitStop = 0;
     resetEnemies();
     clearTargets();
     if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }

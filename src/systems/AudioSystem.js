@@ -35,8 +35,8 @@ export const audio = {
   meow() { this.tone(700, 0.35, 'triangle', 0.03, 0, 1.25); },
   plip() { this.tone(900, 0.15, 'sine', 0.04, 0, 0.5); },
   // --- combat sfx (procedural placeholders: swap for samples later) ---
-  noise(dur = 0.3, vol = 0.08, freq = 1000) {
-    if (!this.ctx) return; const t = this.ctx.currentTime;
+  noise(dur = 0.3, vol = 0.08, freq = 1000, when = 0) {
+    if (!this.ctx) return; const t = this.ctx.currentTime + when;
     if (!this._nb) { this._nb = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate); const d = this._nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
     const src = this.ctx.createBufferSource(), f = this.ctx.createBiquadFilter(), g = this.ctx.createGain(); src.buffer = this._nb;
     f.type = 'lowpass'; f.frequency.setValueAtTime(freq, t); f.frequency.exponentialRampToValueAtTime(Math.max(60, freq * 0.25), t + dur);
@@ -67,6 +67,21 @@ export const audio = {
   clang() { this.tone(1400, 0.18, 'square', 0.03, 0, 0.7); this.tone(2100, 0.3, 'sine', 0.03, 0.02); },
   whoosh() { this.noise(0.25, 0.08, 2600); },
   howl() { this.tone(520, 0.9, 'sine', 0.04, 0, 1.35); this.tone(700, 0.7, 'sine', 0.02, 0.5, 0.8); },
+  // --- ranger sfx ---
+  bowShot() { this.tone(190, 0.14, 'triangle', 0.05, 0, 0.55); this.noise(0.1, 0.04, 4200); },
+  // --- ultimates ---
+  meteorCall() { this.tone(220, 1.1, 'sawtooth', 0.025, 0, 2.2); this.noise(1.1, 0.05, 1200); },
+  meteorImpact() { this.noise(1.2, 0.22, 700); this.tone(55, 0.9, 'sine', 0.14, 0, 0.5); this.tone(90, 0.6, 'square', 0.03, 0.02, 0.5); },
+  leapSlam() { this.noise(0.8, 0.2, 600); this.tone(70, 0.7, 'sine', 0.13, 0, 0.45); this.tone(1400, 0.2, 'square', 0.02, 0, 0.6); },
+  arrowRain() { for (let i = 0; i < 6; i++) this.noise(0.12, 0.04, 4500, i * 0.09); this.tone(900, 0.5, 'triangle', 0.02, 0.1, 0.5); },
+  // --- dragon + demon lord ---
+  bite() { this.noise(0.12, 0.1, 1800); this.tone(150, 0.15, 'square', 0.04, 0, 0.5); },
+  tailSweep() { this.noise(0.45, 0.1, 1400); },
+  wingBeat() { [0, 0.22].forEach(w => this.noise(0.25, 0.09, 500, w)); },
+  fireBreath(dur = 1.8) { this.noise(dur, 0.09, 1500); this.tone(110, dur, 'sawtooth', 0.02, 0, 0.8); },
+  doomCharge() { this.tone(110, 1.9, 'sawtooth', 0.03, 0, 3); this.tone(55, 1.9, 'sine', 0.05, 0, 2); },
+  doomSlam() { this.noise(1.4, 0.26, 500); this.tone(40, 1.2, 'sine', 0.16, 0, 0.5); this.tone(180, 0.5, 'square', 0.04, 0, 0.3); },
+  phaseShift() { this.roar(); this.tone(60, 1.6, 'sawtooth', 0.05, 0.1, 0.4); this.noise(1.5, 0.12, 900); },
   // --- boss + planet travel (procedural placeholders) ---
   roar() { this.tone(80, 0.9, 'sawtooth', 0.05, 0, 0.6); this.tone(120, 0.7, 'square', 0.025, 0.05, 0.7); this.noise(0.8, 0.12, 700); },
   warp() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.9, 'sine', 0.04, i * 0.12, 1.5)); this.noise(1.2, 0.04, 5000); },

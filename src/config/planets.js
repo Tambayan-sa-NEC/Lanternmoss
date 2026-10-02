@@ -7,7 +7,8 @@
               hp (also healing), damage, speed (movement, charges, projectiles), cooldown (<1 = attacks more often), xp
      roster   enemies spawned on arrival, in order. { type, count } spreads them over the wilds,
               { type, groups, size } makes camps, near: 'ponds' gathers them around far ponds
-     boss     { type } from COMBAT.enemies (ai 'boss'), plus optional overrides (name, colours);
+     boss     { type } from COMBAT.enemies (ai 'boss'), plus optional overrides (name, colours, look = model palette + motif);
+              each planet has its own boss type, and with it its own AI (gloomcap -> pyrrhax the dragon -> malgrath);
               trophy = item id (config/items.js) given to the hero when it falls
      forage   items lying around the planet to pick up: { item, count }
    --------------------------------------------------------------------- */
@@ -43,9 +44,9 @@ export const PLANETS = [
       { type: 'goblin', groups: 2, size: 4 }, { type: 'ramhorn', count: 3 }, { type: 'puffcap', count: 5 }, { type: 'wisp', count: 3 },
       { type: 'slime', count: 3, near: 'ponds' },
     ],
-    boss: { type: 'gloomcap', name: 'Cindercap, the Ember King', color: 0xffa060, capColor: 0xff7a4a, trophy: 'emberCrown' },
+    boss: { type: 'pyrrhax', trophy: 'emberCrown' },
     forage: [{ item: 'emberShard', count: 8 }, { item: 'moonberry', count: 5 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
-    arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Cindercap waits under the orange light.',
+    arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Pyrrhax the red dragon waits under the orange light.',
   },
   {
     name: 'Frostveil', tagline: 'the last, coldest and fiercest planet', seed: 31415,
@@ -57,8 +58,8 @@ export const PLANETS = [
       { type: 'goblin', groups: 2, size: 3 }, { type: 'ogre', count: 3 }, { type: 'thornmole', count: 4 }, { type: 'hexlantern', count: 3 },
       { type: 'ramhorn', count: 3 }, { type: 'puffcap', count: 4 }, { type: 'wisp', count: 2 },
     ],
-    boss: { type: 'gloomcap', name: 'Rimecap, the Frost King', color: 0xbfeaff, capColor: 0x8fd8ff, trophy: 'frostCrown' },
+    boss: { type: 'malgrath', trophy: 'frostCrown' },
     forage: [{ item: 'frostPetal', count: 8 }, { item: 'moonberry', count: 5 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
-    arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Find Rimecap!',
+    arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, waits under the crimson light.',
   },
 ];

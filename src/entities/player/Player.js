@@ -16,7 +16,7 @@ import { audio } from '../../systems/AudioSystem.js';
 import { projectTangent, tangentFrame, turnToward } from '../../utils/sphere.js';
 import { damp } from '../../utils/math.js';
 import { groundHeight } from '../../world/terrain.js';
-import { animateHero, animateKnight } from './poses.js';
+import { animateHero, HERO_POSES } from './poses.js';
 
 const V3 = THREE.Vector3;
 const _cf = new V3(), _cr = new V3(), _wish = new V3(), _tv = new V3(), _tv2 = new V3();
@@ -35,7 +35,7 @@ export class Player extends Walker {
     this.fwd.copy(tangentFrame(spawnDir)[0]);
     // combat
     Object.assign(this, { charId: 'witch', stats: COMBAT.player, hp: COMBAT.player.maxHp, mana: COMBAT.player.maxMana, invuln: 0, hurtT: 0,
-      dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, ...KNIGHT_TIMERS });
+      dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS });
     this.inventory = new Inventory(INVENTORY.slots);   // the hero's bag (kept across planets and fainting; emptied on a new adventure)
   }
 
@@ -47,7 +47,7 @@ export class Player extends Walker {
   }
 
   /** Clears every short-lived combat / ability timer. */
-  clearTimers() { Object.assign(this, { castT: 0, castFaceT: 0, invuln: 0, hurtT: 0, ...KNIGHT_TIMERS }); }
+  clearTimers() { Object.assign(this, { castT: 0, castFaceT: 0, invuln: 0, hurtT: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS }); }
 
   /** Stands the hero on the ground at dir, at rest, facing the first tangent axis there. */
   placeAt(dir) {
@@ -57,8 +57,15 @@ export class Player extends Walker {
     return t1;
   }
 
-  /** Movement for one frame. input: { keys, viewFwd (camera heading), enabled (false while menus own the keys) }. */
+  /** Movement for one frame. input: { keys, viewFwd (camera heading), enabled (false while menus own the keys) }.
+      While a scripted move runs (this.motion(player, dt) -> false when finished, e.g. Leap Slam) it replaces steering and physics. */
   update(dt, { keys, viewFwd, enabled }) {
+    if (this.motion) {
+      if (this.dead || !this.motion(this, dt)) this.motion = null;
+      animateHero(this, dt, 0); HERO_POSES[this.charId]?.(this, dt, 0);
+      this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
+      return;
+    }
     let f = 0, s = 0;
     if (enabled && !this.dead) {
       if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1;
@@ -97,7 +104,7 @@ export class Player extends Walker {
     if (this.grounded && hs > 6 && this.trail < 0) {
       this.trail = 0.07; sparkles.emit(this.pos, { count: 1, color: buffs.feather > 0 ? 0xb8ffe0 : 0xfff0e0, speed: 0.6, up: this.up, upBias: 0.5, life: 0.5, size: 0.28 });
     }
-    animateHero(this, dt, hs); if (this.charId === 'knight') animateKnight(this, dt);
+    animateHero(this, dt, hs); HERO_POSES[this.charId]?.(this, dt, hs);
     this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
   }
 }

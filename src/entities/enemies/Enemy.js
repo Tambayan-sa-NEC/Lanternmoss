@@ -1,7 +1,8 @@
 /* ENEMIES: reuse Walker physics/collisions; behaviour is chosen by def.ai
    ('melee' goblins & ogres, 'ranged' wisps, 'hopper' slimes here; newer AIs such as 'bomber', 'charger', 'burrower',
    'support' and 'boss' are behaviour modules in ./behaviors). Balance numbers live in COMBAT.enemies, scaled per planet.
-   States: idle / wander / return (out of combat) and chase / windup / recover / charge / flee (ENGAGED). */
+   States: idle / wander / return (out of combat) and chase / windup / recover / charge / flee, plus the bosses'
+   active / transition (ENGAGED). */
 import * as THREE from 'three';
 import { COMBAT } from '../../config/combat.js';
 import { ctx } from '../../core/context.js';
@@ -31,6 +32,8 @@ import { enemyDef } from '../../combat/enemyDefs.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3(), _a2 = new V3();
+/** Boss states in which a stun lands (never in the middle of a telegraphed attack). */
+const STUNNABLE = new Set(['chase', 'recover']);
 
 /** Enemies never fight inside the village safe zone, or a fainted hero. */
 function playerSafe() { return ctx.player.dead || arcDist(ctx.player.up, SPAWN_DIR) < COMBAT.player.safeRadius; }
@@ -45,7 +48,7 @@ export class Enemy extends Walker {
     this.home = dir.clone(); this.knock = new V3(); this.move = new V3(); this.toP = new V3(); this._c = new V3(); this.seed = Math.random() * 10;
     if (def.slamRadius || def.telegraph) { this.tele = new THREE.Mesh(discGeo, fxMaterial(0xff4d6d, 1.2)); this.tele.renderOrder = 3; this.tele.visible = false; scene.add(this.tele); }
     this.fxMeshes = [];                               // extra warning meshes a behaviour owns: hidden by hideTele, removed by dispose
-    this.behavior = BEHAVIORS[def.ai] || null; this.behavior?.init?.(this);
+    this.behavior = BEHAVIORS[def.behavior ?? def.ai] || null; this.behavior?.init?.(this);   // def.behavior: a boss's own AI
     this.bar = document.createElement('div'); this.bar.className = 'eb'; this.bar.innerHTML = '<i></i>'; dom.enemyBars.appendChild(this.bar); this.barFill = this.bar.firstChild;
     this.spawn(dir);
   }
@@ -65,6 +68,14 @@ export class Enemy extends Walker {
     if (this.def.staggerImmune) return;
     this.stunT = Math.max(this.stunT, t);
     if (this.state === 'windup' || this.state === 'charge') { this.state = 'recover'; this.timer = this.cool = this.def.cooldown * 0.5; this.hideTele(); emote(this, '?', '#8a6ae0'); }
+  }
+  /** Freezes the monster for t seconds (Leap Slam and other heavy stuns). Ordinary monsters also lose the attack they
+      were winding up; bosses only feel it between attacks (chase / recover), shortened by def.stunResist. */
+  stun(t) {
+    if (this.def.staggerImmune) { if (!STUNNABLE.has(this.state)) return; t *= 1 - (this.def.stunResist ?? 0.6); }
+    else this.interrupt(t);
+    if (t < 0.05) return;
+    this.stunT = Math.max(this.stunT, t); emote(this, '★', '#ffd24a');
   }
   die() {
     this.alive = false; this.state = 'dead'; this.deadT = 0; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
@@ -125,6 +136,7 @@ export class Enemy extends Walker {
     this.behavior?.update?.(this, dt, n);
     if (d.contact && ENGAGED.has(this.state) && !safe && this.cool <= 0 && dist < this.radius + ctx.player.radius + 0.3 && ctx.player.r - groundHeight(ctx.player.up) < 1) {
       hurtPlayer(d.damage, this.pos, d.knockback); this.cool = d.contactCooldown; }
+    if (this.stunT > 0.1 && Math.random() < dt * 12) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.55), { count: 1, color: 0xffe066, speed: 1.4, up: this.up, upBias: 0.3, life: 0.5, size: 0.32 });   // dazed stars
     if (this.slowT > 0 && Math.random() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
     if (this.shieldT > 0 && Math.random() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
     if (this.markT > 0 && Math.random() < dt * 6) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.6), { count: 1, color: 0xc7a8ff, speed: 0.4, up: this.up, upBias: 1.5, life: 0.6, size: 0.3 });

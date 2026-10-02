@@ -1,11 +1,12 @@
 # Lanternmoss
 
 A tiny cozy planet of lanterns, moss and friendly critters: a third-person browser game built with
-[Three.js](https://threejs.org/) (r160) and plain ES modules. Pick the Girl Witch or the Boy Knight, explore a
+[Three.js](https://threejs.org/) (r160) and plain ES modules. Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore a
 spherical planet, chat with villagers, take on their mini-challenges and fight the monsters beyond the village lanterns.
 
 **Campaign:** every planet has a boss in a lair on its far side, marked by a shaft of light. Defeat it and the hero
 travels on to the next, harder planet (Lanternmoss, then Emberfall, then Frostveil), keeping their level, XP and treats.
+Each boss is its own fight: Gloomcap the Moss King, Pyrrhax the red dragon, and Malgrath, the two-phase Winged Demon Lord.
 
 ## Running
 
@@ -33,6 +34,7 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 | `E` / `X` | talk, advance, accept / decline |
 | `I` or `Tab` (`Esc` closes) | open / close the bag |
 | `1-4`, `Q R F`, click | abilities (`1` / click can be held to repeat) |
+| `5` / `G` | ultimate: a marker follows the cursor; click (or `5` / `G` again) to cast there, `Esc` / right click cancels |
 | drag / wheel | rotate / zoom camera |
 | `M` | mute |
 | `C` (twice) | back to character select (restarts the adventure) |
@@ -43,7 +45,7 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 index.html                 markup only: HUD, dialogue box, challenge panel, character-select overlay
 styles/main.css            all styling
 scripts/serve.mjs          zero-dependency dev server
-tests/leveling.test.mjs    unit tests for the XP / level math
+tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config
 src/
 ├── main.js                entry point: builds the Game, starts the loop, exposes window.LANTERNMOSS
 ├── errorOverlay.js        classic script that shows load/runtime errors on screen
@@ -53,7 +55,7 @@ src/
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, owl
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
 │   ├── items.js           item definitions, categories, rarities, effects, bag size and pickup settings
-│   ├── characters.js      the two playable heroes (stats, abilities, texts)
+│   ├── characters.js      the three playable heroes (stats, abilities, texts)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   └── critters.js        ambient animal looks
@@ -87,13 +89,16 @@ src/
 │   └── sky.js             sky dome, clouds, fireflies
 ├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js  monsters.js
+│   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
+│   └── dragon.js          Pyrrhax, the red dragon
 ├── items/                 ItemRegistry (validated item catalogue) and itemActions (what each category does)
 ├── inventory/             Inventory: slot storage, stacking, capacity, moving / swapping, events (pure)
 ├── entities/              things that live and move in the world
 │   ├── player/            Player (movement, model swap, placement) and pose animation
 │   ├── enemies/           Enemy (melee / ranged / hopper AI), shared AI states, and behaviors/ for the newer AIs:
-│   │                      bomber, charger, burrower, support and the boss
-│   ├── companions/        Owl (witch) and Wolf (knight)
+│   │                      bomber, charger, burrower, support, and boss/: the boss framework (core.js) with one kit
+│   │                      per boss (gloomcap.js, dragon.js, demonLord.js)
+│   ├── companions/        Owl (witch, ranger) and Wolf (knight)
 │   ├── npc/               NPC behaviour and the villager definitions (dialogue, homes)
 │   ├── wildlife/          critters, birds, pond fish and their spawning
 │   ├── Projectile.js      surface-hugging projectiles
@@ -101,7 +106,10 @@ src/
 ├── combat/
 │   ├── CombatSystem.js    per-frame combat update order
 │   ├── casting.js         cooldowns, input buffering, hold-to-repeat, ability dispatch
-│   ├── abilities/         witch spells and knight moves
+│   ├── abilities/         witch spells, knight (axe warrior) moves, ranger (elf archer) shots, and ultimates.js
+│   ├── aiming.js          aim mode for ground-targeted abilities (cursor -> ground marker, validity, confirm / cancel)
+│   ├── area.js            area queries: who is inside a circle, landable spots, cursor -> ground ray
+│   ├── hazards.js         timed area effects for both sides: Blast (marked, then detonates) and Zone (ticks over time)
 │   ├── damage.js          damage both ways, fainting, respawning, regeneration
 │   ├── enemyDefs.js       per-planet enemy stats (base stats x the planet's difficulty scale)
 │   ├── events.js          encounter events ('bossdefeated')
@@ -118,7 +126,8 @@ src/
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
-├── fx/                    sparkles, emote bubbles, blob shadows, rings and damage numbers
+├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
+│                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming)
 ├── ui/                    DOM side: element lookups, HUD (incl. boss bar), dialogue, challenge panel, banner + travel fade,
 │                          InventoryUI + itemTooltip (the bag window), itemNotices (item toasts),
 │                          overlay (planet chip), toast, character select
@@ -138,8 +147,8 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
 2. Moving bodies resolve collisions in the order they were created, so the player, critters, villagers and enemies are
    created in that order.
 
-**Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → combat (vitals, casting, aim,
-projectiles, enemies, companion, effects, combat HUD) → planet progression → challenges → knight upkeep → menu orbit → camera → world →
+**Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → combat (vitals, casting + area aim, aim,
+projectiles, enemies, hazards, companion, effects, combat HUD) → planet progression → challenges → knight upkeep → menu orbit → camera → world →
 particles and emotes → dialogue → overlay, buffs, toast. Rendering follows each update.
 
 **Dependencies flow one way:** `config` and `utils` depend on nothing. `render` and `physics` build on them, and
@@ -158,9 +167,26 @@ villagers move into its village, wildlife and the scaled roster spawn, and the h
 treats intact. The transition can't fire twice (it only accepts the event while playing), and returning to character
 select always restarts on planet 1.
 
-**Enemy behaviours:** `def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
+**Enemy behaviours:** `def.behavior ?? def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
 `entities/enemies/behaviors/` (`think`, plus optional `init / reset / update / animate / onDie / dispose` hooks).
 A new enemy type = stats in `COMBAT.enemies`, a model in `models/monsters.js`, and (for new behaviour) a module there.
+
+**Bosses** (`behaviors/boss/core.js`) share one state machine: `chase` (the kit steers) → `windup` (the move
+telegraphs) → optional `active` (multi-step moves) → `recover` (the punish window), plus `transition` for phase
+changes. Each boss is a kit: its own movement, poses and moveset, where every move says when it is usable
+(`ready(e, dist)`, e.g. range or facing) and how much the boss wants it (`weight`). The framework picks among the
+current phase's moves, never repeats the last one, honours each move's own `reuse` cooldown, and waits for hazards a
+move left behind before the next one, so attacks never stack into something unreadable. Moves that travel (charges,
+leaps, dives, strafes) are clamped inside the boss's arena so they can't end the fight by leaving it.
+
+**Ultimates:** each hero's `5` / `G` ability has `target: 'ground'`. `casting.js` hands it to `aiming.js` first and only
+pays the cost and cooldown on confirm; then `CAST[id].execute(s, dir, target)` (`abilities/ultimates.js`) runs it.
+Their damage rides on `hazards.js`: Meteor is a `Blast` with a falling meteor, Leap Slam is a scripted jump
+(`Player.motion`) whose landing is a stunning `Blast`, and Arrow Rain is a `Zone` that ticks.
+
+**Heroes:** a new hero = an entry in `config/characters.js`, a builder in `models/heroes.js` (`HERO_BUILDERS`), a pose
+overlay in `entities/player/poses.js` (`HERO_POSES`) and its ability functions in `combat/abilities/` (added to `CAST`).
+The character-select cards are generated from `CHARACTERS`; each needs a `.pic.<id>` icon in `styles/main.css`.
 
 **Console:** `window.LANTERNMOSS` exposes the player, enemies, projectiles, NPCs, camera, dialogue, challenges and
 helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToPlanet(1)`, `inventory` and
@@ -172,7 +198,8 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 |---|---|
 | Movement, jump, camera | `src/config/game.js` |
 | Spells, enemy stats, XP per enemy | `src/config/combat.js` |
-| Boss health, attacks (damage, warning times, cooldowns), phases | `src/config/combat.js` → `enemies.gloomcap` |
+| Boss health, attacks (damage, warning times, cooldowns, reuse), phases | `src/config/combat.js` → `enemies.gloomcap / pyrrhax / malgrath` |
+| Ultimates (Meteor, Leap Slam, Arrow Rain) and evasion cooldowns | `src/config/combat.js` (witch) and `src/config/characters.js` |
 | Planets: order, rosters / spawn counts, difficulty scale, boss, colours | `src/config/planets.js` |
 | Victory / fade timings, heal on arrival | `src/config/planets.js` → `TRANSITION` |
 | Items (stats, stack sizes, effects, icons), bag size, keys, pickup radius | `src/config/items.js` |
@@ -223,7 +250,11 @@ add an action handler plus slots of its own, using `Inventory.move`. Save / load
 | Ramhorn | charger | 2, 3 | marks a lane, then charges in a line. Sidestep it; if it hits scenery it's dazed and takes +50% damage |
 | Thornmole | burrower | 3 | tunnels (untargetable) and erupts under you after a tremor, then stays exposed briefly |
 | Hexlantern | support | 3 | follows fighting monsters, heals them and shields them (−50% damage). Kill it first |
-| **Gloomcap** (boss) | boss | each planet (renamed and recoloured, scaled) | slam, lane charge, homing volley, shockwave ring (jump it), summons; three phases, immune to stagger and knockback |
+| **Gloomcap** (boss) | boss: gloomcap | 1 | the introduction: slam, lane charge, homing volley, shockwave ring (jump it), summons; three phases |
+| **Pyrrhax** (boss) | boss: dragon | 2 | red dragon: bite up front, tail sweep if you flank it (jump it), sweeping fire breath, lobbed fireballs that leave burning patches, a winged leap onto you from afar; Inferno below 50% |
+| **Malgrath** (boss) | boss: demonLord | 3 | Winged Demon Lord. Grounded: greatsword combo, fissure lane, hellfire circles and the **Doom Blade**, a 2 s telegraphed blow that kills anyone left in its circle. At 50% he rises on his wings (immune while transforming): dives, soul-orb barrages, hellstorm, strafing runs |
+
+Bosses are immune to stagger and knockback, and only feel stuns between attacks (shortened by `stunResist`).
 
 **Adding a planet:** append an entry to `PLANETS` in `src/config/planets.js` (new seed, palette, a higher `scale`,
 roster, boss). Nothing else needs to change. `npm test` checks that every planet is complete and harder than the one before.

@@ -75,8 +75,8 @@ export const ITEM_DEFINITIONS = [
   // ---- quest items: one per defeated boss ----
   { id: 'mossCrown', name: "Gloomcap's Crown", description: 'Proof that you freed Lanternmoss from the Moss King.', category: 'quest',
     icon: { shape: 'crown', color: 0xb48cff }, rarity: 'legendary', value: 0 },
-  { id: 'emberCrown', name: "Cindercap's Crown", description: 'Proof that you freed Emberfall from the Ember King.', category: 'quest',
+  { id: 'emberCrown', name: "Pyrrhax's Horn Crown", description: 'Proof that you freed Emberfall from the red dragon.', category: 'quest',
     icon: { shape: 'crown', color: 0xff7a4a }, rarity: 'legendary', value: 0 },
-  { id: 'frostCrown', name: "Rimecap's Crown", description: 'Proof that you freed Frostveil, the last planet.', category: 'quest',
+  { id: 'frostCrown', name: "Malgrath's Crown", description: 'Proof that you cast down the Winged Demon Lord and freed Frostveil, the last planet.', category: 'quest',
     icon: { shape: 'crown', color: 0x8fd8ff }, rarity: 'legendary', value: 0 },
 ];

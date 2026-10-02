@@ -29,7 +29,7 @@ export const CharacterSelect = {
     const ids = Object.keys(CHARACTERS), i = ids.indexOf(this.choice);
     if (code === 'ArrowLeft' || code === 'KeyA') this.pick(ids[i < 0 ? 0 : (i + ids.length - 1) % ids.length]);           // nothing picked yet:
     else if (code === 'ArrowRight' || code === 'KeyD') this.pick(ids[i < 0 ? ids.length - 1 : (i + 1) % ids.length]);   // left/right card
-    else if (code === 'Digit1' || code === 'Digit2') this.pick(ids[+code.slice(5) - 1]);
+    else if (/^Digit[1-9]$/.test(code) && ids[+code.slice(5) - 1]) this.pick(ids[+code.slice(5) - 1]);
     else if (code === 'Enter' || code === 'Space') this.confirm();
   },
   open() {

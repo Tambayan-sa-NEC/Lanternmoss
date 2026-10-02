@@ -1,5 +1,5 @@
-/* The knight's moves (CHARACTERS.knight.abilities): Sword Slash, Shield Dash, Whirlwind, Guard,
-   plus the per-frame upkeep for the dash hit-sweep and the guard bubble. */
+/* The knight's (axe warrior's) moves (CHARACTERS.knight.abilities): Axe Cleave, Shoulder Charge, Whirlwind, Guard,
+   plus the per-frame upkeep for the dash hit-sweep and the guard bubble. His ultimate, Leap Slam, is in ./ultimates.js. */
 import * as THREE from 'three';
 import { CHARACTERS } from '../../config/characters.js';
 import { ctx } from '../../core/context.js';
@@ -9,6 +9,7 @@ import { KNIGHT_SWING } from '../../entities/player/poses.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { shakeCamera } from '../../systems/CameraSystem.js';
 import { tangentTo } from '../../utils/sphere.js';
+import { AREA_MAX_ALT } from '../area.js';
 import { damageEnemy } from '../damage.js';
 
 const V3 = THREE.Vector3;
@@ -17,7 +18,7 @@ const _tv = new V3(), _a2 = new V3();
 /** Living enemies within range and inside an arc (degrees) centred on dir; 360 = all around. */
 function meleeTargets(dir, range, arcDeg) {
   const cosA = Math.cos(THREE.MathUtils.degToRad(arcDeg / 2)), out = [];
-  for (const e of ctx.enemies) { if (!e.alive || e.hidden) continue; const d = tangentTo(ctx.player.pos, ctx.player.up, e.pos, _a2);
+  for (const e of ctx.enemies) { if (!e.alive || e.hidden || e.hover > AREA_MAX_ALT) continue; const d = tangentTo(ctx.player.pos, ctx.player.up, e.pos, _a2);
     if (d > range + e.def.radius) continue; if (arcDeg < 360 && d > e.def.radius && _a2.dot(dir) < cosA) continue; out.push(e); }
   return out;
 }
@@ -41,7 +42,7 @@ export function updateKnight(dt) {
   const P = ctx.player; if (P.charId !== 'knight') return;
   for (const k of ['swingT', 'spinT', 'guardT', 'dashT']) P[k] = Math.max(0, P[k] - dt);
   if (P.dashT > 0) { const s = CHARACTERS.knight.abilities.dash;
-    for (const e of ctx.enemies) if (e.alive && !P.dashHits.has(e) && e.pos.distanceTo(P.pos) < s.width + e.def.radius) {
+    for (const e of ctx.enemies) if (e.alive && !P.dashHits.has(e) && e.hover <= AREA_MAX_ALT && e.pos.distanceTo(P.pos) < s.width + e.def.radius) {
       P.dashHits.add(e); damageEnemy(e, s.damage, { from: P.pos, knock: s.knockback, stagger: s.stun }); audio.clang(); shakeCamera(0.2); }
     sparkles.emit(_tv.copy(P.pos).addScaledVector(P.up, 0.5), { count: 1, color: s.color, speed: 0.4, life: 0.4, size: 0.3 }); }
   P.bubble.visible = P.guardT > 0;
