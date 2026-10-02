@@ -1,0 +1,14 @@
+{
+  "name": "lanternmoss",
+  "version": "1.0.0",
+  "description": "A tiny cozy planet of lanterns, moss and friendly critters: a Three.js browser game.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

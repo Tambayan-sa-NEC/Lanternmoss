@@ -1,0 +1,65 @@
+/* Combat HUD: HP / mana / XP bars, the ability bar, floating enemy health bars and the lock-on reticle. */
+import * as THREE from 'three';
+import { CHARACTERS } from '../config/characters.js';
+import { PLANET_RADIUS as R } from '../config/game.js';
+import { ctx } from '../core/context.js';
+import { ENGAGED } from '../entities/enemies/states.js';
+import { xpToNext } from '../progression/leveling.js';
+import { camera } from '../render/scene.js';
+import { clamp } from '../utils/math.js';
+import { dom, flashEl } from './dom.js';
+
+const bars = {};
+for (const k of ['hp', 'mp', 'xp']) { const el = dom[k + 'Bar']; bars[k] = { el, fill: el.querySelector('i'), text: el.querySelector('span') }; }
+let slots = {};
+
+export function buildSpellBar(abilities) {
+  dom.spells.innerHTML = ''; slots = {};
+  for (const [id, s] of Object.entries(abilities)) {
+    const el = document.createElement('div'); el.className = 'slot';
+    el.innerHTML = `<kbd>${s.label}</kbd><div class="ico" style="background:#${new THREE.Color(s.color).getHexString()}"></div>` +
+      `<div class="nm">${s.name}</div><div class="mc">${s.cost}</div><div class="cd"></div>`;
+    dom.spells.appendChild(el); slots[id] = { el, cd: el.querySelector('.cd') };
+  }
+}
+export function setSkillHint(html) { dom.hintSkills.innerHTML = html; }
+
+export function flashSlot(id, cls) { flashEl(slots[id].el, cls); }
+export function flashManaBar() { flashEl(bars.mp.el, 'flash'); }
+/** Red vignette pulse + HP bar shake when the hero takes a hit. */
+export function showPlayerHurt() {
+  dom.hurt.style.opacity = 1; setTimeout(() => { dom.hurt.style.opacity = 0; }, 90);
+  flashEl(bars.hp.el, 'flash');
+}
+
+const _oc = new THREE.Vector3(), _tv = new THREE.Vector3(), _tv2 = new THREE.Vector3();
+function occludedByPlanet(p) {
+  const c = camera.position; _oc.copy(p).sub(c); const t = clamp(-c.dot(_oc) / _oc.lengthSq(), 0, 1);
+  return _oc.multiplyScalar(t).add(c).length() < R - 0.6;
+}
+/** Positions a fixed element over world point p; false when p is off-screen or behind the planet. */
+function screenPos(p, el) {
+  _tv.copy(p).project(camera);
+  if (_tv.z > 1 || Math.abs(_tv.x) > 1.1 || Math.abs(_tv.y) > 1.1 || occludedByPlanet(p)) return false;
+  el.style.left = ((_tv.x * 0.5 + 0.5) * innerWidth) + 'px'; el.style.top = ((-_tv.y * 0.5 + 0.5) * innerHeight) + 'px'; return true;
+}
+
+export function updateCombatHud(spellState, aimTarget) {
+  const P = ctx.player, C = P.stats, abilities = CHARACTERS[P.charId].abilities;
+  bars.hp.fill.style.transform = `scaleX(${P.hp / C.maxHp})`; bars.hp.text.textContent = `HP ${Math.ceil(P.hp)} / ${C.maxHp}`;
+  bars.mp.fill.style.transform = `scaleX(${P.mana / C.maxMana})`; bars.mp.text.textContent = `${CHARACTERS[P.charId].resource} ${Math.floor(P.mana)} / ${C.maxMana}`;
+  const need = xpToNext(P.level);
+  bars.xp.fill.style.transform = `scaleX(${need ? P.xp / need : 1})`; bars.xp.text.textContent = need ? `LV ${P.level} · XP ${P.xp} / ${need}` : `LV ${P.level} · MAX`;
+  for (const [id, s] of Object.entries(abilities)) {
+    const sl = slots[id];
+    sl.cd.style.transform = `scaleY(${spellState.cd[id] / s.cooldown})`; sl.el.classList.toggle('nomana', P.mana < s.cost);
+  }
+  for (const e of ctx.enemies) {
+    let show = e.alive && (e.hp < e.def.hp || ENGAGED.has(e.state)) && e.pos.distanceTo(camera.position) < 32;
+    if (show) show = screenPos(_tv2.copy(e.pos).addScaledVector(e.up, e.hover + e.height + 0.45), e.bar);
+    e.bar.style.display = show ? 'block' : 'none';
+    if (show) { e.barFill.style.transform = `scaleX(${Math.max(0, e.hp / e.def.hp)})`; e.bar.classList.toggle('marked', e.markT > 0); }
+  }
+  const showRet = aimTarget && screenPos(_tv2.copy(aimTarget.center()), dom.reticle);
+  dom.reticle.style.display = showRet ? 'block' : 'none';
+}

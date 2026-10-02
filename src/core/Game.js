@@ -1,0 +1,125 @@
+/* Game: builds everything in a fixed order, runs the per-frame update order, and owns the run lifecycle
+   (character select -> play -> back to select restarts the adventure). */
+import { CHALLENGES } from '../config/challenges.js';
+import { CHARACTERS } from '../config/characters.js';
+import { COMBAT } from '../config/combat.js';
+import { resetCooldowns, tryCast } from '../combat/casting.js';
+import { updateCombat } from '../combat/CombatSystem.js';
+import { updateKnight } from '../combat/abilities/knight.js';
+import { addEnemy, resetEnemies, spawnInitialEnemies } from '../combat/spawning.js';
+import { clearTargets } from '../combat/targeting.js';
+import { NPC } from '../entities/npc/NPC.js';
+import { createNpcDefs } from '../entities/npc/npcDefs.js';
+import { Player } from '../entities/player/Player.js';
+import { spawnWildlife, updatePonds } from '../entities/wildlife/wildlife.js';
+import { updateEmotes } from '../fx/emotes.js';
+import { createSparkles, sparkles } from '../fx/sparkles.js';
+import { applyCharacter } from '../gameplay/characters.js';
+import { buffs, resetBuffs, updateBuffs } from '../gameplay/buffs.js';
+import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { installLevelFeedback } from '../progression/levelFeedback.js';
+import { gainXp, levelEvents } from '../progression/experience.js';
+import { LEVELING } from '../config/leveling.js';
+import { camera } from '../render/scene.js';
+import { audio } from '../systems/AudioSystem.js';
+import { cam, initCamera, resetView, snapCamera, updateCamera } from '../systems/CameraSystem.js';
+import { keys, releaseAllKeys } from '../systems/InputSystem.js';
+import { RenderSystem } from '../systems/RenderSystem.js';
+import { CharacterSelect } from '../ui/CharacterSelect.js';
+import { Dialog } from '../ui/Dialog.js';
+import { buildSpellBar, setSkillHint } from '../ui/hud.js';
+import { updateOverlay } from '../ui/overlay.js';
+import { toast, updateToast } from '../ui/toast.js';
+import { offsetDir } from '../utils/sphere.js';
+import { colliders } from '../physics/colliders.js';
+import { ponds } from '../world/terrain.js';
+import { World } from '../world/World.js';
+import { ctx } from './context.js';
+import { initControls } from './controls.js';
+import { GameLoop } from './GameLoop.js';
+
+export class Game {
+  /** ORDER MATTERS: world generation and the initial enemy spawn share one seeded random stream, and moving bodies
+      resolve collisions in creation order (player, critters, villagers, enemies). */
+  init() {
+    this.renderSystem = new RenderSystem();
+    this.world = new World();
+    this.world.generate();
+    createSparkles();
+
+    ctx.player = new Player(this.world.spawnDir);
+    initCamera(ctx.player);
+    spawnWildlife(this.world);
+    ctx.npcs = createNpcDefs(this.world).map(d => new NPC(d));
+    resetCooldowns(COMBAT.spells);
+    buildSpellBar(COMBAT.spells); setSkillHint(CHARACTERS.witch.hint);
+    spawnInitialEnemies(this.world);
+
+    Dialog.init();
+    Dialog.lineProvider = npc => Challenges.lineFor(npc);
+    installLevelFeedback();
+    CharacterSelect.init({ onPick: applyCharacter, onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
+    initControls(this.renderSystem.canvas);
+    addEventListener('resize', () => this.renderSystem.resize()); this.renderSystem.resize();
+
+    this.loop = new GameLoop(dt => this.update(dt), () => this.renderSystem.render(ctx.time));
+  }
+
+  start() { this.loop.start(); }
+
+  /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
+  update(dt) {
+    ctx.time += dt;
+    ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started });
+    for (const c of ctx.critters) c.update(dt);
+    for (const b of ctx.birds) b.update(dt);
+    updatePonds(dt);
+    for (const n of ctx.npcs) n.update(dt);
+    updateCombat(dt, this.world, keys);
+    Challenges.update(dt);
+    updateKnight(dt);
+    CharacterSelect.update(dt);
+    updateCamera(dt);
+    this.world.update(dt, ctx.time, ctx.player, cam.up, camera);
+    sparkles.update(dt); updateEmotes(dt);
+    Dialog.update(dt);
+    updateOverlay(dt); updateBuffs(dt); updateToast(dt);
+  }
+
+  beginGame() {
+    if (ctx.started || !CharacterSelect.choice) return;             // a hero must be picked first
+    ctx.started = true; audio.init();
+    CharacterSelect.close();
+    resetView(ctx.player.fwd);                                     // same framing as before the menu orbit
+    toast(CHARACTERS[ctx.player.charId].welcome); this.renderSystem.canvas.focus();
+  }
+
+  /** Back to a fresh adventure: clears everything the previous character left behind. */
+  resetRun() {
+    const P = ctx.player, world = this.world;
+    Dialog.close();
+    Challenges.reset();
+    for (const n of ctx.npcs) n.resetLines();
+    resetBuffs();
+    for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
+    resetEnemies();
+    clearTargets();
+    if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
+    Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, stats: CHARACTERS[P.charId].stats });   // a fresh adventure starts back at level 1
+    P.clearTimers();
+    const fwd = P.placeAt(world.spawnDir);
+    P.root.visible = true; snapCamera(world.spawnDir, fwd);
+    world.resetSun();
+    releaseAllKeys();
+  }
+
+  /** Console handle for poking at a running game (window.LANTERNMOSS). */
+  debugHandle() {
+    const game = this;
+    return { Challenges, CHALLENGES, Dialog, buffs, cam, keys, CharacterSelect, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+      get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
+      get enemies() { return ctx.enemies; }, get companion() { return ctx.companion; },
+      begin: () => game.beginGame(), update: dt => game.update(dt),
+      spawnEnemy: (type, arc = 7) => addEnemy(type, offsetDir(ctx.player.up, Math.random() * 6.28, arc)) };
+  }
+}

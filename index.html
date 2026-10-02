@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lanternmoss — a tiny cozy planet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/main.css">
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script src="src/errorOverlay.js"></script>
+<script type="module" src="src/main.js"></script>
+</head>
+<body class="menu">
+<div id="hint">
+  <b>✦ Lanternmoss</b><br>
+  <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> move &nbsp; <kbd>Shift</kbd> sprint<br>
+  <kbd>Space</kbd> jump &nbsp; <kbd>E</kbd> talk / accept &nbsp; <kbd>X</kbd> decline &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>C</kbd> change hero<br>
+  <kbd>Drag</kbd> rotate camera &nbsp; <kbd>Wheel</kbd> zoom<br>
+  <span id="hint-skills"></span>
+</div>
+<div id="ebars"></div>
+<div id="reticle"></div>
+<div id="hurt"></div>
+<div id="combat">
+  <div class="bar hp"><i></i><span></span></div>
+  <div class="bar mp"><i></i><span></span></div>
+  <div class="bar xp"><i></i><span></span></div>
+  <div id="spells"></div>
+</div>
+<div id="hud"></div>
+<div id="prompt"></div>
+<div id="dialog"><div id="dlg-name"></div><div id="dlg-text"></div>
+  <div id="dlg-choices"><button class="yes"></button><button class="no"></button></div><div id="dlg-next">▼ E</div></div>
+<div id="challenge"></div>
+<div id="cresult"></div>
+<div id="toast"></div>
+<div id="start">
+  <h1>Lanternmoss</h1>
+  <p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p>
+  <div id="cards"></div>
+  <div class="go disabled" id="go">Choose your hero</div>
+  <div class="keys">← → or click to choose · Enter to start</div>
+</div>
+<div id="err"></div>
+</body>
+</html>
