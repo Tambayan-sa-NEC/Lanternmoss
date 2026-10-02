@@ -10,6 +10,13 @@ import { buildSpellBar, setSkillHint } from '../ui/hud.js';
 
 const COMPANIONS = { owl: Owl, wolf: Wolf };
 
+/** A fresh companion beside the hero (after the hero has been moved somewhere new). */
+export function resetCompanion() {
+  const Companion = COMPANIONS[CHARACTERS[ctx.player.charId].companion];
+  if (ctx.companion) ctx.companion.dispose();
+  ctx.companion = new Companion();
+}
+
 export function applyCharacter(id) {
   const C = CHARACTERS[id], P = ctx.player;
   if (P.charId !== id) P.swapModel(HERO_BUILDERS[C.model]());

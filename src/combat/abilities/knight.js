@@ -17,7 +17,7 @@ const _tv = new V3(), _a2 = new V3();
 /** Living enemies within range and inside an arc (degrees) centred on dir; 360 = all around. */
 function meleeTargets(dir, range, arcDeg) {
   const cosA = Math.cos(THREE.MathUtils.degToRad(arcDeg / 2)), out = [];
-  for (const e of ctx.enemies) { if (!e.alive) continue; const d = tangentTo(ctx.player.pos, ctx.player.up, e.pos, _a2);
+  for (const e of ctx.enemies) { if (!e.alive || e.hidden) continue; const d = tangentTo(ctx.player.pos, ctx.player.up, e.pos, _a2);
     if (d > range + e.def.radius) continue; if (arcDeg < 360 && d > e.def.radius && _a2.dot(dir) < cosA) continue; out.push(e); }
   return out;
 }

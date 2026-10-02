@@ -6,8 +6,9 @@ import { emote } from '../../fx/emotes.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buildQuad } from '../../models/creatures.js';
-import { addDyn } from '../../physics/colliders.js';
+import { addDyn, removeDyn } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
+import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { clamp, damp } from '../../utils/math.js';
@@ -28,6 +29,7 @@ export class Critter extends Walker {
     this.selfCollider = addDyn(this.up, this.radius * 0.8);
     this.toP = new V3();      // tangent direction toward the player, refreshed every update (also read by animate)
   }
+  dispose() { scene.remove(this.root, this.shadow); disposeTree(this.root); removeDyn(this.selfCollider); }
   react() {
     this.cool = 9 + Math.random() * 4;
     if (this.kind === 'cat') {

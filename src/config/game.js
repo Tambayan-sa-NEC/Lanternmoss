@@ -1,7 +1,6 @@
 /* Core world, movement and camera tuning. */
 
-export const PLANET_RADIUS = 40;
-export const WORLD_SEED = 20260930;            // same seed => same planet layout every run
+export const PLANET_RADIUS = 40;               // every planet's size (each planet's seed and colours: config/planets.js)
 
 export const PLAYER = {
   walkSpeed: 5.0, sprintSpeed: 8.4,

@@ -3,11 +3,14 @@
 export const ctx = {
   time: 0,            // seconds of simulated time
   started: false,     // false while the character-select screen is open
+  planet: 0,          // index into PLANETS (config/planets.js)
+  transitioning: false,  // true while fading between planets (input is locked)
   player: null,       // Player
   companion: null,    // Owl (witch) or Wolf (knight), created when a hero is picked
   npcs: [],
   critters: [],
   birds: [],
   enemies: [],
+  boss: null,         // this planet's boss (also listed in enemies)
   projectiles: [],
 };

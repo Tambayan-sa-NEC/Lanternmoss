@@ -44,6 +44,16 @@ function screenPos(p, el) {
   el.style.left = ((_tv.x * 0.5 + 0.5) * innerWidth) + 'px'; el.style.top = ((-_tv.y * 0.5 + 0.5) * innerHeight) + 'px'; return true;
 }
 
+/** The planet boss's big health bar: shown while it fights or the hero is near its lair. */
+function updateBossBar() {
+  const b = ctx.boss, show = !!b && b.alive && (ENGAGED.has(b.state) || b.pos.distanceTo(ctx.player.pos) < 24);
+  dom.bossBar.style.display = show ? 'block' : 'none';
+  if (!show) return;
+  dom.bossName.textContent = b.def.name;
+  dom.bossFill.style.transform = `scaleX(${Math.max(0, b.hp / b.def.hp)})`;
+  dom.bossBar.classList.toggle('enraged', b.bossPhase >= b.def.phases.length - 1);
+}
+
 export function updateCombatHud(spellState, aimTarget) {
   const P = ctx.player, C = P.stats, abilities = CHARACTERS[P.charId].abilities;
   bars.hp.fill.style.transform = `scaleX(${P.hp / C.maxHp})`; bars.hp.text.textContent = `HP ${Math.ceil(P.hp)} / ${C.maxHp}`;
@@ -55,11 +65,12 @@ export function updateCombatHud(spellState, aimTarget) {
     sl.cd.style.transform = `scaleY(${spellState.cd[id] / s.cooldown})`; sl.el.classList.toggle('nomana', P.mana < s.cost);
   }
   for (const e of ctx.enemies) {
-    let show = e.alive && (e.hp < e.def.hp || ENGAGED.has(e.state)) && e.pos.distanceTo(camera.position) < 32;
+    let show = e.alive && !e.hidden && e !== ctx.boss && (e.hp < e.def.hp || ENGAGED.has(e.state)) && e.pos.distanceTo(camera.position) < 32;
     if (show) show = screenPos(_tv2.copy(e.pos).addScaledVector(e.up, e.hover + e.height + 0.45), e.bar);
     e.bar.style.display = show ? 'block' : 'none';
-    if (show) { e.barFill.style.transform = `scaleX(${Math.max(0, e.hp / e.def.hp)})`; e.bar.classList.toggle('marked', e.markT > 0); }
+    if (show) { e.barFill.style.transform = `scaleX(${Math.max(0, e.hp / e.def.hp)})`; e.bar.classList.toggle('marked', e.markT > 0); e.bar.classList.toggle('shielded', e.shieldT > 0); }
   }
+  updateBossBar();
   const showRet = aimTarget && screenPos(_tv2.copy(aimTarget.center()), dom.reticle);
   dom.reticle.style.display = showRet ? 'block' : 'none';
 }

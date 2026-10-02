@@ -18,6 +18,8 @@ export function addCollider(dir, r, cam = null) {
   }
   colliders.push(c); return c;
 }
+/** Forgets all scenery colliders (the planet is being replaced). Moving bodies keep theirs. */
+export function clearStaticColliders() { colliders.length = 0; camColliders.length = 0; }
 /** A moving collider that tracks dirRef (the body's own `up` vector, shared by reference). */
 export function addDyn(dirRef, r) { const c = { dir: dirRef, r, cull: Math.cos((r + 2.0) / R), active: true }; dynColliders.push(c); return c; }
 export function removeDyn(c) { const i = dynColliders.indexOf(c); if (i >= 0) dynColliders.splice(i, 1); }

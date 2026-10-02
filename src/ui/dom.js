@@ -10,8 +10,9 @@ export const dom = {
   // dialogue
   dialog: $('dialog'), dlgName: $('dlg-name'), dlgText: $('dlg-text'), dlgNext: $('dlg-next'),
   choices: $('dlg-choices'), yes: document.querySelector('#dlg-choices .yes'), no: document.querySelector('#dlg-choices .no'),
-  // challenges
+  // challenges, banner, boss, planet travel
   challenge: $('challenge'), challengeResult: $('cresult'),
+  bossBar: $('bossbar'), bossName: document.querySelector('#bossbar .bn'), bossFill: document.querySelector('#bossbar .bb i'), fade: $('fade'),
   // character select
   start: $('start'), cards: $('cards'), go: $('go'),
 };

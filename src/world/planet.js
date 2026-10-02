@@ -6,13 +6,14 @@ import { rand } from '../utils/random.js';
 import { arcDist } from '../utils/sphere.js';
 import { groundHeight, ponds } from './terrain.js';
 
-export function buildPlanet() {
+/** palette: ground (4 meadow greens), meadow, sand, bed (pond floor) colours. */
+export function buildPlanet(palette) {
   const geo = new THREE.IcosahedronGeometry(1, 22);      // non-indexed, faceted
   const pos = geo.attributes.position, v = new THREE.Vector3();
   for (let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).normalize(); const h = groundHeight(v); pos.setXYZ(i, v.x * h, v.y * h, v.z * h); }
   geo.deleteAttribute('normal'); geo.deleteAttribute('uv'); geo.computeVertexNormals();
-  const greens = [0x8fd07a, 0x9edb86, 0xb3e393, 0x84c874].map(h => new THREE.Color(h));
-  const meadow = new THREE.Color(0xd4eb9c), sand = new THREE.Color(0xf3dcaa), bed = new THREE.Color(0x5fae9e);
+  const greens = palette.ground.map(h => new THREE.Color(h));
+  const meadow = new THREE.Color(palette.meadow), sand = new THREE.Color(palette.sand), bed = new THREE.Color(palette.bed);
   const cols = new Float32Array(pos.count * 3), cen = new THREE.Vector3(), c = new THREE.Color();
   for (let i = 0; i < pos.count; i += 3) {
     cen.set(0, 0, 0); for (let k = 0; k < 3; k++) cen.add(v.fromBufferAttribute(pos, i + k)); cen.normalize();

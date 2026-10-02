@@ -1,6 +1,7 @@
-/* World overlay: the floating "E Talk to ..." prompt and the status chips (treats, challenges, active buffs). */
+/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, treats, challenges, active buffs). */
 import * as THREE from 'three';
 import { CHALLENGES } from '../config/challenges.js';
+import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { nearestNPC } from '../entities/npc/NPC.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
@@ -25,7 +26,7 @@ function updatePrompt() {
 /** Chips are rebuilt 4x a second (innerHTML churn every frame isn't needed for countdowns in whole seconds). */
 function updateChips(dt) {
   if ((chipsT -= dt) >= 0) return;
-  chipsT = 0.25; let h = '';
+  chipsT = 0.25; let h = `<div class="chip" style="background:#e8eeff">Planet ${ctx.planet + 1}/${PLANETS.length} · ${PLANETS[ctx.planet].name}</div>`;
   if (buffs.buns) h += `<div class="chip">Treats: ${buffs.buns}</div>`;
   const cleared = Challenges.clearedCount();
   if (cleared) h += `<div class="chip" style="background:#fff0c8">Challenges: ${cleared} / ${Object.keys(CHALLENGES).length}</div>`;

@@ -4,6 +4,9 @@ A tiny cozy planet of lanterns, moss and friendly critters: a third-person brows
 [Three.js](https://threejs.org/) (r160) and plain ES modules. Pick the Girl Witch or the Boy Knight, explore a
 spherical planet, chat with villagers, take on their mini-challenges and fight the monsters beyond the village lanterns.
 
+**Campaign:** every planet has a boss in a lair on its far side, marked by a shaft of light. Defeat it and the hero
+travels on to the next, harder planet (Lanternmoss, then Emberfall, then Frostveil), keeping their level, XP and treats.
+
 ## Running
 
 ES modules can't be loaded from `file://`, so the game needs a local web server:
@@ -46,7 +49,8 @@ src/
 ├── config/                every tunable number and authored data table (no logic, no Three.js)
 │   ├── game.js            planet radius, world seed, movement, buff multipliers, camera
 │   ├── render.js          pixel ratio, fog, bloom, outline width
-│   ├── combat.js          spells, enemy stats, XP per enemy, owl, spawn counts
+│   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, owl
+│   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss
 │   ├── characters.js      the two playable heroes (stats, abilities, texts)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
@@ -83,7 +87,8 @@ src/
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js  monsters.js
 ├── entities/              things that live and move in the world
 │   ├── player/            Player (movement, model swap, placement) and pose animation
-│   ├── enemies/           Enemy AI (melee / ranged / hopper) and shared AI states
+│   ├── enemies/           Enemy (melee / ranged / hopper AI), shared AI states, and behaviors/ for the newer AIs:
+│   │                      bomber, charger, burrower, support and the boss
 │   ├── companions/        Owl (witch) and Wolf (knight)
 │   ├── npc/               NPC behaviour and the villager definitions (dialogue, homes)
 │   ├── wildlife/          critters, birds, pond fish and their spawning
@@ -93,18 +98,22 @@ src/
 │   ├── casting.js         cooldowns, input buffering, hold-to-repeat, ability dispatch
 │   ├── abilities/         witch spells and knight moves
 │   ├── damage.js          damage both ways, fainting, respawning, regeneration
+│   ├── enemyDefs.js       per-planet enemy stats (base stats x the planet's difficulty scale)
+│   ├── events.js          encounter events ('bossdefeated')
 │   ├── targeting.js       soft lock-on and "last enemy hit"
-│   └── spawning.js        initial and runtime enemy spawning, run reset
+│   └── spawning.js        planet rosters, boss lairs, runtime spawning, reset / clear
 ├── progression/
 │   ├── leveling.js        pure XP / level / stat math (unit-tested)
 │   ├── experience.js      applies XP to the hero and emits 'xp' / 'levelup' events
 │   └── levelFeedback.js   float text, burst, jingle and toast on those events
 ├── gameplay/
+│   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
 │   ├── characters.js      switching heroes (model, stats, abilities, companion)
 │   ├── buffs.js           Moon-Hop / Feather-Step timers and treats
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings and damage numbers
-├── ui/                    DOM side: element lookups, HUD, dialogue, challenge panel, overlay, toast, character select
+├── ui/                    DOM side: element lookups, HUD (incl. boss bar), dialogue, challenge panel, banner + travel fade,
+│                          overlay (planet chip), toast, character select
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
 ```
 
@@ -122,7 +131,7 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
    created in that order.
 
 **Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → combat (vitals, casting, aim,
-projectiles, enemies, companion, effects, combat HUD) → challenges → knight upkeep → menu orbit → camera → world →
+projectiles, enemies, companion, effects, combat HUD) → planet progression → challenges → knight upkeep → menu orbit → camera → world →
 particles and emotes → dialogue → overlay, buffs, toast. Rendering follows each update.
 
 **Dependencies flow one way:** `config` and `utils` depend on nothing. `render` and `physics` build on them, and
@@ -134,20 +143,54 @@ dialogue through `Dialog.lineProvider` instead of the dialogue importing them. L
 **Shared state** lives in `core/context.js` (`ctx.player`, `ctx.enemies`, `ctx.time`...), filled in by `Game`. That
 is the one place to look for "what is alive right now", instead of dozens of loose globals.
 
-**Console:** `window.LANTERNMOSS` exposes the player, enemies, NPCs, camera, dialogue, challenges and helpers such as
-`spawnEnemy('ogre')` and `gainXp(100)`.
+**Planets:** `World.generate(planet)` builds a planet from its PLANETS entry (seed + palette) and `World.dispose()`
+tears it down. `PlanetProgression` listens for `'bossdefeated'` and runs the trip: the other monsters vanish (no XP),
+any challenge is called off, and after the victory banner the screen fades. Then the next planet is generated, the
+villagers move into its village, wildlife and the scaled roster spawn, and the hero arrives healed with level, XP and
+treats intact. The transition can't fire twice (it only accepts the event while playing), and returning to character
+select always restarts on planet 1.
+
+**Enemy behaviours:** `def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
+`entities/enemies/behaviors/` (`think`, plus optional `init / reset / update / animate / onDie / dispose` hooks).
+A new enemy type = stats in `COMBAT.enemies`, a model in `models/monsters.js`, and (for new behaviour) a module there.
+
+**Console:** `window.LANTERNMOSS` exposes the player, enemies, projectiles, NPCs, camera, dialogue, challenges and
+helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet` and `goToPlanet(1)`.
 
 ## Tuning
 
 | What | Where |
 |---|---|
 | Movement, jump, camera | `src/config/game.js` |
-| Spells, enemy stats, XP per enemy, spawn counts | `src/config/combat.js` |
+| Spells, enemy stats, XP per enemy | `src/config/combat.js` |
+| Boss health, attacks (damage, warning times, cooldowns), phases | `src/config/combat.js` → `enemies.gloomcap` |
+| Planets: order, rosters / spawn counts, difficulty scale, boss, colours | `src/config/planets.js` |
+| Victory / fade timings, heal on arrival | `src/config/planets.js` → `TRANSITION` |
 | Hero stats and abilities | `src/config/characters.js` |
 | XP curve, level cap, stat / damage growth | `src/config/leveling.js` |
 | Challenges and their dialogue | `src/config/challenges.js` |
 | Villager dialogue | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
+
+## Monsters and bosses
+
+| Monster | AI | Planets | How it fights |
+|---|---|---|---|
+| Goblin | melee | 1, 2, 3 | fast hit-and-run, flees when hurt |
+| Ogre | melee | 1, 3 | slow, telegraphed ground slam you can jump over |
+| Wisp | ranged | 1, 2, 3 | keeps its distance, fires slow homing orbs |
+| Slime | hopper | 1, 2 | bounces at you, splits into slimelings |
+| Puffcap | bomber | 2, 3 | rushes in, swells on a fuse, bursts. Stagger it to defuse, kill it to prevent the blast |
+| Ramhorn | charger | 2, 3 | marks a lane, then charges in a line. Sidestep it; if it hits scenery it's dazed and takes +50% damage |
+| Thornmole | burrower | 3 | tunnels (untargetable) and erupts under you after a tremor, then stays exposed briefly |
+| Hexlantern | support | 3 | follows fighting monsters, heals them and shields them (−50% damage). Kill it first |
+| **Gloomcap** (boss) | boss | each planet (renamed and recoloured, scaled) | slam, lane charge, homing volley, shockwave ring (jump it), summons; three phases, immune to stagger and knockback |
+
+**Adding a planet:** append an entry to `PLANETS` in `src/config/planets.js` (new seed, palette, a higher `scale`,
+roster, boss). Nothing else needs to change. `npm test` checks that every planet is complete and harder than the one before.
+
+**Quick test from the console** (after starting a game): `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
+whole victory → travel sequence, or `LANTERNMOSS.goToPlanet(2)` to jump straight to Frostveil.
 
 ## Refactor notes
 

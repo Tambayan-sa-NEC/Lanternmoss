@@ -11,11 +11,12 @@ import { groundHeight } from './terrain.js';
 const V3 = THREE.Vector3;
 export const CLOUD_AXIS = new V3(0.3, 1, 0.2).normalize();
 
-export function createSky() {
+/** colors: horizon / mid / zenith gradient stops. */
+export function createSky({ horizon, mid, zenith }) {
   const sky = new THREE.Mesh(new THREE.SphereGeometry(800, 32, 16), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false,
     uniforms: { uUp: { value: new V3(0, 1, 0) }, uSun: { value: new V3(1, 0.2, 0) }, uTime: { value: 0 },
-      cHorizon: { value: new THREE.Color(0xffd9ae) }, cMid: { value: new THREE.Color(0xf6b1c8) }, cZenith: { value: new THREE.Color(0x8d9be6) },
+      cHorizon: { value: new THREE.Color(horizon) }, cMid: { value: new THREE.Color(mid) }, cZenith: { value: new THREE.Color(zenith) },
       cSun: { value: new THREE.Color(0xffc987) }, cCloud: { value: new THREE.Color(0xfff1ec) } },
     vertexShader: `varying vec3 vDir; void main(){ vDir = (modelMatrix * vec4(position,1.0)).xyz - cameraPosition; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0); }`,
     fragmentShader: `uniform vec3 uUp, uSun, cHorizon, cMid, cZenith, cSun, cCloud; uniform float uTime; varying vec3 vDir;

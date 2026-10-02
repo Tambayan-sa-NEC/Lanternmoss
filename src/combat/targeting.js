@@ -15,7 +15,7 @@ function findAimTarget() {
   _aim.copy(cam.fwd); projectTangent(_aim, player.up).normalize();
   const cosMax = Math.cos(THREE.MathUtils.degToRad(COMBAT.autoAimAngle)); let best = null, bestScore = Infinity;
   for (const e of ctx.enemies) {
-    if (!e.alive) continue; const d = tangentTo(player.pos, player.up, e.pos, _a2);
+    if (!e.alive || e.hidden) continue; const d = tangentTo(player.pos, player.up, e.pos, _a2);
     if (d > COMBAT.autoAimRange || d < 0.01) continue; const c = _aim.dot(_a2); if (c < cosMax) continue;
     const score = (1 - c) * 20 + d * 0.15; if (score < bestScore) { bestScore = score; best = e; }
   }

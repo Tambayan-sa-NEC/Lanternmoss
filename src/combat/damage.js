@@ -26,9 +26,11 @@ function knockDir(from, ent, out) {
 /** o: from (knockback origin), knock, slow + slowTime, mark (seconds), stagger (seconds),
     source ('owl' for the companion; omitted for the hero's own abilities). */
 export function damageEnemy(e, amount, o = {}) {
-  if (!e.alive) return;
+  if (!e.alive || e.hidden) return;                                   // burrowed monsters can't be hit
   if (!o.source) amount *= damageMultiplier(ctx.player.level);       // no source = one of the hero's own abilities
   if (o.source !== 'owl' && e.markT > 0) amount *= 1 + COMBAT.owl.markBonus;
+  if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
+  if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
   const marked = e.markT > 0 && o.source !== 'owl';
   floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`, o.source === 'owl' ? '#c7a8ff' : marked ? '#ffb03d' : '#ffffff');

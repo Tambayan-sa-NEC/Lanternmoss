@@ -35,6 +35,13 @@ export class NPC extends Walker {
     }
     this.last = this.bag.pop(); return this.def.lines[this.last];
   }
+  /** Moves home to dir (a new planet's village): settles clear of obstacles, facing the village centre. */
+  relocate(dir) {
+    this.up.copy(dir).normalize(); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r); this.vy = 0; this.grounded = true;
+    _p.copy(this.pos); resolveCollisions(_p, this.radius, this.selfCollider); this.up.copy(_p).normalize(); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r);
+    this.home.copy(this.up); this.state = 'idle'; this.timer = mr(2, 5); this.speed = 0; this.goal = null; this.talking = false; this.loop = this.spin = 0;
+    this.fwd.copy(tangentToward(this.up, SPAWN_DIR));
+  }
   /** Back to the start-of-adventure chatter. */
   resetLines() { this.def.lines.length = this.baseLineCount; this.bag = []; this.last = -1; }
   update(dt) {

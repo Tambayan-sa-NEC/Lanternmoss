@@ -1,5 +1,6 @@
 /* ENEMIES: reuse Walker physics/collisions; behaviour is chosen by def.ai
-   ('melee' goblins & ogres, 'ranged' wisps, 'hopper' slimes). Balance numbers live in COMBAT.enemies.
+   ('melee' goblins & ogres, 'ranged' wisps, 'hopper' slimes here; newer AIs such as 'bomber', 'charger', 'burrower',
+   'support' and 'boss' are behaviour modules in ./behaviors). Balance numbers live in COMBAT.enemies, scaled per planet.
    States: idle / wander / return (out of combat) and chase / windup / recover / charge / flee (ENGAGED). */
 import * as THREE from 'three';
 import { COMBAT } from '../../config/combat.js';
@@ -25,6 +26,8 @@ import { hurtPlayer } from '../../combat/damage.js';
 import { forgetTarget } from '../../combat/targeting.js';
 import { Projectile } from '../Projectile.js';
 import { ENGAGED } from './states.js';
+import { BEHAVIORS } from './behaviors/index.js';
+import { enemyDef } from '../../combat/enemyDefs.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3(), _a2 = new V3();
@@ -33,13 +36,16 @@ const _tv = new V3(), _tv2 = new V3(), _a2 = new V3();
 function playerSafe() { return ctx.player.dead || arcDist(ctx.player.up, SPAWN_DIR) < COMBAT.player.safeRadius; }
 
 export class Enemy extends Walker {
-  constructor(type, dir) {
-    const def = COMBAT.enemies[type]; super(dir, def.radius);
+  /** def defaults to this planet's scaled stats for the type (a boss passes its own, with per-planet overrides). */
+  constructor(type, dir, def = enemyDef(type)) {
+    super(dir, def.radius);
     this.type = type; this.def = def; this.hover = def.hover || 0; this.height = def.height; this.hitR = def.radius + 0.3;
-    Object.assign(this, ENEMY_BUILDERS[type]()); this.baseScale = this.root.scale.x; scene.add(this.root);
+    Object.assign(this, ENEMY_BUILDERS[type](def)); this.baseScale = this.root.scale.x; scene.add(this.root);
     this.shadow = makeShadow(def.radius * 1.5); this.selfCollider = addDyn(this.up, def.radius);
     this.home = dir.clone(); this.knock = new V3(); this.move = new V3(); this.toP = new V3(); this._c = new V3(); this.seed = Math.random() * 10;
-    if (def.slamRadius) { this.tele = new THREE.Mesh(discGeo, fxMaterial(0xff4d6d, 1.2)); this.tele.renderOrder = 3; this.tele.visible = false; scene.add(this.tele); }
+    if (def.slamRadius || def.telegraph) { this.tele = new THREE.Mesh(discGeo, fxMaterial(0xff4d6d, 1.2)); this.tele.renderOrder = 3; this.tele.visible = false; scene.add(this.tele); }
+    this.fxMeshes = [];                               // extra warning meshes a behaviour owns: hidden by hideTele, removed by dispose
+    this.behavior = BEHAVIORS[def.ai] || null; this.behavior?.init?.(this);
     this.bar = document.createElement('div'); this.bar.className = 'eb'; this.bar.innerHTML = '<i></i>'; dom.enemyBars.appendChild(this.bar); this.barFill = this.bar.firstChild;
     this.spawn(dir);
   }
@@ -47,13 +53,16 @@ export class Enemy extends Walker {
     this.up.copy(dir); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r); this.vy = 0; this.grounded = true;
     this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, Math.random() * 6.28);
     Object.assign(this, { hp: this.def.hp, alive: true, state: 'idle', timer: mr(0.5, 2.5), cool: 0, speed: 0, phase: 0, deadT: 0, turn: 0,
-      slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false });
+      slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false,
+      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0 });   // hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
     this.knock.set(0, 0, 0); this.selfCollider.active = true; this.root.visible = this.shadow.visible = true; this.root.scale.setScalar(this.baseScale);
+    this.behavior?.reset?.(this);
   }
   center() { return this._c.copy(this.pos).addScaledVector(this.up, this.hover + this.height * 0.5); }
   aggro() { if (!this.alive || ENGAGED.has(this.state) || playerSafe()) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
-  hideTele() { if (this.tele) this.tele.visible = false; }
+  hideTele() { if (this.tele) this.tele.visible = false; for (const m of this.fxMeshes) m.visible = false; }
   interrupt(t) {
+    if (this.def.staggerImmune) return;
     this.stunT = Math.max(this.stunT, t);
     if (this.state === 'windup' || this.state === 'charge') { this.state = 'recover'; this.timer = this.cool = this.def.cooldown * 0.5; this.hideTele(); emote(this, '?', '#8a6ae0'); }
   }
@@ -61,12 +70,27 @@ export class Enemy extends Walker {
     this.alive = false; this.state = 'dead'; this.deadT = 0; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
     sparkles.emit(this.center(), { count: 36, color: this.def.color, speed: 3, up: this.up, upBias: 0.6, life: 0.9, size: 0.4 });
     audio.enemyDie(); forgetTarget(this);
+    this.behavior?.onDie?.(this);
     for (let i = 0; i < (this.def.splitCount || 0); i++) {
       const e = new Enemy(this.def.splitInto, dirAlong(this.up, _tv.copy(this.fwd).applyAxisAngle(this.up, i * Math.PI * 2 / this.def.splitCount + 0.8), 0.9));
       e.home.copy(this.home); e.state = 'chase'; e.vy = 4; e.grounded = false; ctx.enemies.push(e); }
   }
+  /** Leaves without a fight (no XP, no splitting): used when a planet is cleared. */
+  vanish() {
+    if (!this.alive) return;
+    this.alive = false; this.state = 'dead'; this.deadT = 0; this.temporary = true; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
+    sparkles.emit(this.center(), { count: 24, color: 0xfff0a0, speed: 2.2, up: this.up, upBias: 1, life: 0.9, size: 0.34 });
+    forgetTarget(this);
+  }
+  /** Calls in a temporary helper that fights alongside this enemy (boss summons). */
+  spawnMinion(type, dir) {
+    const m = new Enemy(type, dir); m.temporary = true; m.owner = this; m.home.copy(this.home);
+    ctx.enemies.push(m); m.aggro(); return m;
+  }
   dispose() {
     scene.remove(this.root, this.shadow); if (this.tele) scene.remove(this.tele); this.bar.remove(); disposeTree(this.root);
+    for (const m of this.fxMeshes) { scene.remove(m); m.material.dispose(); }
+    this.behavior?.dispose?.(this);
     removeDyn(this.selfCollider);
   }
   update(dt) {
@@ -79,6 +103,7 @@ export class Enemy extends Walker {
       return;
     }
     this.slowT = Math.max(0, this.slowT - dt); this.markT = Math.max(0, this.markT - dt); this.stunT = Math.max(0, this.stunT - dt);
+    this.shieldT = Math.max(0, this.shieldT - dt); this.stunnedT = Math.max(0, this.stunnedT - dt);
     this.cool -= dt; this.timer -= dt; this.hitPop = Math.max(0, this.hitPop - dt * 6);
     const dist = tangentTo(this.pos, this.up, ctx.player.pos, this.toP), safe = playerSafe();
     if (!ENGAGED.has(this.state) && this.state !== 'return' && dist < d.aggro) this.aggro();
@@ -97,9 +122,11 @@ export class Enemy extends Walker {
     projectTangent(this.knock, this.up).multiplyScalar(Math.exp(-7 * dt));
     if (this.hopDir) projectTangent(this.hopDir, this.up).normalize();
     if (n && this.state === 'wander') { this.fwd.addScaledVector(n, 0.9); projectTangent(this.fwd, this.up).normalize(); this.turn = -this.turn; }
+    this.behavior?.update?.(this, dt, n);
     if (d.contact && ENGAGED.has(this.state) && !safe && this.cool <= 0 && dist < this.radius + ctx.player.radius + 0.3 && ctx.player.r - groundHeight(ctx.player.up) < 1) {
       hurtPlayer(d.damage, this.pos, d.knockback); this.cool = d.contactCooldown; }
     if (this.slowT > 0 && Math.random() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
+    if (this.shieldT > 0 && Math.random() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
     if (this.markT > 0 && Math.random() < dt * 6) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.6), { count: 1, color: 0xc7a8ff, speed: 0.4, up: this.up, upBias: 1.5, life: 0.6, size: 0.3 });
     this.animate(dt);
     this.place(this.root);
@@ -122,6 +149,7 @@ export class Enemy extends Walker {
         if (arcDist(this.up, this.home) < 1.5) { this.state = 'idle'; this.timer = 1; this.hp = d.hp; }
         return d.speed;
     }
+    if (this.behavior) return this.behavior.think(this, dt, dist);
     return d.ai === 'ranged' ? this.thinkRanged(dt, dist) : d.ai === 'hopper' ? this.thinkHopper(dt) : this.thinkMelee(dt, dist);
   }
   /** Goblins (fast hit-and-run, flee when hurt) and ogres (slow telegraphed ground slam you can jump over). */
@@ -184,6 +212,7 @@ export class Enemy extends Walker {
   thinkHopper(dt) { this.state = 'chase'; turnToward(this.fwd, this.toP, this.up, damp(6, dt)); this.move.copy(this.toP); return this.def.speed; }
   animate(dt) {
     const d = this.def, s = Math.abs(this.speed), pop = 1 + this.hitPop * 0.14; this.phase += dt * (2 + s * 3.2);
+    if (this.behavior?.animate) { this.behavior.animate(this, dt); return; }
     if (this.legL) {
       const sw = Math.sin(this.phase) * Math.min(1, s / 2) * 0.8;
       this.legL.rotation.x = sw; this.legR.rotation.x = -sw; this.armL.rotation.x = -sw * 0.6;

@@ -1,8 +1,8 @@
 /* Two random streams:
-   - rand / rr / rpick: SEEDED, for world generation and initial spawns. Every draw shifts the rest of the layout,
-     so only code run during startup (src/world, src/combat/spawning.js) may use them, always in the same order.
+   - rand / rr / rpick: SEEDED, for world generation and initial spawns. World.generate() reseeds it with the planet's
+     seed; every draw shifts the rest of the layout, so only code run while a planet is being built
+     (src/world, src/combat/spawning.js) may use them, always in the same order.
    - mr / mpick: Math.random, for runtime behaviour and effects. */
-import { WORLD_SEED } from '../config/game.js';
 
 function mulberry32(a) {
   return function () {
@@ -11,7 +11,11 @@ function mulberry32(a) {
   };
 }
 
-export const rand = mulberry32(WORLD_SEED);
+let worldStream = mulberry32(0);
+/** Restarts the seeded stream (same seed => same planet). */
+export function seedWorld(seed) { worldStream = mulberry32(seed); }
+
+export const rand = () => worldStream();
 export const rr = (a, b) => a + (b - a) * rand();
 export const rpick = arr => arr[Math.floor(rand() * arr.length)];
 

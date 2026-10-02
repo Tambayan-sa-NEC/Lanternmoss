@@ -87,10 +87,9 @@ export const Challenges = {
     if (Dialog.open && Dialog.npc === r.npc && Dialog.choice) Dialog.close();   // a stale "Keep going / Give up" prompt
     showChallengeResult(win, c.title, sub);
   },
-  /** Abandons any active run without rewards or reactions, and forgets all records (a fresh adventure). */
-  reset() {
-    const r = this.run; if (r) { r.done = true; this.run = null; r.kind.cleanup(r); hideChallengePanel(); }
-    this.progress = {};
-  },
+  /** Abandons any active run without rewards, losses or reactions (leaving the planet, restarting). */
+  cancel() { const r = this.run; if (r) { r.done = true; this.run = null; r.kind.cleanup(r); hideChallengePanel(); } },
+  /** cancel() and forget all records (a fresh adventure). */
+  reset() { this.cancel(); this.progress = {}; },
   tagFor(npc) { return this.availableFor(npc) ? ' <span class="ctag">✦ Challenge</span>' : ''; },
 };

@@ -6,7 +6,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RENDER } from '../config/render.js';
-import { outlineMat, pointMaterials } from '../render/materials.js';
+import { outlineMat, setPointScale } from '../render/materials.js';
 import { camera, PIXEL_RATIO, scene } from '../render/scene.js';
 
 export class RenderSystem {
@@ -45,7 +45,7 @@ export class RenderSystem {
     this.renderer.setSize(w, h); this.composer.setSize(w, h);
     const db = this.renderer.getDrawingBufferSize(new THREE.Vector2()); outlineMat.uniforms.uRes.value.copy(db);
     const scale = db.y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
-    for (const m of pointMaterials) m.uniforms.uScale.value = scale;
+    setPointScale(scale);
   }
 
   render(time) { this.paperPass.uniforms.uTime.value = time; this.composer.render(); }

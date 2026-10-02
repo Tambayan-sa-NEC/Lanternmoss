@@ -32,7 +32,7 @@ export class Projectile {
     if ((this.trailT -= dt) < 0) { this.trailT = 0.018; sparkles.emit(this.pos, { count: 1, color: this.color, speed: 0.5, life: 0.35, size: this.size * 1.6 }); }
     if (hitsStatic(this.pos, this.radius)) return this.finish(null);
     const player = ctx.player;
-    if (this.team === 'player') { for (const e of ctx.enemies) if (e.alive && e.center().distanceTo(this.pos) < this.radius + e.hitR) return this.finish(e); }
+    if (this.team === 'player') { for (const e of ctx.enemies) if (e.alive && !e.hidden && e.center().distanceTo(this.pos) < this.radius + e.hitR) return this.finish(e); }
     else if (!player.dead && _tv.copy(player.pos).addScaledVector(player.up, 1).distanceTo(this.pos) < this.radius + 0.55) return this.finish(player);
     return true;
   }

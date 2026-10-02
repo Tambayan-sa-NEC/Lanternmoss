@@ -1,10 +1,14 @@
-/* The planet: generates terrain and scenery in a fixed order, and animates the environment every frame.
+/* The planet: generates terrain and scenery in a fixed order, animates the environment every frame, and can be
+   torn down so another planet can be generated in its place (planet travel).
    ORDER MATTERS in generate(): each step draws from the seeded world rand, and later steps avoid what
    earlier ones placed. Reordering steps changes the whole layout. */
 import * as THREE from 'three';
+import { clearStaticColliders } from '../physics/colliders.js';
 import { Batcher } from '../render/Batcher.js';
-import { G, part } from '../render/meshes.js';
-import { scene } from '../render/scene.js';
+import { releasePointsMaterial } from '../render/materials.js';
+import { disposeTree, G, part } from '../render/meshes.js';
+import { scene, setFogColor } from '../render/scene.js';
+import { seedWorld } from '../utils/random.js';
 import { arcDist, frameQuat, offsetDir, projectTangent, randomDir, tangentFrame } from '../utils/sphere.js';
 import { buildPlanet } from './planet.js';
 import { isFree, placed } from './placement.js';
@@ -27,10 +31,14 @@ export class World {
     this.sunTan = new V3();           // tangent heading of the golden-hour sun; transported along with the player
   }
 
-  generate() {
+  /** planet: an entry of PLANETS (config/planets.js): its seed drives the layout, its palette the colours. */
+  generate(planet) {
+    this.planet = planet; this.objects = []; this.ownMaterials = [];
+    const { palette } = planet;
+    seedWorld(planet.seed); setFogColor(palette.fog);
     this.hemi = new THREE.HemisphereLight(0xd6dcff, 0xb6dc8e, 1.15);
     this.sun = new THREE.DirectionalLight(0xffd9a6, 2.35);
-    scene.add(this.hemi, this.sun, this.sun.target);
+    this.add(this.hemi, this.sun, this.sun.target);
 
     // ponds first: they carve the terrain everything else stands on
     const spawnDir = this.spawnDir;
@@ -45,28 +53,40 @@ export class World {
     }
     ponds.forEach(computeWaterLevel);
 
-    scene.add(buildPlanet());
+    this.add(buildPlanet(palette));
 
     const B = new Batcher();
     Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter));   // houses, houseA, cottage
     decoratePonds(B);
     scatterFlora(B);
-    scene.add(B.build());
-    scene.add(createGrass());
+    this.add(B.build());
+    const grass = createGrass(palette.grass); this.add(grass);
 
-    const water = createWater(); this.waterMat = water.material; scene.add(...water.meshes);
+    const water = createWater(palette.water); this.waterMat = water.material; this.add(...water.meshes);
 
     // floating crystal above the stone circle
     this.crystal = part(G.oct(0.45), 0x9ff3ff, { glow: true, intensity: 1.9 });
-    this.crystal.scale.set(1, 1.6, 1); scene.add(this.crystal);
+    this.crystal.scale.set(1, 1.6, 1); this.add(this.crystal);
     this.crystalBase = this.stoneCenter.clone().multiplyScalar(groundHeight(this.stoneCenter) + 2.3);
     this.crystal.quaternion.copy(frameQuat(this.stoneCenter, tangentFrame(this.stoneCenter)[0]));
 
-    this.sky = createSky(); scene.add(this.sky);
-    this.clouds = createClouds(); scene.add(this.clouds);
-    this.fireflies = createFireflies(); scene.add(this.fireflies);
+    this.sky = createSky(palette.sky); this.add(this.sky);
+    this.clouds = createClouds(); this.add(this.clouds);
+    this.fireflies = createFireflies(); this.add(this.fireflies);
+    this.ownMaterials.push(this.sky.material, this.waterMat, grass.material, this.fireflies.material);   // the rest are shared caches
 
     this.resetSun();
+  }
+
+  /** Adds generated objects to the scene and remembers them for dispose(). */
+  add(...objects) { scene.add(...objects); this.objects.push(...objects); }
+
+  /** Removes everything generate() created and forgets the terrain, placement and scenery colliders. */
+  dispose() {
+    for (const o of this.objects) { scene.remove(o); disposeTree(o); }
+    for (const m of this.ownMaterials) { releasePointsMaterial(m); m.dispose(); }
+    this.objects = []; this.ownMaterials = [];
+    ponds.length = 0; placed.length = 0; clearStaticColliders();
   }
 
   /** Puts the sun back at its starting bearing over the village. */

@@ -31,8 +31,8 @@ export class Owl {
   pickTarget() {
     const o = COMBAT.owl; let best = null, bd = o.range;
     const last = targeting.lastHit;
-    if (last && last.alive && ctx.time - targeting.lastHitT < 5 && last.pos.distanceTo(ctx.player.pos) < o.range) best = last;
-    else for (const e of ctx.enemies) { if (!e.alive || !ENGAGED.has(e.state)) continue; const d = e.pos.distanceTo(ctx.player.pos); if (d < bd) { bd = d; best = e; } }
+    if (last && last.alive && !last.hidden && ctx.time - targeting.lastHitT < 5 && last.pos.distanceTo(ctx.player.pos) < o.range) best = last;
+    else for (const e of ctx.enemies) { if (!e.alive || e.hidden || !ENGAGED.has(e.state)) continue; const d = e.pos.distanceTo(ctx.player.pos); if (d < bd) { bd = d; best = e; } }
     if (best) { this.target = best; this.state = 'swoop'; this.t = 0; }
   }
   dispose() { scene.remove(this.root, this.shadow); disposeTree(this.root); }
@@ -45,7 +45,7 @@ export class Owl {
     const o = COMBAT.owl; this.cool -= dt; this.hootT -= dt;
     if (this.state === 'swoop') {
       this.t += dt;
-      if (!this.target || !this.target.alive || this.t > 2.5 || ctx.player.dead) { this.state = 'return'; this.cool = o.cooldown * 0.5; }
+      if (!this.target || !this.target.alive || this.target.hidden || this.t > 2.5 || ctx.player.dead) { this.state = 'return'; this.cool = o.cooldown * 0.5; }
       else { _tv.copy(this.target.center()).sub(this.pos); const d = _tv.length();
         this.vel.lerp(_tv.divideScalar(Math.max(d, 1e-4)).multiplyScalar(o.swoopSpeed), damp(7, dt));
         if (d < this.target.hitR + 0.45) this.strike(); }

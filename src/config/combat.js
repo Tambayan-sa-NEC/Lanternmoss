@@ -21,7 +21,7 @@ export const COMBAT = {
   owl: { damage: 4, cooldown: 4, range: 11, swoopSpeed: 15, followHeight: 2.4,
          markTime: 4, markBonus: 0.25,   // owl-marked enemies take +25% spell damage
          stagger: 0.5 },                 // a strike interrupts wind-ups and charges
-  enemies: {                   // xp = experience awarded to the player for the kill (see config/leveling.js)
+  enemies: {                   // base stats (planet 1); later planets scale them (config/planets.js). xp = experience for the kill
     goblin:    { ai: 'melee', color: 0x8fcf5a, hp: 30, speed: 4.4, radius: 0.35, height: 1.4, aggro: 11, leash: 16, turnRate: 10,
                  range: 1.3, damage: 5, windup: 0.3, windupTurn: 8, cooldown: 1.1, knockback: 3, lunge: 4, weave: 0.5,
                  hitAndRun: true, fleeBelow: 0.3, fleeTime: 2.2, respawn: 40, xp: 10 },
@@ -34,6 +34,33 @@ export const COMBAT = {
                  damage: 7, contactCooldown: 1, knockback: 3, hopInterval: 0.9, hopVel: 5.5, splitInto: 'slimeling', splitCount: 2, respawn: 45, xp: 8 },
     slimeling: { ai: 'hopper', color: 0xa8e89a, hp: 12, speed: 4, radius: 0.3, height: 0.45, aggro: 12, leash: 20, contact: true,
                  damage: 4, contactCooldown: 0.8, knockback: 2, hopInterval: 0.6, hopVel: 4.5, respawn: 0, xp: 4 },
+    // ---- later planets (behaviours in src/entities/enemies/behaviors) ----
+    // telegraph = gets a ground warning disc; cooldown is also the pause after being staggered out of an attack
+    puffcap:   { ai: 'bomber', color: 0xff7a9a, hp: 18, speed: 5.0, radius: 0.4, height: 0.9, aggro: 12, leash: 18, turnRate: 8,
+                 triggerRange: 2.3, fuse: 1.0, blastRadius: 3.0, damage: 22, knockback: 8, cooldown: 1.2, telegraph: true, respawn: 40, xp: 10 },
+    ramhorn:   { ai: 'charger', color: 0x4fa0a8, hp: 70, speed: 3.0, radius: 0.6, height: 1.1, aggro: 14, leash: 22, turnRate: 6,
+                 chargeRange: 11, windup: 0.85, chargeSpeed: 15, chargeTime: 0.85, width: 1.2, damage: 16, knockback: 11, cooldown: 2.4,
+                 stunTime: 2.2, stunnedDamageBonus: 0.5, knockResist: 0.6, respawn: 50, xp: 22 },   // crashes into scenery => stunned, +50% damage taken
+    thornmole: { ai: 'burrower', color: 0xb08a6a, hp: 55, speed: 5.5, radius: 0.45, height: 0.9, aggro: 13, leash: 20, turnRate: 8,
+                 windup: 0.75, eruptRadius: 1.9, damage: 14, knockback: 5, exposed: 2.6, cooldown: 1.5, telegraph: true, respawn: 45, xp: 18 },
+    hexlantern:{ ai: 'support', color: 0x8fffc0, hp: 40, speed: 3.6, radius: 0.4, height: 1.0, hover: 1.4, aggro: 15, leash: 22,
+                 keepDistance: 10, healRadius: 9, heal: 18, healCooldown: 2.5, shieldTime: 4, shieldReduction: 0.5, shieldCooldown: 6,
+                 cooldown: 1, respawn: 50, xp: 20 },
+    // ---- planet bosses (src/entities/enemies/behaviors/boss.js) ----
+    gloomcap:  { ai: 'boss', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6, hp: 900, speed: 2.6, radius: 1.3, height: 4.6,
+                 aggro: 16, leash: 30, turnRate: 3, knockResist: 1, slowResist: 0.8, staggerImmune: true, stunnedDamageBonus: 0.5,
+                 telegraph: true, respawn: 0, xp: 250, cooldown: 1.6,
+                 attacks: {   // windup = warning time; recover = pause after; cooldown = extra wait before the next attack
+                   slam:      { windup: 1.1, range: 4.5, reach: 2.2, radius: 4.2, damage: 22, knockback: 10, recover: 0.9, cooldown: 1.4 },
+                   charge:    { windup: 0.9, minRange: 6, speed: 14, distance: 18, width: 1.9, damage: 20, knockback: 12, recover: 1.0, cooldown: 1.8, crashStun: 1.8 },
+                   volley:    { windup: 0.8, count: 7, spread: 80, speed: 10, homing: 0.6, damage: 9, recover: 0.6, cooldown: 1.6 },
+                   shockwave: { windup: 1.0, speed: 8, maxRadius: 15, width: 1.2, damage: 16, knockback: 6, recover: 0.8, cooldown: 2.0 },   // jump over it
+                   summon:    { windup: 1.2, types: ['slimeling', 'slimeling', 'wisp'], max: 4, recover: 0.8, cooldown: 2.6 },
+                 },
+                 phases: [    // active phase = the last one whose `below` (fraction of max HP) is >= current HP
+                   { below: 1.0,  attacks: ['slam', 'charge', 'volley'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.6,  attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon'], speedMul: 1.15, cooldownMul: 0.85 },
+                   { below: 0.25, attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon'], speedMul: 1.35, cooldownMul: 0.6 },   // enraged
+                 ] },
   },
-  spawns: { goblinCamps: 2, goblinsPerCamp: 3, ogres: 2, wisps: 3, slimes: 4 },
 };

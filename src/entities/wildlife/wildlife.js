@@ -20,6 +20,13 @@ export function spawnWildlife(world) {
   for (const p of ponds) for (let i = 0; i < 3 + Math.floor(p.r / 2); i++) p.fish.push(new Fish(p));
 }
 
+/** Removes every critter, bird and fish (the planet is being replaced). */
+export function despawnWildlife() {
+  for (const c of ctx.critters) c.dispose(); ctx.critters.length = 0;
+  for (const b of ctx.birds) b.dispose(); ctx.birds.length = 0;
+  for (const p of ponds) { for (const f of p.fish) f.dispose(); p.fish.length = 0; }
+}
+
 /** Fish leap more often while the hero stands by their pond. */
 export function updatePonds(dt) {
   for (const p of ponds) {

@@ -6,10 +6,10 @@ import { matrixAt } from '../utils/sphere.js';
 import { ponds } from './terrain.js';
 
 /** Returns the water meshes and their shared material (its uTime drives the animation). */
-export function createWater() {
+export function createWater({ deep, light }) {
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uDeep: { value: new THREE.Color(0x3f9cc4) }, uLight: { value: new THREE.Color(0x9fe8e4) },
+    uniforms: { uTime: { value: 0 }, uDeep: { value: new THREE.Color(deep) }, uLight: { value: new THREE.Color(light) },
     uFoam: { value: new THREE.Color(0xf6fffb) }, uFogColor: { value: FOG_COLOR }, uFogNear: { value: RENDER.fog.near }, uFogFar: { value: RENDER.fog.far } },
     vertexShader: `varying vec2 vUv; varying float vDepth; void main(){ vUv = uv; vec4 mv = modelViewMatrix * vec4(position,1.0); vDepth = -mv.z; gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uTime, uFogNear, uFogFar; uniform vec3 uDeep, uLight, uFoam, uFogColor; varying vec2 vUv; varying float vDepth;

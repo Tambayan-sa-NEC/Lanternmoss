@@ -16,6 +16,7 @@ const GAME_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown
 
 function onKey(code) {
   const player = ctx.player;
+  if (ctx.transitioning) return;                       // travelling between planets
   if (code === 'Space' && !player.dead) player.jumpBuf = 0.14;
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
   if (code === 'KeyC') CharacterSelect.requestMenu();

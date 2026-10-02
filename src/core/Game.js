@@ -1,12 +1,12 @@
 /* Game: builds everything in a fixed order, runs the per-frame update order, and owns the run lifecycle
-   (character select -> play -> back to select restarts the adventure). */
+   (character select -> play, planet to planet via PlanetProgression -> back to select restarts the adventure). */
 import { CHALLENGES } from '../config/challenges.js';
 import { CHARACTERS } from '../config/characters.js';
 import { COMBAT } from '../config/combat.js';
 import { resetCooldowns, tryCast } from '../combat/casting.js';
 import { updateCombat } from '../combat/CombatSystem.js';
 import { updateKnight } from '../combat/abilities/knight.js';
-import { addEnemy, resetEnemies, spawnInitialEnemies } from '../combat/spawning.js';
+import { addEnemy, resetEnemies } from '../combat/spawning.js';
 import { clearTargets } from '../combat/targeting.js';
 import { NPC } from '../entities/npc/NPC.js';
 import { createNpcDefs } from '../entities/npc/npcDefs.js';
@@ -17,6 +17,8 @@ import { createSparkles, sparkles } from '../fx/sparkles.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { buffs, resetBuffs, updateBuffs } from '../gameplay/buffs.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { PlanetProgression } from '../gameplay/PlanetProgression.js';
+import { PLANETS } from '../config/planets.js';
 import { installLevelFeedback } from '../progression/levelFeedback.js';
 import { gainXp, levelEvents } from '../progression/experience.js';
 import { LEVELING } from '../config/leveling.js';
@@ -44,7 +46,8 @@ export class Game {
   init() {
     this.renderSystem = new RenderSystem();
     this.world = new World();
-    this.world.generate();
+    ctx.planet = 0;
+    this.world.generate(PLANETS[0]);
     createSparkles();
 
     ctx.player = new Player(this.world.spawnDir);
@@ -53,7 +56,8 @@ export class Game {
     ctx.npcs = createNpcDefs(this.world).map(d => new NPC(d));
     resetCooldowns(COMBAT.spells);
     buildSpellBar(COMBAT.spells); setSkillHint(CHARACTERS.witch.hint);
-    spawnInitialEnemies(this.world);
+    this.planets = new PlanetProgression(this.world);
+    this.planets.populate();
 
     Dialog.init();
     Dialog.lineProvider = npc => Challenges.lineFor(npc);
@@ -70,12 +74,13 @@ export class Game {
   /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
   update(dt) {
     ctx.time += dt;
-    ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started });
+    ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning });
     for (const c of ctx.critters) c.update(dt);
     for (const b of ctx.birds) b.update(dt);
     updatePonds(dt);
     for (const n of ctx.npcs) n.update(dt);
     updateCombat(dt, this.world, keys);
+    this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
     Challenges.update(dt);
     updateKnight(dt);
     CharacterSelect.update(dt);
@@ -92,6 +97,7 @@ export class Game {
     CharacterSelect.close();
     resetView(ctx.player.fwd);                                     // same framing as before the menu orbit
     toast(CHARACTERS[ctx.player.charId].welcome); this.renderSystem.canvas.focus();
+    this.planets.onBegin();
   }
 
   /** Back to a fresh adventure: clears everything the previous character left behind. */
@@ -105,6 +111,7 @@ export class Game {
     resetEnemies();
     clearTargets();
     if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
+    this.planets.reset();                                          // back to the first planet (and its boss)
     Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, stats: CHARACTERS[P.charId].stats });   // a fresh adventure starts back at level 1
     P.clearTimers();
     const fwd = P.placeAt(world.spawnDir);
@@ -118,7 +125,9 @@ export class Game {
     const game = this;
     return { Challenges, CHALLENGES, Dialog, buffs, cam, keys, CharacterSelect, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
-      get enemies() { return ctx.enemies; }, get companion() { return ctx.companion; },
+      get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
+      get planet() { return ctx.planet; }, get boss() { return ctx.boss; }, planets: game.planets, PLANETS,
+      goToPlanet: i => { game.planets.load(i); game.planets.announceArrival(); },
       begin: () => game.beginGame(), update: dt => game.update(dt),
       spawnEnemy: (type, arc = 7) => addEnemy(type, offsetDir(ctx.player.up, Math.random() * 6.28, arc)) };
   }

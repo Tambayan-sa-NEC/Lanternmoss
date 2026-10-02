@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { ctx } from '../../core/context.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buildFish } from '../../models/creatures.js';
+import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
@@ -36,6 +37,7 @@ export class Fish {
     this.root.position.copy(this.pos); frameQuat(p.dir, _tv, this.root.quaternion); this.root.rotateX(-pitch);
     this.tail.rotation.y = Math.sin(ctx.time * (8 + this.boost * 10) + this.theta * 3) * 0.55;
   }
+  dispose() { scene.remove(this.root); disposeTree(this.root); }
   splash() { sparkles.emit(this.pos.clone().addScaledVector(this.pond.dir, 0.2), { count: 16, color: 0xc8f6ff, speed: 2.2, up: this.pond.dir, upBias: 1.2, life: 0.7, size: 0.26 }); audio.plip(); }
   leap() { if (this.jump < 0) { this.jump = 0; this.splash(); } }
 }

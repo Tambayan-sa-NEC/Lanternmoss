@@ -48,10 +48,14 @@ export function outlineGeo(geo) {
   g = mergeVertices(g, 1e-3); g.computeVertexNormals(); return g;
 }
 
-/** Additive point-sprite material (fireflies, sparkles). uScale tracks the viewport; RenderSystem updates every one created here. */
-export const pointMaterials = [];
+/** Additive point-sprite material (fireflies, sparkles). uScale tracks the viewport (setPointScale, from RenderSystem). */
+const pointMaterials = [];
+let pointScale = 400;
 export function makePointsMaterial(vertexShader, fragmentShader) {
   const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uScale: { value: 400 } }, vertexShader, fragmentShader });
+    uniforms: { uTime: { value: 0 }, uScale: { value: pointScale } }, vertexShader, fragmentShader });
   pointMaterials.push(m); return m;
 }
+export function setPointScale(scale) { pointScale = scale; for (const m of pointMaterials) m.uniforms.uScale.value = scale; }
+/** Stops resizing a points material that is being thrown away (a planet's fireflies). */
+export function releasePointsMaterial(m) { const i = pointMaterials.indexOf(m); if (i >= 0) pointMaterials.splice(i, 1); }

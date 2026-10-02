@@ -6,6 +6,7 @@ import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { buildBird } from '../../models/creatures.js';
 import { resolveCollisions } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
+import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
@@ -24,6 +25,7 @@ export class Bird extends Walker {
     this.state = 'ground'; this.timer = mr(0.5, 2); this.flyTime = 0; this.hopVel = 0; this.peck = 0; this.flap = 0; this.cruise = mr(7.5, 10);
     this.fwd.applyAxisAngle(this.up, Math.random() * 6.28);
   }
+  dispose() { scene.remove(this.root, this.shadow); disposeTree(this.root); }
   takeoff() {
     this.state = 'fly'; this.flyTime = mr(4, 8); this.grounded = false; _tv.copy(_toP).negate(); if (_tv.lengthSq() > 0.1) this.fwd.copy(_tv);
     if (Math.random() < 0.4) emote(this, '!', '#ff8a3d'); audio.chirp();

@@ -62,7 +62,7 @@ export function scatterFlora(B) {
 }
 
 /** Instanced grass tufts (no outline, cheap), kept off ponds and large colliders. */
-export function createGrass() {
+export function createGrass(colors) {
   const tuft = mergeGeometries([0, 1, 2].map(i => facet(new THREE.ConeGeometry(0.07, 0.5, 3, 1, true)).applyMatrix4(LM(Math.cos(i * 2.1) * 0.08, 0.22, Math.sin(i * 2.1) * 0.08, Math.cos(i * 2.1) * 0.35, 0, Math.sin(i * 2.1) * 0.35))));
   const N = 900, mesh = new THREE.InstancedMesh(tuft, new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap }), N);
   const col = new THREE.Color(); let k = 0;
@@ -70,7 +70,7 @@ export function createGrass() {
     const d = randomDir();
     if (ponds.some(p => arcDist(d, p.dir) < p.r + 0.6)) continue;
     if (colliders.some(c => c.r > 0.9 && arcDist(d, c.dir) < c.r)) continue;
-    mesh.setMatrixAt(k, surfM(d, rr(0, 6.28), rr(0.7, 1.4), -0.03)); mesh.setColorAt(k, col.set(rpick([0x7fc574, 0x9adb7e, 0xa9e28a, 0x8fd07a]))); k++;
+    mesh.setMatrixAt(k, surfM(d, rr(0, 6.28), rr(0.7, 1.4), -0.03)); mesh.setColorAt(k, col.set(rpick(colors))); k++;
   }
   mesh.count = k; return mesh;
 }

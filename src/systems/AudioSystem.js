@@ -67,6 +67,9 @@ export const audio = {
   clang() { this.tone(1400, 0.18, 'square', 0.03, 0, 0.7); this.tone(2100, 0.3, 'sine', 0.03, 0.02); },
   whoosh() { this.noise(0.25, 0.08, 2600); },
   howl() { this.tone(520, 0.9, 'sine', 0.04, 0, 1.35); this.tone(700, 0.7, 'sine', 0.02, 0.5, 0.8); },
+  // --- boss + planet travel (procedural placeholders) ---
+  roar() { this.tone(80, 0.9, 'sawtooth', 0.05, 0, 0.6); this.tone(120, 0.7, 'square', 0.025, 0.05, 0.7); this.noise(0.8, 0.12, 700); },
+  warp() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.9, 'sine', 0.04, i * 0.12, 1.5)); this.noise(1.2, 0.04, 5000); },
   /** Mutes / unmutes everything; returns the new muted state. */
   toggle() { this.muted = !this.muted; if (this.master) this.master.gain.setTargetAtTime(this.muted ? 0 : 0.55, this.ctx.currentTime, 0.1); return this.muted; },
 };

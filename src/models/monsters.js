@@ -1,4 +1,5 @@
-/* Enemy models. Builders must keep returning the part names Enemy.animate drives (legs/arms or body/core/ring). */
+/* Enemy models. Builders must keep returning the part names Enemy.animate / the behaviour modules drive
+   (legs/arms, body/core/ring, mound...). */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
 import { buildHumanoid } from './humanoid.js';
@@ -46,5 +47,84 @@ export function buildSlime(scale = 1) {
   root.scale.setScalar(scale); return { root, body };
 }
 
-/** COMBAT.enemies key -> builder. */
-export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buildWisp, slime: () => buildSlime(1), slimeling: () => buildSlime(0.55) };
+// ---- later-planet monsters and bosses (procedural PLACEHOLDER art, same toon + outline style) ----
+
+/** Puffcap: an angry puffball mushroom with a lit fuse. Parts: body (swells on the fuse). */
+export function buildPuffcap() {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  addTo(body, part(G.cyl(0.18, 0.22, 0.3, 6), 0xfff0dc), [0, 0.15, 0]);
+  addTo(body, part(G.ico(0.42, 1), 0xff7a9a), [0, 0.52, 0], [0, 0, 0], [1, 0.8, 1]);
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.3; addTo(body, part(G.ico(0.07, 0), 0xffffff, { outline: false }), [Math.cos(a) * 0.3, 0.72, Math.sin(a) * 0.3]); }
+  for (const sx of [-1, 1]) {
+    addTo(body, part(G.box(0.07, 0.11, 0.03), 0x2a1830, { outline: false }), [sx * 0.12, 0.47, 0.37]);
+    addTo(body, part(G.box(0.12, 0.03, 0.03), 0x2a1830, { outline: false }), [sx * 0.12, 0.56, 0.36], [0, 0, sx * 0.4]);    // angry brows
+  }
+  addTo(body, part(G.cone(0.04, 0.14, 4), 0xffd36b, { glow: true, intensity: 2.6 }), [0, 0.95, 0]);                           // fuse spark
+  return { root, body };
+}
+
+/** Ramhorn: a shelled beetle with one big horn. Parts: body, head, legs[4]. */
+export function buildRamhorn() {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  addTo(body, part(G.ico(0.5, 1), 0x3f6f7a), [0, 0.55, -0.05], [0, 0, 0], [1, 0.75, 1.3]);
+  addTo(body, part(G.box(0.06, 0.5, 1.1), 0x2f5560), [0, 0.86, -0.05]);
+  const head = new THREE.Group(); head.position.set(0, 0.5, 0.6); body.add(head);
+  addTo(head, part(G.ico(0.26, 1), 0x2a4048), [0, 0, 0]);
+  addTo(head, part(G.cone(0.14, 0.7, 6), 0xe8d6b0), [0, 0.12, 0.38], [Math.PI / 2 - 0.35, 0, 0]);
+  for (const sx of [-1, 1]) addTo(head, part(G.box(0.06, 0.06, 0.03), 0xff7a5a, { glow: true, intensity: 2.2 }), [sx * 0.13, 0.06, 0.22]);
+  const legs = [];
+  for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
+    const g = new THREE.Group(); g.position.set(sx * 0.32, 0.4, sz * 0.32); body.add(g);
+    addTo(g, part(G.box(0.1, 0.4, 0.1), 0x24363c), [0, -0.2, 0], [0, 0, sx * 0.25]); legs.push(g);
+  }
+  return { root, body, head, legs };
+}
+
+/** Thornmole: a spiny digging mole. Parts: body (sinks while tunnelling), mound (dirt bump shown underground). */
+export function buildThornmole() {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  addTo(body, part(G.ico(0.42, 1), 0x8a6a5a), [0, 0.38, 0], [0, 0, 0], [1, 0.85, 1.2]);
+  for (let i = 0; i < 7; i++) { const a = (i / 6 - 0.5) * 2.2; addTo(body, part(G.cone(0.08, 0.38, 4), 0xd8c08a), [Math.sin(a) * 0.3, 0.62 + Math.cos(a) * 0.08, -0.1 - Math.abs(a) * 0.05], [-0.5, 0, -a * 0.6]); }
+  addTo(body, part(G.ico(0.12, 1), 0xffa6b8), [0, 0.32, 0.52]);
+  for (const sx of [-1, 1]) {
+    addTo(body, part(G.box(0.05, 0.03, 0.03), 0x2a1830, { outline: false }), [sx * 0.13, 0.46, 0.45]);
+    addTo(body, part(G.cone(0.07, 0.22, 4), 0xf0e6d0), [sx * 0.3, 0.12, 0.38], [Math.PI / 2, 0, sx * 0.4]);                 // digging claws
+  }
+  const mound = addTo(root, part(G.hemi(0.6, 8, 3), 0x9a7a5a), [0, -0.05, 0], [0, 0, 0], [1, 0.45, 1]); mound.visible = false;
+  return { root, body, mound };
+}
+
+/** Hexlantern: a hooded floating lantern spirit. Parts: body, core (glows brighter while casting). */
+export function buildHexlantern() {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  addTo(body, part(G.cone(0.34, 0.5, 6), 0x3a4a5a), [0, 0.95, 0]);
+  for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) addTo(body, part(G.box(0.05, 0.55, 0.05), 0x3a4a5a), [x * 0.2, 0.45, z * 0.2]);
+  addTo(body, part(G.box(0.5, 0.06, 0.5), 0x3a4a5a), [0, 0.15, 0]);
+  const core = addTo(body, part(G.ico(0.17, 1), 0x8fffc0, { glow: true, intensity: 2.8 }), [0, 0.45, 0]);
+  for (const sx of [-1, 1]) addTo(body, part(G.box(0.05, 0.08, 0.02), 0xffffff, { glow: true, intensity: 2 }), [sx * 0.08, 0.8, 0.25]);
+  addTo(body, part(G.cone(0.2, 0.35, 5), 0x8fffc0, { glow: true, intensity: 1.2 }), [0, -0.1, 0], [Math.PI, 0, 0]);
+  return { root, body, core };
+}
+
+/** Gloomcap (and its per-planet variants): a giant mushroom king with a lantern staff.
+    def.capColor tints the cap and lantern. Parts: humanoid rig + core (lantern glow). */
+export function buildGloomcap(def = {}) {
+  const cap = def.capColor ?? 0x9b6ad6;
+  const h = buildHumanoid({ skin: 0xe8dcc4, top: 0x5f7f52, hem: 0x4f6a44, pants: 0x6a5a48, shoes: 0x4a3a2a, belt: 0x8a6a3a, sleeve: 0x5f7f52, w: 1.3,
+    face: { blush: 0xd8a0a0, big: 0.9 } });
+  addTo(h.head, part(G.hemi(0.78, 10, 4), cap), [0, 0.16, 0], [0, 0, 0], [1, 0.7, 1]);
+  addTo(h.head, part(G.cyl(0.76, 0.62, 0.08, 10), 0xf2e6f8), [0, 0.15, 0]);
+  for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; addTo(h.head, part(G.ico(0.09, 0), 0xffffff, { outline: false }), [Math.cos(a) * 0.48, 0.5, Math.sin(a) * 0.48]); }
+  for (let i = -1; i <= 1; i++) addTo(h.head, part(G.cone(0.07, 0.22, 4), 0xffd36b), [i * 0.16, 0.74, 0], [0, 0, -i * 0.3]);       // crown
+  for (const sx of [-1, 1]) addTo(h.head, part(G.box(0.09, 0.05, 0.03), 0xffe066, { glow: true, intensity: 3 }), [sx * 0.13, 0.02, 0.37]);   // glowing eyes
+  addTo(h.head, part(G.cone(0.26, 0.5, 6), 0x6f9a5a), [0, -0.38, 0.16], [Math.PI + 0.25, 0, 0]);                                   // mossy beard
+  const staff = new THREE.Group(); staff.position.set(0, -0.42, 0.05); h.armR.add(staff);
+  addTo(staff, part(G.cyl(0.05, 0.06, 1.6, 6), 0x6a4a3a), [0, 0, 0.6], [Math.PI / 2, 0, 0]);
+  const core = addTo(staff, part(G.ico(0.18, 1), cap, { glow: true, intensity: 2.8 }), [0, 0, 1.45]);
+  h.root.scale.setScalar(2.9);
+  return { ...h, core };
+}
+
+/** COMBAT.enemies key -> builder (called with the enemy's stats, which most builders ignore). */
+export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buildWisp, slime: () => buildSlime(1), slimeling: () => buildSlime(0.55),
+  puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern, gloomcap: buildGloomcap };
