@@ -18,7 +18,7 @@ export const FIXED_CONTROLS = [
     [['I', 'Tab'], 'open / close the bag'],
   ] },
   { group: 'Game', rows: [
-    [['Esc', 'P'], 'pause menu (Esc first closes the bag, dialogue or aiming)'],
+    [['Esc', 'P'], 'pause menu (Esc first closes the shop, bag, dialogue or aiming)'],
     [['H'], 'show / hide the controls panel'],
     [['M'], 'mute / unmute'],
     [['C'], 'back to character select (press twice; restarts the adventure)'],

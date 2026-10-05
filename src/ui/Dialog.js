@@ -1,7 +1,11 @@
-/* Anime dialogue box: typewriter text, an optional yes/no choice, closes when the hero walks away. */
+/* Anime dialogue box: the speaker's portrait (expression per line), typewriter text with story placeholders
+   ({hero} {planet}...), an optional yes/no choice; closes when the hero walks away. A sleeping villager wakes up
+   with a yawn first. */
 import { ctx } from '../core/context.js';
+import { fillStory } from '../gameplay/storyState.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dom } from './dom.js';
+import { guessExpression, portrait } from './portraits.js';
 
 export const Dialog = {
   open: false, npc: null, text: '', shown: 0, acc: 0, choice: null,
@@ -12,13 +16,19 @@ export const Dialog = {
     dom.no.addEventListener('click', () => this.choose(false));
   },
   start(npc) {
-    const line = this.lineProvider?.(npc) || npc.nextLine(); this.npc = npc; npc.talking = true; npc.gesture = 1; this.open = true;
+    const sleepy = npc.asleep; npc.wake();
+    let line = this.lineProvider?.(npc) || npc.nextLine(); this.npc = npc; npc.talking = true; npc.gesture = 1; this.open = true;
+    if (sleepy) line = { ...line, t: `*yawn*... Oh! ${line.t}`, e: line.e ?? 'sleepy' };
     dom.dlgName.innerHTML = `${npc.name}<small>${npc.def.title}</small>`; dom.dlgName.style.background = npc.def.color;
     this.say(line);
   },
   /** Show one line. A line may carry a choice { yes, no, onYes, onNo }; the handler may return a follow-up line. */
   say(line) {
-    this.text = line.t; this.shown = 0; this.acc = 0; this.choice = line.choice || null;
+    this.text = fillStory(line.t); this.shown = 0; this.acc = 0; this.choice = line.choice || null;
+    const kind = this.npc?.def.portrait;
+    dom.dlgFace.style.display = kind ? 'block' : 'none';
+    if (kind) { dom.dlgFace.innerHTML = portrait(kind, line.e ?? guessExpression(this.text), this.npc.def.color); dom.dialog.classList.add('face'); }
+    else dom.dialog.classList.remove('face');
     dom.dlgText.textContent = ''; dom.dlgNext.style.display = 'none'; dom.choices.classList.remove('show');
     if (this.choice) { dom.yes.innerHTML = `<kbd>E</kbd> ${this.choice.yes}`; dom.no.innerHTML = `<kbd>X</kbd> ${this.choice.no}`; }
     dom.dialog.classList.remove('show'); void dom.dialog.offsetWidth; dom.dialog.classList.add('show');

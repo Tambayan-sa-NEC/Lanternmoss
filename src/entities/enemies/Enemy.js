@@ -25,6 +25,7 @@ import { SPAWN_DIR } from '../../world/World.js';
 import { groundHeight } from '../../world/terrain.js';
 import { hurtPlayer } from '../../combat/damage.js';
 import { forgetTarget } from '../../combat/targeting.js';
+import { encounterEvents } from '../../combat/events.js';
 import { Projectile } from '../Projectile.js';
 import { ENGAGED } from './states.js';
 import { BEHAVIORS } from './behaviors/index.js';
@@ -82,6 +83,7 @@ export class Enemy extends Walker {
     sparkles.emit(this.center(), { count: 36, color: this.def.color, speed: 3, up: this.up, upBias: 0.6, life: 0.9, size: 0.4 });
     audio.enemyDie(); forgetTarget(this);
     this.behavior?.onDie?.(this);
+    encounterEvents.dispatchEvent(new CustomEvent('enemydefeated', { detail: { enemy: this } }));
     for (let i = 0; i < (this.def.splitCount || 0); i++) {
       const e = new Enemy(this.def.splitInto, dirAlong(this.up, _tv.copy(this.fwd).applyAxisAngle(this.up, i * Math.PI * 2 / this.def.splitCount + 0.8), 0.9));
       e.home.copy(this.home); e.state = 'chase'; e.vy = 4; e.grounded = false; ctx.enemies.push(e); }

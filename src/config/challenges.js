@@ -3,7 +3,7 @@
    giver      = NPC name (from NPC_DEFS)        kind   = activity in CHALLENGE_KINDS (collect / race / defeat)
    params     = settings for that kind          timeLimit / maxRange = fail if out of time / you walk this far away
    repeatable = can be won more than once       cooldown / declineCooldown = seconds before it's offered again
-   reward / repeatReward = REWARDS keys (treats = Honey-moss Buns into the bag, buff: [kind, secs], restore). unlockLines join the NPC's chatter after the first win.
+   reward / repeatReward = REWARDS keys (treats = Honey-moss Buns into the bag, coins, buff: [kind, secs], restore). unlockLines join the NPC's chatter after the first win.
    text keys: offer, offerAgain, accept, decline, active, success, fail (+ optional timeout / left / fainted / abandoned)
    placeholders: {progress} {best} {time} {wins}
    --------------------------------------------------------------------- */
@@ -11,7 +11,7 @@ export const CHALLENGES = {
   fireflyCatch: {
     giver: 'Fern', title: 'Firefly Catch', kind: 'collect', timeLimit: 30, maxRange: 22, repeatable: true, cooldown: 25, declineCooldown: 20,
     params: { count: 6, minRadius: 3, radius: 10, color: 0xfff08a, size: 0.16, height: 1.2, drift: 2.2, label: 'fireflies' },
-    reward: { treats: 1, buff: ['feather', 25] }, repeatReward: { treats: 1 },
+    reward: { treats: 1, coins: 15, buff: ['feather', 25] }, repeatReward: { treats: 1, coins: 6 },
     text: {
       offer: "Psst! My fireflies wriggled out of their jar... Can you catch all 6 in {time} seconds? They're a little shy~",
       offerAgain: 'The fireflies escaped AGAIN. Another round? Your best time is {best}.',
@@ -26,7 +26,7 @@ export const CHALLENGES = {
   lanternDash: {
     giver: 'Lio', title: 'Lantern Dash', kind: 'race', timeLimit: 24, maxRange: 26, repeatable: true, cooldown: 20, declineCooldown: 20,
     params: { count: 6, radius: 9, color: 0xffc86a },
-    reward: { treats: 1 }, repeatReward: { treats: 1 },
+    reward: { treats: 1, coins: 15 }, repeatReward: { treats: 1, coins: 6 },
     text: {
       offer: "I'm writing a ballad about a speedy hero, but I need inspiration! Run through every lantern ring in {time} seconds?",
       offerAgain: 'Encore! Think you can beat {best}?',
@@ -41,7 +41,7 @@ export const CHALLENGES = {
   moonberryHarvest: {
     giver: 'Pim', title: 'Moonberry Harvest', kind: 'collect', timeLimit: 40, maxRange: 24, repeatable: false, cooldown: 15, declineCooldown: 20,
     params: { count: 5, minRadius: 4, radius: 11, color: 0xc7a8ff, size: 0.18, height: 0.45, label: 'moonberries' },
-    reward: { treats: 3, restore: true },
+    reward: { treats: 3, coins: 20, restore: true },
     unlockLines: ['These moonberry tarts are the best batch yet, all thanks to you!', 'The crows keep asking who picked the berries. I tell them: a hero did.'],
     text: {
       offer: 'My moonberry tarts need fresh berries, but my knees are too old for picking. Could you gather 5 in {time} seconds?',
@@ -56,7 +56,7 @@ export const CHALLENGES = {
   wispTrial: {
     giver: 'Old Bramble', title: 'Wisp Trial', kind: 'defeat', timeLimit: 45, maxRange: 20, repeatable: true, cooldown: 40, declineCooldown: 30,
     params: { spawn: { wisp: 3 }, minRadius: 5, radius: 9 },
-    reward: { buff: ['moon', 30], treats: 2 }, repeatReward: { treats: 1, restore: true },
+    reward: { buff: ['moon', 30], treats: 2, coins: 20 }, repeatReward: { treats: 1, coins: 8, restore: true },
     text: {
       offer: 'Your spellwork shows promise. A trial, then? I shall summon three wisps; banish them within {time} seconds.',
       offerAgain: 'Back for another trial? Your record stands at {best}.',

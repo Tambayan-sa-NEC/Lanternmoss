@@ -81,17 +81,24 @@ Code: `src/ui/CharacterSelect.js`, `src/config/characters.js` (`profile`), `src/
       plays (`profile.voice`). The screen opens with your current hero already picked.
 - [ ] Optional: colour variants / outfits per hero (the hero builders in `src/models/heroes.js` would need palettes first).
 
-## 5. Better NPCs **(core)**
+## 5. Better NPCs **(core)** ✓
 
 **Goal:** villagers feel alive and give the player reasons to come back.
-Code: `src/entities/npc/NPC.js`, `src/entities/npc/npcDefs.js`, `src/ui/Dialog.js`, `src/gameplay/challenges/`.
+Code: `src/entities/npc/`, `src/config/day.js`, `src/config/shop.js`, `src/config/quests.js`, `src/gameplay/` (dayClock,
+storyState, wallet, quests/), `src/ui/` (Dialog, portraits, ShopUI).
 
-- [ ] Daily routines: walk between home, work spot and the square depending on the sun / time of day.
-- [ ] More dialogue: lines that react to progress (bosses defeated, current planet, hero picked, level).
-- [ ] Portraits or expressions in the dialogue box.
-- [ ] Shopkeeper NPC that buys and sells items (item `value` already exists in `src/config/items.js`).
-- [ ] Quest givers with multi-step quests, building on the challenge system.
-- [ ] Villagers on every planet, not just the same cast relocated (new looks per planet).
+- [x] Day and night: a village clock (Morning / Afternoon / Evening / Night, 5 minutes a day) with gently shifting light
+      and a HUD chip. Villagers follow schedules between home, work spots and the square, walk around obstacles, and
+      sleep at night (they wake with a yawn if you talk to them).
+- [x] Story-aware dialogue: lines can depend on the planet, bosses beaten, your hero, level and time of day; one-off
+      reactions are said once per adventure; text placeholders ({hero}, {planet}, {level}...).
+- [x] Portraits with expressions (happy, excited, surprised, sad, thinking, sleepy) drawn as SVG per villager.
+- [x] Coins (from monsters, challenges and quests) and Pim's bakery shop: buy food and charms, sell from your bag;
+      open by day only.
+- [x] Multi-step quests (collect / deliver / talk / defeat / reach a planet) with a HUD tracker, compass guidance and
+      rewards: 5 quests, one spanning all three planets.
+- [x] A local villager on each later planet (Cinder the smith on Emberfall, Tuva the snow keeper on Frostveil, each with
+      lines, tips for that planet's boss and a quest), and the travelling villagers dress for each planet.
 
 ## 6. Enterable houses **(core)**
 

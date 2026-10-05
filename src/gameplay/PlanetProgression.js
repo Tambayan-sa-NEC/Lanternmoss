@@ -10,7 +10,8 @@ import { encounterEvents } from '../combat/events.js';
 import { clearHazards } from '../combat/hazards.js';
 import { clearEnemies, spawnBoss, spawnRoster } from '../combat/spawning.js';
 import { clearTargets } from '../combat/targeting.js';
-import { createNpcDefs } from '../entities/npc/npcDefs.js';
+import { NPC } from '../entities/npc/NPC.js';
+import { createLocalDefs, createNpcDefs } from '../entities/npc/npcDefs.js';
 import { despawnWildlife, spawnWildlife } from '../entities/wildlife/wildlife.js';
 import { audio } from '../systems/AudioSystem.js';
 import { snapCamera } from '../systems/CameraSystem.js';
@@ -20,6 +21,7 @@ import { Dialog } from '../ui/Dialog.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { toast } from '../ui/toast.js';
 import { Challenges } from './challenges/Challenges.js';
+import { Quests } from './quests/Quests.js';
 import { resetCompanion } from './characters.js';
 import { clearWorldItems, grantItem, spawnForage } from './pickups.js';
 
@@ -49,6 +51,7 @@ export class PlanetProgression {
   onBossDefeated(boss) {
     if (this.state !== 'playing' || boss !== ctx.boss) return;          // once per planet, and only for this planet's boss
     this.state = 'victory'; this.timer = TRANSITION.outroDelay; this.pendingClear = true;
+    ctx.bossesDefeated = Math.max(ctx.bossesDefeated, ctx.planet + 1);
   }
 
   update(dt) {
@@ -97,7 +100,12 @@ export class PlanetProgression {
     const fwd = P.placeAt(world.spawnDir); P.root.visible = true; P.shadow.visible = true;
     if (TRANSITION.healOnArrival) { P.hp = P.stats.maxHp; P.mana = P.stats.maxMana; }
     P.invuln = TRANSITION.fadeTime + 1;
-    const homes = createNpcDefs(world); ctx.npcs.forEach((n, i) => n.relocate(homes[i].dir));
+    // the travelling villagers move into the new village (and dress for it); the old planet's local stays behind
+    const travellers = ctx.npcs.filter(n => !n.def.local), homes = createNpcDefs(world);
+    for (const n of ctx.npcs) if (n.def.local) n.dispose();
+    travellers.forEach((n, i) => { n.relocate(homes[i]); n.dress(index); });
+    ctx.npcs = [...travellers, ...createLocalDefs(world, index).map(d => new NPC(d))];
+    Quests.onPlanetChange();
     spawnWildlife(world);
     this.populate();
     if (ctx.companion) resetCompanion();
@@ -110,7 +118,7 @@ export class PlanetProgression {
       Expects the caller to have reset the enemies already (which removes bosses). */
   reset() {
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
-    ctx.transitioning = false; setFade(false, 0);
+    ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0;
     if (ctx.planet !== 0) this.load(0);
     else { spawnBoss(this.world, this.planet.boss, this.lairs[0]); clearWorldItems(); spawnForage(this.planet.forage); }
   }

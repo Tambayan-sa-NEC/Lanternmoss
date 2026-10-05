@@ -14,6 +14,7 @@ export const ctx = {
   birds: [],
   enemies: [],
   boss: null,         // this planet's boss (also listed in enemies)
+  bossesDefeated: 0,  // planet bosses beaten this adventure (villagers react to it)
   projectiles: [],
   hitStop: 0,         // seconds of slow motion left after a heavy impact (fx/combatFx.js hitStop)
   worldItems: [],     // WorldItem pickups lying on the planet

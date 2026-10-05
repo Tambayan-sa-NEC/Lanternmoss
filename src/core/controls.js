@@ -15,6 +15,7 @@ import { Dialog } from '../ui/Dialog.js';
 import { toggleHint } from '../ui/hud.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
+import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
 
 /** Keys whose browser default (page scroll, quick-find...) would get in the way. */
@@ -26,7 +27,8 @@ function onKey(code) {
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens
   if (ctx.transitioning) return;                       // travelling between planets
   if (code === 'Escape' || code === 'KeyP') {          // Esc closes what's open first (bag, aiming, dialogue), then pauses
-    if (code === 'Escape' && InventoryUI.isOpen) InventoryUI.close();
+    if (code === 'Escape' && ShopUI.isOpen) ShopUI.close();
+    else if (code === 'Escape' && InventoryUI.isOpen) InventoryUI.close();
     else if (code === 'Escape' && isAiming()) cancelAim();
     else if (code === 'Escape' && Dialog.open) Dialog.close();
     else PauseMenu.open();
@@ -37,7 +39,7 @@ function onKey(code) {
   if (code === 'KeyM') toast(audio.toggle() ? 'Sound off' : 'Sound on');
   if (code === 'KeyC') CharacterSelect.requestMenu();
   if (code === 'KeyH') toggleHint();
-  if (InventoryUI.isOpen) return;                      // bag open: you can still move and jump, but not fight or talk
+  if (ctx.inventoryOpen) return;                       // bag or shop open: you can still move and jump, but not fight or talk
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
   if (code === 'KeyE') { if (Dialog.open) Dialog.advance(); else { const n = nearestNPC(player, ctx.npcs); if (n) Dialog.start(n); } }
   if (code === 'KeyX' && Dialog.choice) Dialog.choose(false);

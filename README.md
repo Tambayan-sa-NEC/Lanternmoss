@@ -61,6 +61,9 @@ src/
 │   ├── settings.js        player settings schema (drives the Settings screen, defaults and validation)
 │   ├── controls.js        the fixed key list shown on the pause menu's Controls page
 │   ├── credits.js         the Credits page text
+│   ├── day.js             the village clock: day length, phases, light per phase
+│   ├── shop.js            coins per monster, the shop's keeper, hours, stock and prices
+│   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   └── critters.js        ambient animal looks
@@ -94,7 +97,7 @@ src/
 │   ├── water.js           pond water shader
 │   └── sky.js             sky dome, clouds, fireflies
 ├── models/                procedural character and item art (swap a builder to use real assets)
-│   ├── humanoid.js  heroes.js  creatures.js  villagers.js  monsters.js
+│   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
 ├── items/                 ItemRegistry (validated item catalogue) and itemActions (what each category does)
@@ -105,7 +108,8 @@ src/
 │   │                      bomber, charger, burrower, support, and boss/: the boss framework (core.js) with one kit
 │   │                      per boss (gloomcap.js, dragon.js, demonLord.js)
 │   ├── companions/        Owl (witch, ranger) and Wolf (knight)
-│   ├── npc/               NPC behaviour and the villager definitions (dialogue, homes)
+│   ├── npc/               NPC behaviour (schedules, sleep, lines, outfits) and the villager definitions
+│   │                      (places, schedules, story-aware dialogue, a local villager per later planet)
 │   ├── wildlife/          critters, birds, pond fish and their spawning
 │   ├── Projectile.js      surface-hugging projectiles
 │   └── WorldItem.js       an item stack lying on the ground
@@ -129,6 +133,10 @@ src/
 │   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
 │   ├── characters.js      switching heroes (model, stats, abilities, companion)
 │   ├── buffs.js           Moon-Hop / Feather-Step timers
+│   ├── dayClock.js        the village clock (phase, day, light)
+│   ├── storyState.js      what villagers know about your adventure (dialogue conditions and placeholders)
+│   ├── wallet.js          coins: earning, spending, shop prices
+│   ├── quests/            quest runtime (offers, steps, tracker, rewards)
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
@@ -137,6 +145,7 @@ src/
 ├── ui/                    DOM side: element lookups, HUD (bars, status row, ability bar + tooltips, boss bar), icons (SVG),
 │                          waypoints (compass strip + off-screen arrows), PauseMenu (pause, settings, controls, quit),
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
+│                          ShopUI (buy / sell), portraits (dialogue faces),
 │                          dialogue, challenge panel, banner + travel fade,
 │                          InventoryUI + itemTooltip (the bag window), itemNotices (item toasts),
 │                          overlay (planet chip), toast, character select (reached from the title, or C in play)
@@ -216,7 +225,10 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Hero stats and abilities | `src/config/characters.js` |
 | XP curve, level cap, stat / damage growth | `src/config/leveling.js` |
 | Challenges and their dialogue | `src/config/challenges.js` |
-| Villager dialogue | `src/entities/npc/npcDefs.js` |
+| Quests (steps, rewards, dialogue) | `src/config/quests.js` |
+| Day length, phases and light | `src/config/day.js` |
+| Coins per monster, shop stock, prices and hours | `src/config/shop.js` |
+| Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |
 

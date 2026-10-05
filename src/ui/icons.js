@@ -31,6 +31,7 @@ const GLYPHS = {
   boss: `<path ${F} d="M12 3c-4.7 0-8 3.2-8 7.5 0 2.4 1.1 4.3 2.8 5.4V19h2.4v-2h1.6v2h2.4v-2h1.6v2h2.4v-3.1c1.7-1.1 2.8-3 2.8-5.4C20 6.2 16.7 3 12 3z"/><circle fill="#fff" cx="8.8" cy="11" r="1.9"/><circle fill="#fff" cx="15.2" cy="11" r="1.9"/>`,
   home: `<path ${F} d="M12 3.5L2.5 11.5h2.8V20h5v-5h3.4v5h5v-8.5h2.8z"/>`,
   star: `<path ${F} d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/>`,
+  quest: `<path ${F} d="M6 3.5h10.5a3 3 0 0 1 3 3V19a2 2 0 0 1-2 2H7.5a3 3 0 0 1-3-3V5a1.5 1.5 0 0 1 1.5-1.5z"/><path fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" d="M8 8h8M8 11.5h8M8 15h5"/>`,
   talk: `<path ${F} d="M4 4.5h16a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 16.5H10l-4.5 4v-4H4A1.5 1.5 0 0 1 2.5 15V6A1.5 1.5 0 0 1 4 4.5z"/><path fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" d="M12 7.5v4M12 14v.1"/>`,
 };
 

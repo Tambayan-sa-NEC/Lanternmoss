@@ -18,12 +18,15 @@ import { updateEmotes } from '../fx/emotes.js';
 import { createSparkles, sparkles } from '../fx/sparkles.js';
 import { applyCharacter, showcaseHero } from '../gameplay/characters.js';
 import { buffs, resetBuffs, updateBuffs } from '../gameplay/buffs.js';
+import { dayClock } from '../gameplay/dayClock.js';
 import { useItemInSlot } from '../gameplay/itemUse.js';
 import { dropFromSlot, spawnWorldItem, updateWorldItems } from '../gameplay/pickups.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { installItemNotices } from '../ui/itemNotices.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { Quests } from '../gameplay/quests/Quests.js';
+import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
 import { PlanetProgression } from '../gameplay/PlanetProgression.js';
 import { PLANETS } from '../config/planets.js';
 import { installLevelFeedback } from '../progression/levelFeedback.js';
@@ -72,7 +75,12 @@ export class Game {
     this.planets.populate();
 
     Dialog.init();
-    Dialog.lineProvider = npc => Challenges.lineFor(npc);
+    // what a villager says first: a quest hand-in, a running challenge, the shop greeting, a fresh story reaction,
+    // then quest / challenge offers, then their ordinary chatter (Dialog falls back to npc.nextLine())
+    const chat = npc => npc.reaction() || Quests.offerFor(npc) || Challenges.lineFor(npc);
+    Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
+      || shopLineFor(npc, n => chat(n) || n.nextLine()) || chat(npc);
+    Quests.init(); ShopUI.init();
     installLevelFeedback();
     const bag = ctx.player.inventory;
     installItemNotices(bag);
@@ -112,12 +120,14 @@ export class Game {
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
-    Challenges.update(dt);
+    Challenges.update(dt); Quests.update(dt); ShopUI.update();
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
     updateCamera(dt);
     updateWaypoints();                                             // after the camera: bearings are relative to the view
+    if (ctx.started) dayClock.update(dt);                          // the village clock only runs while you play
+    this.world.setDaylight(dayClock.light());
     this.world.update(dt, ctx.time, ctx.player, cam.up, camera);
     sparkles.update(dt); updateEmotes(dt);
     Dialog.update(dt);
@@ -127,7 +137,7 @@ export class Game {
   beginGame() {
     if (ctx.started || !CharacterSelect.choice) return;             // a hero must be picked first
     ctx.started = true; audio.init();
-    CharacterSelect.close();
+    CharacterSelect.close(); MainMenu.onBegin();
     resetView(ctx.player.fwd);                                     // same framing as before the menu orbit
     toast(CHARACTERS[ctx.player.charId].welcome); this.renderSystem.canvas.focus();
     showBanner(`Planet ${ctx.planet + 1} · ${PLANETS[ctx.planet].name}`, PLANETS[ctx.planet].tagline);
@@ -138,16 +148,16 @@ export class Game {
   resetRun() {
     const P = ctx.player, world = this.world;
     Dialog.close(); InventoryUI.close();
-    Challenges.reset();
+    Challenges.reset(); Quests.reset(); ShopUI.close();
     for (const n of ctx.npcs) n.resetLines();
-    resetBuffs();
+    resetBuffs(); dayClock.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards(); ctx.hitStop = 0;
     resetEnemies();
     clearTargets();
     if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
     this.planets.reset();                                          // back to the first planet (and its boss)
-    Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, stats: CHARACTERS[P.charId].stats });   // a fresh adventure starts back at level 1
+    Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, coins: 0, stats: CHARACTERS[P.charId].stats });   // a fresh adventure starts back at level 1
     P.clearTimers(); P.inventory.clear();
     const fwd = P.placeAt(world.spawnDir);
     P.root.visible = true; snapCamera(world.spawnDir, fwd);

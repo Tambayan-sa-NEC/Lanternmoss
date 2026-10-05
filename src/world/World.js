@@ -89,6 +89,9 @@ export class World {
     ponds.length = 0; placed.length = 0; clearStaticColliders();
   }
 
+  /** Time-of-day light (gameplay/dayClock.js light()): sun colour and strength, ambient strength. */
+  setDaylight({ sun, sunIntensity, ambient }) { this.sun.color.copy(sun); this.sun.intensity = sunIntensity; this.hemi.intensity = ambient; }
+
   /** Puts the sun back at its starting bearing over the village. */
   resetSun() {
     const [t1, t2] = tangentFrame(this.spawnDir);

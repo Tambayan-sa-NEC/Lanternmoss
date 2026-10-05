@@ -6,6 +6,7 @@ import { ctx } from '../core/context.js';
 import { settings } from '../core/settings.js';
 import { floatText, hitStop } from '../fx/combatFx.js';
 import { sparkles } from '../fx/sparkles.js';
+import { coinsForKill, gainCoins } from '../gameplay/wallet.js';
 import { gainXp } from '../progression/experience.js';
 import { damageMultiplier } from '../progression/leveling.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -51,7 +52,10 @@ export function damageEnemy(e, amount, o = {}) {
   if (o.stun && e.hp > 0) e.stun(o.stun);
   if (o.source !== 'owl') noteHit(e);
   e.aggro(); audio.hitEnemy();
-  if (e.hp <= 0) { e.die(); if (LEVELING.creditSources.includes(o.source || 'player')) gainXp(e.def.xp, e); }
+  if (e.hp <= 0) {
+    e.die();
+    if (LEVELING.creditSources.includes(o.source || 'player')) { gainXp(e.def.xp, e); gainCoins(coinsForKill(e), _tv.copy(e.center()).addScaledVector(e.up, e.height * 0.9)); }
+  }
 }
 
 /** o.lethal = a boss's killing blow: ignores armor and Guard and always takes the hero down (only i-frames save you,

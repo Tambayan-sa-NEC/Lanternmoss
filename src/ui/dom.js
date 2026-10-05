@@ -10,7 +10,7 @@ export const dom = {
   combat: $('combat'), status: $('status'), level: document.querySelector('#combat .lvl b'), tip: $('tip'), lowHp: $('lowhp'),
   compass: $('compass'), compassTrack: document.querySelector('#compass .track'), markers: $('markers'),
   // dialogue
-  dialog: $('dialog'), dlgName: $('dlg-name'), dlgText: $('dlg-text'), dlgNext: $('dlg-next'),
+  dialog: $('dialog'), dlgFace: $('dlg-face'), dlgName: $('dlg-name'), dlgText: $('dlg-text'), dlgNext: $('dlg-next'),
   choices: $('dlg-choices'), yes: document.querySelector('#dlg-choices .yes'), no: document.querySelector('#dlg-choices .no'),
   // challenges, banner, boss, planet travel
   challenge: $('challenge'), challengeResult: $('cresult'),
@@ -26,7 +26,7 @@ export const dom = {
   // title screen
   title: $('title'), titleMenu: document.querySelector('#title .tmenu'), campaign: document.querySelector('#title .campaign'),
   // pause menu
-  pause: $('pause'),
+  pause: $('pause'), shop: $('shop'),
 };
 
 /** Restarts a one-shot CSS animation class on an element. */

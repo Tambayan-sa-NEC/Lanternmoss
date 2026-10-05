@@ -49,6 +49,8 @@ export const MainMenu = {
     CharacterSelect.show();
   },
   backToTitle() { CharacterSelect.hide(); this.showTitle(); },
+  /** Play has begun (whatever the route in): make sure the title is gone. */
+  onBegin() { dom.title.classList.remove('enter', 'leave'); dom.title.style.display = 'none'; },
   act(name) {
     audio.init();
     if (name === 'play') this.play(); else PauseMenu.openPanel(name);

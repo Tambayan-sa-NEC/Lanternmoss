@@ -1,11 +1,14 @@
-/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, treats, challenges).
+/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, time of day, coins, the tracked
+   quest, treats, challenges).
    Active buffs show in the HUD's status row (src/ui/hud.js). */
 import * as THREE from 'three';
 import { CHALLENGES } from '../config/challenges.js';
 import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
+import { dayClock } from '../gameplay/dayClock.js';
 import { nearestNPC } from '../entities/npc/NPC.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { Quests } from '../gameplay/quests/Quests.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { camera } from '../render/scene.js';
 import { Dialog } from './Dialog.js';
@@ -29,6 +32,10 @@ function updatePrompt() {
 function updateChips(dt) {
   if ((chipsT -= dt) >= 0) return;
   chipsT = 0.25; let h = `<div class="chip" style="background:#e8eeff">Planet ${ctx.planet + 1}/${PLANETS.length} · ${PLANETS[ctx.planet].name}</div>`;
+  h += `<div class="chip time ${dayClock.phase}">${dayClock.phase === 'night' ? '☾' : '☀'} ${dayClock.label} · Day ${dayClock.day}</div>`;
+  h += `<div class="chip coins">✦ ${ctx.player.coins} coins</div>`;
+  const q = Quests.trackerInfo();
+  if (q) h += `<div class="chip quest"><b>Quest · ${q.title}</b><span>${q.text}${q.progress ? ` <i>${q.progress}</i>` : ''}</span></div>`;
   const treats = TREATS.reduce((n, id) => n + ctx.player.inventory.count(id), 0);
   if (treats) h += `<div class="chip">Treats: ${treats}</div>`;
   const cleared = Challenges.clearedCount();

@@ -3,12 +3,14 @@
    planet. Points of interest:
      village  always (compass)                               boss     while it lives (compass + edge arrow)
      goal     the active challenge's next target (compass + edge arrow; CHALLENGE_KINDS[kind].target)
-     giver    villagers with a challenge to offer, when no challenge is running (compass)
+     giver    villagers with a challenge or quest to offer, when no challenge is running (compass)
+     quest    the villager your tracked quest needs next (compass + edge arrow)
    Edge arrows only appear while their target is off-screen or hidden behind the planet. */
 import * as THREE from 'three';
 import { ctx } from '../core/context.js';
 import { settings } from '../core/settings.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { Quests } from '../gameplay/quests/Quests.js';
 import { cam } from '../systems/CameraSystem.js';
 import { clamp } from '../utils/math.js';
 import { arcDist, projectTangent, tangentToward } from '../utils/sphere.js';
@@ -34,7 +36,9 @@ function pointsOfInterest() {
   if (run) {
     const d = run.kind.target?.(run);
     if (d) list.push({ key: 'goal', dir: d, icon: 'star', label: run.def.title, edge: true, far: true, point: _p.copy(d).multiplyScalar(groundHeight(d) + 1.2).clone() });
-  } else for (const n of ctx.npcs) if (Challenges.availableFor(n)) list.push({ key: `giver:${n.name}`, dir: n.up, icon: 'talk', label: n.name });
+  } else for (const n of ctx.npcs) if (Challenges.availableFor(n) || Quests.offerable(n)) list.push({ key: `giver:${n.name}`, dir: n.up, icon: 'talk', label: n.name });
+  const qt = Quests.target();                                        // the villager your tracked quest needs next
+  if (qt) list.push({ key: 'quest', dir: qt.up, icon: 'quest', label: qt.name, edge: true, far: true, point: _p.copy(qt.pos).addScaledVector(qt.up, qt.height).clone() });
   return list;
 }
 
