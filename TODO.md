@@ -232,6 +232,9 @@ Code: `src/ui/CharacterSelect.js`, `src/gameplay/Pets.js`, `src/ui/InventoryUI.j
       be reached from the pet card.
 - [ ] Remember the chosen pet per hero.
 - [ ] Keep the bag's Pets tab or fold it into the new menu, but have only one place for each action.
+- [ ] **No camera orbit when choosing a hero or a pet.** The camera stays still, with a fixed framing of the hero or
+      pet, instead of circling around them. This also changes the current hero-select screen, which slowly orbits
+      the hero (`src/ui/CharacterSelect.js`, `orbitCamera` in `src/systems/CameraSystem.js`).
 
 ## 13. Achievements and bestiary **(core)**
 
@@ -253,11 +256,20 @@ Code: new `src/config/achievements.js`, `src/gameplay/Journal.js`, `src/ui/` (jo
       of the items found.
 - [ ] Saved with the rest of the game (needs Save / load).
 
-## 14. Better boss fights **(core)**
+## 14. Better fights **(core)**
 
-**Goal:** bosses feel earned and part of the world, not just a lair at the far side of the planet.
-Code: `src/gameplay/PlanetProgression.js`, `src/combat/spawning.js`, `src/config/planets.js`,
+**Goal:** fighting feels natural, and bosses feel earned and part of the world, not just a lair at the far side of the
+planet.
+Code: `src/combat/targeting.js` (`aimDirection`, soft lock-on), `src/combat/aiming.js`, `src/combat/casting.js`,
+`src/gameplay/PlanetProgression.js`, `src/combat/spawning.js`, `src/config/planets.js`,
 `src/entities/enemies/behaviors/boss/`.
+
+- [ ] **Aim where the hero is facing, not where the camera looks.** Today, aiming and attacks follow the camera angle.
+      Instead:
+  - Attacks, projectiles and the soft lock-on go in the direction the character faces.
+  - Aimed abilities place their marker in front of the hero.
+  - Turning the hero (with movement keys or the mouse) is how you aim.
+  - Rotating the camera only changes the view.
 
 - [ ] **Conditions before a boss appears**, set per boss in config:
   - a minimum hero level (e.g. Pyrrhax won't show below level 4);
