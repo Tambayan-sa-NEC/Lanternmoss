@@ -29,8 +29,10 @@ export function dragCamera(dx, dy) {
   cam.fwd.applyAxisAngle(cam.up, -dx * 0.005 * k); cam.pitch = clamp(cam.pitch + dy * 0.004 * k * sy, -0.05, 1.15); cam.lastDrag = ctx.time;
 }
 export function zoomCamera(sign) { cam.dist = clamp(cam.dist * (1 + sign * 0.1), CAMERA.minDist, CAMERA.maxDist); }
-/** Slow showcase orbit behind the character-select screen. */
-export function orbitCamera(dt) { cam.fwd.applyAxisAngle(cam.up, dt * 0.3); cam.dist += (5.5 - cam.dist) * damp(2, dt); }
+/** Slow showcase orbit behind the menus: eases to `dist` and `pitch` while turning at `speed` rad/s. */
+export function orbitCamera(dt, dist = 5.5, speed = 0.3, pitch = CAMERA.pitch) {
+  cam.fwd.applyAxisAngle(cam.up, dt * speed); cam.dist += (dist - cam.dist) * damp(1.5, dt); cam.pitch += (pitch - cam.pitch) * damp(1.5, dt);
+}
 
 const _off = new V3(), _q = new V3(), _tv = new V3();
 /** March from the head outward along the given pitch; returns the farthest unobstructed distance. */

@@ -5,9 +5,12 @@
      settings  generated from SETTINGS_SCHEMA (config/settings.js); changes apply and save immediately
      controls  the fixed keys (config/controls.js) + the current hero's abilities (CHARACTERS), never out of date
      quit      confirmation: going back to the menu restarts the adventure (there is no saving yet)
-   Esc on a sub-page goes back to the main page; Esc / P on the main page resumes. */
+     credits   who made it (config/credits.js); title screen only
+   Esc on a sub-page goes back to the main page; Esc / P on the main page resumes.
+   The title screen opens single pages with openPanel(page) (no pausing): Back / Esc closes the panel again. */
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
 import { AIM_CONTROLS, FIXED_CONTROLS } from '../config/controls.js';
+import { CREDITS } from '../config/credits.js';
 import { PLANETS } from '../config/planets.js';
 import { SETTINGS_SCHEMA } from '../config/settings.js';
 import { cancelAim } from '../combat/aiming.js';
@@ -49,24 +52,30 @@ const PAGES = {
       `<div class="krow ab"><span class="keys">${keys(s.label.split('/'))}${s.mouse ? ' <kbd>Click</kbd>' : ''}</span>
         <span class="ic" style="--c:#${s.color.toString(16).padStart(6, '0')}">${icon(id)}</span><span><b>${s.name}</b>${s.ult ? ' <em>ultimate</em>' : ''}<small>${ABILITY_TEXT[id] ?? ''}</small></span></div>`).join('');
     const rows = list => list.map(([k, what]) => `<div class="krow"><span class="keys">${keys(k)}</span><span>${what}</span></div>`).join('');
+    const heroPart = ctx.started ? `<section class="wide"><h3>${hero.title}'s abilities</h3>${abilities}${rows(AIM_CONTROLS)}</section>`
+      : `<section class="wide"><h3>Abilities</h3><p class="note">Each hero has five abilities on <kbd>1</kbd>–<kbd>5</kbd> (and <kbd>Q</kbd> <kbd>R</kbd> <kbd>F</kbd> <kbd>G</kbd>).
+         You'll see them on the character cards, on the ability bar (hover for details), and here during play.</p>${rows(AIM_CONTROLS)}</section>`;
     return `<h2>Controls</h2><div class="scroll cols">
-      <section class="wide"><h3>${hero.title}'s abilities</h3>${abilities}${rows(AIM_CONTROLS)}</section>
+      ${heroPart}
       ${FIXED_CONTROLS.map(g => `<section><h3>${g.group}</h3>${rows(g.rows)}</section>`).join('')}</div>
       <div class="menu"><button type="button" class="primary" data-go="main">Back</button></div><div class="foot"><kbd>Esc</kbd> back</div>`;
   },
   quit: () => `<h2>Quit to menu?</h2><p class="warn">Your adventure restarts from the first planet: your level, bag and progress on
     ${PLANETS[ctx.planet].name} are lost (there is no saving yet).</p>
     <div class="menu row2"><button type="button" data-go="main">Keep playing</button><button type="button" class="danger" data-go="confirm-quit">Quit to menu</button></div>`,
+  credits: () => `<h2>Credits</h2><div class="scroll credits">${CREDITS.map(([h, lines]) =>
+      `<section><h3>${h}</h3>${lines.map(l => `<p>${l}</p>`).join('')}</section>`).join('')}</div>
+    <div class="menu"><button type="button" class="primary" data-go="main">Back</button></div><div class="foot"><kbd>Esc</kbd> back</div>`,
 };
 
 export const PauseMenu = {
-  isOpen: false, page: 'main', handlers: null,
-  /** handlers.onQuit() returns to the main menu (it restarts the adventure). */
+  isOpen: false, page: 'main', handlers: null, panel: false,
+  /** handlers.onQuit() returns to the main menu (it restarts the adventure); onPanelClosed() after a title-screen panel. */
   init(handlers) {
     this.handlers = handlers;
     dom.pause.addEventListener('click', e => this.onClick(e));
     dom.pause.addEventListener('input', e => this.onInput(e));
-    const autoPause = () => { if (settings.pauseOnBlur) this.open(); };
+    const autoPause = () => { if (settings.pauseOnBlur && !this.panel) this.open(); };
     addEventListener('blur', autoPause);
     document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
   },
@@ -76,10 +85,16 @@ export const PauseMenu = {
     dom.tip.style.display = 'none'; document.body.classList.add('paused'); dom.pause.style.display = 'flex';
     this.page = null; this.show('main');
   },
+  /** A single page over the title screen (settings / controls / credits): nothing to pause. */
+  openPanel(page) {
+    if (this.isOpen) return;
+    this.isOpen = true; this.panel = true; dom.pause.style.display = 'flex'; this.page = null; this.show(page);
+  },
   close() {
     if (!this.isOpen) return;
-    this.isOpen = false; ctx.paused = false; audio.duck(false);
-    document.body.classList.remove('paused'); dom.pause.style.display = 'none';
+    this.isOpen = false; dom.pause.style.display = 'none';
+    if (this.panel) { this.panel = false; this.handlers.onPanelClosed?.(); return; }
+    ctx.paused = false; audio.duck(false); document.body.classList.remove('paused');
   },
   /** Renders a page; re-rendering the same page (after a settings change) keeps its scroll position. */
   show(page) {
@@ -89,7 +104,7 @@ export const PauseMenu = {
   },
   /** Keys while paused (play input is ignored). */
   key(code) {
-    if (code === 'Escape') { if (this.page === 'main') this.close(); else this.show('main'); }
+    if (code === 'Escape') { if (this.page === 'main' || this.panel) this.close(); else this.show('main'); }
     else if (code === 'KeyP' && this.page === 'main') this.close();
   },
   onClick(e) {
@@ -97,6 +112,7 @@ export const PauseMenu = {
     if (go === 'resume') this.close();
     else if (go === 'confirm-quit') { this.close(); this.handlers.onQuit(); }
     else if (go === 'reset') { resetSettings(); this.show('settings'); }
+    else if (go === 'main' && this.panel) this.close();                  // a title-screen panel's Back
     else if (go) this.show(go);
     else if (set) {                                                        // toggles and choice buttons
       const key = set.dataset.set; setSetting(key, set.dataset.value ?? !settings[key]); this.show('settings');

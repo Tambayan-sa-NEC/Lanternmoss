@@ -63,12 +63,23 @@
 </div>
 <div id="toast"></div>
 <div id="pause"></div>
-<div id="start">
-  <h1>Lanternmoss</h1>
-  <p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p>
+<div id="title">
+  <div class="logo"><h1>Lanternmoss</h1><p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p></div>
+  <div class="tmenu">
+    <button type="button" class="primary" data-act="play">Play</button>
+    <button type="button" data-act="settings">Settings</button>
+    <button type="button" data-act="controls">Controls</button>
+    <button type="button" data-act="credits">Credits</button>
+  </div>
+  <div class="campaign"></div>
+  <div class="keys">Enter to play · ↑ ↓ to choose</div>
+</div>
+<div id="start" style="display:none">
+  <button type="button" class="back" id="selback">◀ Back</button>
+  <h2>Choose your hero</h2>
   <div id="cards"></div>
   <div class="go disabled" id="go">Choose your hero</div>
-  <div class="keys">← → or click to choose · Enter to start</div>
+  <div class="keys">← → or click to choose · Enter to start · Esc back</div>
 </div>
 <div id="err"></div>
 </body>

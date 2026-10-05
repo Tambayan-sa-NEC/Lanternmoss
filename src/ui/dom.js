@@ -22,7 +22,9 @@ export const dom = {
   invCount: document.querySelector('#inventory .inv-count'), invUse: document.querySelector('#inventory .inv-use'),
   invDrop: document.querySelector('#inventory .inv-drop'), invClose: document.querySelector('#inventory .inv-close'), invMsg: document.querySelector('#inventory .inv-msg'),
   // character select
-  start: $('start'), cards: $('cards'), go: $('go'),
+  start: $('start'), cards: $('cards'), go: $('go'), selBack: $('selback'),
+  // title screen
+  title: $('title'), titleMenu: document.querySelector('#title .tmenu'), campaign: document.querySelector('#title .campaign'),
   // pause menu
   pause: $('pause'),
 };

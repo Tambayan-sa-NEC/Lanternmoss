@@ -1,5 +1,6 @@
 /* Game: builds everything in a fixed order, runs the per-frame update order, and owns the run lifecycle
-   (character select -> play, planet to planet via PlanetProgression -> back to select restarts the adventure). */
+   (title screen -> character select -> play, planet to planet via PlanetProgression -> quitting to the title or
+   back to character select restarts the adventure). */
 import { CHALLENGES } from '../config/challenges.js';
 import { CHARACTERS } from '../config/characters.js';
 import { COMBAT } from '../config/combat.js';
@@ -45,7 +46,9 @@ import { ponds } from '../world/terrain.js';
 import { World } from '../world/World.js';
 import { ctx } from './context.js';
 import { onSettingsChange, settings } from './settings.js';
+import { MainMenu } from '../ui/MainMenu.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
+import { showBanner } from '../ui/banner.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
 
@@ -76,7 +79,8 @@ export class Game {
     InventoryUI.init(bag, { use: slot => useItemInSlot(bag, slot), drop: slot => dropFromSlot(slot) });
     CharacterSelect.init({ onPick: applyCharacter, onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
-    PauseMenu.init({ onQuit: () => CharacterSelect.open() });            // quitting = back to the menu (restarts the run)
+    PauseMenu.init({ onQuit: () => MainMenu.showTitle(true), onPanelClosed: () => MainMenu.onPanelClosed() });   // quitting restarts the run
+    MainMenu.init({ onReset: () => this.resetRun() });
     this.applySettings();
     onSettingsChange(key => { this.applySettings(); if (key === 'cameraDistance' || key === null) cam.dist = settings.cameraDistance; });
     addEventListener('resize', () => { this.renderSystem.resize(); applyUiScale(); }); this.renderSystem.resize();
@@ -109,7 +113,7 @@ export class Game {
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
     Challenges.update(dt);
     updateKnight(dt);
-    CharacterSelect.update(dt);
+    MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     updateCamera(dt);
     updateWaypoints();                                             // after the camera: bearings are relative to the view
     this.world.update(dt, ctx.time, ctx.player, cam.up, camera);
@@ -124,6 +128,7 @@ export class Game {
     CharacterSelect.close();
     resetView(ctx.player.fwd);                                     // same framing as before the menu orbit
     toast(CHARACTERS[ctx.player.charId].welcome); this.renderSystem.canvas.focus();
+    showBanner(`Planet ${ctx.planet + 1} · ${PLANETS[ctx.planet].name}`, PLANETS[ctx.planet].tagline);
     this.planets.onBegin();
   }
 
@@ -151,7 +156,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Dialog, buffs, cam, keys, CharacterSelect, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Challenges, CHALLENGES, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

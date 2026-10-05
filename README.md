@@ -60,6 +60,7 @@ src/
 │   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips)
 │   ├── settings.js        player settings schema (drives the Settings screen, defaults and validation)
 │   ├── controls.js        the fixed key list shown on the pause menu's Controls page
+│   ├── credits.js         the Credits page text
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   └── critters.js        ambient animal looks
@@ -135,9 +136,10 @@ src/
 │                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming)
 ├── ui/                    DOM side: element lookups, HUD (bars, status row, ability bar + tooltips, boss bar), icons (SVG),
 │                          waypoints (compass strip + off-screen arrows), PauseMenu (pause, settings, controls, quit),
+│                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
 │                          dialogue, challenge panel, banner + travel fade,
 │                          InventoryUI + itemTooltip (the bag window), itemNotices (item toasts),
-│                          overlay (planet chip), toast, character select
+│                          overlay (planet chip), toast, character select (reached from the title, or C in play)
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
 ```
 

@@ -10,6 +10,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
 import { initInput } from '../systems/InputSystem.js';
 import { CharacterSelect } from '../ui/CharacterSelect.js';
+import { MainMenu } from '../ui/MainMenu.js';
 import { Dialog } from '../ui/Dialog.js';
 import { toggleHint } from '../ui/hud.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
@@ -53,7 +54,7 @@ export function initControls(canvas) {
   initInput(canvas, {
     preventKeys: GAME_KEYS,
     isActive: () => ctx.started,
-    onMenuKey: code => CharacterSelect.key(code),
+    onMenuKey: code => MainMenu.key(code),
     onKey, onClick,
     onCancel: cancelAim,
     onDrag: dragCamera,

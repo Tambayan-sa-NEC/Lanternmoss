@@ -52,15 +52,20 @@ Schema: `src/config/settings.js` (one table drives the screen, defaults and vali
 - [ ] Remappable keys (stretch goal; needs bindings to move out of `CHARACTERS` key lists into one keymap table).
 - [x] Remembered in `localStorage` (`lanternmoss.settings`); saved values are validated on load, Reset restores defaults.
 
-## 3. Main menu / landing page **(core)**
+## 3. Main menu / landing page **(core)** ✓
 
 **Goal:** a proper title screen before character selection.
-Code: `index.html` (`#start`), `src/ui/CharacterSelect.js`, `styles/main.css`.
+Code: `src/ui/MainMenu.js`, `index.html` (`#title`, `#start`), `src/ui/CharacterSelect.js`, `styles/main.css`.
 
-- [ ] Title screen with the logo, a slowly orbiting live view of the planet behind it, and soft music.
-- [ ] Buttons: **Play** / **Continue** (once saving exists), **Settings**, **Controls**, **Credits**.
-- [ ] Animated transition from the menu into character selection, and from selection into the game.
-- [ ] Show a short tagline and the current campaign (Lanternmoss → Emberfall → Frostveil).
+- [x] Title screen with the floating logo and tagline over a slow, wide, high orbit of the planet; the music starts on
+      the first click or key press (browsers block audio until then).
+- [x] Buttons: **Play**, **Settings**, **Controls**, **Credits** (credits text in `src/config/credits.js`); mouse or
+      ↑ ↓ + Enter. Settings / Controls / Credits open as panels of the pause menu (`PauseMenu.openPanel`).
+- [ ] **Continue**: needs the save system (see "Suggested"); add the button then.
+- [x] Animated transitions: the title lifts away as the hero cards slide in (and the camera moves in close); character
+      select has Back / Esc; starting fades the overlay while the camera swoops into play, with the planet banner.
+- [x] Campaign strip: Lanternmoss → Emberfall → Frostveil with each planet's colour and boss (from `config/planets.js`).
+- [x] "Quit to menu" in the pause menu now returns to the title screen (restarting the run).
 
 ## 4. Character selection **(core)**
 

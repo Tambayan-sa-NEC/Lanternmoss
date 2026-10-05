@@ -51,9 +51,55 @@ kbd { display:inline-block; min-width:14px; padding:0 5px; margin:0 1px; border:
 #start { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center;
   padding-top:5vh; box-sizing:border-box; cursor:default; transition:opacity .7s;
   background:radial-gradient(ellipse at 50% 45%, rgba(255,236,214,0) 25%, rgba(255,170,160,.65)); }
-#start h1 { font-size:clamp(44px,8vw,88px); margin:0; color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill;
-  text-shadow:0 7px 0 var(--ink); letter-spacing:2px; font-weight:800; }
-#start p { margin:10px 0 0; font-size:18px; font-weight:800; color:var(--ink); background:rgba(255,255,255,.7); padding:4px 14px; border-radius:999px; }
+#start h2 { margin:0; font-size:clamp(30px,4.6vw,50px); color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill;
+  text-shadow:0 5px 0 var(--ink); letter-spacing:1px; font-weight:800; }
+#start .back { position:absolute; top:18px; left:18px; z-index:1; font:inherit; font-weight:800; font-size:15px; padding:6px 16px; cursor:pointer;
+  background:#fff8ee; color:var(--ink); border:3px solid var(--ink); border-radius:999px; box-shadow:0 3px 0 var(--ink); }
+#start .back:hover { transform:translateY(-2px); }
+#start.enter h2 { animation:dropin .5s cubic-bezier(.2,1.4,.4,1) backwards; }
+#start.enter #cards .card:nth-child(odd) { animation:fromleft .55s cubic-bezier(.2,1.2,.4,1) backwards; }
+#start.enter #cards .card:nth-child(even) { animation:fromright .55s .08s cubic-bezier(.2,1.2,.4,1) backwards; }
+#start.enter #cards .card:nth-child(3) { animation-delay:.16s; }
+#start.leave { animation:fadeout .3s ease-in forwards; }
+/* ---------- title screen (src/ui/MainMenu.js) ---------- */
+#title { position:fixed; inset:0; z-index:2; display:flex; flex-direction:column; align-items:center; padding:8vh 0 3.5vh; box-sizing:border-box;
+  text-align:center; cursor:default; background:radial-gradient(ellipse at 50% 58%, rgba(255,236,214,0) 30%, rgba(255,170,160,.62)); }
+#title h1 { font-size:clamp(56px,10vw,118px); margin:0; color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill;
+  text-shadow:0 8px 0 var(--ink); letter-spacing:2px; font-weight:800; animation:logofloat 5s ease-in-out infinite; }
+#title .logo p { display:inline-block; margin:12px 0 0; font-size:18px; font-weight:800; background:rgba(255,255,255,.75); padding:4px 16px; border-radius:999px; }
+#title .tmenu { display:flex; flex-direction:column; gap:12px; width:min(270px,72vw); margin-top:7vh; }
+#title .tmenu button { font:inherit; font-weight:800; font-size:18px; padding:9px 18px; cursor:pointer; color:var(--ink); background:#fff8ee;
+  border:4px solid var(--ink); border-radius:999px; box-shadow:0 4px 0 var(--ink); transition:transform .12s, background .12s; }
+#title .tmenu button.primary { font-size:24px; padding:11px 18px; background:var(--pink); color:#fff; }
+#title .tmenu button.focus { transform:translateY(-3px) scale(1.04); background:#fff; }
+#title .tmenu button.primary.focus { background:#ff9fbd; }
+#title .tmenu button:active { transform:translateY(1px); box-shadow:0 2px 0 var(--ink); }
+#title .campaign { margin-top:auto; display:flex; align-items:center; gap:12px; padding:8px 18px; background:rgba(255,248,238,.88);
+  border:3px solid var(--ink); border-radius:999px; box-shadow:0 3px 0 var(--ink); }
+#title .planet { display:flex; align-items:center; gap:8px; text-align:left; line-height:1.15; }
+#title .planet b { width:28px; height:28px; border-radius:50%; border:3px solid var(--ink); background:radial-gradient(circle at 35% 30%, var(--s), var(--c) 70%); }
+#title .planet strong { display:block; font-size:13.5px; }
+#title .planet small { font-size:10.5px; font-weight:800; opacity:.65; }
+#title .arrow { font-style:normal; font-weight:800; opacity:.45; }
+#title .keys { margin-top:10px; font-size:12px; font-weight:800; opacity:.75; }
+#title.enter .logo { animation:dropin .8s cubic-bezier(.2,1.4,.4,1) backwards; }
+#title.enter .tmenu button { animation:risein .5s cubic-bezier(.2,1.3,.4,1) backwards; }
+#title.enter .tmenu button:nth-child(1) { animation-delay:.25s; } #title.enter .tmenu button:nth-child(2) { animation-delay:.32s; }
+#title.enter .tmenu button:nth-child(3) { animation-delay:.39s; } #title.enter .tmenu button:nth-child(4) { animation-delay:.46s; }
+#title.enter .campaign, #title.enter .keys { animation:fadein .6s .55s backwards; }
+#title.leave .logo { animation:liftout .38s ease-in forwards; }
+#title.leave .tmenu, #title.leave .campaign, #title.leave .keys { animation:sinkout .3s ease-in forwards; }
+#title.leave { pointer-events:none; background:transparent; transition:background .35s; }
+@keyframes logofloat { 50% { transform:translateY(-6px) rotate(-1deg); } }
+@keyframes dropin { from { opacity:0; transform:translateY(-40px) scale(.9); } }
+@keyframes risein { from { opacity:0; transform:translateY(24px) scale(.9); } }
+@keyframes fromleft { from { opacity:0; transform:translateX(-60px); } }
+@keyframes fromright { from { opacity:0; transform:translateX(60px); } }
+@keyframes fadein { from { opacity:0; } }
+@keyframes fadeout { to { opacity:0; } }
+@keyframes liftout { to { opacity:0; transform:translateY(-50px) scale(.92); } }
+@keyframes sinkout { to { opacity:0; transform:translateY(30px); } }
+body.menu #toast, body.menu #prompt { visibility:hidden; }
 #start .go { position:absolute; bottom:8vh; left:50%; transform:translateX(-50%); margin-top:28px; padding:12px 30px; white-space:nowrap; cursor:pointer;
   background:var(--pink); color:#fff; border:4px solid var(--ink); border-radius:999px;
   font-weight:800; font-size:21px; box-shadow:0 5px 0 var(--ink); animation:bob 1.4s ease-in-out infinite; }
@@ -330,4 +376,6 @@ img.item-icon { background:none; border:none; object-fit:contain; }
 #pause .krow.ab .ic svg { width:17px; height:17px; color:var(--ink); }
 #pause .krow.ab em { font-style:normal; font-size:10px; padding:0 6px; border-radius:999px; background:#ffd36b; border:2px solid var(--ink); }
 #pause .krow.ab small { display:block; font-size:11.5px; opacity:.75; }
+#pause .note { font-size:12.5px; line-height:1.55; margin:2px 0 6px; }
+#pause .credits { text-align:center; } #pause .credits p { margin:2px 0; font-size:13.5px; } #pause .credits h3 { margin-top:12px; }
 body.paused #tip, body.paused #aimhint { display:none !important; }
