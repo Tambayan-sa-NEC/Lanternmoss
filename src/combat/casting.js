@@ -45,7 +45,7 @@ function pay(id, s) {
 }
 
 export function tryCast(id) {
-  const player = ctx.player, s = kit()[id]; if (!ctx.started || ctx.transitioning || ctx.inventoryOpen || player.dead || !s || player.motion) return;
+  const player = ctx.player, s = kit()[id]; if (!ctx.started || ctx.transitioning || ctx.inventoryOpen || ctx.indoors || player.dead || !s || player.motion) return;   // no fighting indoors
   if (isAiming() && !isAiming(id)) cancelAim();                        // another ability drops the aim
   if (s.target === 'ground') {
     if (isAiming(id)) { confirmAim(); return; }

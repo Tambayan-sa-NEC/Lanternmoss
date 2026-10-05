@@ -14,7 +14,7 @@ const V3 = THREE.Vector3;
 
 /** fwd/up = view heading and up (transported around the sphere); pitch/dist = what the player asked for,
     effPitch/curDist = what obstacles allow; init = false snaps the follow target on the next frame. */
-export const cam = { fwd: new V3(), up: new V3(), target: new V3(), pitch: CAMERA.pitch, effPitch: CAMERA.pitch, dist: settings.cameraDistance, curDist: settings.cameraDistance,
+export const cam = { room: null, fwd: new V3(), up: new V3(), target: new V3(), pitch: CAMERA.pitch, effPitch: CAMERA.pitch, dist: settings.cameraDistance, curDist: settings.cameraDistance,
   lastDrag: -99, init: false, shake: 0 };
 
 export function initCamera(player) { cam.fwd.copy(player.fwd); cam.up.copy(player.up); }
@@ -29,6 +29,16 @@ export function dragCamera(dx, dy) {
   cam.fwd.applyAxisAngle(cam.up, -dx * 0.005 * k); cam.pitch = clamp(cam.pitch + dy * 0.004 * k * sy, -0.05, 1.15); cam.lastDrag = ctx.time;
 }
 export function zoomCamera(sign) { cam.dist = clamp(cam.dist * (1 + sign * 0.1), CAMERA.minDist, CAMERA.maxDist); }
+/** Indoors: a fixed dollhouse view looking down into the room from `back` (null = the normal follow camera). */
+export function setRoomView(view) { cam.room = view; cam.init = false; }
+const ROOM_PITCH = 0.92;
+function updateRoomCamera(dt) {
+  const P = ctx.player, { up, back } = cam.room, d = clamp(cam.dist, 5, 10);
+  _tv.copy(P.pos).addScaledVector(up, 1.0);
+  if (!cam.init) { cam.target.copy(_tv); cam.init = true; } else cam.target.lerp(_tv, damp(8, dt));
+  camera.position.copy(cam.target).addScaledVector(back, Math.cos(ROOM_PITCH) * d).addScaledVector(up, Math.sin(ROOM_PITCH) * d);
+  camera.up.copy(up); camera.lookAt(cam.target); cam.up.copy(up); cam.fwd.copy(back).negate();
+}
 /** Turns the view around the hero by `rad` (dragging on the character-select screen). */
 export function spinCamera(rad) { cam.fwd.applyAxisAngle(cam.up, rad); }
 /** Slow showcase orbit behind the menus: eases to `dist` and `pitch` while turning at `speed` rad/s. */
@@ -50,6 +60,7 @@ function camMarch(pitch) {
 
 export function updateCamera(dt) {
   const P = ctx.player;
+  if (cam.room) { updateRoomCamera(dt); return applyShake(dt); }
   if (!cam.init) { cam.target.copy(P.pos).addScaledVector(P.up, 1.4); cam.init = true; }
   cam.up.lerp(P.up, damp(10, dt)).normalize();
   projectTangent(cam.fwd, cam.up).normalize();                 // transport camera heading across the sphere (pole-safe)
@@ -74,8 +85,10 @@ export function updateCamera(dt) {
   const len = camera.position.length(); _tv.copy(camera.position).divideScalar(len);
   const gh = groundHeight(_tv) + 0.6; if (len < gh) camera.position.copy(_tv).multiplyScalar(gh);
   camera.up.copy(cam.up); camera.lookAt(cam.target);
-  if (cam.shake > 0) {
-    cam.shake = Math.max(0, cam.shake - dt); const a = cam.shake * 0.5;
-    camera.position.add(_tv.set(mr(-a, a), mr(-a, a), mr(-a, a)));
-  }
+  applyShake(dt);
+}
+function applyShake(dt) {
+  if (cam.shake <= 0) return;
+  cam.shake = Math.max(0, cam.shake - dt); const a = cam.shake * 0.5;
+  camera.position.add(_tv.set(mr(-a, a), mr(-a, a), mr(-a, a)));
 }

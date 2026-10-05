@@ -26,6 +26,8 @@ import { InventoryUI } from '../ui/InventoryUI.js';
 import { installItemNotices } from '../ui/itemNotices.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { Quests } from '../gameplay/quests/Quests.js';
+import { Houses } from '../gameplay/Houses.js';
+import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
 import { PlanetProgression } from '../gameplay/PlanetProgression.js';
 import { PLANETS } from '../config/planets.js';
@@ -81,6 +83,7 @@ export class Game {
     Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
       || shopLineFor(npc, n => chat(n) || n.nextLine()) || chat(npc);
     Quests.init(); ShopUI.init();
+    Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
     installLevelFeedback();
     const bag = ctx.player.inventory;
     installItemNotices(bag);
@@ -120,7 +123,7 @@ export class Game {
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
-    Challenges.update(dt); Quests.update(dt); ShopUI.update();
+    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt);
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -148,7 +151,7 @@ export class Game {
   resetRun() {
     const P = ctx.player, world = this.world;
     Dialog.close(); InventoryUI.close();
-    Challenges.reset(); Quests.reset(); ShopUI.close();
+    Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs(); dayClock.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;

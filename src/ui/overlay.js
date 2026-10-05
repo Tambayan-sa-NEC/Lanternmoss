@@ -6,24 +6,24 @@ import { CHALLENGES } from '../config/challenges.js';
 import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { dayClock } from '../gameplay/dayClock.js';
-import { nearestNPC } from '../entities/npc/NPC.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { currentInteraction } from '../gameplay/Houses.js';
 import { Quests } from '../gameplay/quests/Quests.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { camera } from '../render/scene.js';
-import { Dialog } from './Dialog.js';
 import { dom } from './dom.js';
 
 const _tv = new THREE.Vector3();
 const TREATS = itemRegistry.all().filter(d => d.tags.includes('treat')).map(d => d.id);
 let chipsT = 0;
 
+/** The "E ..." bubble over whatever E would use: a villager, a door, furniture (src/gameplay/Houses.js currentInteraction). */
 function updatePrompt() {
-  const n = !Dialog.open && ctx.started ? nearestNPC(ctx.player, ctx.npcs) : null;
-  if (!n) { dom.prompt.style.display = 'none'; return; }
-  _tv.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).project(camera);
+  const t = currentInteraction();
+  if (!t) { dom.prompt.style.display = 'none'; return; }
+  _tv.copy(t.at).project(camera);
   if (_tv.z < 1) {
-    dom.prompt.style.display = 'block'; dom.prompt.innerHTML = `<kbd>E</kbd> Talk to ${n.name}${Challenges.tagFor(n)}`;
+    dom.prompt.style.display = 'block'; dom.prompt.innerHTML = `<kbd>E</kbd> ${t.label}`;
     dom.prompt.style.left = ((_tv.x * 0.5 + 0.5) * innerWidth) + 'px'; dom.prompt.style.top = ((-_tv.y * 0.5 + 0.5) * innerHeight) + 'px';
   } else dom.prompt.style.display = 'none';
 }

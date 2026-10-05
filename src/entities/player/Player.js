@@ -62,7 +62,7 @@ export class Player extends Walker {
   update(dt, { keys, viewFwd, enabled }) {
     if (this.motion) {
       if (this.dead || !this.motion(this, dt)) this.motion = null;
-      animateHero(this, dt, 0); HERO_POSES[this.charId]?.(this, dt, 0);
+      const hs = this.motionHs || 0; animateHero(this, dt, hs); HERO_POSES[this.charId]?.(this, dt, hs);   // indoors walking animates too
       this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
       return;
     }

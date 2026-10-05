@@ -22,6 +22,7 @@ import { InventoryUI } from '../ui/InventoryUI.js';
 import { toast } from '../ui/toast.js';
 import { Challenges } from './challenges/Challenges.js';
 import { Quests } from './quests/Quests.js';
+import { Houses } from './Houses.js';
 import { resetCompanion } from './characters.js';
 import { clearWorldItems, grantItem, spawnForage } from './pickups.js';
 
@@ -91,7 +92,7 @@ export class PlanetProgression {
   load(index) {
     const P = ctx.player, world = this.world;
     ctx.planet = index;
-    Dialog.close(); Challenges.cancel();
+    Dialog.close(); Challenges.cancel(); Houses.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
     clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems();

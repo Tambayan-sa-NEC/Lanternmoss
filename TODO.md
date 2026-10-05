@@ -100,16 +100,21 @@ storyState, wallet, quests/), `src/ui/` (Dialog, portraits, ShopUI).
 - [x] A local villager on each later planet (Cinder the smith on Emberfall, Tuva the snow keeper on Frostveil, each with
       lines, tips for that planet's boss and a quest), and the travelling villagers dress for each planet.
 
-## 6. Enterable houses **(core)**
+## 6. Enterable houses **(core)** ✓
 
 **Goal:** the player can walk into village houses.
-Code: `src/world/village.js`, `src/world/props.js`, `src/physics/colliders.js`, `src/systems/CameraSystem.js`.
+Code: `src/config/houses.js`, `src/world/interiors.js`, `src/gameplay/Houses.js`, `src/systems/CameraSystem.js`.
 
-- [ ] Doors with a "press E to enter" prompt.
-- [ ] Interiors as separate small scenes (simpler than carving real interiors into a tiny curved planet): fade out, load the room, fade in, and the reverse on exit.
-- [ ] A fixed or close-follow camera mode for small indoor spaces.
-- [ ] Furniture, an NPC who lives there, and things to interact with (bed to rest/heal, chest, bookshelf lore).
-- [ ] No combat indoors (a safe zone, like the village).
+- [x] Doors with a "press E to enter" prompt (E talks to a villager instead when one is closer).
+- [x] Interiors as separate small scenes, built far from the planet: fade out, build the room, fade in, and the reverse
+      on exit (walk onto the doormat or press E at the door). Two layouts: round mushroom rooms and cottages.
+- [x] A fixed dollhouse camera for small indoor spaces (front walls kept low so nothing blocks the view).
+- [x] Six houses per planet with their own furniture: owners' homes (Lio, Pim's bakery, Old Bramble, Cinder, Tuva),
+      residents who live indoors (Granny Thimble, Moth the librarian), and empty houses with notes. Things to use:
+      bed (nap to heal, or sleep until morning at night), a chest with a gift (once per adventure), bookshelf lore,
+      kettle tea, Pim's oven (a bun a day), instruments, telescope, fireplace, anvil. Villagers who sleep at home are
+      found asleep in their bed at night.
+- [x] No combat indoors (abilities are blocked, monsters ignore you, the companion waits outside).
 
 ## 7. Chests **(core)**
 

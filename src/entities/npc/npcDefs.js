@@ -7,7 +7,8 @@
      once  said once per adventure, the first time it applies (story reactions); text may use {hero} {planet} {level} ...
    places = named spots { dir, wander (radius to stroll) }; schedule = day phase -> place (config/day.js). They sleep at
    night unless sleeps: false. gesture: 'wave' = right arm waves while talking, 'raise' = left arm raised.
-   portrait = face drawn in the dialogue box; headR / hat size and limit the outfit each planet adds (models/villagers.js). */
+   portrait = face drawn in the dialogue box; headR / hat size and limit the outfit each planet adds (models/villagers.js).
+   sleepsIndoors = their night spot is their own front door: asleep, they go inside to bed (config/houses.js owner). */
 import * as THREE from 'three';
 import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
@@ -37,7 +38,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
   const stones = dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 3.3), square = (a, r = 4.5) => offsetDir(spawnDir, a, r);
   return [
     { name: 'Old Bramble', title: 'Wizard', color: '#8a6ae0', build: buildWizard, height: 2.75, radius: 0.6,
-      gesture: 'raise', portrait: 'wizard', headR: 0.34, hat: true,
+      gesture: 'raise', portrait: 'wizard', headR: 0.34, hat: true, sleepsIndoors: true,
       dir: stones,
       places: { home: place(houses[2].door), stones: place(stones, 2.5), square: place(square(3.9), 3) },
       schedule: { morning: 'stones', noon: 'square', evening: 'stones', night: 'home' },
@@ -63,7 +64,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { when: s => s.night, t: 'Shh... the stars are reading tonight. Out loud, if you listen very carefully.', e: 'thinking' },
       ] },
     { name: 'Pim', title: 'Baker', color: '#f2915f', build: buildBaker, height: 2.25, radius: 0.62, gesture: 'wave',
-      portrait: 'baker', headR: 0.36, hat: true,
+      portrait: 'baker', headR: 0.36, hat: true, sleepsIndoors: true,
       dir: dirAlong(cottage.door, new V3().crossVectors(cottage.fwd, cottage.door).normalize(), 1.9),
       places: { bakery: place(dirAlong(cottage.door, new V3().crossVectors(cottage.fwd, cottage.door).normalize(), 1.9), 1.5), square: place(square(0.5), 2) },
       schedule: { morning: 'bakery', noon: 'square', evening: 'bakery', night: 'bakery' },
@@ -82,7 +83,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { once: true, when: s => s.planet === 2, t: 'Brr! Even my dough is shivering. A warm bun for the road, {hero}?', e: 'sad' },
       ] },
     { name: 'Lio', title: 'Wandering Bard', color: '#5fae55', build: buildBard, height: 2.15, radius: 0.55,
-      portrait: 'bard', headR: 0.36, hat: true,
+      portrait: 'bard', headR: 0.36, hat: true, sleepsIndoors: true,
       dir: offsetDir(spawnDir, 1.3, 5),
       places: { home: place(houses[0].door), square: place(offsetDir(spawnDir, 1.3, 5), 12),
         pond: place(dirAlong(pond1.dir, tangentToward(pond1.dir, spawnDir).applyAxisAngle(pond1.dir, 1.2), pond1.r + 2.5), 2.5),
@@ -136,7 +137,7 @@ export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet) {
   const home = houses[3 + (planet % 3)]?.door ?? offsetDir(spawnDir, 4.8, 9);
   if (planet === 1) return [
     { name: 'Cinder', title: 'Ember Smith', color: '#e0682a', build: buildSmith, height: 2.3, radius: 0.62, gesture: 'raise',
-      portrait: 'smith', headR: 0.36, hat: true, local: true,
+      portrait: 'smith', headR: 0.36, hat: true, local: true, sleepsIndoors: true,
       dir: offsetDir(spawnDir, 3.6, 6.5),
       places: { home: place(home), forge: place(offsetDir(spawnDir, 3.6, 6.5), 1.5), square: place(offsetDir(spawnDir, 5.3, 4.5), 3) },
       schedule: { morning: 'forge', noon: 'forge', evening: 'square', night: 'home' },
@@ -154,7 +155,7 @@ export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet) {
   ];
   if (planet === 2) return [
     { name: 'Tuva', title: 'Snow Keeper', color: '#6fa8dc', build: buildSnowKeeper, height: 2.3, radius: 0.66, gesture: 'wave',
-      portrait: 'snowkeeper', headR: 0.36, hat: true, local: true,
+      portrait: 'snowkeeper', headR: 0.36, hat: true, local: true, sleepsIndoors: true,
       dir: dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 5.5),
       places: { home: place(home), lookout: place(dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 5.5), 2), square: place(offsetDir(spawnDir, 1.9, 4.5), 3) },
       schedule: { morning: 'lookout', noon: 'square', evening: 'lookout', night: 'home' },

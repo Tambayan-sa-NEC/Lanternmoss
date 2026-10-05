@@ -36,8 +36,8 @@ const _tv = new V3(), _tv2 = new V3(), _a2 = new V3();
 /** Boss states in which a stun lands (never in the middle of a telegraphed attack). */
 const STUNNABLE = new Set(['chase', 'recover']);
 
-/** Enemies never fight inside the village safe zone, or a fainted hero. */
-function playerSafe() { return ctx.player.dead || arcDist(ctx.player.up, SPAWN_DIR) < COMBAT.player.safeRadius; }
+/** Enemies never fight inside the village safe zone, indoors, or a fainted hero. */
+function playerSafe() { return ctx.player.dead || ctx.indoors || arcDist(ctx.player.up, SPAWN_DIR) < COMBAT.player.safeRadius; }
 
 export class Enemy extends Walker {
   /** def defaults to this planet's scaled stats for the type (a boss passes its own, with per-planet overrides). */

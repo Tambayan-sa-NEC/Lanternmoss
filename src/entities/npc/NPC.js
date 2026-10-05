@@ -125,6 +125,11 @@ export class NPC extends Walker {
   update(dt) {
     const time = ctx.time, dist = tangentTo(this.pos, this.up, ctx.player.pos, _toP);
     const target = this.steer(dt, dist);
+    // asleep at home: they've gone inside to bed (you'll find them there: src/gameplay/Houses.js). Nothing to bump into
+    // or push around out here, just the odd "z" drifting from the door.
+    const inBed = this.asleep && this.def.sleepsIndoors;
+    this.root.visible = this.shadow.visible = !inBed; this.selfCollider.active = !inBed;
+    if (inBed) return;
     this.speed += (target - this.speed) * damp(6, dt);
     _tv2.copy(this.fwd).multiplyScalar(this.speed);
     const n = this.step(_tv2, dt, 24);
@@ -155,9 +160,9 @@ export class NPC extends Walker {
   }
 }
 
-/** The villager within talking range of the player, nearest first (or null). */
+/** The villager within talking range of the player, nearest first (or null). Villagers asleep indoors don't count. */
 export function nearestNPC(player, npcs) {
   let best = null, bd = PLAYER.talkRange;
-  for (const n of npcs) { const d = player.pos.distanceTo(n.pos); if (d < bd) { bd = d; best = n; } }
+  for (const n of npcs) { if (!n.root.visible) continue; const d = player.pos.distanceTo(n.pos); if (d < bd) { bd = d; best = n; } }
   return best;
 }

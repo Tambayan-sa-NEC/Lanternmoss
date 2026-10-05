@@ -5,7 +5,7 @@ import { INVENTORY } from '../config/items.js';
 import { ctx } from './context.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
 import { cancelAim, isAiming } from '../combat/aiming.js';
-import { nearestNPC } from '../entities/npc/NPC.js';
+import { currentInteraction } from '../gameplay/Houses.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
 import { initInput } from '../systems/InputSystem.js';
@@ -41,7 +41,7 @@ function onKey(code) {
   if (code === 'KeyH') toggleHint();
   if (ctx.inventoryOpen) return;                       // bag or shop open: you can still move and jump, but not fight or talk
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
-  if (code === 'KeyE') { if (Dialog.open) Dialog.advance(); else { const n = nearestNPC(player, ctx.npcs); if (n) Dialog.start(n); } }
+  if (code === 'KeyE') { if (Dialog.open) Dialog.advance(); else currentInteraction()?.run(); }   // talk, enter a house, use furniture
   if (code === 'KeyX' && Dialog.choice) Dialog.choose(false);
 }
 

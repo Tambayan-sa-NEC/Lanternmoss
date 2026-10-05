@@ -129,3 +129,27 @@ export function buildOutfit(planet, { headR = 0.36, color = 0xffffff, hat = fals
   }
   return g;
 }
+
+// ---- indoor residents (src/gameplay/Houses.js): they live inside their house ----
+
+/** Granny Thimble: silver bun, round spectacles, a knitted shawl and needles. */
+export function buildGranny() {
+  const h = buildHumanoid({ skin: 0xffe2cc, top: 0xb48cc8, hem: 0x9a74b0, pants: 0x7a6a8a, shoes: 0x5a4a5a, belt: 0xffd36b, sleeve: 0xb48cc8, w: 1.2, face: { big: 0.85 } });
+  addTo(h.head, part(G.ico(0.38, 1), 0xe8e8f0), [0, 0.1, -0.07], [0, 0, 0], [1.03, 0.85, 1]);
+  addTo(h.head, part(G.ico(0.17, 1), 0xe8e8f0), [0, 0.36, -0.22]);                                   // bun
+  for (const sx of [-1, 1]) addTo(h.head, part(new THREE.TorusGeometry(0.08, 0.015, 4, 10), 0xffd36b), [sx * 0.13, 0.0, 0.34]);
+  addTo(h.body, part(new THREE.TorusGeometry(0.3, 0.09, 5, 12), 0xff8fb1), [0, 1.08, 0], [Math.PI / 2, 0, 0]);   // shawl
+  addTo(h.armR, part(G.cyl(0.015, 0.015, 0.5, 4), 0xd8c08a), [0.05, -0.45, 0.1], [0.8, 0, 0.3]);
+  return h;
+}
+
+/** Moth the librarian: a tall reader with big round glasses, a long coat and a book under one arm. */
+export function buildLibrarian() {
+  const h = buildHumanoid({ skin: 0xf0d6c0, top: 0x5a6ab0, hem: 0x4a5a98, pants: 0x3a3a5a, shoes: 0x2a2a3a, belt: 0xd8c08a, sleeve: 0x5a6ab0 });
+  addTo(h.head, part(G.ico(0.38, 1), 0x6a5a8a), [0, 0.12, -0.08], [0, 0, 0], [1.03, 0.85, 1]);
+  for (const sx of [-1, 1]) addTo(h.head, part(new THREE.TorusGeometry(0.1, 0.022, 4, 12), 0x3a2a40), [sx * 0.13, 0.0, 0.34]);
+  addTo(h.head, part(G.box(0.08, 0.02, 0.02), 0x3a2a40), [0, 0.0, 0.35]);
+  const book = addTo(h.armL, part(G.box(0.3, 0.38, 0.08), 0xe0605a), [0.05, -0.42, 0.14], [0.2, 0, 0]);
+  addTo(book, part(G.box(0.26, 0.34, 0.09), 0xfff6ee, { outline: false }), [0.03, 0, 0]);
+  return h;
+}

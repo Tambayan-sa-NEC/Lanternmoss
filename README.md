@@ -63,6 +63,7 @@ src/
 │   ├── credits.js         the Credits page text
 │   ├── day.js             the village clock: day length, phases, light per phase
 │   ├── shop.js            coins per monster, the shop's keeper, hours, stock and prices
+│   ├── houses.js          enterable houses per planet: layout, furniture, owner / resident, note, chest gift
 │   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
@@ -93,6 +94,7 @@ src/
 │   ├── planet.js          the planet mesh
 │   ├── props.js           prop builders (houses, trees, rocks, lanterns, flowers...)
 │   ├── village.js         houses, standing-stone circle, lantern paths
+│   ├── interiors.js       house interiors: room shells and furniture, built away from the planet
 │   ├── scatter.js         pond decoration, trees, rocks, flowers, grass
 │   ├── water.js           pond water shader
 │   └── sky.js             sky dome, clouds, fireflies
@@ -136,6 +138,7 @@ src/
 │   ├── dayClock.js        the village clock (phase, day, light)
 │   ├── storyState.js      what villagers know about your adventure (dialogue conditions and placeholders)
 │   ├── wallet.js          coins: earning, spending, shop prices
+│   ├── Houses.js          entering / leaving houses, walking indoors, using furniture, the E-prompt target
 │   ├── quests/            quest runtime (offers, steps, tracker, rewards)
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
@@ -228,6 +231,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Quests (steps, rewards, dialogue) | `src/config/quests.js` |
 | Day length, phases and light | `src/config/day.js` |
 | Coins per monster, shop stock, prices and hours | `src/config/shop.js` |
+| Houses: who lives where, furniture, notes, chest gifts, nap healing | `src/config/houses.js` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |

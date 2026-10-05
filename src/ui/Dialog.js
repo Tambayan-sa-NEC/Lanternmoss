@@ -22,6 +22,13 @@ export const Dialog = {
     dom.dlgName.innerHTML = `${npc.name}<small>${npc.def.title}</small>`; dom.dlgName.style.background = npc.def.color;
     this.say(line);
   },
+  /** A line from something that isn't a walking villager (furniture, a note, an indoor resident):
+      speaker = { name, def: { title, color, portrait }, pos }. Closes when the hero walks off, like any talk. */
+  show(speaker, line) {
+    this.close(); this.npc = speaker; this.open = true;
+    dom.dlgName.innerHTML = `${speaker.name}<small>${speaker.def.title}</small>`; dom.dlgName.style.background = speaker.def.color;
+    this.say(line);
+  },
   /** Show one line. A line may carry a choice { yes, no, onYes, onNo }; the handler may return a follow-up line. */
   say(line) {
     this.text = fillStory(line.t); this.shown = 0; this.acc = 0; this.choice = line.choice || null;

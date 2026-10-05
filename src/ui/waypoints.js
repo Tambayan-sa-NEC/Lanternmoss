@@ -63,7 +63,7 @@ let ticksAdded = false;
 const _sp = { x: 0, y: 0 };
 
 export function updateWaypoints() {
-  const P = ctx.player, show = ctx.started && !P.dead && settings.compass;
+  const P = ctx.player, show = ctx.started && !P.dead && !ctx.indoors && settings.compass;
   dom.compass.style.display = show ? 'block' : 'none'; dom.markers.style.display = show ? 'block' : 'none';
   if (!show) return;
   if (!ticksAdded) { ticksAdded = true; for (const t of ticks) dom.compassTrack.appendChild(t); }

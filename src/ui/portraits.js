@@ -2,7 +2,7 @@
    per line (line.e, or guessed from the text): happy, neutral, excited, surprised, sad, thinking, sleepy. */
 
 const INK = '#3a2340';
-const SKIN = { wizard: '#ffe2cc', baker: '#ffd9c0', bard: '#ffe6d2', sprite: '#fff0e0', smith: '#d9a07a', snowkeeper: '#ffe6da' };
+const SKIN = { wizard: '#ffe2cc', baker: '#ffd9c0', bard: '#ffe6d2', sprite: '#fff0e0', smith: '#d9a07a', snowkeeper: '#ffe6da', granny: '#ffe2cc', librarian: '#f0d6c0' };
 
 /** Hair, hats and the like, drawn behind (back) and over (front) the face. */
 const KIT = {
@@ -38,6 +38,16 @@ const KIT = {
     front: `<path d="M20 40 Q50 26 80 40 L80 46 Q50 34 20 46 Z" fill="#e0482a" stroke="${INK}" stroke-width="2.5"/>
       <circle cx="40" cy="34" r="7" fill="#ffd36b" stroke="${INK}" stroke-width="3"/><circle cx="60" cy="34" r="7" fill="#ffd36b" stroke="${INK}" stroke-width="3"/>
       <path d="M47 34 h6" stroke="${INK}" stroke-width="3"/><ellipse cx="66" cy="70" rx="5" ry="3" fill="#7a5040" opacity=".55"/>`,
+  },
+  granny: {
+    back: `<ellipse cx="50" cy="50" rx="32" ry="26" fill="#e8e8f0"/><circle cx="50" cy="20" r="11" fill="#e8e8f0" stroke="${INK}" stroke-width="3"/>`,
+    front: `<circle cx="39" cy="58" r="8" fill="none" stroke="#e0a830" stroke-width="2.5"/><circle cx="61" cy="58" r="8" fill="none" stroke="#e0a830" stroke-width="2.5"/>
+      <path d="M47 58 h6" stroke="#e0a830" stroke-width="2.5"/><path d="M26 84 Q50 96 74 84 Q74 92 50 98 Q26 92 26 84 Z" fill="#ff8fb1" stroke="${INK}" stroke-width="2.5"/>`,
+  },
+  librarian: {
+    back: `<ellipse cx="50" cy="50" rx="32" ry="27" fill="#6a5a8a"/>`,
+    front: `<circle cx="39" cy="58" r="9" fill="none" stroke="${INK}" stroke-width="3"/><circle cx="61" cy="58" r="9" fill="none" stroke="${INK}" stroke-width="3"/>
+      <path d="M48 58 h4" stroke="${INK}" stroke-width="3"/><path d="M24 44 Q50 22 76 44 Q62 34 50 36 Q36 34 24 44 Z" fill="#6a5a8a" stroke="${INK}" stroke-width="2.5"/>`,
   },
   snowkeeper: {
     back: `<circle cx="50" cy="54" r="40" fill="#f8fbff" stroke="${INK}" stroke-width="3"/>
