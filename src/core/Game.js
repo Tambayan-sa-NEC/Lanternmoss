@@ -35,7 +35,8 @@ import { keys, releaseAllKeys } from '../systems/InputSystem.js';
 import { RenderSystem } from '../systems/RenderSystem.js';
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { Dialog } from '../ui/Dialog.js';
-import { buildSpellBar, setSkillHint } from '../ui/hud.js';
+import { applyUiScale, buildSpellBar, setSkillHint } from '../ui/hud.js';
+import { updateWaypoints } from '../ui/waypoints.js';
 import { updateOverlay } from '../ui/overlay.js';
 import { toast, updateToast } from '../ui/toast.js';
 import { offsetDir } from '../utils/sphere.js';
@@ -73,7 +74,7 @@ export class Game {
     InventoryUI.init(bag, { use: slot => useItemInSlot(bag, slot), drop: slot => dropFromSlot(slot) });
     CharacterSelect.init({ onPick: applyCharacter, onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
-    addEventListener('resize', () => this.renderSystem.resize()); this.renderSystem.resize();
+    addEventListener('resize', () => { this.renderSystem.resize(); applyUiScale(); }); this.renderSystem.resize();
 
     this.loop = new GameLoop(dt => this.update(dt), () => this.renderSystem.render(ctx.time));
   }
@@ -96,6 +97,7 @@ export class Game {
     updateKnight(dt);
     CharacterSelect.update(dt);
     updateCamera(dt);
+    updateWaypoints();                                             // after the camera: bearings are relative to the view
     this.world.update(dt, ctx.time, ctx.player, cam.up, camera);
     sparkles.update(dt); updateEmotes(dt);
     Dialog.update(dt);

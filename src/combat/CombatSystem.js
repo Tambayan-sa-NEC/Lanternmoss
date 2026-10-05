@@ -17,5 +17,5 @@ export function updateCombat(dt, world, keys) {
   updateHazards(dt);
   if (ctx.companion) ctx.companion.update(dt);
   updateFx(dt);
-  updateCombatHud(spellState, targeting.aim);
+  updateCombatHud(dt, spellState, targeting.aim);
 }

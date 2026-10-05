@@ -18,28 +18,41 @@
 </head>
 <body class="menu">
 <div id="hint">
-  <b>✦ Lanternmoss</b><br>
-  <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> move &nbsp; <kbd>Shift</kbd> sprint<br>
-  <kbd>Space</kbd> jump &nbsp; <kbd>E</kbd> talk / accept &nbsp; <kbd>X</kbd> decline &nbsp; <kbd>I</kbd> bag &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>C</kbd> change hero<br>
-  <kbd>Drag</kbd> rotate camera &nbsp; <kbd>Wheel</kbd> zoom<br>
-  <span id="hint-skills"></span>
+  <div class="full">
+    <b>✦ Lanternmoss</b> <span class="hide-tip"><kbd>H</kbd> hide</span><br>
+    <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> move &nbsp; <kbd>Shift</kbd> sprint<br>
+    <kbd>Space</kbd> jump &nbsp; <kbd>E</kbd> talk / accept &nbsp; <kbd>X</kbd> decline &nbsp; <kbd>I</kbd> bag &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>C</kbd> change hero<br>
+    <kbd>Drag</kbd> rotate camera &nbsp; <kbd>Wheel</kbd> zoom<br>
+    <span id="hint-skills"></span>
+  </div>
+  <div class="mini"><kbd>H</kbd> Controls</div>
 </div>
+<div id="compass"><div class="track"></div><i class="notch"></i></div>
+<div id="markers"></div>
+<div id="lowhp"></div>
 <div id="ebars"></div>
 <div id="reticle"></div>
 <div id="aimhint"></div>
 <div id="hurt"></div>
 <div id="combat">
-  <div class="bar hp"><i></i><span></span></div>
-  <div class="bar mp"><i></i><span></span></div>
-  <div class="bar xp"><i></i><span></span></div>
+  <div id="status"></div>
+  <div class="vitals">
+    <div class="lvl"><small>LV</small><b></b></div>
+    <div class="bars">
+      <div class="bar hp"><b></b><i></i><span><em>HP</em><strong></strong></span></div>
+      <div class="bar mp"><b></b><i></i><span><em></em><strong></strong></span></div>
+      <div class="bar xp"><i></i><span><em>XP</em><strong></strong></span></div>
+    </div>
+  </div>
   <div id="spells"></div>
 </div>
+<div id="tip"></div>
 <div id="hud"></div>
 <div id="prompt"></div>
 <div id="dialog"><div id="dlg-name"></div><div id="dlg-text"></div>
   <div id="dlg-choices"><button class="yes"></button><button class="no"></button></div><div id="dlg-next">▼ E</div></div>
 <div id="challenge"></div>
-<div id="bossbar"><div class="bn"></div><div class="bb"><i></i></div></div>
+<div id="bossbar"><div class="bn"></div><div class="bb"><b></b><i></i><div class="ticks"></div><span class="pct"></span></div></div>
 <div id="fade"></div>
 <div id="cresult"></div>
 <div id="inventory">

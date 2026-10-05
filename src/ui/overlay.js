@@ -1,11 +1,11 @@
-/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, treats, challenges, active buffs). */
+/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, treats, challenges).
+   Active buffs show in the HUD's status row (src/ui/hud.js). */
 import * as THREE from 'three';
 import { CHALLENGES } from '../config/challenges.js';
 import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { nearestNPC } from '../entities/npc/NPC.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
-import { buffs } from '../gameplay/buffs.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { camera } from '../render/scene.js';
 import { Dialog } from './Dialog.js';
@@ -33,8 +33,6 @@ function updateChips(dt) {
   if (treats) h += `<div class="chip">Treats: ${treats}</div>`;
   const cleared = Challenges.clearedCount();
   if (cleared) h += `<div class="chip" style="background:#fff0c8">Challenges: ${cleared} / ${Object.keys(CHALLENGES).length}</div>`;
-  if (buffs.moon > 0) h += `<div class="chip" style="background:#e6ddff">Moon-Hop ${Math.ceil(buffs.moon)}s</div>`;
-  if (buffs.feather > 0) h += `<div class="chip" style="background:#d6ffec">Feather-Step ${Math.ceil(buffs.feather)}s</div>`;
   dom.hud.innerHTML = h;
 }
 

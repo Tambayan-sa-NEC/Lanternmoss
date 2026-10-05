@@ -36,6 +36,7 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 | `1-4`, `Q R F`, click | abilities (`1` / click can be held to repeat) |
 | `5` / `G` | ultimate: a marker follows the cursor; click (or `5` / `G` again) to cast there, `Esc` / right click cancels |
 | drag / wheel | rotate / zoom camera |
+| `H` | show / hide the controls panel (it folds away by itself after a while) |
 | `M` | mute |
 | `C` (twice) | back to character select (restarts the adventure) |
 
@@ -128,7 +129,8 @@ src/
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
 │                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming)
-├── ui/                    DOM side: element lookups, HUD (incl. boss bar), dialogue, challenge panel, banner + travel fade,
+├── ui/                    DOM side: element lookups, HUD (bars, status row, ability bar + tooltips, boss bar), icons (SVG),
+│                          waypoints (compass strip + off-screen arrows), dialogue, challenge panel, banner + travel fade,
 │                          InventoryUI + itemTooltip (the bag window), itemNotices (item toasts),
 │                          overlay (planet chip), toast, character select
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
@@ -153,7 +155,7 @@ particles and emotes → dialogue → overlay, buffs, toast. Rendering follows e
 
 **Dependencies flow one way:** `config` and `utils` depend on nothing. `render` and `physics` build on them, and
 `world` on those. Entities, combat and gameplay sit above, and `core/Game.js` wires everything. UI modules receive the
-data they show (`updateCombatHud(spellState, aimTarget)`) rather than reaching into combat. Challenges plug into the
+data they show (`updateCombatHud(dt, spellState, aimTarget)`) rather than reaching into combat. Challenges plug into the
 dialogue through `Dialog.lineProvider` instead of the dialogue importing them. Level-ups are announced on an
 `EventTarget` (`progression/experience.js`), so feedback stays decoupled from the rules.
 

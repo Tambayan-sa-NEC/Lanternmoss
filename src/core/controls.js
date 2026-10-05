@@ -10,11 +10,12 @@ import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
 import { initInput } from '../systems/InputSystem.js';
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { Dialog } from '../ui/Dialog.js';
+import { toggleHint } from '../ui/hud.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { toast } from '../ui/toast.js';
 
 /** Keys whose browser default (page scroll, quick-find...) would get in the way. */
-const GAME_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'ShiftLeft', 'ShiftRight', 'KeyE', 'KeyM', 'KeyX',
+const GAME_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'ShiftLeft', 'ShiftRight', 'KeyE', 'KeyM', 'KeyX', 'KeyH',
   'KeyC', ...INVENTORY.keys, ...Object.values(CHARACTERS).flatMap(c => Object.values(c.abilities).flatMap(s => s.keys))]);
 
 function onKey(code) {
@@ -26,6 +27,7 @@ function onKey(code) {
   if (code === 'Space' && !player.dead) player.jumpBuf = 0.14;
   if (code === 'KeyM') toast(audio.toggle() ? 'Sound off' : 'Sound on');
   if (code === 'KeyC') CharacterSelect.requestMenu();
+  if (code === 'KeyH') toggleHint();
   if (InventoryUI.isOpen) return;                      // bag open: you can still move and jump, but not fight or talk
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
   if (code === 'KeyE') { if (Dialog.open) Dialog.advance(); else { const n = nearestNPC(player, ctx.npcs); if (n) Dialog.start(n); } }

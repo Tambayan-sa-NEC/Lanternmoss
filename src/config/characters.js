@@ -58,3 +58,22 @@ export const CHARACTERS = {
     welcome: 'Welcome to Lanternmoss! Your owl Wren keeps watch. Monsters prowl beyond the village lanterns.',
   },
 };
+
+/** One-line ability descriptions for the ability-bar tooltips (src/ui/hud.js), by ability id (ids are unique across heroes). */
+export const ABILITY_TEXT = {
+  bolt: 'A homing arcane missile. Hold to keep casting.',
+  fireball: 'A slow fireball that explodes on impact, knocking foes back.',
+  nova: 'A freezing burst around you that damages and slows.',
+  blink: 'Teleport a short way, toward where you are running. Briefly invulnerable.',
+  meteor: 'Aim a spot: a meteor crashes down a moment later, crushing everything in a wide area.',
+  slash: 'A wide axe swing in front of you. Hold to keep swinging.',
+  dash: 'Charge forward through enemies, stunning them. Invulnerable while charging.',
+  whirl: 'Spin with the axe, hitting everything around you.',
+  guard: 'Brace behind the axe: much less damage taken and no knockback.',
+  leapSlam: 'Aim a spot: leap there and slam the ground, damaging and stunning everything nearby.',
+  shot: 'A homing arrow. Hold to keep shooting.',
+  volley: 'A fan of five arrows.',
+  snare: 'A thorned arrow that slows and interrupts wind-ups.',
+  leap: 'Hop back, away from your aim. Briefly invulnerable.',
+  rain: 'Aim a spot: arrows pour down for several seconds, hurting and slowing all inside.',
+};

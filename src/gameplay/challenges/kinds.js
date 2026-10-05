@@ -24,7 +24,15 @@ function spotsAround(anchor, n, minArc, maxArc, clearance) {
   return out;
 }
 
-/* Activity kinds. A kind is { start(run), update(run, dt) -> 'success' | 'fail' | null, progress(run) -> string, cleanup(run) }.
+/** The surface direction among `dirs` nearest the hero (for waypoints), or null. */
+function nearestToHero(dirs) {
+  let best = null, bd = Infinity;
+  for (const d of dirs) { const a = arcDist(ctx.player.up, d); if (a < bd) { bd = a; best = d; } }
+  return best;
+}
+
+/* Activity kinds. A kind is { start(run), update(run, dt) -> 'success' | 'fail' | null, progress(run) -> string, cleanup(run),
+   target(run) -> surface direction of where to go next (the HUD's compass and edge arrows), or null }.
    Timeouts, fainting and wandering off are handled by the core, so kinds only describe the activity itself.
    cleanup() must remove everything start() created; it runs on every outcome. */
 export const CHALLENGE_KINDS = {
@@ -49,6 +57,7 @@ export const CHALLENGE_KINDS = {
       return run.got >= run.items.length ? 'success' : null; },
     progress: run => `${run.got} / ${run.items.length} ${run.def.params.label}`,
     cleanup(run) { for (const it of run.items) if (!it.got) { scene.remove(it.m); disposeTree(it.m); } },
+    target: run => nearestToHero(run.items.filter(it => !it.got).map(it => it.d)),
   },
   /** Run through glowing rings in order, laid out in a loop around the giver. params: count, radius, color */
   race: {
@@ -72,6 +81,7 @@ export const CHALLENGE_KINDS = {
     progress: run => `Ring ${Math.min(run.idx + 1, run.rings.length)} / ${run.rings.length}`,
     cleanup(run) { for (const r of run.rings.slice(run.idx)) { scene.remove(r.m); disposeTree(r.m); }
       scene.remove(run.beacon); run.beacon.geometry.dispose(); run.beacon.material.dispose(); },
+    target: run => run.rings[run.idx]?.d ?? null,
   },
   /** Defeat summoned enemies (uses the combat system). params: spawn { type: count }, minRadius, radius */
   defeat: {
@@ -83,5 +93,6 @@ export const CHALLENGE_KINDS = {
     progress: run => `${run.foes.filter(e => !e.alive).length} / ${run.foes.length} defeated`,
     cleanup(run) { for (const e of run.foes) { if (!e.alive) continue;     // banish leftovers so nothing lingers after a fail
       e.alive = false; e.dispose(); const i = ctx.enemies.indexOf(e); if (i >= 0) ctx.enemies.splice(i, 1); } },
+    target: run => nearestToHero(run.foes.filter(e => e.alive).map(e => e.up)),
   },
 };

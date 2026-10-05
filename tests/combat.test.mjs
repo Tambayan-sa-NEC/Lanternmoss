@@ -2,7 +2,7 @@
 // (each planet its own boss and AI; the Demon Lord's two phases and single, telegraphed lethal blow). Run with `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CHARACTERS } from '../src/config/characters.js';
+import { ABILITY_TEXT, CHARACTERS } from '../src/config/characters.js';
 import { COMBAT } from '../src/config/combat.js';
 import { PLANETS } from '../src/config/planets.js';
 import { scaleEnemyDef } from '../src/combat/enemyDefs.js';
@@ -12,6 +12,12 @@ const BOSS_KITS = ['gloomcap', 'dragon', 'demonLord'];   // src/entities/enemies
 test('ability ids are unique across heroes (they share one CAST table)', () => {
   const ids = Object.values(CHARACTERS).flatMap(c => Object.keys(c.abilities));
   assert.equal(new Set(ids).size, ids.length);
+});
+
+test('every ability has a tooltip description, and no description is orphaned', () => {
+  const ids = Object.values(CHARACTERS).flatMap(c => Object.keys(c.abilities));
+  for (const id of ids) assert.ok(ABILITY_TEXT[id]?.length > 10, `${id}: needs ABILITY_TEXT`);
+  for (const id of Object.keys(ABILITY_TEXT)) assert.ok(ids.includes(id), `ABILITY_TEXT.${id}: no such ability`);
 });
 
 test('every hero has exactly one ultimate: ground-targeted, on 5/G, with range, radius and a long cooldown', () => {

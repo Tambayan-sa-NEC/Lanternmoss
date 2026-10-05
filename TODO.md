@@ -8,18 +8,24 @@ Legend: `[ ]` to do · `[~]` in progress · `[x]` done. Tags: **(core)** must-ha
 
 ---
 
-## 1. Better HUD **(core)**
+## 1. Better HUD **(core)** ✓
 
 **Goal:** a clearer, better-looking heads-up display that stays readable in hectic boss fights.
-Code: `src/ui/hud.js`, `index.html`, `styles/main.css`.
+Code: `src/ui/hud.js`, `src/ui/icons.js`, `src/ui/waypoints.js`, `index.html`, `styles/main.css`.
 
-- [ ] Redesign the HP / mana / XP bars: smoother fill, a "recent damage" trail that drains after the hit, clearer labels.
-- [ ] Ability bar: larger icons (real icon art instead of coloured dots), cost shown in the resource colour, tooltip with name, cost, cooldown and description on hover.
-- [ ] Buff / debuff row (Moon-Hop, Feather-Step, slowed, ...) with remaining time.
-- [ ] Boss bar: phase markers on the bar (e.g. ticks at 50%), phase name, a short flash when a phase starts.
-- [ ] Off-screen indicator pointing to the boss lair and to active challenge targets.
-- [ ] Optional minimap or compass strip (see "Suggested" below).
-- [ ] Scale the HUD for small and large screens (CSS clamp / a UI-scale setting from the Settings menu).
+- [x] Redesign the HP / mana / XP bars: smoother fill, a damage trail that drains after a hit, label + value on each bar,
+      a level badge, the resource bar coloured per hero (mana / stamina / focus), a pulsing bar and red screen edges at low HP.
+- [x] Ability bar: drawn SVG icons for every ability, cost in the resource colour, the ultimate glows when ready, and a
+      hover tooltip (description from `ABILITY_TEXT` in `config/characters.js`, key, damage at your level, area, cost, cooldown).
+- [x] Status row with remaining time: Moon-Hop, Feather-Step, Guard, plus a "regenerating" heart. (No hero debuffs exist yet;
+      new ones are one entry in `STATUSES` in `hud.js`.)
+- [x] Boss bar: a tick at each phase threshold, phase name, HP %, a damage trail and a flash when a phase starts.
+- [x] Off-screen arrows at the screen edge toward the boss and the active challenge's next target (with distance).
+- [x] Compass strip (top centre) with the village, the boss, the challenge target and villagers offering a challenge.
+      A full minimap is still open, if wanted.
+- [x] HUD scales with the window (`--ui`, `applyUiScale`); `setUiScale()` stores a player preference, ready for the
+      Settings menu slider (section 2a).
+- [x] The controls panel folds into a small `H Controls` pill after 25 s of play; `H` toggles it.
 
 ## 2. Pause menu **(core)**
 
@@ -38,6 +44,7 @@ Code: `src/core/controls.js` (Esc handling), `src/core/Game.js` (update loop), n
 - [ ] Camera: mouse sensitivity, invert Y, default zoom (`src/systems/CameraSystem.js`).
 - [ ] Graphics: bloom on/off, outline width, pixel ratio / quality preset (`src/config/render.js`).
 - [ ] Gameplay: screen shake intensity, damage numbers on/off, hit-stop on/off.
+- [ ] Interface: HUD size slider (call `setUiScale()` from `src/ui/hud.js`), compass on/off.
 - [ ] Remappable keys (stretch goal; needs bindings to move out of `CHARACTERS` key lists into one keymap table).
 - [ ] Remember settings in `localStorage`.
 
