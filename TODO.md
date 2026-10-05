@@ -27,26 +27,30 @@ Code: `src/ui/hud.js`, `src/ui/icons.js`, `src/ui/waypoints.js`, `index.html`, `
       Settings menu slider (section 2a).
 - [x] The controls panel folds into a small `H Controls` pill after 25 s of play; `H` toggles it.
 
-## 2. Pause menu **(core)**
+## 2. Pause menu **(core)** ✓
 
 **Goal:** `Esc` (when nothing else is open) pauses the game and opens a menu.
-Code: `src/core/controls.js` (Esc handling), `src/core/Game.js` (update loop), new `src/ui/PauseMenu.js`.
+Code: `src/ui/PauseMenu.js`, `src/core/controls.js` (Esc / P), `src/core/Game.js` (update loop, `applySettings`).
 
-- [ ] Pausing freezes the simulation (skip `Game.update`, keep rendering), mutes or ducks audio, and releases held keys.
-- [ ] **Resume**: closes the menu and continues.
-- [ ] **Settings**: opens the settings screen (section 2a).
-- [ ] **Controls / keymap**: shows every binding, generated from `CHARACTERS[...].abilities` and the fixed keys, so it never goes stale.
-- [ ] **Quit**: back to the main menu (with an "are you sure? progress on this planet is lost" confirm until saving exists).
-- [ ] Esc priority: close the inventory / dialogue / ability aiming first; only open the pause menu when none of those is active.
+- [x] Pausing freezes the simulation (`ctx.paused`: `Game.update` skips, rendering continues), ducks the audio and
+      releases held keys. `P` also pauses, and losing window focus pauses automatically (can be turned off).
+- [x] **Resume**: closes the menu and continues.
+- [x] **Settings**: opens the settings screen (section 2a).
+- [x] **Controls**: the current hero's abilities (icon, keys, description) generated from `CHARACTERS`, then the fixed
+      keys from `src/config/controls.js`.
+- [x] **Quit to menu**: with a confirmation that says what is lost (the adventure restarts; no saving yet).
+- [x] Esc priority: closes the bag, then ability aiming, then dialogue; only then opens the pause menu. Esc on a sub-page
+      goes back; Esc on the main page resumes.
 
-### 2a. Settings screen **(core)**
-- [ ] Audio: master, music and effects volume sliders (`src/systems/AudioSystem.js`).
-- [ ] Camera: mouse sensitivity, invert Y, default zoom (`src/systems/CameraSystem.js`).
-- [ ] Graphics: bloom on/off, outline width, pixel ratio / quality preset (`src/config/render.js`).
-- [ ] Gameplay: screen shake intensity, damage numbers on/off, hit-stop on/off.
-- [ ] Interface: HUD size slider (call `setUiScale()` from `src/ui/hud.js`), compass on/off.
+### 2a. Settings screen **(core)** ✓
+Schema: `src/config/settings.js` (one table drives the screen, defaults and validation); store: `src/core/settings.js`.
+- [x] Audio: master, music & ambience, and effects volume (separate audio buses).
+- [x] Camera: mouse sensitivity, invert vertical drag, default zoom.
+- [x] Graphics: quality preset (render resolution), bloom on/off, outline width (0 hides outlines).
+- [x] Gameplay: screen shake strength, damage numbers on/off, impact slow-motion on/off.
+- [x] Interface: HUD size, compass & target arrows on/off, pause when the window loses focus.
 - [ ] Remappable keys (stretch goal; needs bindings to move out of `CHARACTERS` key lists into one keymap table).
-- [ ] Remember settings in `localStorage`.
+- [x] Remembered in `localStorage` (`lanternmoss.settings`); saved values are validated on load, Reset restores defaults.
 
 ## 3. Main menu / landing page **(core)**
 

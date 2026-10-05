@@ -4,27 +4,29 @@
 import { mpick } from '../utils/random.js';
 
 export const audio = {
-  ctx: null, master: null, fx: null, muted: false,
+  ctx: null, master: null, fx: null, music: null, muted: false, ducked: false,
+  vol: { master: 1, music: 1, sfx: 1 },      // player volume settings (0..1), see setVolumes
   init() {
     if (this.ctx) return; const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
-    const ctx = this.ctx = new C(); this.master = ctx.createGain(); this.master.gain.value = 0.55; this.master.connect(ctx.destination);
+    const ctx = this.ctx = new C(); this.master = ctx.createGain(); this.master.gain.value = this.level(); this.master.connect(ctx.destination);
     const delay = ctx.createDelay(1), fb = ctx.createGain(), wet = ctx.createGain(); delay.delayTime.value = 0.36; fb.gain.value = 0.38; wet.gain.value = 0.4;
     delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(this.master);
-    this.fx = ctx.createGain(); this.fx.connect(this.master); this.fx.connect(delay);
+    this.fx = ctx.createGain(); this.fx.gain.value = this.vol.sfx; this.fx.connect(this.master); this.fx.connect(delay);
+    this.music = ctx.createGain(); this.music.gain.value = this.vol.music; this.music.connect(this.master); this.music.connect(delay);
     const pad = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850;
-    pad.gain.setValueAtTime(0, ctx.currentTime); pad.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 5); lp.connect(pad); pad.connect(this.master);
+    pad.gain.setValueAtTime(0, ctx.currentTime); pad.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 5); lp.connect(pad); pad.connect(this.music);
     [130.81, 196.0, 261.63, 329.63, 392.0].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
       o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (Math.random() - 0.5) * 10; g.gain.value = 0.22;
       lfo.frequency.value = 0.05 + i * 0.031; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(g.gain); o.connect(g); g.connect(lp); o.start(); lfo.start(); });
     const chime = () => { setTimeout(() => { const s = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; const f = mpick(s);
-      this.tone(f, 2.4, 'sine', 0.03); if (Math.random() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2); chime(); }, 2500 + Math.random() * 5000); };
+      this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (Math.random() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, 2500 + Math.random() * 5000); };
     chime();
   },
-  tone(freq, dur = 0.5, type = 'sine', vol = 0.08, when = 0, slide = 0) {
+  tone(freq, dur = 0.5, type = 'sine', vol = 0.08, when = 0, slide = 0, out = this.fx) {
     if (!this.ctx) return; const t = this.ctx.currentTime + when, o = this.ctx.createOscillator(), g = this.ctx.createGain();
     o.type = type; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur * 0.6);
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g); g.connect(this.fx); o.start(t); o.stop(t + dur + 0.05);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.05);
   },
   jump() { this.tone(330, 0.18, 'sine', 0.05, 0, 1.9); },
   land() { this.tone(160, 0.12, 'sine', 0.05, 0, 0.6); },
@@ -85,6 +87,16 @@ export const audio = {
   // --- boss + planet travel (procedural placeholders) ---
   roar() { this.tone(80, 0.9, 'sawtooth', 0.05, 0, 0.6); this.tone(120, 0.7, 'square', 0.025, 0.05, 0.7); this.noise(0.8, 0.12, 700); },
   warp() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.9, 'sine', 0.04, i * 0.12, 1.5)); this.noise(1.2, 0.04, 5000); },
+  /** Output level from the master volume, the mute toggle and pause ducking. */
+  level() { return this.muted ? 0 : 0.55 * this.vol.master * (this.ducked ? 0.3 : 1); },
+  applyLevels() {
+    if (!this.ctx) return; const t = this.ctx.currentTime;
+    this.master.gain.setTargetAtTime(this.level(), t, 0.1); this.music.gain.setTargetAtTime(this.vol.music, t, 0.1); this.fx.gain.setTargetAtTime(this.vol.sfx, t, 0.1);
+  },
+  /** Player volume settings, 0..1 each. */
+  setVolumes(master, music, sfx) { this.vol = { master, music, sfx }; this.applyLevels(); },
+  /** Quieter while the game is paused. */
+  duck(on) { this.ducked = on; this.applyLevels(); },
   /** Mutes / unmutes everything; returns the new muted state. */
-  toggle() { this.muted = !this.muted; if (this.master) this.master.gain.setTargetAtTime(this.muted ? 0 : 0.55, this.ctx.currentTime, 0.1); return this.muted; },
+  toggle() { this.muted = !this.muted; this.applyLevels(); return this.muted; },
 };

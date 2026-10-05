@@ -6,6 +6,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RENDER } from '../config/render.js';
+import { QUALITY_PIXEL_RATIO } from '../config/settings.js';
 import { outlineMat, setPointScale } from '../render/materials.js';
 import { camera, PIXEL_RATIO, scene } from '../render/scene.js';
 
@@ -23,7 +24,7 @@ export class RenderSystem {
     const composer = this.composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(dbs.x, dbs.y, { type: THREE.HalfFloatType, samples: 4 }));
     composer.addPass(new RenderPass(scene, camera));
     const { strength, radius, threshold } = RENDER.bloom;
-    composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), strength, radius, threshold));
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), strength, radius, threshold); composer.addPass(this.bloomPass);
     this.paperPass = new ShaderPass({
       uniforms: { tDiffuse: { value: null }, uTime: { value: 0 } },
       vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
@@ -46,6 +47,15 @@ export class RenderSystem {
     const db = this.renderer.getDrawingBufferSize(new THREE.Vector2()); outlineMat.uniforms.uRes.value.copy(db);
     const scale = db.y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
     setPointScale(scale);
+  }
+
+  /** Graphics settings: quality (render resolution), bloom on / off, outline width (CSS pixels). */
+  applyGraphics({ quality, bloom, outlineWidth }) {
+    const pr = Math.min(QUALITY_PIXEL_RATIO[quality] ?? PIXEL_RATIO, window.devicePixelRatio || 1, RENDER.maxPixelRatio);
+    if (pr !== this.renderer.getPixelRatio()) { this.renderer.setPixelRatio(pr); this.composer.setPixelRatio(pr); }
+    this.bloomPass.enabled = bloom;
+    outlineMat.uniforms.uWidth.value = outlineWidth * pr; outlineMat.visible = outlineWidth > 0;
+    this.resize();
   }
 
   render(time) { this.paperPass.uniforms.uTime.value = time; this.composer.render(); }

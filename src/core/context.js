@@ -5,6 +5,7 @@ export const ctx = {
   started: false,     // false while the character-select screen is open
   planet: 0,          // index into PLANETS (config/planets.js)
   transitioning: false,  // true while fading between planets (input is locked)
+  paused: false,      // the pause menu is open: the simulation is frozen (src/ui/PauseMenu.js)
   inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
   player: null,       // Player
   companion: null,    // Owl (witch, ranger) or Wolf (knight), created when a hero is picked

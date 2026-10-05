@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { CAMERA, PLAYER } from '../config/game.js';
 import { ctx } from '../core/context.js';
+import { settings } from '../core/settings.js';
 import { cameraBlocked } from '../physics/colliders.js';
 import { camera } from '../render/scene.js';
 import { clamp, damp } from '../utils/math.js';
@@ -13,18 +14,19 @@ const V3 = THREE.Vector3;
 
 /** fwd/up = view heading and up (transported around the sphere); pitch/dist = what the player asked for,
     effPitch/curDist = what obstacles allow; init = false snaps the follow target on the next frame. */
-export const cam = { fwd: new V3(), up: new V3(), target: new V3(), pitch: CAMERA.pitch, effPitch: CAMERA.pitch, dist: CAMERA.dist, curDist: CAMERA.dist,
+export const cam = { fwd: new V3(), up: new V3(), target: new V3(), pitch: CAMERA.pitch, effPitch: CAMERA.pitch, dist: settings.cameraDistance, curDist: settings.cameraDistance,
   lastDrag: -99, init: false, shake: 0 };
 
 export function initCamera(player) { cam.fwd.copy(player.fwd); cam.up.copy(player.up); }
-export function shakeCamera(amount) { cam.shake = Math.max(cam.shake, amount); }
+export function shakeCamera(amount) { cam.shake = Math.max(cam.shake, amount * settings.screenShake / 100); }
 /** Jump straight to a new view frame (after respawning or restarting) instead of easing there. */
 export function snapCamera(up, fwd) { cam.up.copy(up); cam.fwd.copy(fwd); cam.init = false; }
 /** The default gameplay framing, looking along fwd. */
-export function resetView(fwd) { cam.fwd.copy(fwd); cam.dist = CAMERA.dist; cam.pitch = CAMERA.pitch; cam.init = false; }
-/** Mouse-drag orbit (dx, dy in pixels). */
+export function resetView(fwd) { cam.fwd.copy(fwd); cam.dist = settings.cameraDistance; cam.pitch = CAMERA.pitch; cam.init = false; }
+/** Mouse-drag orbit (dx, dy in pixels), scaled by the sensitivity setting (and optionally inverted vertically). */
 export function dragCamera(dx, dy) {
-  cam.fwd.applyAxisAngle(cam.up, -dx * 0.005); cam.pitch = clamp(cam.pitch + dy * 0.004, -0.05, 1.15); cam.lastDrag = ctx.time;
+  const k = settings.mouseSensitivity / 100, sy = settings.invertY ? -1 : 1;
+  cam.fwd.applyAxisAngle(cam.up, -dx * 0.005 * k); cam.pitch = clamp(cam.pitch + dy * 0.004 * k * sy, -0.05, 1.15); cam.lastDrag = ctx.time;
 }
 export function zoomCamera(sign) { cam.dist = clamp(cam.dist * (1 + sign * 0.1), CAMERA.minDist, CAMERA.maxDist); }
 /** Slow showcase orbit behind the character-select screen. */

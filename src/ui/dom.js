@@ -23,6 +23,8 @@ export const dom = {
   invDrop: document.querySelector('#inventory .inv-drop'), invClose: document.querySelector('#inventory .inv-close'), invMsg: document.querySelector('#inventory .inv-msg'),
   // character select
   start: $('start'), cards: $('cards'), go: $('go'),
+  // pause menu
+  pause: $('pause'),
 };
 
 /** Restarts a one-shot CSS animation class on an element. */

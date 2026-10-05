@@ -44,6 +44,8 @@ import { colliders } from '../physics/colliders.js';
 import { ponds } from '../world/terrain.js';
 import { World } from '../world/World.js';
 import { ctx } from './context.js';
+import { onSettingsChange, settings } from './settings.js';
+import { PauseMenu } from '../ui/PauseMenu.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
 
@@ -74,6 +76,9 @@ export class Game {
     InventoryUI.init(bag, { use: slot => useItemInSlot(bag, slot), drop: slot => dropFromSlot(slot) });
     CharacterSelect.init({ onPick: applyCharacter, onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
+    PauseMenu.init({ onQuit: () => CharacterSelect.open() });            // quitting = back to the menu (restarts the run)
+    this.applySettings();
+    onSettingsChange(key => { this.applySettings(); if (key === 'cameraDistance' || key === null) cam.dist = settings.cameraDistance; });
     addEventListener('resize', () => { this.renderSystem.resize(); applyUiScale(); }); this.renderSystem.resize();
 
     this.loop = new GameLoop(dt => this.update(dt), () => this.renderSystem.render(ctx.time));
@@ -81,8 +86,17 @@ export class Game {
 
   start() { this.loop.start(); }
 
+  /** Pushes the player settings (core/settings.js) into the systems that hold state: audio, renderer, HUD scale.
+      Others (camera feel, shake, hit-stop, damage numbers, compass) read `settings` when they need it. */
+  applySettings() {
+    audio.setVolumes(settings.masterVolume / 100, settings.musicVolume / 100, settings.sfxVolume / 100);
+    this.renderSystem.applyGraphics(settings);
+    applyUiScale();
+  }
+
   /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
   update(dt) {
+    if (ctx.paused) return;                                        // pause menu open: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning });

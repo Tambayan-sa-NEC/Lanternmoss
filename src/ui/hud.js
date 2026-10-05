@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
 import { PLANET_RADIUS as R } from '../config/game.js';
 import { ctx } from '../core/context.js';
+import { setSetting, settings } from '../core/settings.js';
 import { aim } from '../combat/aiming.js';
 import { ENGAGED } from '../entities/enemies/states.js';
 import { buffs } from '../gameplay/buffs.js';
@@ -157,20 +158,13 @@ function updateHint(dt) {
   if ((hintT += dt) > HUD.hintAutoHide) { hintMode = 'manual'; dom.hint.classList.add('collapsed'); }
 }
 
-const SCALE_KEY = 'lanternmoss.uiScale';
-let userScale = 1;
-try { userScale = Number(localStorage.getItem(SCALE_KEY)) || 1; } catch { /* storage unavailable: default size */ }
-/** HUD size = fitted to the window (smaller on small screens, larger on big ones) x the player's preference. */
+/** HUD size = fitted to the window (smaller on small screens, larger on big ones) x the HUD-size setting. */
 export function applyUiScale() {
   const fit = clamp(Math.min(innerWidth / 1280, innerHeight / 720), 0.75, 1.3);
-  document.documentElement.style.setProperty('--ui', (fit * userScale).toFixed(3));
+  document.documentElement.style.setProperty('--ui', (fit * settings.uiScale / 100).toFixed(3));
 }
-/** The player's UI size preference (for the settings menu); kept in localStorage. */
-export function setUiScale(s) {
-  userScale = clamp(s, 0.6, 1.6);
-  try { localStorage.setItem(SCALE_KEY, String(userScale)); } catch { /* not persisted */ }
-  applyUiScale();
-}
+/** Sets the HUD-size setting (1 = 100%); saved with the other settings. */
+export function setUiScale(s) { setSetting('uiScale', s * 100); applyUiScale(); }
 applyUiScale();
 
 // ---------------------------------------------------------------- per frame

@@ -7,6 +7,7 @@
    Edge arrows only appear while their target is off-screen or hidden behind the planet. */
 import * as THREE from 'three';
 import { ctx } from '../core/context.js';
+import { settings } from '../core/settings.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { cam } from '../systems/CameraSystem.js';
 import { clamp } from '../utils/math.js';
@@ -58,7 +59,7 @@ let ticksAdded = false;
 const _sp = { x: 0, y: 0 };
 
 export function updateWaypoints() {
-  const P = ctx.player, show = ctx.started && !P.dead;
+  const P = ctx.player, show = ctx.started && !P.dead && settings.compass;
   dom.compass.style.display = show ? 'block' : 'none'; dom.markers.style.display = show ? 'block' : 'none';
   if (!show) return;
   if (!ticksAdded) { ticksAdded = true; for (const t of ticks) dom.compassTrack.appendChild(t); }

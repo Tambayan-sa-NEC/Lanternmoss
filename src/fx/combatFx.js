@@ -1,6 +1,7 @@
 /* Combat feedback: expanding ground rings, sword crescents, floating damage numbers and hit-stop. */
 import * as THREE from 'three';
 import { ctx } from '../core/context.js';
+import { settings } from '../core/settings.js';
 import { scene } from '../render/scene.js';
 import { smoothstep } from '../utils/math.js';
 import { mr } from '../utils/random.js';
@@ -37,7 +38,7 @@ export function arcFX(pos, up, dir, range, arcDeg, color) {
 }
 
 /** A brief slow-motion beat on a heavy impact (Game.update scales the timestep while it lasts). */
-export function hitStop(secs) { ctx.hitStop = Math.max(ctx.hitStop, secs); }
+export function hitStop(secs) { if (settings.hitStop) ctx.hitStop = Math.max(ctx.hitStop, secs); }
 
 /** scale > 1 for big hits (ultimates, boss blows) so they read at a glance. */
 export function floatText(pos, text, color = '#ffffff', scale = 1) {

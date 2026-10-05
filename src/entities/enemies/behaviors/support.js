@@ -3,6 +3,7 @@
    out first. It never helps bosses or other lanterns. */
 import * as THREE from 'three';
 import { ctx } from '../../../core/context.js';
+import { settings } from '../../../core/settings.js';
 import { floatText } from '../../../fx/combatFx.js';
 import { sparkles } from '../../../fx/sparkles.js';
 import { audio } from '../../../systems/AudioSystem.js';
@@ -56,7 +57,7 @@ function beam(from, to, color) {
 }
 function mend(e, a) {
   const amt = Math.min(e.def.heal, a.def.hp - a.hp); a.hp += amt; e.castT = 0.4;
-  beam(e, a, 0x8fffc0); floatText(_p.copy(a.center()).addScaledVector(a.up, a.height * 0.5), `+${Math.round(amt)}`, '#7dffb0'); audio.plip();
+  beam(e, a, 0x8fffc0); if (settings.damageNumbers) floatText(_p.copy(a.center()).addScaledVector(a.up, a.height * 0.5), `+${Math.round(amt)}`, '#7dffb0'); audio.plip();
 }
 function ward(e, a) {
   a.shieldT = e.def.shieldTime; a.shieldAmt = e.def.shieldReduction; e.castT = 0.4;

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { COMBAT } from '../config/combat.js';
 import { LEVELING } from '../config/leveling.js';
 import { ctx } from '../core/context.js';
+import { settings } from '../core/settings.js';
 import { floatText, hitStop } from '../fx/combatFx.js';
 import { sparkles } from '../fx/sparkles.js';
 import { gainXp } from '../progression/experience.js';
@@ -31,7 +32,7 @@ const BIG_HIT = 40;
 export function damageEnemy(e, amount, o = {}) {
   if (!e.alive || e.hidden) return;                                   // burrowed monsters can't be hit
   if (e.invulnerable) {                                               // e.g. a boss mid phase-transition
-    if (ctx.time - (e.immuneTextT ?? -9) > 0.6) { e.immuneTextT = ctx.time; floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), 'IMMUNE', '#b8b0c8'); }
+    if (settings.damageNumbers && ctx.time - (e.immuneTextT ?? -9) > 0.6) { e.immuneTextT = ctx.time; floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), 'IMMUNE', '#b8b0c8'); }
     return;
   }
   if (!o.source) amount *= damageMultiplier(ctx.player.level);       // no source = one of the hero's own abilities
@@ -40,7 +41,7 @@ export function damageEnemy(e, amount, o = {}) {
   if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
   const marked = e.markT > 0 && o.source !== 'owl', big = amount >= BIG_HIT;
-  floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
+  if (settings.damageNumbers) floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
     o.source === 'owl' ? '#c7a8ff' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
   sparkles.emit(e.center(), { count: big ? 18 : 8, color: o.color ?? 0xffffff, speed: big ? 3.6 : 2.5, life: 0.4, size: big ? 0.4 : 0.3 });
   if (o.knock && o.from) e.knock.addScaledVector(knockDir(o.from, e, _tv), o.knock * (1 - (e.def.knockResist || 0)));
@@ -64,7 +65,7 @@ export function hurtPlayer(amount, from, knock = 0, o = {}) {
   } else amount = Math.max(1, Math.round(amount));
   const heavy = amount >= P.stats.maxHp * 0.25;
   P.hp -= amount; P.invuln = P.hurtT = COMBAT.player.invuln; P.lastHurt = ctx.time; P.squash = -0.2;
-  floatText(_tv.copy(P.pos).addScaledVector(P.up, 2.3), `-${amount}`, '#ff5a7a', heavy ? 1.5 : 1);
+  if (settings.damageNumbers) floatText(_tv.copy(P.pos).addScaledVector(P.up, 2.3), `-${amount}`, '#ff5a7a', heavy ? 1.5 : 1);
   showPlayerHurt(); audio.hurt(); shakeCamera(heavy ? 0.5 : 0.25); if (heavy) hitStop(0.08);
   if (knock && from) { P.knock.addScaledVector(knockDir(from, P, _tv), knock); if (P.grounded) { P.vy = knock * 0.5; P.grounded = false; } }
   if (P.hp <= 0) faint();
