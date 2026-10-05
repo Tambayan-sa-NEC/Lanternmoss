@@ -11,7 +11,6 @@ import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { encounterEvents } from '../combat/events.js';
 import { Chest } from '../entities/Chest.js';
-import { itemRegistry } from '../items/ItemRegistry.js';
 import { freeOfColliders } from '../physics/colliders.js';
 import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
@@ -20,7 +19,7 @@ import { arcDist, offsetDir, randomDir, tangentFrame, tangentToward } from '../u
 import { spawnSpot } from '../world/placement.js';
 import { ponds } from '../world/terrain.js';
 import { SPAWN_DIR } from '../world/World.js';
-import { rollLoot } from './loot.js';
+import { lootName, rollLoot } from './loot.js';
 import { grantItem, spawnWorldItem } from './pickups.js';
 import { gainCoins } from './wallet.js';
 
@@ -94,14 +93,14 @@ export const Chests = {
       ctx.player.inventory.remove(KEYS.item, 1); audio.unlock(); toast('The Lantern Key turns with a click!');
     }
     c.open(); this.opened.add(c.id);
-    const loot = rollLoot(c.def.loot, ctx.planet), names = [];
+    const loot = rollLoot(c.def.loot, ctx.planet, Math.random, ctx.player.charId), names = [];
     if (loot.coins) { gainCoins(loot.coins, c.top(0.6)); names.push(`${loot.coins} coins`); }
-    loot.items.forEach(({ item, qty }, i) => {
+    loot.items.forEach(({ item, qty, props }, i) => {
       const heading = (i / Math.max(1, loot.items.length)) * Math.PI * 2 + mr(-0.4, 0.4);
       const to = spawnSpot(offsetDir(c.up, heading, mr(...LOOT.popDistance)), 0, 0.4, 0.3);
-      const w = spawnWorldItem(item, qty, to, { from: c.up, popTime: LOOT.popTime + i * 0.08, stepAway: false });
+      const w = spawnWorldItem(item, qty, to, { from: c.up, popTime: LOOT.popTime + i * 0.08, stepAway: false, props });
       if (w && c === this.bossChest) w.bossLoot = true;
-      names.push(`${qty > 1 ? `${qty}x ` : ''}${itemRegistry.get(item).name}`);
+      names.push(lootName(item, qty, props));
     });
     toast(`${c.def.name}: ${names.join(', ') || 'empty... just dust and a moth'}`);
   },
@@ -110,7 +109,7 @@ export const Chests = {
   collectBossLoot() {
     for (let i = ctx.worldItems.length - 1; i >= 0; i--) {
       const w = ctx.worldItems[i]; if (!w.bossLoot) continue;
-      grantItem(w.itemId, w.quantity); w.dispose(); ctx.worldItems.splice(i, 1);
+      grantItem(w.itemId, w.quantity, w.props); w.dispose(); ctx.worldItems.splice(i, 1);
     }
   },
 

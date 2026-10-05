@@ -7,7 +7,7 @@ import { Owl } from '../entities/companions/Owl.js';
 import { Wolf } from '../entities/companions/Wolf.js';
 import { sparkles } from '../fx/sparkles.js';
 import { HERO_BUILDERS } from '../models/heroes.js';
-import { statsForLevel } from '../progression/leveling.js';
+import { computeStats } from './equipment.js';
 import { buildSpellBar, setSkillHint } from '../ui/hud.js';
 
 const COMPANIONS = { owl: Owl, wolf: Wolf };
@@ -36,7 +36,7 @@ export function showcaseHero(picked = false) {
 export function applyCharacter(id) {
   const C = CHARACTERS[id], P = ctx.player;
   if (P.charId !== id) P.swapModel(HERO_BUILDERS[C.model]());
-  P.charId = id; P.stats = statsForLevel(C.stats, P.level); P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
+  P.charId = id; P.stats = computeStats(P); P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
   P.clearTimers();
   resetCooldowns(C.abilities);
   buildSpellBar(C.abilities); setSkillHint(C.hint);

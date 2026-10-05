@@ -1,20 +1,25 @@
 /* Combat HUD: HP / resource / XP bars (each with a damage trail that drains after a hit), the level badge, the status
    row (buffs, Guard, regeneration), the ability bar (drawn icons, cooldown sweep + seconds left, a flash when a move is
    ready again, the ultimate in its own gold slot, a hover tooltip), floating enemy health bars, the boss bar (phase
-   ticks, damage trail, a flash when a phase starts), the lock-on reticle, the collapsible controls panel and UI scale. */
+   ticks, damage trail, a flash when a phase starts), the lock-on reticle, the collapsible controls panel and UI scale,
+   and the quick-use bar (keys 6-8: src/gameplay/quickSlots.js). */
 import * as THREE from 'three';
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
+import { QUICK_SLOTS } from '../config/items.js';
 import { PLANET_RADIUS as R } from '../config/game.js';
 import { ctx } from '../core/context.js';
 import { setSetting, settings } from '../core/settings.js';
 import { aim } from '../combat/aiming.js';
 import { ENGAGED } from '../entities/enemies/states.js';
 import { buffs } from '../gameplay/buffs.js';
+import { Quick } from '../gameplay/quickSlots.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
 import { damageMultiplier, xpToNext } from '../progression/leveling.js';
 import { camera } from '../render/scene.js';
 import { clamp } from '../utils/math.js';
 import { dom, flashEl } from './dom.js';
 import { icon } from './icons.js';
+import { itemIconHtml } from './itemTooltip.js';
 
 const HUD = {
   trailHold: 0.45,      // seconds a bar's damage trail waits before draining
@@ -55,6 +60,31 @@ export function buildSpellBar(abilities) {
     dom.spells.appendChild(el); slots[id] = { el, cd: el.querySelector('.cd'), cdt: el.querySelector('.cdt'), was: 0, text: '' };
   }
 }
+// ---------------------------------------------------------------- quick-use bar
+let quick = [];
+export function buildQuickBar() {
+  dom.quick.innerHTML = '';
+  quick = QUICK_SLOTS.labels.map((label, i) => {
+    const el = document.createElement('div'); el.className = 'qslot empty';
+    el.innerHTML = `<kbd>${label}</kbd><div class="qi"></div><span class="qn"></span><div class="cd"></div>`;
+    el.addEventListener('click', () => Quick.use(i)); dom.quick.appendChild(el);
+    return { el, qi: el.querySelector('.qi'), qn: el.querySelector('.qn'), cd: el.querySelector('.cd'), id: undefined, n: -1 };
+  });
+}
+function updateQuickBar() {
+  quick.forEach((q, i) => {
+    const id = Quick.ids[i];
+    if (id !== q.id) {
+      q.id = id; q.el.classList.toggle('empty', !id);
+      q.qi.innerHTML = id ? itemIconHtml(itemRegistry.get(id)) : '';
+      q.el.title = id ? `${itemRegistry.get(id).name} (key ${QUICK_SLOTS.labels[i]})` : `Quick slot ${QUICK_SLOTS.labels[i]}: choose a food or tonic in the bag`;
+    }
+    const n = Quick.count(i);
+    if (n !== q.n) { q.n = n; q.qn.textContent = id ? n : ''; q.el.classList.toggle('out', !!id && !n); }
+    q.cd.style.transform = `scaleY(${Quick.cd / QUICK_SLOTS.cooldown})`;
+  });
+}
+
 export function setSkillHint(html) { dom.hintSkills.innerHTML = html; }
 
 const titleCase = w => w.charAt(0) + w.slice(1).toLowerCase();
@@ -175,6 +205,7 @@ export function updateCombatHud(dt, spellState, aimTarget) {
   setBar(bars.mp, P.mana / C.maxMana, `${Math.floor(P.mana)} / ${C.maxMana}`, dt);
   const need = xpToNext(P.level);
   setBar(bars.xp, need ? P.xp / need : 1, need ? `${P.xp} / ${need}` : 'MAX', dt);
+  updateQuickBar();
   if (shownLevel !== P.level) { if (shownLevel) flashEl(dom.level.parentElement, 'pop'); shownLevel = P.level; dom.level.textContent = P.level; }
   const low = !P.dead && P.hp / C.maxHp < HUD.lowHp;
   bars.hp.el.classList.toggle('low', low); dom.lowHp.classList.toggle('on', low);

@@ -6,7 +6,7 @@ export const dom = {
   hud: $('hud'), prompt: $('prompt'), toast: $('toast'),
   // combat HUD
   hpBar: document.querySelector('.bar.hp'), mpBar: document.querySelector('.bar.mp'), xpBar: document.querySelector('.bar.xp'),
-  spells: $('spells'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'), aimHint: $('aimhint'),
+  spells: $('spells'), quick: $('quick'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'), aimHint: $('aimhint'),
   combat: $('combat'), status: $('status'), level: document.querySelector('#combat .lvl b'), tip: $('tip'), lowHp: $('lowhp'),
   compass: $('compass'), compassTrack: document.querySelector('#compass .track'), markers: $('markers'),
   // dialogue

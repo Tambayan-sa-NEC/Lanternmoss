@@ -4,7 +4,7 @@
 
 export const ITEM_ACTIONS = {
   use:     { label: 'Use', supported: true },        // apply the item's `use` effects, then consume one
-  equip:   { label: 'Equip', supported: false },     // reserved: equipment slots are a future feature
+  equip:   { label: 'Equip', supported: true },      // wear it (src/gameplay/equipment.js)
   inspect: { label: 'Inspect', supported: true },    // only shows details; never consumes
 };
 

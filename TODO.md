@@ -132,17 +132,22 @@ Code: `src/config/chests.js`, `src/entities/Chest.js`, `src/models/chest.js`, `s
 - [x] Locked Lantern chests need a Lantern Key: monsters drop one now and then while a locked chest waits (guaranteed
       after a few kills), and Old Bramble hands you his spare once.
 
-## 8. Better items **(core)**
+## 8. Better items **(core)** ✓
 
 **Goal:** items that matter for gameplay, not just healing.
-Code: `src/config/items.js`, `src/items/`, `src/inventory/`, `src/gameplay/itemUse.js`, `src/ui/InventoryUI.js`.
+Code: `src/config/items.js`, `src/config/crafting.js`, `src/items/` (gear, crafting), `src/gameplay/` (equipment, drops,
+quickSlots, loot), `src/ui/` (InventoryUI, itemTooltip, itemArt), `src/models/items.js`.
 
-- [ ] **Equipment system:** equip slots (weapon, armour, charm) with stat bonuses. The `equipment` / `weapon` categories already exist but do nothing yet.
-- [ ] Item rarities that affect stats (the `RARITIES` table already exists).
-- [ ] Monster and boss drops.
-- [ ] Crafting from materials (Glowcap, Ember Shard, Frost Petal already exist but have no use).
-- [ ] Better item art: icons and world models per item instead of shared shapes.
-- [ ] Quick-use slots for potions on number keys (avoid conflicts with ability keys `1`–`5`).
+- [x] **Equipment system:** weapon, armour and trinket slots shown in the bag, with stat bonuses (damage, max HP / mana,
+      regeneration, armour, move speed; capped). Six hero weapons (two per hero), three armours, three trinkets.
+- [x] Item rarities that affect stats: every piece rolls its own rarity when it drops; Uncommon x1.3, Rare x1.7,
+      Legendary x2.3 its Common stats. Bag borders and names show the rarity.
+- [x] Monster and boss drops: monsters sometimes drop food, materials, tonics or gear (tougher ones more often);
+      chests can hold gear, and each boss chest holds a Rare-or-better piece for your hero.
+- [x] Crafting from materials: the bag's Craft tab with 18 recipes (tonics, stews, draughts, tarts, Lantern Keys, all
+      the gear), showing what you have and what's missing.
+- [x] Better item art: an SVG icon and a 3D world model for each kind of item, tinted per item.
+- [x] Quick-use slots for food and tonics on `6` `7` `8` (shown next to the ability bar; new snacks fill an empty key).
 
 ## 9. Better pet system **(core)**
 

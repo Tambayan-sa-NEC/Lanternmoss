@@ -6,6 +6,7 @@ import { ctx } from '../core/context.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { audio } from '../systems/AudioSystem.js';
 import { BUFF_NAMES, buff, buffs } from './buffs.js';
+import { equipFromSlot } from './equipment.js';
 
 /** effect id -> (effect entry) => did it change anything? */
 const EFFECTS = {
@@ -23,6 +24,7 @@ export function useItemInSlot(inventory, slot) {
   if (!action) return { ok: false, message: `${def.name} can't be used. It's kept for later.` };
   if (!ITEM_ACTIONS[action]?.supported) return { ok: false, message: `${ITEM_ACTIONS[action]?.label ?? 'That'} isn't available yet.` };
   if (action === 'inspect') return { ok: true, message: def.description };
+  if (action === 'equip') return equipFromSlot(inventory, slot);
   if (ctx.player.dead) return { ok: false, message: "You can't do that while fainted." };
   const applied = def.use.map(e => EFFECTS[e.effect]?.(e) ?? false).some(Boolean);
   if (!applied) return { ok: false, message: 'It would have no effect right now.' };

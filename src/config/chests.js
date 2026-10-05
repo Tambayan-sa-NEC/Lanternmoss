@@ -7,7 +7,11 @@
    LOOT_TABLES   what's inside: coins [min, max] (x (1 + coinsPerPlanet * planet index)), `guaranteed` entries,
                  then `rolls` picks from `pool` (by weight; a picked entry isn't picked twice)
      entry       { item, qty: n | [min, max], weight }; item may be '@material' (the planet's forage material,
-                 PLANETS[i].material) or '@trophy' (the planet's boss trophy)
+                 PLANETS[i].material), '@trophy' (the planet's boss trophy) or '@gear' (a piece of equipment for this
+                 planet and the current hero, its rarity rolled from GEAR_RARITY[entry.rarity])
+   GEAR_RARITY   rarity odds (weights) for '@gear' by source
+   MONSTER_DROPS what defeated monsters leave behind (runtime: src/gameplay/drops.js): a chance that grows with the
+                 monster's XP, then one roll of LOOT_TABLES[table]. Bosses drop their chest instead.
    KEYS          Lantern Keys for locked chests: monsters drop them now and then while a locked chest is still waiting
                  on the planet and you have none (pity = a guaranteed drop after that many kills without one);
                  Old Bramble also hands you one, once per adventure (src/entities/npc/npcDefs.js).
@@ -33,6 +37,7 @@ export const LOOT_TABLES = {
       { item: 'moonberryTart', qty: 1, weight: 1.5 },
       { item: 'featherCharm', qty: 1, weight: 0.6 },
       { item: 'moonHopCharm', qty: 1, weight: 0.6 },
+      { item: '@gear', rarity: 'chest', weight: 1.2 },
     ],
   },
   rare: {
@@ -43,16 +48,41 @@ export const LOOT_TABLES = {
       { item: 'moonHopCharm', qty: 1, weight: 3 },
       { item: 'honeyBun', qty: 2, weight: 2 },
       { item: '@material', qty: [3, 5], weight: 2 },
+      { item: '@gear', rarity: 'rare', weight: 4 },
     ],
   },
   boss: {
     coins: [40, 55], rolls: 1,
-    guaranteed: [{ item: '@trophy', qty: 1 }, { item: 'moonberryTart', qty: 2 }, { item: 'honeyBun', qty: 2 }],
+    guaranteed: [{ item: '@trophy', qty: 1 }, { item: '@gear', rarity: 'boss' }, { item: 'moonberryTart', qty: 2 }, { item: 'honeyBun', qty: 2 }],
     pool: [
       { item: 'featherCharm', qty: 2, weight: 1 },
       { item: 'moonHopCharm', qty: 2, weight: 1 },
     ],
   },
+  monster: {
+    rolls: 1,
+    pool: [
+      { item: 'moonberry', qty: [1, 2], weight: 5 },
+      { item: '@material', qty: [1, 2], weight: 5 },
+      { item: 'honeyBun', qty: 1, weight: 1 },
+      { item: 'glowTonic', qty: 1, weight: 0.8 },
+      { item: '@gear', rarity: 'monster', weight: 1 },
+    ],
+  },
+};
+
+export const GEAR_RARITY = {
+  monster: { common: 70, uncommon: 25, rare: 5 },
+  chest:   { common: 45, uncommon: 40, rare: 15 },
+  rare:    { uncommon: 45, rare: 45, legendary: 10 },
+  boss:    { rare: 65, legendary: 35 },
+};
+
+export const MONSTER_DROPS = {
+  chance: 0.1,             // base chance a defeated monster drops something...
+  perXp: 0.005,            // ...plus this per XP it's worth (a goblin ~15%, an ogre ~30%)
+  max: 0.45,
+  table: 'monster',
 };
 
 export const LOOT = {

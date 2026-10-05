@@ -19,14 +19,17 @@ import { createSparkles, sparkles } from '../fx/sparkles.js';
 import { applyCharacter, showcaseHero } from '../gameplay/characters.js';
 import { buffs, resetBuffs, updateBuffs } from '../gameplay/buffs.js';
 import { dayClock } from '../gameplay/dayClock.js';
-import { useItemInSlot } from '../gameplay/itemUse.js';
-import { dropFromSlot, spawnWorldItem, updateWorldItems } from '../gameplay/pickups.js';
+import { spawnWorldItem, updateWorldItems } from '../gameplay/pickups.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { installItemNotices } from '../ui/itemNotices.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { Quests } from '../gameplay/quests/Quests.js';
+import { bagCommands } from '../gameplay/bagCommands.js';
 import { Chests } from '../gameplay/Chests.js';
+import '../gameplay/drops.js';
+import { Quick } from '../gameplay/quickSlots.js';
+import { computeStats, emptyEquipment } from '../gameplay/equipment.js';
 import { Houses } from '../gameplay/Houses.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
@@ -42,7 +45,7 @@ import { keys, releaseAllKeys } from '../systems/InputSystem.js';
 import { RenderSystem } from '../systems/RenderSystem.js';
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { Dialog } from '../ui/Dialog.js';
-import { applyUiScale, buildSpellBar, setSkillHint } from '../ui/hud.js';
+import { applyUiScale, buildQuickBar, buildSpellBar, setSkillHint } from '../ui/hud.js';
 import { updateWaypoints } from '../ui/waypoints.js';
 import { updateOverlay } from '../ui/overlay.js';
 import { toast, updateToast } from '../ui/toast.js';
@@ -88,7 +91,9 @@ export class Game {
     installLevelFeedback();
     const bag = ctx.player.inventory;
     installItemNotices(bag);
-    InventoryUI.init(bag, { use: slot => useItemInSlot(bag, slot), drop: slot => dropFromSlot(slot) });
+    InventoryUI.init(bag, bagCommands(bag));
+    bag.addEventListener('itemadded', e => Quick.autoAssign(e.detail.itemId));   // new consumables fill an empty quick key
+    buildQuickBar();
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -124,7 +129,7 @@ export class Game {
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
-    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt);
+    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Quick.update(dt);
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -152,7 +157,7 @@ export class Game {
   resetRun() {
     const P = ctx.player, world = this.world;
     Dialog.close(); InventoryUI.close();
-    Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun();
+    Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Quick.reset();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs(); dayClock.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
@@ -161,7 +166,8 @@ export class Game {
     clearTargets();
     if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
     this.planets.reset();                                          // back to the first planet (and its boss)
-    Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, coins: 0, stats: CHARACTERS[P.charId].stats });   // a fresh adventure starts back at level 1
+    Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, coins: 0, equipment: emptyEquipment() });   // a fresh adventure starts back at level 1
+    P.stats = computeStats(P);
     P.clearTimers(); P.inventory.clear();
     const fwd = P.placeAt(world.spawnDir);
     P.root.visible = true; snapCamera(world.spawnDir, fwd);
@@ -172,7 +178,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Chests, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Challenges, CHALLENGES, Chests, Quick, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

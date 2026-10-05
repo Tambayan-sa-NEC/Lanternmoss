@@ -31,9 +31,9 @@ export function spawnForage(forage) {
 
 /** Gives the hero `quantity` of itemId; anything the bag can't hold is set down in front of them.
     Returns how many went into the bag. */
-export function grantItem(itemId, quantity = 1) {
-  const r = ctx.player.inventory.add(itemId, quantity);
-  if (r.remaining && !r.error) spawnWorldItem(itemId, r.remaining, dropSpot(), { pickupDelay: INVENTORY.dropPickupDelay });
+export function grantItem(itemId, quantity = 1, props = null) {
+  const r = ctx.player.inventory.add(itemId, quantity, props);
+  if (r.remaining && !r.error) spawnWorldItem(itemId, r.remaining, dropSpot(), { pickupDelay: INVENTORY.dropPickupDelay, props });
   return r.added;
 }
 

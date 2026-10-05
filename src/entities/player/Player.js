@@ -36,6 +36,7 @@ export class Player extends Walker {
     // combat
     Object.assign(this, { charId: 'witch', stats: COMBAT.player, hp: COMBAT.player.maxHp, mana: COMBAT.player.maxMana, invuln: 0, hurtT: 0,
       dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, coins: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS });
+    this.equipment = { weapon: null, armor: null, charm: null };   // worn gear (src/gameplay/equipment.js)
     this.inventory = new Inventory(INVENTORY.slots);   // the hero's bag (kept across planets and fainting; emptied on a new adventure)
   }
 
@@ -75,7 +76,7 @@ export class Player extends Walker {
     _cf.copy(viewFwd); projectTangent(_cf, this.up).normalize(); _cr.crossVectors(_cf, this.up);
     _wish.set(0, 0, 0).addScaledVector(_cf, f).addScaledVector(_cr, s); if (_wish.lengthSq() > 1) _wish.normalize();
     const sprint = keys.ShiftLeft || keys.ShiftRight;
-    const speed = (sprint ? PLAYER.sprintSpeed : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1);
+    const speed = (sprint ? PLAYER.sprintSpeed : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1) * (1 + (this.stats.moveSpeed || 0));
     _tv.copy(_wish).multiplyScalar(speed);
     this.vel.lerp(_tv, damp(this.grounded ? PLAYER.accelGround : PLAYER.accelAir, dt));
     // jump with coyote time + input buffer

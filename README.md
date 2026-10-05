@@ -32,7 +32,8 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 | `Shift` | sprint |
 | `Space` | jump (hold for a floatier rise) |
 | `E` / `X` | talk, advance, accept / decline |
-| `I` or `Tab` (`Esc` closes) | open / close the bag |
+| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
+| `6` `7` `8` | quick-use the food or tonic on that key (set with the bag's Quick buttons) |
 | `1-4`, `Q R F`, click | abilities (`1` / click can be held to repeat) |
 | `5` / `G` | ultimate: a marker follows the cursor; click (or `5` / `G` again) to cast there, `Esc` / right click cancels |
 | drag / wheel | rotate / zoom camera |
@@ -56,7 +57,9 @@ src/
 │   ├── render.js          pixel ratio, fog, bloom, outline width
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, owl
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
-│   ├── items.js           item definitions, categories, rarities, effects, bag size and pickup settings
+│   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
+│   │                      stats, quick-use keys, effects, bag size and pickup settings
+│   ├── crafting.js        crafting recipes (materials + coins -> food, tonics, keys, gear)
 │   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips, selection profile)
 │   ├── settings.js        player settings schema (drives the Settings screen, defaults and validation)
 │   ├── controls.js        the fixed key list shown on the pause menu's Controls page
@@ -64,7 +67,7 @@ src/
 │   ├── day.js             the village clock: day length, phases, light per phase
 │   ├── shop.js            coins per monster, the shop's keeper, hours, stock and prices
 │   ├── houses.js          enterable houses per planet: layout, furniture, owner / resident, note, chest gift
-│   ├── chests.js          treasure chests: kinds, loot tables, Lantern Key drops, the boss chest
+│   ├── chests.js          treasure chests and drops: kinds, loot tables, gear rarity odds, monster drops, keys, boss chest
 │   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
@@ -104,7 +107,8 @@ src/
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
-├── items/                 ItemRegistry (validated item catalogue) and itemActions (what each category does)
+├── items/                 ItemRegistry (validated item catalogue), itemActions (what each category does),
+│                          gear (rarity -> stats, totals, caps) and crafting (recipe rules); all pure
 ├── inventory/             Inventory: slot storage, stacking, capacity, moving / swapping, events (pure)
 ├── entities/              things that live and move in the world
 │   ├── player/            Player (movement, model swap, placement) and pose animation
@@ -145,7 +149,11 @@ src/
 │   ├── quests/            quest runtime (offers, steps, tracker, rewards)
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
 │   ├── Chests.js          placing a planet's chests, opening them, keys from monsters, the boss chest
-│   ├── loot.js            rolling a loot table into coins and item stacks
+│   ├── loot.js            rolling a loot table into coins and item stacks (gear with a rolled rarity)
+│   ├── drops.js           monster drops
+│   ├── equipment.js       what the hero wears; the hero's stats = base + level + gear
+│   ├── quickSlots.js      quick-use keys 6-8
+│   ├── bagCommands.js     what the bag window can ask the game to do (use, equip, craft, quick keys...)
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
@@ -155,7 +163,8 @@ src/
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
 │                          ShopUI (buy / sell), portraits (dialogue faces),
 │                          dialogue, challenge panel, banner + travel fade,
-│                          InventoryUI + itemTooltip (the bag window), itemNotices (item toasts),
+│                          InventoryUI + itemTooltip (the bag window: gear, Craft tab), itemArt (SVG item pictures),
+│                          itemNotices (item toasts),
 │                          overlay (planet chip), toast, character select (reached from the title, or C in play)
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
 ```
@@ -238,6 +247,10 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Coins per monster, shop stock, prices and hours | `src/config/shop.js` |
 | Houses: who lives where, furniture, notes, chest gifts, nap healing | `src/config/houses.js` |
 | Chests: kinds, loot tables, key drop chance, boss chest timings | `src/config/chests.js` |
+| Gear: stats per piece, rarity multipliers, stat caps, gear slots | `src/config/items.js` → `equip`, `RARITIES`, `STATS` |
+| Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
+| Crafting recipes | `src/config/crafting.js` |
+| Quick-use keys and their cooldown | `src/config/items.js` → `QUICK_SLOTS` |
 | How many chests each planet has, its loot material | `src/config/planets.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
@@ -258,17 +271,31 @@ stacks free their slot. `move` merges into a matching stack (any overflow stays 
 
 **Getting items.** Walk over items lying in the world (each planet's `forage`, or anything dropped). The world item only
 shrinks by what the bag accepted, so with a full bag it stays put. Pim hands out buns and tarts, challenge "treats" are
-Honey-moss Buns, and each boss leaves its crown. Gifts that don't fit are set down at your feet.
+Honey-moss Buns, chests hold loot, monsters sometimes drop something (`gameplay/drops.js`), and each boss's treasure
+chest holds its crown and a piece of gear. Gifts that don't fit are set down at your feet.
+
+**Gear and rarity.** Weapons (one hero each), armour and trinkets carry `equip: { slot, hero, tier, stats }`. A dropped
+piece rolls its own rarity (`props.rarity`, odds in `GEAR_RARITY`), and `RARITIES[r].statMult` scales its stats, so a
+Legendary Ember Ring is more than twice a Common one. Worn gear lives in `player.equipment` (not the bag), and the
+hero's stats are always `computeStats()` = base stats, grown to their level, plus gear (`items/gear.js`, with caps per
+stat in `STATS`): damage, max HP / mana, regeneration, armour and move speed.
+
+**Crafting.** The bag's Craft tab lists every recipe the hero can use (`config/crafting.js`): Glowcaps, Ember Shards
+and Frost Petals become tonics, stews, draughts, Lantern Keys and gear. Crafted gear comes out at a set rarity.
+
+**Quick keys.** `6`, `7` and `8` each use a consumable straight from the bag. Snacks you pick up fill an empty key by
+themselves; select one in the bag and press **Quick 6/7/8** to choose.
 
 **Using items.** `I` opens the bag. Movement still works, but abilities and talking pause. Click an item to select it,
-click another slot to move, merge or swap, and double-click or **Use** to use it. Behaviour comes from the category
-(`items/itemActions.js`): consumables are used (effects in `gameplay/itemUse.js`, never wasted when they'd do nothing),
-materials are kept, quest items are inspected and can't be dropped, and equipment / weapons are reserved for an equip
-system. **Drop** sets a stack on the ground.
+click another slot to move, merge or swap, and double-click or **Use** / **Equip** to use it. Behaviour comes from
+the category (`items/itemActions.js`): consumables are used (effects in `gameplay/itemUse.js`, never wasted when
+they'd do nothing), equipment and weapons are worn (click a worn piece to take it off), materials are kept for crafting,
+quest items are inspected and can't be dropped. **Drop** sets a stack on the ground.
 
 **Extending it.** A new item = an entry in `ITEM_DEFINITIONS`. A new effect = a key in `ITEM_EFFECTS` plus a handler in
-`itemUse.js`. A new item source (enemy drops, chests, shops) calls `spawnWorldItem` or `grantItem`. Equipment would
-add an action handler plus slots of its own, using `Inventory.move`. Save / load can use `inventory.toJSON()` and
+`itemUse.js`. A new item source calls `spawnWorldItem` or `grantItem` (or rolls a loot table: `gameplay/loot.js`).
+A new picture = a drawing in `ui/itemArt.js` and a model in `models/items.js` under a new `ITEM_ART_KINDS` entry.
+A new gear stat = an entry in `STATS` plus where it's read (like `damageBonus` in `combat/damage.js`). Save / load can use `inventory.toJSON()` and
 `inventory.load()`. The bag is kept across planets and fainting, and emptied on a new adventure (there is no save system).
 
 ## Monsters and bosses

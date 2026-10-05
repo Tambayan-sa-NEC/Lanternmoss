@@ -15,7 +15,8 @@ export const FIXED_CONTROLS = [
   { group: 'Interact', rows: [
     [['E'], 'talk, advance, accept'],
     [['X'], 'decline'],
-    [['I', 'Tab'], 'open / close the bag'],
+    [['I', 'Tab'], 'open / close the bag (and its Craft tab)'],
+    [['6', '7', '8'], 'quick-use the food or tonic on that key (set in the bag)'],
   ] },
   { group: 'Game', rows: [
     [['Esc', 'P'], 'pause menu (Esc first closes the shop, bag, dialogue or aiming)'],

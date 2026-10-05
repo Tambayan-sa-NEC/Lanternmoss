@@ -36,7 +36,7 @@ export function damageEnemy(e, amount, o = {}) {
     if (settings.damageNumbers && ctx.time - (e.immuneTextT ?? -9) > 0.6) { e.immuneTextT = ctx.time; floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), 'IMMUNE', '#b8b0c8'); }
     return;
   }
-  if (!o.source) amount *= damageMultiplier(ctx.player.level);       // no source = one of the hero's own abilities
+  if (!o.source) amount *= damageMultiplier(ctx.player.level) * (1 + (ctx.player.stats.damageBonus || 0));   // no source = the hero's own abilities (level + gear)
   if (o.source !== 'owl' && e.markT > 0) amount *= 1 + COMBAT.owl.markBonus;
   if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
   if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
@@ -63,7 +63,7 @@ export function damageEnemy(e, amount, o = {}) {
 export function hurtPlayer(amount, from, knock = 0, o = {}) {
   const P = ctx.player; if (P.dead || P.invuln > 0) return;
   if (o.lethal) amount = Math.max(Math.round(amount), Math.ceil(P.hp));
-  else if (P.stats.armor || P.guardT > 0) {     // knight only: armor, and Guard blocks knockback
+  else if (P.stats.armor || P.guardT > 0) {     // armour (the knight's own, plus gear), and Guard blocks knockback
     amount = Math.max(1, Math.round(amount * (1 - (P.stats.armor || 0)) * (P.guardT > 0 ? 1 - P.guardReduction : 1)));
     if (P.guardT > 0) { knock = 0; audio.clang(); }
   } else amount = Math.max(1, Math.round(amount));
