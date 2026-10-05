@@ -24,6 +24,7 @@ import { groundHeight } from '../world/terrain.js';
 import { buff } from './buffs.js';
 import { Challenges } from './challenges/Challenges.js';
 import { Chests } from './Chests.js';
+import { Pets } from './Pets.js';
 import { dayClock } from './dayClock.js';
 import { grantItem } from './pickups.js';
 import { gainCoins } from './wallet.js';
@@ -244,7 +245,7 @@ export function currentInteraction() {
   if (!ctx.started || Dialog.open || Houses.fade) return null;
   let h = Houses.target();
   if (Houses.inside) return h;
-  const c = Chests.target(); if (c && (!h || c.dist < h.dist)) h = c;
+  for (const c of [Chests.target(), Pets.target()]) if (c && (!h || c.dist < h.dist)) h = c;
   const P = ctx.player, n = nearestNPC(P, ctx.npcs);
   if (n && (!h || n.pos.distanceTo(P.pos) <= h.dist)) {
     return { label: `Talk to ${n.name}${Challenges.tagFor(n)}`, at: _w.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).clone(), run: () => Dialog.start(n) };

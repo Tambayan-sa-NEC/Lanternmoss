@@ -6,12 +6,14 @@
      giver    villagers with a challenge or quest to offer, when no challenge is running (compass)
      quest    the villager your tracked quest needs next (compass + edge arrow)
      chest    a beaten boss's treasure chest until it's opened (compass + edge arrow)
+     spotted  monsters a pet's Scout found (compass), scent = the chest a pet's Fetch sniffed out (compass + edge arrow)
    Edge arrows only appear while their target is off-screen or hidden behind the planet. */
 import * as THREE from 'three';
 import { ctx } from '../core/context.js';
 import { settings } from '../core/settings.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { Chests } from '../gameplay/Chests.js';
+import { petEffects } from '../gameplay/petAbilities.js';
 import { Quests } from '../gameplay/quests/Quests.js';
 import { cam } from '../systems/CameraSystem.js';
 import { clamp } from '../utils/math.js';
@@ -41,6 +43,9 @@ function pointsOfInterest() {
   } else for (const n of ctx.npcs) if (Challenges.availableFor(n) || Quests.offerable(n)) list.push({ key: `giver:${n.name}`, dir: n.up, icon: 'talk', label: n.name });
   const bc = Chests.bossChest;
   if (bc && !bc.opened) list.push({ key: 'chest', dir: bc.up, icon: 'chest', label: 'Treasure', edge: true, far: true, point: bc.top(0.4) });
+  petEffects.spotted.forEach((s, i) => list.push({ key: `spotted:${i}`, dir: s.enemy.up, icon: 'eye', label: 'Spotted' }));
+  const sc = petEffects.scent;
+  if (sc) list.push({ key: 'scent', dir: sc.dir, icon: 'paw', label: 'A chest', edge: true, far: true, point: _p.copy(sc.dir).multiplyScalar(groundHeight(sc.dir) + 1).clone() });
   const qt = Quests.target();                                        // the villager your tracked quest needs next
   if (qt) list.push({ key: 'quest', dir: qt.up, icon: 'quest', label: qt.name, edge: true, far: true, point: _p.copy(qt.pos).addScaledVector(qt.up, qt.height).clone() });
   return list;

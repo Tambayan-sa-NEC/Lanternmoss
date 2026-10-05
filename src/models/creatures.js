@@ -1,6 +1,7 @@
-/* Animals: four-legged critters (cats, dogs, foxes, the wolf), birds, pond fish and Pip the owl. */
+/* Animals: four-legged critters (cats, dogs, foxes, the wolf), birds, pond fish, and the flying pets (owl, wisp, dragon whelp). */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { buildDragon } from './dragon.js';
 
 export function buildQuad(o) {
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
@@ -71,4 +72,25 @@ export function buildOwl() {
   addTo(body, part(G.box(0.14, 0.04, 0.18), 0x86664f), [0, -0.18, -0.2], [-0.5, 0, 0]);
   root.scale.setScalar(0.85);
   return { root, body, head, wingL: wings[0], wingR: wings[1] };
+}
+
+/** Glimmer-style pet wisp: a glowing little spirit with a face and petal wings (parts like buildOwl: body, head, wings). */
+export function buildWispPet(color = 0x9ff3ff) {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const head = new THREE.Group(); body.add(head);
+  addTo(head, part(G.ico(0.24, 1), color, { glow: true, intensity: 0.9 }), [0, 0, 0]);
+  addTo(head, part(G.ico(0.16, 1), 0xffffff, { glow: true, intensity: 1.1, outline: false }), [0, 0.02, 0.06]);
+  for (const sx of [-1, 1]) addTo(head, part(G.ico(0.035, 0), 0x2a1830, { outline: false }), [sx * 0.07, 0.03, 0.21]);
+  addTo(head, part(G.cone(0.08, 0.22, 5), color, { glow: true, intensity: 0.9 }), [0, -0.24, -0.08], [Math.PI - 0.5, 0, 0]);
+  const wings = [];
+  for (const sx of [-1, 1]) { const g = new THREE.Group(); g.position.set(sx * 0.16, 0.08, -0.06); body.add(g);
+    addTo(g, part(G.ico(0.2, 0), 0xffd6f5, { glow: true, intensity: 0.9 }), [sx * 0.16, 0.06, 0], [0, 0, sx * 0.4], [1, 0.1, 0.55]); wings.push(g); }
+  return { root, body, head, wingL: wings[0], wingR: wings[1] };
+}
+
+/** A dragon whelp: Pyrrhax's model in miniature, a little rounder and paler. */
+export function buildWhelp() {
+  const d = buildDragon({ look: { scale: 1, body: 0xe0503a, belly: 0xffc878, dark: 0x9a2f24, horn: 0xfff0d8, membrane: 0xff8a5a, eye: 0xfff07a } });
+  d.root.scale.setScalar(0.1); d.head.scale.setScalar(1.4);
+  return d;
 }

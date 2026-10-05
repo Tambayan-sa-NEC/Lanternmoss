@@ -123,6 +123,7 @@ export function showPlayerHurt() {
 const STATUSES = [
   { id: 'moon', name: 'Moon-Hop', left: () => buffs.moon },
   { id: 'feather', name: 'Feather-Step', left: () => buffs.feather },
+  { id: 'howl', name: 'Howl (+damage)', left: () => buffs.howl },
   { id: 'guard', name: 'Guard', left: P => P.guardT },
   { id: 'regen', name: 'Regenerating', active: P => !P.dead && P.hp < P.stats.maxHp && ctx.time - P.lastHurt > P.stats.hpRegenDelay },
 ];

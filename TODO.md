@@ -149,16 +149,21 @@ quickSlots, loot), `src/ui/` (InventoryUI, itemTooltip, itemArt), `src/models/it
 - [x] Better item art: an SVG icon and a 3D world model for each kind of item, tinted per item.
 - [x] Quick-use slots for food and tonics on `6` `7` `8` (shown next to the ability bar; new snacks fill an empty key).
 
-## 9. Better pet system **(core)**
+## 9. Better pet system **(core)** ✓
 
 **Goal:** companions are a feature in their own right, not just a hero accessory.
-Code: `src/entities/companions/Owl.js`, `src/entities/companions/Wolf.js`, `src/gameplay/characters.js`.
+Code: `src/config/pets.js`, `src/gameplay/Pets.js`, `src/gameplay/petAbilities.js`, `src/entities/companions/`,
+`src/ui/petHud.js`, the bag's Pets tab (`src/ui/InventoryUI.js`).
 
-- [ ] Pets level up alongside the hero, with stronger attacks at higher levels.
-- [ ] Pet commands: follow, stay, attack my target, passive.
-- [ ] More pets, unlocked through quests, chests or bosses, and any hero can pick any unlocked pet.
-- [ ] Pet abilities with their own cooldown shown on the HUD (e.g. Wolf howl buff, Owl scouting reveal).
-- [ ] Pet care touches: naming, petting, an emote reaction, a pet health bar and fainting instead of dying.
+- [x] Pets level up alongside the hero (pet level = hero level): +10% damage and more health per level.
+- [x] Pet commands on `T` (or the pet card / Pets tab): follow, stay (guards its spot), attack my target, passive.
+- [x] More pets: a fox (in your first Lantern chest), Glimmer the wisp (finishing the Humming Stones quest) and a dragon
+      whelp (hatched from Pyrrhax's treasure chest), besides the owl and the wolf; any hero can take any unlocked pet.
+- [x] Pet abilities on `V` with their own cooldown on the HUD pet card: Owl Scout (marks and shows every monster
+      nearby on the compass), Wolf Howl (+20% damage), Fox Fetch (brings items over, sniffs out a chest), Wisp Mend
+      (heals you over time), Whelp Flame Burst (area damage).
+- [x] Pet care: rename them in the Pets tab, pet them with `E` (a heart, a happy hop and a little healing), a health bar
+      on the pet card; monsters hit back when bitten, and a pet at 0 HP faints for 20s and bounds back healed.
 
 ---
 

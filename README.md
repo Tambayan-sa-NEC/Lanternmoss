@@ -34,6 +34,9 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 | `E` / `X` | talk, advance, accept / decline |
 | `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
 | `6` `7` `8` | quick-use the food or tonic on that key (set with the bag's Quick buttons) |
+| `T` | pet command: follow → stay → attack my target → passive |
+| `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
+| `E` beside your pet (standing still) | pet them |
 | `1-4`, `Q R F`, click | abilities (`1` / click can be held to repeat) |
 | `5` / `G` | ultimate: a marker follows the cursor; click (or `5` / `G` again) to cast there, `Esc` / right click cancels |
 | drag / wheel | rotate / zoom camera |
@@ -55,7 +58,8 @@ src/
 ├── config/                every tunable number and authored data table (no logic, no Three.js)
 │   ├── game.js            planet radius, world seed, movement, buff multipliers, camera
 │   ├── render.js          pixel ratio, fog, bloom, outline width
-│   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, owl
+│   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, pet marks
+│   ├── pets.js            every pet: body, attack, ability, unlock; pet growth, care, commands, keys, motion
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
 │   │                      stats, quick-use keys, effects, bag size and pickup settings
@@ -115,7 +119,7 @@ src/
 │   ├── enemies/           Enemy (melee / ranged / hopper AI), shared AI states, and behaviors/ for the newer AIs:
 │   │                      bomber, charger, burrower, support, and boss/: the boss framework (core.js) with one kit
 │   │                      per boss (gloomcap.js, dragon.js, demonLord.js)
-│   ├── companions/        Owl (witch, ranger) and Wolf (knight)
+│   ├── companions/        pet bodies: FlyingPet (owl, wisp, dragon whelp), WalkingPet (wolf, fox), petBrain (targets, hits)
 │   ├── npc/               NPC behaviour (schedules, sleep, lines, outfits) and the villager definitions
 │   │                      (places, schedules, story-aware dialogue, a local villager per later planet)
 │   ├── wildlife/          critters, birds, pond fish and their spawning
@@ -140,7 +144,9 @@ src/
 │   └── levelFeedback.js   float text, burst, jingle and toast on those events
 ├── gameplay/
 │   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
-│   ├── characters.js      switching heroes (model, stats, abilities, companion)
+│   ├── characters.js      switching heroes (model, stats, abilities, pet)
+│   ├── Pets.js            the pet system: unlocked pets, the one out, names, commands, health and fainting, petting
+│   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst) and their lasting effects
 │   ├── buffs.js           Moon-Hop / Feather-Step timers
 │   ├── dayClock.js        the village clock (phase, day, light)
 │   ├── storyState.js      what villagers know about your adventure (dialogue conditions and placeholders)
@@ -250,6 +256,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Gear: stats per piece, rarity multipliers, stat caps, gear slots | `src/config/items.js` → `equip`, `RARITIES`, `STATS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | Crafting recipes | `src/config/crafting.js` |
+| Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | Quick-use keys and their cooldown | `src/config/items.js` → `QUICK_SLOTS` |
 | How many chests each planet has, its loot material | `src/config/planets.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |

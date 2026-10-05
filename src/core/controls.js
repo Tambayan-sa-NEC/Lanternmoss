@@ -2,10 +2,12 @@
    The pause menu's Controls page lists them from config/controls.js: keep the two in step. */
 import { CHARACTERS } from '../config/characters.js';
 import { INVENTORY, QUICK_SLOTS } from '../config/items.js';
+import { PET_KEYS } from '../config/pets.js';
 import { ctx } from './context.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
 import { cancelAim, isAiming } from '../combat/aiming.js';
 import { currentInteraction } from '../gameplay/Houses.js';
+import { Pets } from '../gameplay/Pets.js';
 import { Quick } from '../gameplay/quickSlots.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
@@ -21,7 +23,7 @@ import { toast } from '../ui/toast.js';
 
 /** Keys whose browser default (page scroll, quick-find...) would get in the way. */
 const GAME_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'ShiftLeft', 'ShiftRight', 'KeyE', 'KeyM', 'KeyX', 'KeyH', 'KeyP',
-  'KeyC', ...INVENTORY.keys, ...QUICK_SLOTS.keys, ...Object.values(CHARACTERS).flatMap(c => Object.values(c.abilities).flatMap(s => s.keys))]);
+  'KeyC', ...INVENTORY.keys, ...QUICK_SLOTS.keys, PET_KEYS.command, PET_KEYS.ability, ...Object.values(CHARACTERS).flatMap(c => Object.values(c.abilities).flatMap(s => s.keys))]);
 
 function onKey(code) {
   const player = ctx.player;
@@ -43,6 +45,8 @@ function onKey(code) {
   const q = QUICK_SLOTS.keys.indexOf(code); if (q >= 0) { Quick.use(q); return; }   // quick-use a consumable (bag open or not)
   if (ctx.inventoryOpen) return;                       // bag or shop open: you can still move and jump, but not fight or talk
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
+  if (code === PET_KEYS.command) Pets.cycleCommand();                 // follow -> stay -> attack -> passive
+  if (code === PET_KEYS.ability) Pets.useAbility();
   if (code === 'KeyE') { if (Dialog.open) Dialog.advance(); else currentInteraction()?.run(); }   // talk, enter a house, use furniture
   if (code === 'KeyX' && Dialog.choice) Dialog.choose(false);
 }

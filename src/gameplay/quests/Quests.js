@@ -8,6 +8,7 @@ import { QUESTS } from '../../config/quests.js';
 import { SHOP } from '../../config/shop.js';
 import { encounterEvents } from '../../combat/events.js';
 import { ctx } from '../../core/context.js';
+import { emit } from '../../core/events.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
 import { gainXp } from '../../progression/experience.js';
 import { audio } from '../../systems/AudioSystem.js';
@@ -73,6 +74,7 @@ export const Quests = {
     for (const [item, n] of r.items ?? []) { grantItem(item, n); parts.push(`${n > 1 ? `${n}x ` : ''}${itemName(item)}`); }
     showBanner('Quest complete!', [q.title, ...parts].join(' · ')); audio.melody();
     if (this.tracked === id) this.tracked = this.active()[0] ?? null;
+    emit('questcomplete', { id });                                      // (a pet may come with it: config/pets.js)
   },
   /** Ticks off steps that are already satisfied (items in the bag, planet reached), possibly several in a row. */
   check(id) {

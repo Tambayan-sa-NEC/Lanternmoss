@@ -1,23 +1,16 @@
-/* Switching the playable character: model, level-scaled stats, abilities, HUD and companion; plus the little
-   showcase moves the character-select screen plays (showcaseHero). */
+/* Switching the playable character: model, level-scaled stats, abilities, HUD and pet (src/gameplay/Pets.js); plus
+   the little showcase moves the character-select screen plays (showcaseHero). */
 import { CHARACTERS } from '../config/characters.js';
 import { ctx } from '../core/context.js';
 import { resetCooldowns } from '../combat/casting.js';
-import { Owl } from '../entities/companions/Owl.js';
-import { Wolf } from '../entities/companions/Wolf.js';
 import { sparkles } from '../fx/sparkles.js';
 import { HERO_BUILDERS } from '../models/heroes.js';
 import { computeStats } from './equipment.js';
+import { Pets } from './Pets.js';
 import { buildSpellBar, setSkillHint } from '../ui/hud.js';
 
-const COMPANIONS = { owl: Owl, wolf: Wolf };
-
-/** A fresh companion beside the hero (after the hero has been moved somewhere new). */
-export function resetCompanion() {
-  const Companion = COMPANIONS[CHARACTERS[ctx.player.charId].companion];
-  if (ctx.companion) ctx.companion.dispose();
-  ctx.companion = new Companion();
-}
+/** A fresh pet body beside the hero (after the hero has been moved somewhere new). */
+export function resetCompanion() { Pets.spawn(); }
 
 /** Each hero's signature flourish, reusing their ability poses (src/entities/player/poses.js). */
 const SHOWCASE = {
@@ -40,8 +33,5 @@ export function applyCharacter(id) {
   P.clearTimers();
   resetCooldowns(C.abilities);
   buildSpellBar(C.abilities); setSkillHint(C.hint);
-  const Companion = COMPANIONS[C.companion];
-  if (!(ctx.companion instanceof Companion)) {
-    if (ctx.companion) ctx.companion.dispose(); ctx.companion = new Companion();
-  }
+  if (ctx.companion?.petId !== Pets.id) Pets.spawn();   // the hero's own pet, unless another was picked
 }

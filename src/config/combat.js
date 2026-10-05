@@ -1,4 +1,4 @@
-/* COMBAT TUNING: every balance number for spells, enemies and the owl.
+/* COMBAT TUNING: every balance number for spells and enemies (pets: config/pets.js).
    Rough power ladder per hit: basic attack ~10  <  ability ~20-30  <  ultimate ~70-110 (long cooldown, aimed)
    <  a boss's big telegraphed blow (the Demon Lord's Doom Blade is lethal). */
 
@@ -24,9 +24,7 @@ export const COMBAT = {
                 cost: 40, cooldown: 30, damage: 110, range: 18, radius: 5.5, delay: 1.1, falloff: 0.35, knockback: 9,
                 burn: { duration: 3, tick: 0.5, damage: 5 } },                   // the crater keeps burning for a moment
   },
-  owl: { damage: 4, cooldown: 4, range: 11, swoopSpeed: 15, followHeight: 2.4,
-         markTime: 4, markBonus: 0.25,   // owl-marked enemies take +25% spell damage
-         stagger: 0.5 },                 // a strike interrupts wind-ups and charges
+  mark: { bonus: 0.25 },       // monsters a pet has marked (the owl's strike, Scout) take +25% damage from the hero
   enemies: {                   // base stats (planet 1); later planets scale them (config/planets.js). xp = experience for the kill
     goblin:    { ai: 'melee', color: 0x8fcf5a, hp: 30, speed: 4.4, radius: 0.35, height: 1.4, aggro: 11, leash: 16, turnRate: 10,
                  range: 1.3, damage: 5, windup: 0.3, windupTurn: 8, cooldown: 1.1, knockback: 3, lunge: 4, weave: 0.5,

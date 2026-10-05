@@ -3,7 +3,8 @@
    The witch points straight at her original COMBAT values, so she plays exactly as before.
    The knight id is kept for the axe warrior (same moves and numbers as the old sword-and-shield kit, renamed to match the art).
    abilities use the same format as COMBAT.spells and are dispatched through CAST[id] (src/combat/casting.js).
-   model = key in HERO_BUILDERS (src/models/heroes.js) and HERO_POSES (src/entities/player/poses.js); companion = 'owl' | 'wolf'.
+   model = key in HERO_BUILDERS (src/models/heroes.js) and HERO_POSES (src/entities/player/poses.js); companion = the
+   hero's own pet (a PETS key, config/pets.js; any unlocked pet can be taken along instead).
    profile = what the character-select screen shows (src/ui/CharacterSelect.js): role, difficulty (1 easy .. 3 hard),
      ratings 1..5 for a quick comparison, what the companion does, and the voice chirp played when the hero is picked.
    --------------------------------------------------------------------- */
@@ -14,7 +15,7 @@ export const CHARACTERS = {
     title: 'Girl Witch', style: 'Arcane magic', companionName: 'Pip the owl', color: '#7a5cc8', model: 'witch', companion: 'owl',
     blurb: 'A staff-wielding mage who casts from range. Pip swoops at foes, marking them for extra spell damage.',
     profile: { role: 'Ranged caster', difficulty: 2, ratings: { damage: 4, toughness: 2, range: 5, mobility: 3 },
-      companionText: 'swoops at monsters you fight, marking them for +25% spell damage and interrupting their wind-ups',
+      companionText: 'swoops at monsters you fight, marking them for +25% damage, and scouts out every monster nearby (V)',
       voice: { pitch: 620, slide: 1.35 } },
     resource: 'MANA', stats: COMBAT.player, abilities: COMBAT.spells,
     hint: '<kbd>Click</kbd>/<kbd>1</kbd> bolt &nbsp; <kbd>2</kbd>/<kbd>Q</kbd> fireball &nbsp; <kbd>3</kbd>/<kbd>R</kbd> nova &nbsp; <kbd>4</kbd>/<kbd>F</kbd> blink &nbsp; <kbd>5</kbd>/<kbd>G</kbd> meteor',
@@ -24,7 +25,7 @@ export const CHARACTERS = {
     title: 'Boy Warrior', style: 'Two-handed axe', companionName: 'Fang the wolf', color: '#c0392b', model: 'knight', companion: 'wolf',
     blurb: 'Tough and up close: heavy axe cleaves, shoulder charges and a guard that shrugs off hits.',
     profile: { role: 'Melee bruiser', difficulty: 1, ratings: { damage: 4, toughness: 5, range: 1, mobility: 3 },
-      companionText: 'stays at your heel, keeps you company and howls at the sky now and then',
+      companionText: 'stays at your heel, bites whatever you fight and howls to rally you (V)',
       voice: { pitch: 300, slide: 0.8 } },
     resource: 'STAMINA', stats: { ...COMBAT.player, maxHp: 140, manaRegen: 16, armor: 0.2 },   // armor = damage taken reduction
     abilities: {
@@ -41,14 +42,13 @@ export const CHARACTERS = {
                   cost: 35, cooldown: 22, damage: 80, range: 14, radius: 5, stun: 1.6, knockback: 8, leapTime: 0.7, leapHeight: 5 },
     },
     hint: '<kbd>Click</kbd>/<kbd>1</kbd> cleave &nbsp; <kbd>2</kbd>/<kbd>Q</kbd> charge &nbsp; <kbd>3</kbd>/<kbd>R</kbd> whirlwind &nbsp; <kbd>4</kbd>/<kbd>F</kbd> guard &nbsp; <kbd>5</kbd>/<kbd>G</kbd> leap slam',
-    wolf: { sideOffset: 1.4, behind: 1.3, stopDist: 1.2, walkSpeed: 3.2, runSpeed: 9.5, sitAfter: 2.5, teleportDist: 25 },
     welcome: 'Welcome to Lanternmoss! Your wolf Fang is at your side. Monsters prowl beyond the village lanterns.',
   },
   ranger: {
     title: 'Elf Archer', style: 'Longbow', companionName: 'Wren the owl', color: '#3f9a5a', model: 'ranger', companion: 'owl',
     blurb: 'Quick and keen-eyed: arrows from afar, a fan of shots, a pinning thorn arrow and a nimble back-leap.',
     profile: { role: 'Ranged skirmisher', difficulty: 3, ratings: { damage: 3, toughness: 1, range: 5, mobility: 5 },
-      companionText: 'swoops at monsters you fight, marking them for bonus damage and interrupting their wind-ups',
+      companionText: 'swoops at monsters you fight, marking them for bonus damage, and scouts out every monster nearby (V)',
       voice: { pitch: 760, slide: 1.2 } },
     resource: 'FOCUS', stats: { ...COMBAT.player, maxHp: 90, manaRegen: 13 },
     abilities: {

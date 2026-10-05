@@ -33,6 +33,12 @@ export class WorldItem {
     this.seed = Math.random() * 6.28;
     this.sparkleColor = parseInt(RARITIES[this.def.rarity].color.slice(1), 16);
   }
+  /** Hops over to `dir` (a pet fetching it), collectable once it lands. */
+  hopTo(dir, time = 0.6) {
+    this.from = this.up.clone(); this.up.copy(dir).normalize(); this.pos.copy(this.up).multiplyScalar(groundHeight(this.up));
+    this.popTime = time; this.popT = 0; this.delay = time; this.armed = false; this.stepAway = false; this.blocked = false;
+    updateShadow(this.shadow, this.up, this.fwd, HOVER);
+  }
   /** Partway (k in 0..1) through the hop out of a chest: along the ground from `from`, up and over. */
   hop(k) {
     slerpDir(this.from, this.up, k, _d).normalize();

@@ -1,11 +1,13 @@
 /* Damage in both directions, plus fainting and respawning. */
 import * as THREE from 'three';
 import { COMBAT } from '../config/combat.js';
+import { PETS } from '../config/pets.js';
 import { LEVELING } from '../config/leveling.js';
 import { ctx } from '../core/context.js';
 import { settings } from '../core/settings.js';
 import { floatText, hitStop } from '../fx/combatFx.js';
 import { sparkles } from '../fx/sparkles.js';
+import { buffs } from '../gameplay/buffs.js';
 import { coinsForKill, gainCoins } from '../gameplay/wallet.js';
 import { gainXp } from '../progression/experience.js';
 import { damageMultiplier } from '../progression/leveling.js';
@@ -29,7 +31,7 @@ function knockDir(from, ent, out) {
 const BIG_HIT = 40;
 
 /** o: from (knockback origin), knock, slow + slowTime, mark (seconds), stagger (seconds), stun (seconds, see Enemy.stun),
-    color (spark tint), source ('owl' for the companion; omitted for the hero's own abilities). */
+    color (spark tint), source ('pet' for the companion; omitted for the hero's own abilities). */
 export function damageEnemy(e, amount, o = {}) {
   if (!e.alive || e.hidden) return;                                   // burrowed monsters can't be hit
   if (e.invulnerable) {                                               // e.g. a boss mid phase-transition
@@ -37,20 +39,21 @@ export function damageEnemy(e, amount, o = {}) {
     return;
   }
   if (!o.source) amount *= damageMultiplier(ctx.player.level) * (1 + (ctx.player.stats.damageBonus || 0));   // no source = the hero's own abilities (level + gear)
-  if (o.source !== 'owl' && e.markT > 0) amount *= 1 + COMBAT.owl.markBonus;
+  if (o.source !== 'pet' && e.markT > 0) amount *= 1 + COMBAT.mark.bonus;
+  if (!o.source && buffs.howl > 0) amount *= 1 + PETS.wolf.ability.damage;   // a pet's Howl (gameplay/petAbilities.js)
   if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
   if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
-  const marked = e.markT > 0 && o.source !== 'owl', big = amount >= BIG_HIT;
+  const marked = e.markT > 0 && o.source !== 'pet', big = amount >= BIG_HIT;
   if (settings.damageNumbers) floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
-    o.source === 'owl' ? '#c7a8ff' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
+    o.source === 'pet' ? '#c7a8ff' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
   sparkles.emit(e.center(), { count: big ? 18 : 8, color: o.color ?? 0xffffff, speed: big ? 3.6 : 2.5, life: 0.4, size: big ? 0.4 : 0.3 });
   if (o.knock && o.from) e.knock.addScaledVector(knockDir(o.from, e, _tv), o.knock * (1 - (e.def.knockResist || 0)));
   if (o.slow) { e.slowT = o.slowTime; e.slowAmt = o.slow * (1 - (e.def.slowResist || 0)); }
   if (o.mark) e.markT = o.mark;
   if (o.stagger) e.interrupt(o.stagger);
   if (o.stun && e.hp > 0) e.stun(o.stun);
-  if (o.source !== 'owl') noteHit(e);
+  if (o.source !== 'pet') noteHit(e);
   e.aggro(); audio.hitEnemy();
   if (e.hp <= 0) {
     e.die();

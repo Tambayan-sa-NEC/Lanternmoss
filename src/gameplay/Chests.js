@@ -9,6 +9,7 @@
 import { CHEST_KINDS, CHEST_REACH, KEYS, LOOT } from '../config/chests.js';
 import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { encounterEvents } from '../combat/events.js';
 import { Chest } from '../entities/Chest.js';
 import { freeOfColliders } from '../physics/colliders.js';
@@ -92,7 +93,7 @@ export const Chests = {
       if (!this.hasKey()) { c.rattle(); toast('Locked tight. A Lantern Key would open it: monsters sometimes carry one.'); return; }
       ctx.player.inventory.remove(KEYS.item, 1); audio.unlock(); toast('The Lantern Key turns with a click!');
     }
-    c.open(); this.opened.add(c.id);
+    c.open(); this.opened.add(c.id); emit('chestopened', { kind: c.kind, planet: ctx.planet });
     const loot = rollLoot(c.def.loot, ctx.planet, Math.random, ctx.player.charId), names = [];
     if (loot.coins) { gainCoins(loot.coins, c.top(0.6)); names.push(`${loot.coins} coins`); }
     loot.items.forEach(({ item, qty, props }, i) => {

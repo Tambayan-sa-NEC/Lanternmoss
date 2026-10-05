@@ -18,6 +18,11 @@ export const FIXED_CONTROLS = [
     [['I', 'Tab'], 'open / close the bag (and its Craft tab)'],
     [['6', '7', '8'], 'quick-use the food or tonic on that key (set in the bag)'],
   ] },
+  { group: 'Pet', rows: [
+    [['T'], 'tell your pet: follow, stay, attack my target, passive (press again for the next)'],
+    [['V'], "your pet's ability (shown on its card next to the ability bar)"],
+    [['E'], 'pet your pet (stand still beside it)'],
+  ] },
   { group: 'Game', rows: [
     [['Esc', 'P'], 'pause menu (Esc first closes the shop, bag, dialogue or aiming)'],
     [['H'], 'show / hide the controls panel'],

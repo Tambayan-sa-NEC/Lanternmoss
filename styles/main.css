@@ -141,7 +141,7 @@ body.menu #toast, body.menu #prompt { visibility:hidden; }
   border-radius:999px; box-shadow:0 2px 0 var(--ink); font-size:11px; font-weight:800; overflow:hidden; }
 #status .st svg { width:18px; height:18px; color:var(--ink); }
 #status .st i { position:absolute; left:0; right:0; bottom:0; height:3px; background:var(--ink); opacity:.45; transform-origin:left; }
-#status .moon { background:#e6ddff; } #status .feather { background:#d6ffec; } #status .guard { background:#d9f6ff; }
+#status .howl { background:#dbeaff; } #status .moon { background:#e6ddff; } #status .feather { background:#d6ffec; } #status .guard { background:#d9f6ff; }
 #status .regen { background:#ffe3ea; } #status .regen svg { color:#e04a6a; animation:beat 1s ease-in-out infinite; }
 @keyframes beat { 50% { transform:scale(1.15) } }
 /* ability bar */
@@ -157,6 +157,23 @@ body.menu #toast, body.menu #prompt { visibility:hidden; }
 .qslot .cd { position:absolute; inset:0; background:rgba(58,35,64,.45); transform-origin:bottom; transform:scaleY(0); pointer-events:none; }
 .qslot.empty { opacity:.55; border-style:dashed; box-shadow:none; }
 .qslot.out .qi { filter:grayscale(1) opacity(.45); }
+/* pet card (ui/petHud.js) */
+#petcard { position:relative; display:flex; align-items:center; gap:7px; padding:5px 7px 5px 6px; background:#fff8ee; border:3px solid var(--ink);
+  border-radius:16px; box-shadow:0 3px 0 var(--ink); }
+#petcard .pc-face { width:38px; height:38px; border-radius:50%; border:2.5px solid var(--ink); background:var(--pc,#fff); display:flex; align-items:center;
+  justify-content:center; color:var(--ink); box-shadow:inset 0 -3px 0 rgba(58,35,64,.18); }
+#petcard .pc-face svg { width:24px; height:24px; }
+#petcard .pc-mid { display:flex; flex-direction:column; gap:3px; min-width:86px; }
+#petcard .pc-name { font-weight:800; font-size:12px; line-height:1; white-space:nowrap; } #petcard .pc-name small { margin-left:4px; font-size:10px; opacity:.6; }
+#petcard .pc-hp { height:7px; border:2px solid var(--ink); border-radius:999px; background:#ffe3ea; overflow:hidden; }
+#petcard .pc-hp i { display:block; height:100%; background:#ff6b8f; transform-origin:left; }
+#petcard .pc-mode { font:inherit; font-size:10px; font-weight:800; padding:1px 6px; border:2px solid var(--ink); border-radius:999px; background:#fff; cursor:pointer; align-self:flex-start; }
+#petcard .pc-ab { width:46px; height:50px; cursor:pointer; }
+#petcard .pc-ab .ico { margin-top:13px; width:26px; height:26px; background:var(--pc,#fff); }
+#petcard .pc-ab .ico svg { width:16px; height:16px; }
+#petcard .pc-ab .cdt { top:14px; font-size:15px; }
+#petcard .pc-rest { position:absolute; left:6px; right:58px; top:-17px; font-size:10px; font-weight:800; color:#b03a5a; text-align:center; }
+#petcard.fainted .pc-face { filter:grayscale(1) opacity(.5); }
 .slot { position:relative; width:60px; height:66px; background:#fff8ee; border:3px solid var(--ink); border-radius:14px; box-shadow:0 3px 0 var(--ink);
   overflow:hidden; text-align:center; font-weight:800; cursor:help; }
 .slot .ico { margin:13px auto 0; width:30px; height:30px; border-radius:50%; border:2px solid var(--ink); background:var(--c,#fff);
@@ -379,7 +396,29 @@ body.menu #inventory { display:none; }
 .inv-actions .inv-quick { font-size:11.5px; padding:3px 9px; }
 .inv-actions .inv-quick.on { background:var(--ink); color:#fff; }
 .inv-d-note.worn { color:#3f9a5a; }
-.inv-craft { display:none; }
+.inv-craft, .inv-pets { display:none; }
+#inventory.petting .inv-gear, #inventory.petting .inv-body, #inventory.petting .inv-actions, #inventory.petting .inv-hint { display:none; }
+#inventory.petting .inv-pets { display:block; }
+.pet-cmds { display:flex; align-items:center; flex-wrap:wrap; gap:5px; margin-bottom:8px; font-size:12px; }
+.pet-cmds button { font:inherit; font-weight:800; font-size:12px; padding:2px 11px; border:3px solid var(--ink); border-radius:999px; background:#fff8ee; cursor:pointer; }
+.pet-cmds button.on { background:var(--ink); color:#fff; } .pet-cmds .dim { opacity:.6; font-size:11px; }
+.pet-list { display:flex; flex-direction:column; gap:6px; max-height:min(50vh,400px); overflow-y:auto; padding-right:4px; }
+.pet { display:flex; align-items:center; gap:10px; padding:7px 10px; background:#fff; border:2px solid rgba(58,35,64,.3); border-radius:14px; }
+.pet.out { border:3px solid var(--ink); background:#fffaf0; }
+.pet.locked { opacity:.6; background:rgba(255,255,255,.5); }
+.pet .pc-face { flex:none; width:40px; height:40px; border-radius:50%; border:2.5px solid var(--ink); background:var(--pc); display:flex; align-items:center; justify-content:center; font-weight:800; }
+.pet .pc-face svg { width:25px; height:25px; }
+.pet-main { flex:1; min-width:0; }
+.pet-head { display:flex; align-items:center; gap:8px; }
+.pet-head input { width:120px; font:inherit; font-weight:800; font-size:14px; padding:1px 6px; border:2px solid transparent; border-radius:8px; background:transparent; color:var(--ink); }
+.pet-head input:hover, .pet-head input:focus { border-color:var(--ink); background:#fff; outline:none; }
+.pet-head small { font-size:11px; font-weight:800; opacity:.6; }
+.pet-hp { width:70px; height:7px; border:2px solid var(--ink); border-radius:999px; background:#ffe3ea; overflow:hidden; } .pet-hp i { display:block; height:100%; background:#ff6b8f; transform-origin:left; }
+.pet p { margin:2px 0 3px; font-size:12px; line-height:1.35; }
+.pet-ab { display:flex; align-items:center; gap:4px; flex-wrap:wrap; font-size:11.5px; line-height:1.3; color:#3f6a9a; }
+.pet-ab svg { width:16px; height:16px; }
+.pet button { font:inherit; font-weight:800; font-size:12px; padding:3px 12px; border:3px solid var(--ink); border-radius:999px; background:var(--pink); color:#fff; cursor:pointer; white-space:nowrap; }
+.pet-with { font-size:12px; font-weight:800; color:#3f9a5a; white-space:nowrap; }
 #inventory.crafting .inv-gear, #inventory.crafting .inv-body, #inventory.crafting .inv-actions, #inventory.crafting .inv-hint { display:none; }
 #inventory.crafting .inv-craft { display:block; }
 .rc-list { display:flex; flex-direction:column; gap:6px; max-height:min(52vh,420px); overflow-y:auto; padding-right:4px; }
@@ -472,7 +511,8 @@ body.paused #tip, body.paused #aimhint { display:none !important; }
 .chip.quest span { display:block; font-size:12.5px; }
 .chip.quest i { font-style:normal; padding:0 6px; margin-left:4px; border-radius:999px; background:#ffd36b; border:2px solid var(--ink); font-size:11px; }
 #compass .cm.quest svg, #markers .wm.quest svg { color:#d0567e; }
-#compass .cm.chest svg, #markers .wm.chest svg { color:#d8820a; } #markers .wm.chest { animation:wmbob 1.4s ease-in-out infinite; }
+#compass .cm.chest svg, #markers .wm.chest svg { color:#d8820a; }
+#compass .cm.eye svg { color:#9a6ae0; } #compass .cm.paw svg, #markers .wm.paw svg { color:#e8702a; } #markers .wm.chest { animation:wmbob 1.4s ease-in-out infinite; }
 /* the shop (src/ui/ShopUI.js), styled like the other .modal panels */
 #shop { display:none; }
 .modal .panel.shop { width:min(560px,94vw); }
