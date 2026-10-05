@@ -7,7 +7,8 @@ import { CHARACTERS } from '../src/config/characters.js';
 import { CHEST_KINDS } from '../src/config/chests.js';
 import { CRITTER_DEFS } from '../src/config/critters.js';
 import { KEYBINDS } from '../src/config/controls.js';
-import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_MOTION, PETS } from '../src/config/pets.js';
+import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_MOTION, PET_PICKS_KEY, PET_SHOWCASE, PETS } from '../src/config/pets.js';
+import { sanitizePicks } from '../src/gameplay/petPicks.js';
 import { PLANETS } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 
@@ -43,8 +44,24 @@ test('unlocks point at real quests, chest kinds and planets; every hero starts w
 test('commands, keys, growth and care numbers make sense', () => {
   assert.deepEqual(Object.keys(PET_COMMANDS), ['follow', 'stay', 'attack', 'passive']);
   const ids = KEYBINDS.map(b => b.id);
-  assert.ok(ids.includes('petCommand') && ids.includes('petAbility'), 'the pet keys are remappable actions (clashes: tests/keybinds.test.mjs)');
+  assert.ok(ids.includes('petCommand') && ids.includes('petAbility') && ids.includes('petMenu'), 'the pet keys are remappable actions (clashes: tests/keybinds.test.mjs)');
   assert.ok(PET_LEVELS.damagePerLevel > 0 && PET_LEVELS.hpPerLevel > 0);
   assert.ok(PET_CARE.faintTime > 0 && PET_CARE.regen > 0 && PET_CARE.retaliate >= 0 && PET_CARE.retaliate <= 1 && PET_CARE.nameLength >= 8);
   assert.ok(PET_MOTION.fly.height > 0 && PET_MOTION.walk.runSpeed > PET_MOTION.walk.walkSpeed);
+});
+
+test('the pet menus: every pet has a role, both bodies have a camera framing', () => {
+  for (const [id, p] of Object.entries(PETS)) {
+    assert.ok(typeof p.role === 'string' && p.role.length > 2, `${id}: role (shown on its card)`);
+    const s = PET_SHOWCASE[p.body];
+    assert.ok(s && s.dist > 1.5 && s.dist < 6 && s.pitch > -0.2 && s.pitch < 1 && Number.isFinite(s.lift), `${id}: a ${p.body} framing`);
+  }
+  assert.ok(PET_PICKS_KEY.startsWith('lanternmoss.'));
+});
+
+test('remembered pets per hero: only real heroes and real pets survive loading', () => {
+  assert.deepEqual(sanitizePicks({ knight: 'owl', ranger: 'fox' }), { knight: 'owl', ranger: 'fox' });
+  assert.deepEqual(sanitizePicks({ knight: 'dragon', nobody: 'owl', witch: 3, ranger: 'wisp' }), { ranger: 'wisp' });
+  assert.deepEqual(sanitizePicks({ toString: 'owl', __proto__: { knight: 'owl' } }), {});
+  for (const junk of [null, undefined, 'owl', 42, ['owl']]) assert.deepEqual(sanitizePicks(junk), {});
 });

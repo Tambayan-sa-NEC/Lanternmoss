@@ -47,7 +47,8 @@ export class Critter extends Walker {
   update(dt) {
     const toP = this.toP, dist = tangentTo(this.pos, this.up, ctx.player.pos, toP);
     this.cool -= dt; this.timer -= dt;
-    if (this.cool <= 0 && dist < 4.2 && !['flee', 'spin'].includes(this.state)) this.react();
+    if (ctx.showcase && dist < 6) { this.state = 'wander'; this.timer = Math.max(this.timer, 1); this.turnRate = 0; this.fwd.copy(toP).negate(); }   // keep out of a menu's shot
+    else if (this.cool <= 0 && dist < 4.2 && !['flee', 'spin'].includes(this.state)) this.react();
     let target = 0;
     switch (this.state) {
       case 'idle':
@@ -92,9 +93,10 @@ export class Critter extends Walker {
     this.animate(dt, dist);
     this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
   }
-  /** Legs, sitting, tail wag and head-turn toward the player (uses this.toP from the latest update). */
-  animate(dt, dist) {
-    const time = ctx.time, toP = this.toP, s = this.speed; this.phase += dt * (2 + s * 5.5);
+  /** Legs, sitting, tail wag and head-turn toward the player (uses this.toP from the latest update). time = the
+      clock the wag and nods follow (the pet menu passes its own while the world is paused). */
+  animate(dt, dist, time = ctx.time) {
+    const toP = this.toP, s = this.speed; this.phase += dt * (2 + s * 5.5);
     const sw = Math.min(1, s / 1.4) * 0.8, a = Math.sin(this.phase) * sw, [fl, fr, bl, br] = this.legs;
     const sitT = (this.state === 'sit' || this.state === 'nap') ? 1 : 0; this.sit += (sitT - this.sit) * damp(6, dt);
     fl.rotation.x = a; br.rotation.x = a - this.sit * 1.2; fr.rotation.x = -a; bl.rotation.x = -a - this.sit * 1.2;

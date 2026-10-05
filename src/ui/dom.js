@@ -24,6 +24,9 @@ export const dom = {
   invHint: document.querySelector('#inventory .inv-hint'),
   // character select
   start: $('start'), cards: $('cards'), go: $('go'), selBack: $('selback'), heroDetail: $('hero-detail'),
+  selHead: $('selhead'), selKeys: $('selkeys'), petCards: $('pet-cards'), petDetail: $('pet-detail'),
+  // pet menu (during play)
+  petMenu: $('petmenu'),
   // title screen
   title: $('title'), titleMenu: document.querySelector('#title .tmenu'), campaign: document.querySelector('#title .campaign'),
   // pause menu

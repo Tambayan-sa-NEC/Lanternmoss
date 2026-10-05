@@ -26,13 +26,16 @@ const shot = async (name, { keepToast = false } = {}) => {
   await page.screenshot({ path: `${out}${name}.jpg`, type: 'jpeg', quality: 84 }); console.log('saved', name);
 };
 const run = (fn, ...args) => page.evaluate(fn, ...args);
+/** Steps the game `secs` ahead at 30 fps (software rendering is too slow for the menu camera's swoop to settle). */
+const ff = secs => run(s => { for (let i = 0; i < s * 30; i++) window.LANTERNMOSS.update(1 / 30); }, secs);
 
 try {
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle0', timeout: 90000 });
   await page.waitForFunction(() => window.LANTERNMOSS, { timeout: 60000 });
   await run(() => localStorage.setItem('lanternmoss.settings', JSON.stringify({ pauseOnBlur: false })));
   await wait(5000); await shot('title');
-  await page.click('[data-act="play"]'); await wait(4500); await shot('select');
+  await page.click('[data-act="play"]'); await ff(3); await wait(2500); await shot('select');
+  await page.keyboard.press('Enter'); await ff(3); await wait(2500); await shot('select-pet');       // the pet step
   await run(() => { const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); });
   await wait(2500); await page.keyboard.press('KeyH'); await wait(500);       // fold the controls panel away
 
@@ -97,7 +100,7 @@ try {
     window.__stand(c.up, 2.2); window.__frame(c.up, { turn: 0.9, pitch: 0.55, dist: 5.5 }); window.__chest = c; });
   await wait(3500); await run(() => window.LANTERNMOSS.Chests.open(window.__chest)); await wait(2600); await shot('chest', { keepToast: true });
 
-  // the bag: gear, a full grid, then the Craft and Pets tabs
+  // the bag: gear, a full grid, then the Craft tab
   await run(() => {
     const L = window.LANTERNMOSS, inv = L.inventory; L.player.coins = 140;
     for (const [id, n, r] of [['honeyBun', 4], ['moonberryTart', 2], ['glowTonic', 2], ['emberStew', 1], ['frostDraught', 1], ['glowcap', 14], ['emberShard', 9],
@@ -109,8 +112,12 @@ try {
   await wait(2000); await shot('bag');
   await page.click('[data-tab="craft"]'); await wait(1500); await shot('crafting');
   await run(() => { const Pt = window.LANTERNMOSS.Pets; for (const id of ['fox', 'wisp', 'whelp']) Pt.unlocked.add(id); });
-  await page.click('[data-tab="pets"]'); await wait(1500); await shot('pets');
-  await run(() => { const L = window.LANTERNMOSS; L.InventoryUI.close(); L.Pets.choose('whelp'); });
+  // the pet menu (B): the world pauses, the camera holds on the pet
+  await run(() => { const L = window.LANTERNMOSS; L.InventoryUI.close(); L.PetMenu.open(); L.PetMenu.pick('whelp'); });
+  await ff(3); await wait(2500); await shot('pets');
+  await run(() => { const L = window.LANTERNMOSS, P = L.player; L.PetMenu.close();     // and out with the whelp (pet card lower left)
+    L.cam.fwd.copy(P.fwd).applyAxisAngle(P.up, 2.5); L.cam.pitch = 0.3; L.cam.dist = 6.5; L.cam.init = false; L.cam.lastDrag = 1e9; });
+  await wait(5000); await shot('pet-field');
 
   // the pause menu: Settings → Keys (remapping), and the Controls page
   await run(() => window.LANTERNMOSS.PauseMenu.open()); await wait(800);

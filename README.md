@@ -26,6 +26,16 @@ the Boy Warrior (a two-handed axe and a guard) and the Elf Archer (a longbow), w
 rating chart. Each hero has four abilities plus an aimed ultimate (Meteor, Leap Slam, Arrow Rain).
 
 <p>
+  <img src="docs/screenshots/select-pet.jpg" width="49%" alt="Choosing a pet">
+  <img src="docs/screenshots/pets.jpg" width="49%" alt="The pet menu">
+</p>
+
+**And a pet.** After the hero comes the pet: each one shows off in front of the hero with its stats, its strike and its
+ability, and locked pets say how to find them. During play the pet menu (`B`, or click the pet card) pauses the world
+to show your pet: swap, rename and command them there. Each hero remembers the pet they last took. The camera holds a
+still view on these screens instead of circling.
+
+<p>
   <img src="docs/screenshots/dialogue.jpg" width="49%" alt="Talking to Fern">
   <img src="docs/screenshots/night.jpg" width="49%" alt="The village at night">
 </p>
@@ -73,7 +83,7 @@ bottom of the screen: hold one, then use it (eat, drink or equip) mid-fight.
 
 <p>
   <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab">
-  <img src="docs/screenshots/pets.jpg" width="49%" alt="The Pets tab">
+  <img src="docs/screenshots/pet-field.jpg" width="49%" alt="Out with the dragon whelp">
 </p>
 
 **Crafting and pets.** Glowcaps, Ember Shards and Frost Petals craft into tonics, keys and gear. Pets fight beside you,
@@ -92,6 +102,9 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Choosing a pet:** a pet step after the hero on character select, and a pet menu during play (`B`, or click the pet
+  card) to see, swap, rename and command your pets. Each hero remembers their pet, and the camera holds still on these
+  screens instead of orbiting.
 - **Bigger, varied planets:** nearly 3x the ground, with rolling hills, Emberfall's mesas and cliffs, and Frostveil's
   ridged mountains. Rocks and boulders you can jump onto, and lakes you can wade and swim in.
 - **A new HUD:** a Minecraft-style hotbar on `1`–`9` with vitals above it, skills on the lower right on letter keys,
@@ -148,7 +161,8 @@ over). The defaults:
 | `G` | skill 5, the ultimate: a marker follows the cursor; click (or `G` again) to cast there, `Esc` / right click cancels |
 | `1` – `9` | hold the item in that hotbar slot (or click it); press the number again, or right click, to use it |
 | `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them) |
-| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag, Craft and Pets tabs) |
+| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
+| `B` (or click the pet card) | the pet menu: see, swap, rename and command your pets (the world pauses) |
 | `T` | pet command: follow → stay → attack my target → passive |
 | `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
 | drag / wheel | rotate / zoom camera |
@@ -265,6 +279,7 @@ src/
 │   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
 │   ├── characters.js      switching heroes (model, stats, abilities, pet)
 │   ├── Pets.js            the pet system: unlocked pets, the one out, names, commands, health and fainting, petting
+│   ├── petPicks.js        which pet each hero last took (saved in the browser)
 │   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst) and their lasting effects
 │   ├── buffs.js           Moon-Hop / Feather-Step / Howl timers
 │   ├── dayClock.js        the village clock (phase, day, light)
@@ -278,7 +293,7 @@ src/
 │   ├── drops.js           monster drops
 │   ├── equipment.js       what the hero wears; the hero's stats = base + level + gear
 │   ├── hotbar.js          the hotbar (keys 1-9): which slot the hero holds, using what's held
-│   ├── bagCommands.js     what the bag window can ask the game to do (use, equip, craft, pets...)
+│   ├── bagCommands.js     what the bag window can ask the game to do (use, equip, craft...)
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
@@ -288,10 +303,12 @@ src/
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
 │                          ShopUI (buy / sell), portraits (dialogue faces),
 │                          dialogue, challenge panel, banner + travel fade,
-│                          InventoryUI + itemTooltip (the bag window: gear, Craft and Pets tabs), itemArt (SVG item
-│                          pictures), petHud (the pet card beside the ability bar),
+│                          InventoryUI + itemTooltip (the bag window: gear and the Craft tab), itemArt (SVG item
+│                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play),
+│                          petViews (pet cards and detail panels for both pet screens), showcase (the menus' still
+│                          camera framings of the hero and pet, and finding a clear view for them),
 │                          itemNotices (item toasts),
-│                          overlay (planet chip), toast, character select (reached from the title, or C in play).
+│                          overlay (planet chip), toast, character select (hero, then pet; from the title, or C in play).
 │                          HUD layout: vitals + hotbar bottom centre, skills lower right, pet card lower left, boss bar top
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
 ```
@@ -381,6 +398,8 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | Crafting recipes | `src/config/crafting.js` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
+| How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
+| How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
 | Default keys, hotbar keys | `src/config/controls.js` → `KEYBINDS`, `HOTBAR_KEYS` |
 | Hotbar size, use cooldown, which items land on it first | `src/config/items.js` → `HOTBAR` |
 | Fonts | `styles/main.css` → `--font-display`, `--font-body` (and the font link in `index.html`; see `docs/typography.md`) |
@@ -439,9 +458,11 @@ A new gear stat = an entry in `STATS` plus where it's read (like `damageBonus` i
 `config/pets.js` defines every pet: its body (`fly`: owl, wisp, dragon whelp; `walk`: wolf, fox), attack, ability,
 health and how it's unlocked. `gameplay/Pets.js` owns what outlives one pet body (bodies are rebuilt after travel, a
 house or a swap): which pets are unlocked and which one is out, names, the command, health and fainting, the ability
-cooldown. Bodies (`entities/companions/`) ask it what to do; `petBrain.js` picks targets by command and lands hits
+cooldown, and which pet each hero last took (`gameplay/petPicks.js`, in localStorage). Bodies (`entities/companions/`) ask it what to do; `petBrain.js` picks targets by command and lands hits
 (`source: 'pet'`, which also earns XP). Pet level = hero level. Unlocks listen on `core/events.js` (`questcomplete`,
-`chestopened`), so quests and chests don't know pets exist. A new pet = an entry in `PETS`, a model (a critter look or
+`chestopened`), so quests and chests don't know pets exist. Pets are chosen on the pet step of character select and in
+the pet menu (`ui/PetMenu.js`, which pauses the world; bodies then idle through `pose(dt)`); both screens share
+`ui/petViews.js`, and `Pets.presenting` brings the pet round in front of the hero for the camera. A new pet = an entry in `PETS`, a model (a critter look or
 a flyer builder), an ability handler in `gameplay/petAbilities.js` and two glyphs in `ui/icons.js`; `npm test` checks
 all of that is in place.
 

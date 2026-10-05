@@ -1,16 +1,14 @@
 /* The bag window. Renders the inventory's current state and turns clicks into commands; all rules (stacking,
    moving, using, equipping, crafting) live in the inventory, items and gameplay layers. Re-renders whenever the
-   inventory changes. Two tabs:
+   inventory changes. Two tabs (pets have a menu of their own: src/ui/PetMenu.js):
      Bag    the grid, the worn gear (weapon / armour / trinket: click one to take it off) with the stats it adds, and
             the details of the hovered or selected item. Selection works like a simple drag-and-drop: click an item,
             then click where it should go (empty slot = move, same item = merge, different item = swap).
             Double-click or the first button uses / equips it. Under the grid is the hotbar row (the same slots as the
             hotbar at the bottom of the screen, keys 1-9): move things there to hold them.
-    Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have.
-    Pets   every pet (config/pets.js): take one along, rename it, give it a command; locked ones say how to find them. */
+    Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have. */
 import { CHARACTERS } from '../config/characters.js';
 import { RECIPES } from '../config/crafting.js';
-import { PET_COMMANDS, PETS } from '../config/pets.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
 import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { ctx } from '../core/context.js';
@@ -19,7 +17,6 @@ import { craftProblem, recipesFor, requirements } from '../items/crafting.js';
 import { formatStat, gearTotals } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { dom } from './dom.js';
-import { icon } from './icons.js';
 import { describeItem, itemIconHtml, rarityColor } from './itemTooltip.js';
 
 const PROBLEM = { materials: 'Not enough materials.', coins: 'Not enough coins.', space: 'No room in the bag.' };
@@ -36,7 +33,7 @@ export const InventoryUI = {
     const root = dom.inventory;
     // tabs
     const tabs = document.createElement('div'); tabs.className = 'inv-tabs';
-    tabs.innerHTML = '<button type="button" data-tab="bag">Bag</button><button type="button" data-tab="craft">Craft</button><button type="button" data-tab="pets">Pets</button>';
+    tabs.innerHTML = '<button type="button" data-tab="bag">Bag</button><button type="button" data-tab="craft">Craft</button>';
     tabs.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t) this.setTab(t.dataset.tab); });
     root.querySelector('.inv-head b').after(tabs); this.tabsEl = tabs;
     // worn gear
@@ -70,17 +67,6 @@ export const InventoryUI = {
     this.craftEl = document.createElement('div'); this.craftEl.className = 'inv-craft';
     this.craftEl.addEventListener('click', e => { const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe); });
     root.querySelector('.inv-actions').after(this.craftEl);
-    // pets
-    this.petsEl = document.createElement('div'); this.petsEl.className = 'inv-pets';
-    this.petsEl.addEventListener('click', e => {
-      const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.pet) { this.commands.choosePet(b.dataset.pet); this.message = ''; }
-      if (b.dataset.mode) this.commands.petCommand(b.dataset.mode);
-      this.render();
-    });
-    this.petsEl.addEventListener('change', e => { const id = e.target.dataset?.rename; if (id) { e.target.value = this.commands.renamePet(id, e.target.value); this.render(); } });
-    this.petsEl.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT') { e.stopPropagation(); if (e.key === 'Enter') e.target.blur(); } });   // typing a name never moves the hero
-    this.craftEl.after(this.petsEl);
     this.hintEl = root.querySelector('.inv-hint');
     dom.invUse.addEventListener('click', () => this.use(this.selected));
     dom.invDrop.addEventListener('click', () => this.drop(this.selected));
@@ -121,13 +107,11 @@ export const InventoryUI = {
     if (!this.isOpen) return;
     for (const b of this.tabsEl.children) b.classList.toggle('on', b.dataset.tab === this.tab);
     dom.inventory.classList.toggle('crafting', this.tab === 'craft');
-    dom.inventory.classList.toggle('petting', this.tab === 'pets');
     const inv = this.inventory;
     const bagUsed = inv.getSlots().slice(HOTBAR.size).filter(Boolean).length;
     dom.invCount.textContent = `${bagUsed} / ${inv.size - HOTBAR.size}`;
     dom.invHint.innerHTML = `click an item, then another slot to move / swap (the hotbar row too) · double-click to use · ${bindKbd('bag')} or <kbd>Esc</kbd> to close`;
     if (this.tab === 'craft') { this.renderCraft(); return; }
-    if (this.tab === 'pets') { this.renderPets(); return; }
     const slots = inv.getSlots();
     if (this.selected >= 0 && !slots[this.selected]) this.selected = -1;
     slots.forEach((s, i) => {
@@ -172,24 +156,6 @@ export const InventoryUI = {
     dom.invUse.disabled = !action || !ITEM_ACTIONS[action].supported;
     dom.invDrop.disabled = !def || !def.droppable;
     dom.invMsg.textContent = this.message;
-  },
-
-  renderPets() {
-    if (this.petsEl.contains(document.activeElement)) return;               // don't redraw under someone typing a name
-    const v = this.commands.pets();
-    const modes = Object.entries(PET_COMMANDS).map(([m, c]) => `<button type="button" data-mode="${m}" class="${v.mode === m ? 'on' : ''}" title="${c.text}">${c.label}</button>`).join('');
-    const rows = Object.entries(PETS).map(([id, p]) => {
-      const open = v.unlocked.has(id), out = v.active === id, a = p.ability;
-      const hp = out ? `<div class="pet-hp" title="${Math.ceil(v.hp(id))} / ${v.maxHp(id)} HP"><i style="transform:scaleX(${v.hp(id) / v.maxHp(id)})"></i></div>` : '';
-      return `<div class="pet${open ? '' : ' locked'}${out ? ' out' : ''}" style="--pc:${p.color}"><div class="pc-face">${open ? icon(id) : '?'}</div>` +
-        `<div class="pet-main"><div class="pet-head">${open ? `<input data-rename="${id}" value="${v.nameOf(id)}" maxlength="14" aria-label="Name">` : '<b>???</b>'}` +
-        `<small>${p.name} · Lv ${v.level}</small>${hp}</div>` +
-        `<p>${open ? p.blurb : `<em>Locked:</em> ${p.unlock.text}`}</p>` +
-        (open ? `<div class="pet-ab">${icon(a.id)}<b>${a.name}</b> ${bindKbd('petAbility')} ${a.cooldown}s · ${a.text}</div>` : '') + '</div>' +
-        (open ? (out ? `<span class="pet-with">${v.fainted ? 'Resting' : 'With you'}</span>` : `<button type="button" data-pet="${id}">Take along</button>`) : '') + '</div>';
-    });
-    this.petsEl.innerHTML = `<div class="pet-cmds"><b>Command</b> ${modes} <span class="dim">(${bindKbd('petCommand')} cycles · stand still by your pet and press ${bindKbd('interact')} to pet them)</span></div>` +
-      `<div class="pet-list">${rows.join('')}</div>`;
   },
 
   renderCraft() {

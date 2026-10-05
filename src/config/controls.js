@@ -25,6 +25,7 @@ export const KEYBINDS = [
   { group: 'Actions', id: 'bag', label: 'Open / close the bag', keys: ['KeyI', 'Tab'] },
   { group: 'Actions', id: 'petCommand', label: 'Pet command (follow, stay, attack, passive)', keys: ['KeyT'] },
   { group: 'Actions', id: 'petAbility', label: "Pet's ability", keys: ['KeyV'] },
+  { group: 'Actions', id: 'petMenu', label: 'Pet menu: see, swap and rename your pets', keys: ['KeyB'] },
   { group: 'Game', id: 'pause', label: 'Pause menu (Esc always works too)', keys: ['KeyP'] },
   { group: 'Game', id: 'toggleHint', label: 'Show / hide the controls panel', keys: ['KeyH'] },
   { group: 'Game', id: 'mute', label: 'Mute / unmute', keys: ['KeyM'] },

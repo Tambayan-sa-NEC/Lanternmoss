@@ -1,7 +1,7 @@
 /* A walking pet (wolf, fox): a Critter that heels beside the hero instead of wandering (or sits at its stay spot),
    runs in to bite the monster its command picks (./petBrain.js), then trots back. */
 import * as THREE from 'three';
-import { PET_MOTION, PETS } from '../../config/pets.js';
+import { PET_MOTION, PET_SHOWCASE, PETS } from '../../config/pets.js';
 import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
 import { updateShadow } from '../../fx/shadows.js';
@@ -20,6 +20,7 @@ import { keepTarget, pickTarget, strike } from './petBrain.js';
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3();
 const SCALE = { wolf: 1.15, fox: 1.0 };
+const W_POSE = 4;              // trotting speed into the show-off spot while the world is paused
 
 export class WalkingPet extends Critter {
   constructor(id) {
@@ -48,6 +49,23 @@ export class WalkingPet extends Critter {
   }
   dispose() { scene.remove(this.root, this.shadow); disposeTree(this.root); removeDyn(this.selfCollider); }
 
+  /** Where it shows off in front of the hero (a menu is presenting it). */
+  showSpot(out) { const P = ctx.player; return out.copy(P.pos).addScaledVector(P.fwd, PET_SHOWCASE.walk.ahead); }
+  /** While the world is paused for the pet menu (src/ui/PetMenu.js): trots round in front of the hero, then stands
+      facing the same way, wagging and hopping on the menu's own clock. */
+  pose(dt) {
+    if (!this.visible) return;
+    const t = this.poseT = (this.poseT ?? 0) + dt, P = ctx.player;
+    if (this.state === 'chase') { this.state = 'idle'; this.target = null; }
+    const d = tangentTo(this.pos, this.up, this.showSpot(this.goal), this.toGoal), target = d > 0.35 ? Math.min(W_POSE, d * 3) : 0;
+    if (target > 0) { turnToward(this.fwd, this.toGoal, this.up, damp(8, dt)); this.state = 'follow'; }
+    else { _tv2.copy(P.fwd); projectTangent(_tv2, this.up).normalize(); turnToward(this.fwd, _tv2, this.up, damp(4, dt)); this.state = 'idle'; }
+    if (this.spinT > 0) { this.spinT -= dt; this.fwd.applyAxisAngle(this.up, 12 * dt); }
+    this.speed += (target - this.speed) * damp(6, dt);
+    this.step(_tv2.copy(this.fwd).multiplyScalar(this.speed), dt, 24);
+    this.animate(dt, 99, t);
+    this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
+  }
   update(dt) {
     if (!this.visible) return;
     const W = PET_MOTION.walk, P = ctx.player;
@@ -66,13 +84,15 @@ export class WalkingPet extends Critter {
       }
     }
     if (this.state !== 'chase') {
-      if (Pets.mode === 'stay' && Pets.stayDir) this.goal.copy(Pets.stayDir).multiplyScalar(groundHeight(Pets.stayDir));
+      if (Pets.presenting) this.showSpot(this.goal);                                                   // a menu shows it off
+      else if (Pets.mode === 'stay' && Pets.stayDir) this.goal.copy(Pets.stayDir).multiplyScalar(groundHeight(Pets.stayDir));
       else { _tv.crossVectors(P.up, P.fwd).normalize(); this.goal.copy(P.pos).addScaledVector(_tv, W.sideOffset).addScaledVector(P.fwd, -W.behind); }   // heel spot
       const d = tangentTo(this.pos, this.up, this.goal, this.toGoal);
       if (d > W.teleportDist && Pets.mode !== 'stay') {                    // after respawning or a long dash, just catch up
         this.up.copy(this.goal).normalize(); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r);
         this.fwd.copy(P.fwd); projectTangent(this.fwd, this.up).normalize(); }
-      target = d > W.stopDist ? Math.min(W.runSpeed, W.walkSpeed + (d - W.stopDist) * 2.5) : 0;
+      const stop = Pets.presenting ? 0.35 : W.stopDist;
+      target = d > stop ? Math.min(W.runSpeed, W.walkSpeed + (d - stop) * 2.5) : 0;
       if (target > 0) { turnToward(this.fwd, this.toGoal, this.up, damp(8, dt)); this.idleT = 0; this.state = 'follow'; }
       else {
         _tv2.copy(Pets.mode === 'stay' ? this.toP : P.fwd); projectTangent(_tv2, this.up).normalize(); turnToward(this.fwd, _tv2, this.up, damp(2, dt));

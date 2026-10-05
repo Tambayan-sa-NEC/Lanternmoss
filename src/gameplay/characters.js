@@ -33,5 +33,6 @@ export function applyCharacter(id) {
   P.clearTimers();
   resetCooldowns(C.abilities);
   buildSpellBar(C.abilities); setSkillHint(C.abilities);
-  if (ctx.companion?.petId !== Pets.id) Pets.spawn();   // the hero's own pet, unless another was picked
+  Pets.forHero(id);
+  if (ctx.companion?.petId !== Pets.id) Pets.spawn();   // the pet this hero took last time, else their own
 }

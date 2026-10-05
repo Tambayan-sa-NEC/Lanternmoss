@@ -61,6 +61,7 @@
 <div id="toast"></div>
 <div id="pause" class="modal"></div>
 <div id="shop" class="modal"></div>
+<div id="petmenu"></div>
 <div id="title">
   <div class="logo"><h1>Lanternmoss</h1><p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p></div>
   <div class="tmenu">
@@ -74,12 +75,14 @@
 </div>
 <div id="start" style="display:none">
   <button type="button" class="back" id="selback">◀ Back</button>
-  <h2>Choose your hero</h2>
-  <div id="cards"></div>
-  <div id="hero-detail"></div>
+  <h2 id="selhead">Choose your hero</h2>
+  <div id="cards" class="sel-cards"></div>
+  <div id="hero-detail" class="sel-detail"></div>
+  <div id="pet-cards" class="sel-cards"></div>
+  <div id="pet-detail" class="sel-detail"></div>
   <div class="drag-hint">⟲ drag to turn</div>
   <div class="go disabled" id="go">Choose your hero</div>
-  <div class="keys">← → or click to choose · drag to turn · Enter to play · Esc back</div>
+  <div class="keys" id="selkeys">← → or click to choose · drag to turn · Enter for the pet · Esc back</div>
 </div>
 <div id="err"></div>
 </body>

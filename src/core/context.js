@@ -8,6 +8,7 @@ export const ctx = {
   paused: false,      // the pause menu is open: the simulation is frozen (src/ui/PauseMenu.js)
   indoors: null,      // name of the house the hero is inside (src/gameplay/Houses.js), or null
   inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
+  showcase: false,    // a menu holds the camera on the hero or pet (CameraSystem.setShowcase): critters keep out of the shot
   player: null,       // Player
   companion: null,    // Owl (witch, ranger) or Wolf (knight), created when a hero is picked
   npcs: [],

@@ -100,7 +100,7 @@ export const PauseMenu = {
     document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
   },
   open() {
-    if (this.isOpen || !ctx.started || ctx.transitioning) return;
+    if (this.isOpen || !ctx.started || ctx.transitioning || ctx.paused) return;   // (paused already: the pet menu is up)
     this.isOpen = true; ctx.paused = true; releaseAllKeys(); cancelAim(); audio.duck(true);
     dom.tip.style.display = 'none'; document.body.classList.add('paused'); dom.pause.style.display = 'flex';
     this.page = null; this.show('main');

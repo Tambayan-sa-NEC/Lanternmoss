@@ -1,7 +1,7 @@
 /* A flying pet (owl, wisp, dragon whelp): flutters at the hero's shoulder (or hovers over its stay spot), swoops at
    the monster its command picks (./petBrain.js), strikes and flies back. Models: src/models/creatures.js. */
 import * as THREE from 'three';
-import { PET_MOTION, PETS } from '../../config/pets.js';
+import { PET_MOTION, PET_SHOWCASE, PETS } from '../../config/pets.js';
 import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
@@ -48,12 +48,28 @@ export class FlyingPet {
     sparkles.emit(this.pos, { count: 16, color: this.color, speed: 2.4, up: this.up, upBias: 0.6, life: 0.6, size: 0.3 });
     audio[STRIKE_SOUND[this.def.model]](); this.state = 'return'; this.cool = this.def.attack.cooldown; this.vel.addScaledVector(this.up, 7);
   }
-  /** Where it wants to be: the hero's shoulder, or above its stay spot. */
+  /** Where it wants to be: the hero's shoulder, or above its stay spot (in front of the hero while a menu shows it off). */
   home(out) {
     const P = ctx.player, M = PET_MOTION.fly, bob = Math.sin(ctx.time * 1.7) * 0.18;
+    if (Pets.presenting) { const S = PET_SHOWCASE.fly; return out.copy(P.pos).addScaledVector(P.up, S.height).addScaledVector(P.fwd, S.ahead); }
     if (Pets.mode === 'stay' && Pets.stayDir) return out.copy(Pets.stayDir).multiplyScalar(groundHeight(Pets.stayDir) + M.height * 0.8 + bob);
     this.side.crossVectors(P.fwd, P.up);
     return out.copy(P.pos).addScaledVector(P.up, M.height + bob).addScaledVector(this.side, 0.95).addScaledVector(P.fwd, -0.6);
+  }
+  /** While the world is paused for the pet menu (src/ui/PetMenu.js): hover at the hero's shoulder (or its stay spot),
+      flapping gently, on the menu's own clock. A body swapped in there flies in from above the hero. */
+  pose(dt) {
+    if (!this.visible) return;
+    const t = this.poseT = (this.poseT ?? 0) + dt;
+    this.home(this.goal).addScaledVector(this.up, Math.sin(t * 1.7) * 0.15);
+    this.pos.lerp(this.goal, damp(4, dt)); const len = this.pos.length(); this.up.copy(this.pos).divideScalar(len);
+    if (this.spinT > 0) { this.spinT -= dt; this.fwd.applyAxisAngle(this.up, 14 * dt); }
+    else { _tv2.copy(ctx.player.fwd); projectTangent(_tv2, this.up).normalize(); turnToward(this.fwd, _tv2, this.up, damp(4, dt)); }
+    projectTangent(this.fwd, this.up).normalize();
+    const flap = Math.sin(t * 9) * 0.45; this.wingL.rotation.z = -flap; this.wingR.rotation.z = flap;
+    this.body.rotation.set(0, 0, 0); this.head.rotation.y = Math.sin(t * 0.6) * 0.5;
+    this.root.position.copy(this.pos); frameQuat(this.up, this.fwd, this.root.quaternion);
+    updateShadow(this.shadow, this.up, this.fwd, len - groundHeight(this.up));
   }
   update(dt) {
     if (!this.visible) return;

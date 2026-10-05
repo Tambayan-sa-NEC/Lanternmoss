@@ -1,10 +1,11 @@
 /* ---------------------------------------------------------------------
    PETS: every companion, how it fights, its ability, and how it's unlocked (runtime: src/gameplay/Pets.js, bodies:
-   src/entities/companions/). Any hero can take any unlocked pet (the bag's Pets tab); each hero starts with their own
-   (CHARACTERS[id].companion).
+   src/entities/companions/). Any hero can take any unlocked pet: on the pet step of character select, or in the pet
+   menu during play (src/ui/PetMenu.js). Each hero starts with their own (CHARACTERS[id].companion), and the game
+   remembers which pet each hero last took (PET_PICKS_KEY).
      body      'fly' (flutters at the hero's shoulder, swoops to strike) | 'walk' (heels at the hero's side, runs in to bite)
      model     'owl' | 'wisp' | 'whelp' for flyers (src/models/creatures.js), or a CRITTER_DEFS key for walkers
-     name      the species; defaultName = what it's called until you rename it
+     name      the species; defaultName = what it's called until you rename it; role = one word on its card
      hp        health at level 1 (+ PET_LEVELS.hpPerLevel per hero level above 1); at 0 it faints for a while
      attack    { damage, cooldown, range, ...damageEnemy options (mark, stagger, slow + slowTime, knock) }
      ability   { id, name, key text, cooldown, ...its numbers } (effects: src/gameplay/petAbilities.js)
@@ -13,7 +14,7 @@
 
 export const PETS = {
   owl: {
-    name: 'Owl', defaultName: 'Pip', body: 'fly', model: 'owl', color: '#b58cff', hp: 60,
+    name: 'Owl', defaultName: 'Pip', role: 'Scout', body: 'fly', model: 'owl', color: '#b58cff', hp: 60,
     blurb: 'Swoops at monsters you fight, marking them for +25% damage and interrupting their wind-ups.',
     attack: { damage: 4, cooldown: 4, range: 11, mark: 4, stagger: 0.6 },
     ability: { id: 'scout', name: 'Scout', cooldown: 25, radius: 30, mark: 8,
@@ -21,7 +22,7 @@ export const PETS = {
     unlock: null,
   },
   wolf: {
-    name: 'Wolf', defaultName: 'Fang', body: 'walk', model: 'wolf', color: '#7fb8ff', hp: 95,
+    name: 'Wolf', defaultName: 'Fang', role: 'Brawler', body: 'walk', model: 'wolf', color: '#7fb8ff', hp: 95,
     blurb: 'Runs in to bite whatever you are fighting, slowing it down.',
     attack: { damage: 7, cooldown: 2.6, range: 9, slow: 0.3, slowTime: 1.5, knock: 1.5 },
     ability: { id: 'howl', name: 'Howl', cooldown: 30, seconds: 8, damage: 0.2,
@@ -29,7 +30,7 @@ export const PETS = {
     unlock: null,
   },
   fox: {
-    name: 'Fox', defaultName: 'Ember', body: 'walk', model: 'fox', color: '#ff8c4a', hp: 70,
+    name: 'Fox', defaultName: 'Ember', role: 'Finder', body: 'walk', model: 'fox', color: '#ff8c4a', hp: 70,
     blurb: 'Quick, darting nips that stagger monsters; never far from your heels.',
     attack: { damage: 5, cooldown: 1.8, range: 9, stagger: 0.3 },
     ability: { id: 'fetch', name: 'Fetch', cooldown: 25, radius: 14,
@@ -37,7 +38,7 @@ export const PETS = {
     unlock: { chest: 'rare', text: 'Curled up asleep in a locked Lantern chest.' },
   },
   wisp: {
-    name: 'Wisp', defaultName: 'Glimmer', body: 'fly', model: 'wisp', color: '#9ff3ff', hp: 50,
+    name: 'Wisp', defaultName: 'Glimmer', role: 'Healer', body: 'fly', model: 'wisp', color: '#9ff3ff', hp: 50,
     blurb: 'A calmed wisp. Its little sparks chill monsters, slowing them.',
     attack: { damage: 3, cooldown: 3, range: 10, slow: 0.35, slowTime: 2 },
     ability: { id: 'mend', name: 'Mend', cooldown: 35, heal: 0.35, seconds: 5,
@@ -45,13 +46,23 @@ export const PETS = {
     unlock: { quest: 'humStones', text: 'Befriended when the Humming Stones are tuned (Old Bramble\'s quest).' },
   },
   whelp: {
-    name: 'Dragon whelp', defaultName: 'Cinderling', body: 'fly', model: 'whelp', color: '#ff7a4a', hp: 80,
+    name: 'Dragon whelp', defaultName: 'Cinderling', role: 'Firestarter', body: 'fly', model: 'whelp', color: '#ff7a4a', hp: 80,
     blurb: 'Pyrrhax\'s last egg, hatched. Spits little fireballs that hit hard.',
     attack: { damage: 8, cooldown: 3.5, range: 12, knock: 2 },
     ability: { id: 'flame', name: 'Flame Burst', cooldown: 20, damage: 30, radius: 4.5,
       text: 'Bursts into flame around your target (or you): 30 damage to every monster within 4.5m.' },
     unlock: { bossChest: 1, text: 'An egg in Pyrrhax\'s treasure chest, on Emberfall.' },
   },
+};
+
+/** localStorage key for the pet each hero last took ({ heroId: petId }). */
+export const PET_PICKS_KEY = 'lanternmoss.pets';
+
+/** The menus show a pet off in front of the hero (ahead = metres in front, height = for flyers), and the camera
+    frames it from the front: distance, pitch, and how far above the pet's origin to look. Per body. */
+export const PET_SHOWCASE = {
+  walk: { ahead: 1.9, dist: 3.3, pitch: 0.3, lift: 0.45 },
+  fly: { ahead: 1.8, height: 1.5, dist: 3.4, pitch: 0.18, lift: 0.05 },
 };
 
 /** Pets grow with the hero: pet level = hero level. */

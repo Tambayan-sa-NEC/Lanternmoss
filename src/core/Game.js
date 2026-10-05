@@ -59,6 +59,7 @@ import { ctx } from './context.js';
 import { onSettingsChange, settings } from './settings.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
+import { PetMenu } from '../ui/PetMenu.js';
 import { showBanner } from '../ui/banner.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
@@ -94,7 +95,7 @@ export class Game {
     const bag = ctx.player.inventory;
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
-    buildHotbar(); buildPetCard();
+    buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init();
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -119,7 +120,7 @@ export class Game {
 
   /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
   update(dt) {
-    if (ctx.paused) return;                                        // pause menu open: freeze everything (rendering continues)
+    if (ctx.paused) { if (PetMenu.isOpen) PetMenu.update(dt); return; }   // pause / pet menu open: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning });
@@ -157,7 +158,7 @@ export class Game {
   /** Back to a fresh adventure: clears everything the previous character left behind. */
   resetRun() {
     const P = ctx.player, world = this.world;
-    Dialog.close(); InventoryUI.close();
+    Dialog.close(); InventoryUI.close(); PetMenu.close();
     Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs(); dayClock.reset();
@@ -179,7 +180,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

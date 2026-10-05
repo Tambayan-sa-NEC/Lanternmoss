@@ -65,6 +65,18 @@ export function resolveCollisions(p, radius, self) {
 }
 
 const _cu2 = new V3();
+/** Stricter than cameraBlocked, for the menus' still framings (src/ui/showcase.js): every prop's footprint counts
+    (lamp posts and rocks too, which the follow camera passes through), up to its camera top or `height`. */
+export function viewBlocked(q, pad = 0.3, height = 2.8) {
+  if (cameraBlocked(q)) return true;
+  const len = q.length(); _cu2.copy(q).divideScalar(len);
+  for (const c of colliders) {
+    if (!c.active || c.water || _cu2.dot(c.dir) < c.cull) continue;
+    const along = q.dot(c.dir), h = along - c.baseH; if (h < -0.5 || h > (c.camTop ?? c.top ?? height)) continue;
+    if (len * len - along * along < (c.r + pad) ** 2) return true;
+  }
+  return false;
+}
 export function cameraBlocked(q) {
   const len = q.length(); _cu2.copy(q).divideScalar(len);
   if (len < groundHeight(_cu2) + 0.35) return true;

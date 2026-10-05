@@ -252,20 +252,36 @@ Code: `src/world/` (terrain, planet, placement, scatter, water), `src/physics/` 
     - Aiming rays reach over the taller hills.
     - Shadows lie on rock tops and water.
 
-## 12. Pet selection **(core)**
+## 12. Pet selection **(core)** ✓
 
 **Goal:** choosing a pet is a moment of its own, not just a tab in the bag.
 Code: `src/ui/CharacterSelect.js`, `src/gameplay/Pets.js`, `src/ui/InventoryUI.js` (Pets tab).
 
-- [ ] Choose your pet at the start: a pet step on the hero-select screen, or a pet picker right after it, with each
+- [x] Choose your pet at the start: a pet step on the hero-select screen, or a pet picker right after it, with each
       unlocked pet shown in 3D, its ability and its stats.
-- [ ] A pet menu during play: a showcase of the pet, swapping, renaming, and how to find the locked pets. It could
+  - Done: character select has two steps, the hero and then the pet. Every pet is listed, and locked ones say how to
+    find them. The chosen pet comes round in front of the hero to show off, next to its detail panel: role, body,
+    health, strike damage, rate and reach, what its strike does, and its ability with key and cooldown. You can rename
+    it there. Esc goes back a step.
+- [x] A pet menu during play: a showcase of the pet, swapping, renaming, and how to find the locked pets. It could
       be reached from the pet card.
-- [ ] Remember the chosen pet per hero.
-- [ ] Keep the bag's Pets tab or fold it into the new menu, but have only one place for each action.
-- [ ] **No camera orbit when choosing a hero or a pet.** The camera stays still, with a fixed framing of the hero or
+  - Done: `B` (remappable) or a click on the pet card's face or name opens it (`src/ui/PetMenu.js`). The world
+    pauses while the camera holds on the pet, which keeps idling (wags, flaps). From there you can swap pets (the new
+    one appears right away), rename them, give commands and see how to find the locked ones. Indoors, or while the pet
+    rests, the menu opens without the showcase.
+- [x] Remember the chosen pet per hero.
+  - Done: `gameplay/petPicks.js` saves `{ hero: pet }` in localStorage, and it's kept across adventures. Picking a
+    hero brings back their pet if it's unlocked in this adventure, otherwise their own.
+- [x] Keep the bag's Pets tab or fold it into the new menu, but have only one place for each action.
+  - Done: the bag's Pets tab is gone, and the pet menu is the one place for all of it. The HUD pet card keeps its
+    quick command and ability buttons.
+- [x] **No camera orbit when choosing a hero or a pet.** The camera stays still, with a fixed framing of the hero or
       pet, instead of circling around them. This also changes the current hero-select screen, which slowly orbits
       the hero (`src/ui/CharacterSelect.js`, `orbitCamera` in `src/systems/CameraSystem.js`).
+  - Done: `setShowcase` eases the camera to a fixed framing, then holds still. Dragging on the hero step turns the
+    hero, not the camera. The framings live in `src/ui/showcase.js`: the camera aims at the pet's spot rather than
+    the pet, so its hops don't move it. If a lamppost, house or hill would block the view, the hero turns to a clear
+    heading first, and wandering critters keep out of the shot. Only the title screen still orbits.
 
 ## 13. Achievements and bestiary **(core)**
 

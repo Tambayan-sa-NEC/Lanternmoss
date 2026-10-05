@@ -2,12 +2,15 @@
    Owns everything that outlives one pet body (a body is rebuilt after travel, leaving a house, swapping pets):
      which pets are unlocked and which one is out, their names, the command (follow / stay / attack / passive),
      health and fainting, the ability cooldown. Pets level with the hero (pet level = hero level).
+   It also remembers which pet each hero last took (./petPicks.js: localStorage, kept across adventures): picking a hero
+   brings that pet back if it's unlocked in this adventure, otherwise the hero's own.
    The body asks Pets what to do (mode, stay spot, damage); Pets tells the body to show / hide and to celebrate.
    Unlocks come from game events: a quest finished, a chest opened (core/events.js). */
 import { CHARACTERS } from '../config/characters.js';
 import { PET_CARE, PET_COMMANDS, PET_LEVELS, PETS } from '../config/pets.js';
 import { ctx } from '../core/context.js';
 import { gameEvents } from '../core/events.js';
+import { bindLabel } from '../core/keybinds.js';
 import { FlyingPet } from '../entities/companions/FlyingPet.js';
 import { WalkingPet } from '../entities/companions/WalkingPet.js';
 import { floatText } from '../fx/combatFx.js';
@@ -20,6 +23,7 @@ import { toast } from '../ui/toast.js';
 import { mpick } from '../utils/random.js';
 import { arcDist } from '../utils/sphere.js';
 import { PET_ABILITIES, resetPetAbilities, updatePetAbilities } from './petAbilities.js';
+import { loadPicks, savePicks } from './petPicks.js';
 
 const STARTERS = Object.keys(PETS).filter(id => !PETS[id].unlock);
 const MODES = Object.keys(PET_COMMANDS);
@@ -27,10 +31,11 @@ const PET_LINES = ['{name} leans into the scratch.', '{name} looks very pleased 
   '{name} nuzzles your hand.', '{name} would like that to continue, please.'];
 
 export const Pets = {
-  unlocked: new Set(STARTERS), active: null, names: {}, mode: 'follow', stayDir: null,
+  unlocked: new Set(STARTERS), active: null, names: {}, mode: 'follow', stayDir: null, picks: loadPicks(),
   hp: null, hpFor: null, faintT: 0, hurtAt: -99, abilityCd: 0, petCool: 0,
+  presenting: false,     // a menu is showing the pet off: it comes round in front of the hero (PET_SHOWCASE)
 
-  /** The pet that's out: the one picked in the Pets tab, else the hero's own. */
+  /** The pet that's out: the one picked (pet step or pet menu), else the hero's own. */
   get id() { return this.active ?? CHARACTERS[ctx.player.charId].companion; },
   get def() { return PETS[this.id]; },
   get fainted() { return this.faintT > 0; },
@@ -47,25 +52,33 @@ export const Pets = {
   power() { return 1 + PET_LEVELS.damagePerLevel * (this.level - 1); },
 
   // ---------------------------------------------------------------- the body
-  /** (Re)builds the pet's body beside the hero: after travel, a house, a swap. A fainted pet stays hidden. */
+  /** (Re)builds the pet's body beside the hero: after travel, a house, a swap. A fainted pet stays hidden, and so
+      does one picked indoors (it waits outside: Houses.onLeave brings it to the door). */
   spawn() {
     if (ctx.companion) ctx.companion.dispose();
     if (this.hpFor !== this.id) { this.hpFor = this.id; this.hp = this.maxHp(); this.faintT = 0; }
     const Body = this.def.body === 'fly' ? FlyingPet : WalkingPet;
     ctx.companion = new Body(this.id);
-    ctx.companion.setVisible(!this.fainted);
+    ctx.companion.setVisible(!this.fainted && !ctx.indoors);
     if (this.mode === 'stay') this.stayDir = ctx.companion.up.clone();   // a new place: wait here instead
     return ctx.companion;
   },
-  /** Takes pet `id` along instead (it must be unlocked). */
-  choose(id) {
+  /** Takes pet `id` along instead (it must be unlocked), and remembers it for this hero. quiet = no toast. */
+  choose(id, quiet = false) {
     if (!this.unlocked.has(id) || !PETS[id]) return false;
+    this.remember(id);
     if (id === this.id) return true;
     this.active = id; this.spawn();
-    if (!this.fainted) { emote(ctx.companion, 'heart'); audio.sparkle(); }
-    toast(`${this.nameOf()} the ${PETS[id].name.toLowerCase()} comes along now.`);
+    if (!this.fainted && !ctx.indoors) { emote(ctx.companion, 'heart'); audio.sparkle(); }
+    if (!quiet) toast(`${this.nameOf()} the ${PETS[id].name.toLowerCase()} comes along now.`);
     return true;
   },
+  remember(id, hero = ctx.player.charId) {
+    if (id === CHARACTERS[hero].companion) delete this.picks[hero]; else this.picks[hero] = id;
+    savePicks(this.picks);
+  },
+  /** A hero was picked: their remembered pet comes out if it's unlocked in this adventure, else their own. */
+  forHero(hero) { const p = this.picks[hero]; this.active = p && this.unlocked.has(p) ? p : null; },
   rename(id, name) {
     const clean = String(name ?? '').replace(/[^\p{L}\p{N} '\-]/gu, '').trim().slice(0, PET_CARE.nameLength);
     if (clean) this.names[id] = clean; else delete this.names[id];
@@ -135,7 +148,7 @@ export const Pets = {
   unlock(id) {
     if (!PETS[id] || this.unlocked.has(id)) return false;
     this.unlocked.add(id);
-    showBanner(`New pet: ${this.nameOf(id)} the ${PETS[id].name.toLowerCase()}!`, 'Open the bag (I) and its Pets tab to bring them along.');
+    showBanner(`New pet: ${this.nameOf(id)} the ${PETS[id].name.toLowerCase()}!`, `Open the pet menu (${bindLabel('petMenu')}, or click the pet card) to bring them along.`);
     audio.melody();
     return true;
   },
@@ -146,7 +159,7 @@ export const Pets = {
     else if (this.hp !== null && ctx.time - this.hurtAt > PET_CARE.regenDelay) this.heal(PET_CARE.regen * dt);
     updatePetAbilities(dt);
   },
-  /** A fresh adventure: back to the starter pets, default names, full health. */
+  /** A fresh adventure: back to the starter pets, default names, full health (which pet each hero likes is kept). */
   reset() {
     this.unlocked = new Set(STARTERS); this.active = null; this.names = {}; this.mode = 'follow'; this.stayDir = null;
     this.hp = null; this.hpFor = null; this.faintT = 0; this.hurtAt = -99; this.abilityCd = 0; this.petCool = 0;
