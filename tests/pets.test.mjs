@@ -6,8 +6,8 @@ import { readFileSync } from 'node:fs';
 import { CHARACTERS } from '../src/config/characters.js';
 import { CHEST_KINDS } from '../src/config/chests.js';
 import { CRITTER_DEFS } from '../src/config/critters.js';
-import { INVENTORY, QUICK_SLOTS } from '../src/config/items.js';
-import { PET_CARE, PET_COMMANDS, PET_KEYS, PET_LEVELS, PET_MOTION, PETS } from '../src/config/pets.js';
+import { KEYBINDS } from '../src/config/controls.js';
+import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_MOTION, PETS } from '../src/config/pets.js';
 import { PLANETS } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 
@@ -42,10 +42,8 @@ test('unlocks point at real quests, chest kinds and planets; every hero starts w
 
 test('commands, keys, growth and care numbers make sense', () => {
   assert.deepEqual(Object.keys(PET_COMMANDS), ['follow', 'stay', 'attack', 'passive']);
-  const taken = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyE', 'KeyX', 'KeyH', 'KeyM', 'KeyP', 'KeyC', 'Space', ...INVENTORY.keys, ...QUICK_SLOTS.keys,
-    ...Object.values(CHARACTERS).flatMap(c => Object.values(c.abilities).flatMap(a => a.keys))]);
-  for (const k of Object.values(PET_KEYS)) assert.ok(!taken.has(k), `${k} is already used`);
-  assert.notEqual(PET_KEYS.command, PET_KEYS.ability);
+  const ids = KEYBINDS.map(b => b.id);
+  assert.ok(ids.includes('petCommand') && ids.includes('petAbility'), 'the pet keys are remappable actions (clashes: tests/keybinds.test.mjs)');
   assert.ok(PET_LEVELS.damagePerLevel > 0 && PET_LEVELS.hpPerLevel > 0);
   assert.ok(PET_CARE.faintTime > 0 && PET_CARE.regen > 0 && PET_CARE.retaliate >= 0 && PET_CARE.retaliate <= 1 && PET_CARE.nameLength >= 8);
   assert.ok(PET_MOTION.fly.height > 0 && PET_MOTION.walk.runSpeed > PET_MOTION.walk.walkSpeed);

@@ -3,6 +3,7 @@
    Active buffs show in the HUD's status row (src/ui/hud.js). */
 import * as THREE from 'three';
 import { CHALLENGES } from '../config/challenges.js';
+import { bindKbd } from '../core/keybinds.js';
 import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { dayClock } from '../gameplay/dayClock.js';
@@ -23,7 +24,7 @@ function updatePrompt() {
   if (!t) { dom.prompt.style.display = 'none'; return; }
   _tv.copy(t.at).project(camera);
   if (_tv.z < 1) {
-    dom.prompt.style.display = 'block'; dom.prompt.innerHTML = `<kbd>E</kbd> ${t.label}`;
+    dom.prompt.style.display = 'block'; dom.prompt.innerHTML = `${bindKbd('interact')} ${t.label}`;
     dom.prompt.style.left = ((_tv.x * 0.5 + 0.5) * innerWidth) + 'px'; dom.prompt.style.top = ((-_tv.y * 0.5 + 0.5) * innerHeight) + 'px';
   } else dom.prompt.style.display = 'none';
 }

@@ -174,14 +174,14 @@ so the order matters: **10** reworks the key layout that later items build on, *
 **14**, **15**, **17** and **18** place things on, and **Save / load** (Suggested additions) becomes a must-have once
 players can build (**17**) and travel back and forth (**18**).
 
-## 10. A much better HUD **(core)**
+## 10. A much better HUD **(core)** ✓
 
 **Goal:** a cleaner, more readable HUD in a familiar layout: items in a hotbar at the bottom centre (like Minecraft),
 the hero's vitals right above it, and skills on the lower right.
 Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/controls.js`, `src/config/characters.js`
 (ability keys), `src/gameplay/quickSlots.js`, `index.html`, `styles/main.css`.
 
-- [ ] **10.1 Fonts that fit Lanternmoss:** type chosen to express the game's identity, not just any nice-looking
+- [x] **10.1 Fonts that fit Lanternmoss:** type chosen to express the game's identity, not just any nice-looking
       font. Lanternmoss is a cozy, storybook world of lanterns, moss and little planets, so the lettering should feel
       handmade, warm and a little magical. The choice should hold up on the title, the planet banners, names and
       numbers.
@@ -189,7 +189,9 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
   - Keep sizes and weights consistent across the HUD, menus and dialogue.
   - Before picking, write a short brief on the game's look and feel (mood words, references), and compare 2–3
     candidate pairings in a mock-up of the HUD and the title screen.
-- [ ] **10.2 Item hotbar** at the lower centre of the screen:
+  - Done: the brief, the three pairings compared (Fredoka, Grandstander or Fraunces, each with Nunito) and the choice,
+    **Grandstander + Nunito**, are in `docs/typography.md`. The specimen is in `docs/type-specimen.html`.
+- [x] **10.2 Item hotbar** at the lower centre of the screen:
   - Numbered slots (`1`–`9`). Pressing a number selects that slot and the hero **holds** that item; clicking a slot does
     the same.
   - The hotbar is its own row, separate from the bag: the number keys cycle through the hotbar items, not the bag.
@@ -198,15 +200,23 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
     (`6`–`8`). The hotbar replaces the quick-use slots.
   - Decide what "holding" does for each kind of item: food and tonics are used, weapons and tools are swung, and
     placeables are put down (needed by 17).
-- [ ] **10.3 Vitals above the hotbar:** health, mana / stamina / focus, level and XP sit just above the hotbar, centred.
-- [ ] **10.4 Skills HUD on the lower right:** skill icons with their names, cooldowns and keys.
+  - Done: the hotbar is the first 9 slots of the hero's inventory. Food and gear land there first; materials go
+    in the bag. Press the held slot's number again, or right click, to use it: food and tonics are eaten, gear is
+    equipped. Materials and keys show a hint about where they're used. Placeables wait for 17, and tools for 15. The held
+    item's name shows above the vitals.
+- [x] **10.3 Vitals above the hotbar:** health, mana / stamina / focus, level and XP sit just above the hotbar, centred.
+- [x] **10.4 Skills HUD on the lower right:** skill icons with their names, cooldowns and keys.
   - Skills are triggered by **letter keys only**.
   - Needs a new key layout: today `1`–`5` are the main keys, and `E` (interact), `T` / `V` (pet), `C`, `H`, `M`, `X`,
     `I` and `P` are taken.
   - Option: basic attack on click plus `Q`, `R`, `F`, `G` (as now), with one more letter for the fifth skill.
   - Keybinds should be remappable in Settings.
-- [ ] Move the pet card and boss bar so nothing overlaps the new layout. Update the Controls page, the character-select
-      key chips, the README and the screenshot scenes.
+  - Done: the skills are on click / `Z`, then `Q`, `R`, `F` and `G`. Every action is remappable in Settings → Keys: a
+    key that's already in use swaps over, and `1`–`9` and `Esc` are reserved (`src/core/keybinds.js`). All key hints
+    (the controls panel, prompts, dialogue, the pet card, the Controls page and character select) follow the bindings.
+- [x] Move the pet card and boss bar so nothing overlaps the new layout. Done: the pet card is on the lower left and the
+      boss bar at the top (toasts move below it). The centre slides left on narrow screens so it never reaches the
+      skills. The Controls page, the character-select key chips, the README and the screenshots are updated too.
 
 ## 11. Better and bigger planets **(core)**
 

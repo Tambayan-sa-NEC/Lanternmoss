@@ -53,8 +53,9 @@ export const STATS = {
   moveSpeed: { label: 'move speed', pct: true, cap: 0.25 },
 };
 
-/** Quick-use slots for consumables (src/gameplay/quickSlots.js): keys clear of the ability keys 1-5. */
-export const QUICK_SLOTS = { keys: ['Digit6', 'Digit7', 'Digit8'], labels: ['6', '7', '8'], cooldown: 0.8 };
+/** The hotbar (src/gameplay/hotbar.js): the first `size` slots of the hero's inventory, on the number keys
+    (HOTBAR_KEYS, config/controls.js). New food, tonics and gear land here first; everything else goes in the bag. */
+export const HOTBAR = { size: 9, useCooldown: 0.8, holdCategories: ['consumable', 'weapon', 'equipment'] };
 
 /** Effects a usable item can apply ({param} placeholders are filled from the effect entry for tooltips). */
 export const ITEM_EFFECTS = {
@@ -72,7 +73,6 @@ export const ITEM_ART_KINDS = ['bun', 'tart', 'berry', 'bottle', 'bowl', 'flask'
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width
   defaultStackSize: 20,
-  keys: ['KeyI', 'Tab'],           // open / close (Escape also closes)
   pickupRadius: 1.3,               // walk this close to a world item to pick it up
   dropDistance: 1.4,               // dropped items land this far in front of the hero
   dropPickupDelay: 1.2,            // seconds before a dropped item can be picked up again (and you must step away first)

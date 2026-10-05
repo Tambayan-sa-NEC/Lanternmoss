@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lanternmoss — a tiny cozy planet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<!-- Grandstander (display) + Nunito (body): see docs/typography.md -->
+<link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/main.css">
 <script type="importmap">
 { "imports": {
@@ -18,14 +19,8 @@
 </head>
 <body class="menu">
 <div id="hint">
-  <div class="full">
-    <b>✦ Lanternmoss</b> <span class="hide-tip"><kbd>H</kbd> hide</span><br>
-    <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> move &nbsp; <kbd>Shift</kbd> sprint<br>
-    <kbd>Space</kbd> jump &nbsp; <kbd>E</kbd> talk / accept &nbsp; <kbd>X</kbd> decline &nbsp; <kbd>I</kbd> bag &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>C</kbd> change hero<br>
-    <kbd>Drag</kbd> rotate camera &nbsp; <kbd>Wheel</kbd> zoom<br>
-    <span id="hint-skills"></span>
-  </div>
-  <div class="mini"><kbd>H</kbd> Controls</div>
+  <div class="full"><b>✦ Lanternmoss</b> <span class="hide-tip"></span><div id="hint-keys"></div></div>
+  <div class="mini"></div>
 </div>
 <div id="compass"><div class="track"></div><i class="notch"></i></div>
 <div id="markers"></div>
@@ -35,22 +30,24 @@
 <div id="aimhint"></div>
 <div id="hurt"></div>
 <div id="combat">
-  <div id="status"></div>
-  <div class="vitals">
-    <div class="lvl"><small>LV</small><b></b></div>
-    <div class="bars">
+  <div id="center">
+    <div id="status"></div>
+    <div id="heldname"></div>
+    <div class="vitals">
       <div class="bar hp"><b></b><i></i><span><em>HP</em><strong></strong></span></div>
+      <div class="lvl"><small>LV</small><b></b></div>
       <div class="bar mp"><b></b><i></i><span><em></em><strong></strong></span></div>
-      <div class="bar xp"><i></i><span><em>XP</em><strong></strong></span></div>
     </div>
+    <div class="bar xp"><i></i><span><em>XP</em><strong></strong></span></div>
+    <div id="hotbar"></div>
   </div>
-  <div class="actionrow"><div id="spells"></div><div id="quick"></div></div>
+  <div id="skills"><div id="spells"></div></div>
 </div>
 <div id="tip"></div>
 <div id="hud"></div>
 <div id="prompt"></div>
 <div id="dialog"><div id="dlg-face"></div><div id="dlg-name"></div><div id="dlg-text"></div>
-  <div id="dlg-choices"><button class="yes"></button><button class="no"></button></div><div id="dlg-next">▼ E</div></div>
+  <div id="dlg-choices"><button class="yes"></button><button class="no"></button></div><div id="dlg-next"></div></div>
 <div id="challenge"></div>
 <div id="bossbar"><div class="bn"></div><div class="bb"><b></b><i></i><div class="ticks"></div><span class="pct"></span></div></div>
 <div id="fade"></div>
@@ -59,7 +56,7 @@
   <div class="inv-head"><b>✦ Bag</b><span class="inv-count"></span><button class="inv-close" type="button">✕</button></div>
   <div class="inv-body"><div class="inv-grid"></div><div class="inv-detail"></div></div>
   <div class="inv-actions"><button class="inv-use" type="button">Use</button><button class="inv-drop" type="button">Drop</button><span class="inv-msg"></span></div>
-  <div class="inv-hint">click an item, then another slot to move / swap · double-click to use · <kbd>I</kbd> or <kbd>Esc</kbd> to close</div>
+  <div class="inv-hint"></div>
 </div>
 <div id="toast"></div>
 <div id="pause" class="modal"></div>

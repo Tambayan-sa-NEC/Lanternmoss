@@ -2,11 +2,11 @@
 const $ = id => document.getElementById(id);
 
 export const dom = {
-  hint: $('hint'), hintSkills: $('hint-skills'),
+  hint: $('hint'), hintKeys: $('hint-keys'), hintHide: document.querySelector('#hint .hide-tip'), hintMini: document.querySelector('#hint .mini'),
   hud: $('hud'), prompt: $('prompt'), toast: $('toast'),
   // combat HUD
   hpBar: document.querySelector('.bar.hp'), mpBar: document.querySelector('.bar.mp'), xpBar: document.querySelector('.bar.xp'),
-  spells: $('spells'), quick: $('quick'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'), aimHint: $('aimhint'),
+  spells: $('spells'), hotbar: $('hotbar'), heldName: $('heldname'), center: $('center'), skills: $('skills'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'), aimHint: $('aimhint'),
   combat: $('combat'), status: $('status'), level: document.querySelector('#combat .lvl b'), tip: $('tip'), lowHp: $('lowhp'),
   compass: $('compass'), compassTrack: document.querySelector('#compass .track'), markers: $('markers'),
   // dialogue
@@ -21,6 +21,7 @@ export const dom = {
   inventory: $('inventory'), invGrid: document.querySelector('#inventory .inv-grid'), invDetail: document.querySelector('#inventory .inv-detail'),
   invCount: document.querySelector('#inventory .inv-count'), invUse: document.querySelector('#inventory .inv-use'),
   invDrop: document.querySelector('#inventory .inv-drop'), invClose: document.querySelector('#inventory .inv-close'), invMsg: document.querySelector('#inventory .inv-msg'),
+  invHint: document.querySelector('#inventory .inv-hint'),
   // character select
   start: $('start'), cards: $('cards'), go: $('go'), selBack: $('selback'), heroDetail: $('hero-detail'),
   // title screen

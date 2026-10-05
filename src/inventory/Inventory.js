@@ -18,11 +18,13 @@ const copyProps = p => (p && Object.keys(p).length ? JSON.parse(JSON.stringify(p
 const event = (type, detail) => (typeof CustomEvent === 'function' ? new CustomEvent(type, { detail }) : Object.assign(new Event(type), { detail }));
 
 export class Inventory extends EventTarget {
-  #slots; #registry;
+  #slots; #registry; #fillOrder;
 
-  constructor(size = INVENTORY.slots, registry = itemRegistry) {
+  /** fillOrder(def) -> slot indices, the order new stacks take empty slots in (default: first to last); the hero's
+      inventory uses it to put things you hold (food, gear) on the hotbar first and everything else in the bag first. */
+  constructor(size = INVENTORY.slots, registry = itemRegistry, { fillOrder = null } = {}) {
     super();
-    this.#registry = registry;
+    this.#registry = registry; this.#fillOrder = fillOrder;
     this.#slots = new Array(Math.max(0, Math.floor(size) || 0)).fill(null);
   }
 
@@ -70,7 +72,9 @@ export class Inventory extends EventTarget {
         const n = Math.min(left, def.maxStack - s.quantity); s.quantity += n; left -= n; changed.push(i);
       }
     }
-    for (let i = 0; i < this.#slots.length && left; i++) {                 // 2. then empty slots, a stack at a time
+    const order = this.#fillOrder?.(def) ?? this.#slots.map((_, i) => i);
+    for (const i of order) {                                                  // 2. then empty slots, a stack at a time
+      if (!left) break;
       if (this.#slots[i]) continue;
       const n = Math.min(left, def.maxStack);
       this.#slots[i] = { itemId, quantity: n, props: copyProps(props) }; left -= n; changed.push(i);
@@ -79,6 +83,15 @@ export class Inventory extends EventTarget {
     if (added) { this.notify('itemadded', { itemId, quantity: added }); this.notify('change', { slots: changed }); }
     if (left) this.notify('full', { itemId, remaining: left });
     return { added, remaining: left };
+  }
+
+  /** Puts a stack into empty slot i (a piece of gear swapped back into the slot it came from). Returns whether it did. */
+  insertAt(i, itemId, quantity = 1, props = null) {
+    const def = this.#registry.get(itemId), q = toCount(quantity);
+    if (!def || !this.isValidSlot(i) || this.#slots[i] || !q || q > def.maxStack) return false;
+    this.#slots[i] = { itemId, quantity: q, props: copyProps(props) };
+    this.notify('itemadded', { itemId, quantity: q }); this.notify('change', { slots: [i] });
+    return true;
   }
 
   /** Removes exactly `quantity` of itemId across stacks (last slots first). All-or-nothing: returns false and
@@ -163,4 +176,12 @@ export class Inventory extends EventTarget {
   notify(type, detail) { this.dispatchEvent(event(type, detail)); }
 
   #compatible(stack, itemId, props, def) { return def.stackable && stack.itemId === itemId && sameProps(stack.props, copyProps(props)); }
+}
+
+/** A fillOrder for an inventory whose first `front` slots are a hotbar: items of `categories` take empty hotbar slots
+    first, everything else fills the bag first (either spills into the other part when it's full). */
+export function hotbarFirst(front, size, categories) {
+  const hot = [...Array(front).keys()], bag = [...Array(size - front).keys()].map(i => i + front);
+  const a = [...hot, ...bag], b = [...bag, ...hot];
+  return def => (categories.includes(def.category) ? a : b);
 }

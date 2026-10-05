@@ -12,7 +12,7 @@ export const pointer = { x: 0, y: 0, over: false };
  *   onKey(code)          non-repeat key press while active
  *   onDrag(dx, dy)       pointer drag in pixels
  *   onClick()            quick left click (not a drag)
- *   onCancel()           right click (cancels area-ability aiming)
+ *   onCancel()           right click (cancels aiming, or uses the held item: src/core/controls.js)
  *   onZoom(sign)         wheel step (+1 out / -1 in) */
 export function initInput(canvas, handlers) {
   addEventListener('keydown', e => {

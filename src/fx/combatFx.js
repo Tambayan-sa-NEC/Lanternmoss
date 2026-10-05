@@ -43,7 +43,7 @@ export function hitStop(secs) { if (settings.hitStop) ctx.hitStop = Math.max(ctx
 /** scale > 1 for big hits (ultimates, boss blows) so they read at a glance. */
 export function floatText(pos, text, color = '#ffffff', scale = 1) {
   const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64; const g = cv.getContext('2d');
-  g.font = 'bold 44px "M PLUS Rounded 1c","Trebuchet MS",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '800 44px "Grandstander","Nunito","Trebuchet MS",sans-serif';   // the display face (docs/typography.md) g.textAlign = 'center'; g.textBaseline = 'middle';
   g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = '#3a2340'; g.strokeText(text, 64, 34); g.fillStyle = color; g.fillText(text, 64, 34);
   const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, fog: false })); s.renderOrder = 6; scene.add(s);

@@ -26,7 +26,8 @@ test('every hero has exactly one ultimate: ground-targeted, on 5/G, with range, 
     assert.equal(ults.length, 1, `${id}: one ultimate`);
     const u = ults[0];
     assert.equal(u.target, 'ground', `${id}: ultimates are aimed on the ground`);
-    assert.deepEqual(u.keys, ['Digit5', 'KeyG']);
+    assert.equal(u.slot, 5, `${id}: the ultimate is the fifth skill`);
+    assert.deepEqual(u.keys, ['KeyG'], 'on the skill 5 key (G by default)');
     assert.ok(u.range > u.radius && u.radius >= 4, `${id}: a large area within reach`);
     assert.ok(u.cooldown >= 20 && u.cost > 0, `${id}: limited by cooldown and cost`);
   }

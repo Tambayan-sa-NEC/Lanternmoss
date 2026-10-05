@@ -31,7 +31,7 @@ export function isAiming(id = null) { return id ? aim.id === id : aim.id !== nul
 
 export function beginAim(id, s) {
   Object.assign(aim, { id, s, target: null, valid: false });
-  dom.aimHint.innerHTML = `<b>${s.name}</b> · <kbd>Click</kbd> or <kbd>${s.label.split('/').pop()}</kbd> to cast · <kbd>Esc</kbd> / right click to cancel`;
+  dom.aimHint.innerHTML = `<b>${s.name}</b> · <kbd>Click</kbd> or <kbd>${s.label}</kbd> to cast · <kbd>Esc</kbd> / right click to cancel`;
   dom.aimHint.style.display = 'block';
   updateAiming();
 }

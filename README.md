@@ -58,7 +58,8 @@ and every boss has telegraphed attacks to read and dodge.
 </p>
 
 **Gear.** Weapons, armour and trinkets with stat bonuses, each piece with its own rolled rarity (Common to Legendary)
-that scales its stats. Monsters drop food, materials and gear; quick keys `6` `7` `8` use food and tonics mid-fight.
+that scales its stats. Monsters drop food, materials and gear. Food, tonics and gear land on the hotbar (`1`–`9`) at the
+bottom of the screen: hold one, then use it (eat, drink or equip) mid-fight.
 
 <p>
   <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab">
@@ -69,10 +70,20 @@ that scales its stats. Monsters drop food, materials and gear; quick keys `6` `7
 grow with you, take commands (follow, stay, attack, passive), have an ability of their own, can be renamed and petted,
 and new ones are found through quests and chests: an owl, a wolf, a fox, a wisp and a dragon whelp.
 
+<p>
+  <img src="docs/screenshots/keys.jpg" width="49%" alt="Settings: Keys">
+  <img src="docs/screenshots/controls.jpg" width="49%" alt="The Controls page">
+</p>
+
+**Your keys.** The HUD keeps the hotbar and vitals at the bottom centre, skills on the lower right and your pet on the
+lower left. Every action can be remapped in Settings → Keys, and every key hint in the game follows your bindings.
+
 ## What's new
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **A new HUD:** a Minecraft-style hotbar on `1`–`9` with vitals above it, skills on the lower right on letter keys,
+  every key remappable, and new type chosen for the game's storybook feel ([docs/typography.md](docs/typography.md)).
 - **Pets:** five pets with commands, abilities, levels, health and fainting, naming and petting; any hero, any pet.
 - **Better items:** equipment slots, rarity-scaled gear, monster drops, crafting, per-item art, quick-use keys.
 - **Treasure chests:** loot tables, locked chests and keys, a boss chest that holds the trophy.
@@ -112,19 +123,22 @@ gets a scene in `scripts/screenshots.mjs` and a spot in the tour above.
 
 ### Controls
 
+Every key except the number row and `Esc` can be remapped in **Settings → Keys** (a key that's already in use swaps
+over). The defaults:
+
 | Key | Action |
 |---|---|
 | `W A S D` / arrows | move (camera-relative) |
 | `Shift` | sprint |
 | `Space` | jump (hold for a floatier rise) |
-| `E` / `X` | talk, advance, accept / decline |
-| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
-| `6` `7` `8` | quick-use the food or tonic on that key (set with the bag's Quick buttons) |
+| click / `Z` | skill 1: the basic attack (hold to repeat) |
+| `Q` `R` `F` | skills 2–4 |
+| `G` | skill 5, the ultimate: a marker follows the cursor; click (or `G` again) to cast there, `Esc` / right click cancels |
+| `1` – `9` | hold the item in that hotbar slot (or click it); press the number again, or right click, to use it |
+| `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them) |
+| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag, Craft and Pets tabs) |
 | `T` | pet command: follow → stay → attack my target → passive |
 | `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
-| `E` beside your pet (standing still) | pet them |
-| `1-4`, `Q R F`, click | abilities (`1` / click can be held to repeat) |
-| `5` / `G` | ultimate: a marker follows the cursor; click (or `5` / `G` again) to cast there, `Esc` / right click cancels |
 | drag / wheel | rotate / zoom camera |
 | `Esc` / `P` | pause menu: resume, settings, controls, quit (Esc first closes the bag, aiming or dialogue) |
 | `H` | show / hide the controls panel (it folds away by itself after a while) |
@@ -139,8 +153,9 @@ styles/main.css            all styling
 scripts/serve.mjs          zero-dependency dev server
 scripts/screenshots.mjs    retakes the README screenshots (headless Chrome)
 docs/screenshots/          the README screenshots
+docs/typography.md         the type brief, the pairings compared (type-specimen.html) and the choice
 tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
-                           heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets
+                           heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds
 src/
 ├── main.js                entry point: builds the Game, starts the loop, exposes window.LANTERNMOSS
 ├── errorOverlay.js        classic script that shows load/runtime errors on screen
@@ -151,11 +166,11 @@ src/
 │   ├── pets.js            every pet: body, attack, ability, unlock; pet growth, care, commands, keys, motion
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
-│   │                      stats, quick-use keys, effects, bag size and pickup settings
+│   │                      stats, the hotbar, effects, bag size and pickup settings
 │   ├── crafting.js        crafting recipes (materials + coins -> food, tonics, keys, gear)
 │   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips, selection profile)
 │   ├── settings.js        player settings schema (drives the Settings screen, defaults and validation)
-│   ├── controls.js        the fixed key list shown on the pause menu's Controls page
+│   ├── controls.js        every key: the remappable KEYBINDS (defaults), hotbar keys, fixed controls, key-cap labels
 │   ├── credits.js         the Credits page text
 │   ├── day.js             the village clock: day length, phases, light per phase
 │   ├── shop.js            coins per monster, the shop's keeper, hours, stock and prices
@@ -170,6 +185,7 @@ src/
 │   ├── GameLoop.js        requestAnimationFrame loop with a clamped timestep
 │   ├── context.js         the shared live state (time, player, enemies, NPCs, paused...)
 │   ├── settings.js        live player settings: validated, saved to localStorage, change listeners
+│   ├── keybinds.js        live key bindings: is / held / labels, remapping with swaps, saved to localStorage
 │   ├── events.js          game-wide events (quest completed, chest opened) other systems react to
 │   └── controls.js        key bindings: what each input does
 ├── systems/               engine-level services
@@ -248,8 +264,8 @@ src/
 │   ├── loot.js            rolling a loot table into coins and item stacks (gear with a rolled rarity)
 │   ├── drops.js           monster drops
 │   ├── equipment.js       what the hero wears; the hero's stats = base + level + gear
-│   ├── quickSlots.js      quick-use keys 6-8
-│   ├── bagCommands.js     what the bag window can ask the game to do (use, equip, craft, quick keys...)
+│   ├── hotbar.js          the hotbar (keys 1-9): which slot the hero holds, using what's held
+│   ├── bagCommands.js     what the bag window can ask the game to do (use, equip, craft, pets...)
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
@@ -262,7 +278,8 @@ src/
 │                          InventoryUI + itemTooltip (the bag window: gear, Craft and Pets tabs), itemArt (SVG item
 │                          pictures), petHud (the pet card beside the ability bar),
 │                          itemNotices (item toasts),
-│                          overlay (planet chip), toast, character select (reached from the title, or C in play)
+│                          overlay (planet chip), toast, character select (reached from the title, or C in play).
+│                          HUD layout: vitals + hotbar bottom centre, skills lower right, pet card lower left, boss bar top
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
 ```
 
@@ -281,7 +298,7 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
 
 **Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → world items → combat (vitals, casting +
 area aim, aim, projectiles, enemies, hazards, pet body, pet system, effects, combat HUD) → planet progression → challenges,
-quests, shop, houses, chests, quick keys → knight upkeep → menu orbit → camera → compass → day clock → world → particles and
+quests, shop, houses, chests, hotbar → knight upkeep → menu orbit → camera → compass → day clock → world → particles and
 emotes → dialogue → overlay, buffs, toast, pet card. Rendering follows each update.
 
 **Dependencies flow one way:** `config` and `utils` depend on nothing. `render` and `physics` build on them, and
@@ -349,7 +366,9 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | Crafting recipes | `src/config/crafting.js` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
-| Quick-use keys and their cooldown | `src/config/items.js` → `QUICK_SLOTS` |
+| Default keys, hotbar keys | `src/config/controls.js` → `KEYBINDS`, `HOTBAR_KEYS` |
+| Hotbar size, use cooldown, which items land on it first | `src/config/items.js` → `HOTBAR` |
+| Fonts | `styles/main.css` → `--font-display`, `--font-body` (and the font link in `index.html`; see `docs/typography.md`) |
 | How many chests each planet has, its loot material | `src/config/planets.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
@@ -382,8 +401,11 @@ stat in `STATS`): damage, max HP / mana, regeneration, armour and move speed.
 **Crafting.** The bag's Craft tab lists every recipe the hero can use (`config/crafting.js`): Glowcaps, Ember Shards
 and Frost Petals become tonics, stews, draughts, Lantern Keys and gear. Crafted gear comes out at a set rarity.
 
-**Quick keys.** `6`, `7` and `8` each use a consumable straight from the bag. Snacks you pick up fill an empty key by
-themselves; select one in the bag and press **Quick 6/7/8** to choose.
+**The hotbar.** The hero's inventory is one list of slots: the first nine are the hotbar along the bottom of the screen,
+the rest is the bag (so counts for quests, crafting and keys cover both). Food, tonics and gear land on the hotbar first,
+everything else in the bag (`hotbarFirst` in `inventory/Inventory.js`). `1`–`9` hold a slot; pressing the held slot's
+number again, or a right click, uses it: food is eaten, gear equipped (whatever was worn takes its slot). Move things
+between the bag and its hotbar row in the bag window.
 
 **Using items.** `I` opens the bag. Movement still works, but abilities and talking pause. Click an item to select it,
 click another slot to move, merge or swap, and double-click or **Use** / **Equip** to use it. Behaviour comes from

@@ -75,7 +75,6 @@ export const PET_COMMANDS = {
   attack:  { label: 'Attack', text: 'goes after your target, whatever it is' },
   passive: { label: 'Passive', text: 'stays close and never fights' },
 };
-export const PET_KEYS = { command: 'KeyT', ability: 'KeyV' };
 
 /** How pets move. fly: shoulder height and swoop speed; walk: the heel spot beside and behind the hero. */
 export const PET_MOTION = {

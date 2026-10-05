@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { HOUSES, INTERACTIONS, REST } from '../config/houses.js';
 import { DAY } from '../config/day.js';
 import { ctx } from '../core/context.js';
+import { held } from '../core/keybinds.js';
 import { emote } from '../fx/emotes.js';
 import { sparkles } from '../fx/sparkles.js';
 import { buildGranny, buildLibrarian } from '../models/villagers.js';
@@ -115,10 +116,10 @@ export const Houses = {
     const s = this.inside; if (!s) return false;
     let f = 0, side = 0;
     if (!ctx.transitioning && !ctx.inventoryOpen) {
-      if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1;
-      if (keys.KeyD || keys.ArrowRight) side += 1; if (keys.KeyA || keys.ArrowLeft) side -= 1;
+      if (held('moveForward', keys)) f += 1; if (held('moveBack', keys)) f -= 1;
+      if (held('moveRight', keys)) side += 1; if (held('moveLeft', keys)) side -= 1;
     }
-    const len = Math.hypot(f, side) || 1, speed = keys.ShiftLeft || keys.ShiftRight ? RUN : WALK;
+    const len = Math.hypot(f, side) || 1, speed = held('sprint', keys) ? RUN : WALK;
     const k = damp(12, dt); s.vx += (side / len * speed - s.vx) * k; s.vz += (-f / len * speed - s.vz) * k;
     s.x += s.vx * dt; s.z += s.vz * dt;
     for (const o of s.room.obstacles) {                              // slide around furniture

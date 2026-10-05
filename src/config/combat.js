@@ -10,17 +10,17 @@ export const COMBAT = {
   autoAimAngle: 35,            // soft lock-on cone (degrees either side of the camera direction)
   autoAimRange: 20,
   castFaceTime: 0.35,          // seconds the magician keeps facing her target after casting
-  spells: {                    // label = shown on the spell bar; keys = KeyboardEvent.code; mouse = left click; repeat = hold to keep casting
-    bolt:     { name: 'Arcane Bolt', label: '1', keys: ['Digit1'], mouse: true, repeat: true, color: 0xd49bff,
+  spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
+    bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
-    fireball: { name: 'Fireball', label: '2/Q', keys: ['Digit2', 'KeyQ'], color: 0xff9a4a,
+    fireball: { name: 'Fireball', color: 0xff9a4a,
                 cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 },
-    nova:     { name: 'Frost Nova', label: '3/R', keys: ['Digit3', 'KeyR'], color: 0x9fe8ff,
+    nova:     { name: 'Frost Nova', color: 0x9fe8ff,
                 cost: 28, cooldown: 8, damage: 12, radius: 4.5, slow: 0.55, slowTime: 3.5, knockback: 4 },
-    blink:    { name: 'Blink', label: '4/F', keys: ['Digit4', 'KeyF'], color: 0xbff4ff,
+    blink:    { name: 'Blink', color: 0xbff4ff,
                 cost: 15, cooldown: 3, distance: 6.5, invuln: 0.35 },            // evasion: was 5 s
     // ultimate (src/combat/abilities/ultimates.js): aim a spot (target: 'ground'), the meteor lands `delay` s later
-    meteor:   { name: 'Meteor', label: '5/G', keys: ['Digit5', 'KeyG'], color: 0xff7a3a, ult: true, target: 'ground',
+    meteor:   { name: 'Meteor', color: 0xff7a3a, ult: true, target: 'ground',
                 cost: 40, cooldown: 30, damage: 110, range: 18, radius: 5.5, delay: 1.1, falloff: 0.35, knockback: 9,
                 burn: { duration: 3, tick: 0.5, damage: 5 } },                   // the crater keeps burning for a moment
   },

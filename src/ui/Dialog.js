@@ -2,6 +2,7 @@
    ({hero} {planet}...), an optional yes/no choice; closes when the hero walks away. A sleeping villager wakes up
    with a yawn first. */
 import { ctx } from '../core/context.js';
+import { bindKbd, bindLabel } from '../core/keybinds.js';
 import { fillStory } from '../gameplay/storyState.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dom } from './dom.js';
@@ -36,8 +37,8 @@ export const Dialog = {
     dom.dlgFace.style.display = kind ? 'block' : 'none';
     if (kind) { dom.dlgFace.innerHTML = portrait(kind, line.e ?? guessExpression(this.text), this.npc.def.color); dom.dialog.classList.add('face'); }
     else dom.dialog.classList.remove('face');
-    dom.dlgText.textContent = ''; dom.dlgNext.style.display = 'none'; dom.choices.classList.remove('show');
-    if (this.choice) { dom.yes.innerHTML = `<kbd>E</kbd> ${this.choice.yes}`; dom.no.innerHTML = `<kbd>X</kbd> ${this.choice.no}`; }
+    dom.dlgText.textContent = ''; dom.dlgNext.style.display = 'none'; dom.dlgNext.textContent = `▼ ${bindLabel('interact')}`; dom.choices.classList.remove('show');
+    if (this.choice) { dom.yes.innerHTML = `${bindKbd('interact')} ${this.choice.yes}`; dom.no.innerHTML = `${bindKbd('decline')} ${this.choice.no}`; }
     dom.dialog.classList.remove('show'); void dom.dialog.offsetWidth; dom.dialog.classList.add('show');
     if (line.a) line.a(this.npc);
   },

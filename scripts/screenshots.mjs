@@ -104,6 +104,13 @@ try {
   await page.click('[data-tab="pets"]'); await wait(1500); await shot('pets');
   await run(() => { const L = window.LANTERNMOSS; L.InventoryUI.close(); L.Pets.choose('whelp'); });
 
+  // the pause menu: Settings → Keys (remapping), and the Controls page
+  await run(() => window.LANTERNMOSS.PauseMenu.open()); await wait(800);
+  await page.click('[data-go="settings"]'); await wait(800);
+  await run(() => document.querySelector('#pause .keys h4:nth-of-type(2)')?.scrollIntoView({ block: 'start' })); await wait(600); await shot('keys');
+  await page.click('[data-go="main"]'); await wait(400); await page.click('[data-go="controls"]'); await wait(800); await shot('controls');
+  await run(() => window.LANTERNMOSS.PauseMenu.close()); await wait(600);
+
   // bosses: Pyrrhax on Emberfall, then Malgrath on Frostveil
   for (const [planet, name, turn] of [[1, 'boss-dragon', -0.5], [2, 'boss-demon', 0.45]]) {
     await run(p => window.LANTERNMOSS.goToPlanet(p), planet); await wait(4000);

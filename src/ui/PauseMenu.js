@@ -2,19 +2,21 @@
    (Game.update skips while ctx.paused; the scene keeps rendering), ducks the audio and releases held keys.
    Pages:
      main      Resume · Settings · Controls · Quit to menu
-     settings  generated from SETTINGS_SCHEMA (config/settings.js); changes apply and save immediately
-     controls  the fixed keys (config/controls.js) + the current hero's abilities (CHARACTERS), never out of date
+     settings  generated from SETTINGS_SCHEMA (config/settings.js); changes apply and save immediately. Its Keys section
+               remaps any KEYBINDS action (click one, press the new key; a key already in use swaps over)
+     controls  the current keybinds, the fixed keys (config/controls.js) and the hero's abilities, never out of date
      quit      confirmation: going back to the menu restarts the adventure (there is no saving yet)
      credits   who made it (config/credits.js); title screen only
    Esc on a sub-page goes back to the main page; Esc / P on the main page resumes.
    The title screen opens single pages with openPanel(page) (no pausing): Back / Esc closes the panel again. */
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
-import { AIM_CONTROLS, FIXED_CONTROLS } from '../config/controls.js';
+import { AIM_CONTROLS, FIXED_CONTROLS, KEYBINDS, keyLabel } from '../config/controls.js';
 import { CREDITS } from '../config/credits.js';
 import { PLANETS } from '../config/planets.js';
 import { SETTINGS_SCHEMA } from '../config/settings.js';
 import { cancelAim } from '../combat/aiming.js';
 import { ctx } from '../core/context.js';
+import { bindKbd, bindLabel, bindable, is, rebind, resetBinds } from '../core/keybinds.js';
 import { resetSettings, setSetting, settings } from '../core/settings.js';
 import { audio } from '../systems/AudioSystem.js';
 import { releaseAllKeys } from '../systems/InputSystem.js';
@@ -32,6 +34,19 @@ function settingControl(def) {
   return `<input type="range" min="${def.min}" max="${def.max}" step="${def.step}" value="${v}" data-set="${def.key}"><output>${fmt(def, v)}</output>`;
 }
 
+const BIND_GROUPS = [...new Set(KEYBINDS.map(b => b.group))];
+/** The Keys section of the Settings page: every remappable action, grouped. */
+function keysSection() {
+  const rows = g => KEYBINDS.filter(b => b.group === g).map(b => `<div class="row"><span>${b.label}</span><span class="ctl">` +
+    `<button type="button" class="bind ${PauseMenu.capture === b.id ? 'listening' : ''}" data-bind="${b.id}">` +
+    `${PauseMenu.capture === b.id ? 'Press a key…' : bindLabel(b.id, true)}</button></span></div>`).join('');
+  return `<section class="keys"><h3>Keys</h3><p class="note">Click an action, then press its new key (<kbd>Esc</kbd> cancels). A key
+    that's already in use swaps over. <kbd>1</kbd>–<kbd>9</kbd> (the hotbar) and <kbd>Esc</kbd> can't be taken.</p>
+    ${BIND_GROUPS.map(g => `<h4>${g}</h4>${rows(g)}`).join('')}
+    ${PauseMenu.bindMsg ? `<p class="bindmsg">${PauseMenu.bindMsg}</p>` : ''}
+    <div class="menu"><button type="button" class="quiet" data-go="reset-keys">Reset keys</button></div></section>`;
+}
+
 const PAGES = {
   main: () => {
     const hero = CHARACTERS[ctx.player.charId];
@@ -44,7 +59,7 @@ const PAGES = {
       </div><div class="foot"><kbd>Esc</kbd> resume</div>`;
   },
   settings: () => `<h2>Settings</h2><div class="scroll">${SETTINGS_SCHEMA.map(g => `<section><h3>${g.group}</h3>${g.items.map(def =>
-      `<div class="row"><span>${def.label}</span><span class="ctl">${settingControl(def)}</span></div>`).join('')}</section>`).join('')}</div>
+      `<div class="row"><span>${def.label}</span><span class="ctl">${settingControl(def)}</span></div>`).join('')}</section>`).join('')}${keysSection()}</div>
     <div class="menu row2"><button type="button" class="quiet" data-go="reset">Reset to defaults</button><button type="button" class="primary" data-go="main">Back</button></div>
     <div class="foot">Changes apply right away and are remembered on this device · <kbd>Esc</kbd> back</div>`,
   controls: () => {
@@ -52,12 +67,16 @@ const PAGES = {
       `<div class="krow ab"><span class="keys">${keys(s.label.split('/'))}${s.mouse ? ' <kbd>Click</kbd>' : ''}</span>
         <span class="ic" style="--c:#${s.color.toString(16).padStart(6, '0')}">${icon(id)}</span><span><b>${s.name}</b>${s.ult ? ' <em>ultimate</em>' : ''}<small>${ABILITY_TEXT[id] ?? ''}</small></span></div>`).join('');
     const rows = list => list.map(([k, what]) => `<div class="krow"><span class="keys">${keys(k)}</span><span>${what}</span></div>`).join('');
+    const bound = g => KEYBINDS.filter(b => b.group === g && g !== 'Skills').map(b => `<div class="krow"><span class="keys">${bindKbd(b.id, true)}</span><span>${b.label}</span></div>`).join('');
+    const skillKeys = KEYBINDS.filter(b => b.group === 'Skills').map(b => bindKbd(b.id)).join(' ');
     const heroPart = ctx.started ? `<section class="wide"><h3>${hero.title}'s abilities</h3>${abilities}${rows(AIM_CONTROLS)}</section>`
-      : `<section class="wide"><h3>Abilities</h3><p class="note">Each hero has five abilities on <kbd>1</kbd>–<kbd>5</kbd> (and <kbd>Q</kbd> <kbd>R</kbd> <kbd>F</kbd> <kbd>G</kbd>).
-         You'll see them on the character cards, on the ability bar (hover for details), and here during play.</p>${rows(AIM_CONTROLS)}</section>`;
+      : `<section class="wide"><h3>Abilities</h3><p class="note">Each hero has five skills on ${skillKeys} (the first one on click too; the last is the
+         ultimate). You'll see them on the character cards, on the skill bar (hover for details), and here during play.</p>${rows(AIM_CONTROLS)}</section>`;
     return `<h2>Controls</h2><div class="scroll cols">
       ${heroPart}
-      ${FIXED_CONTROLS.map(g => `<section><h3>${g.group}</h3>${rows(g.rows)}</section>`).join('')}</div>
+      ${BIND_GROUPS.filter(g => g !== 'Skills').map(g => `<section><h3>${g}</h3>${bound(g)}</section>`).join('')}
+      ${FIXED_CONTROLS.map(g => `<section><h3>${g.group}</h3>${rows(g.rows)}</section>`).join('')}
+      <p class="note wide">Change any of these in Settings → Keys.</p></div>
       <div class="menu"><button type="button" class="primary" data-go="main">Back</button></div><div class="foot"><kbd>Esc</kbd> back</div>`;
   },
   quit: () => `<h2>Quit to menu?</h2><p class="warn">Your adventure restarts from the first planet: your level, bag and progress on
@@ -70,6 +89,7 @@ const PAGES = {
 
 export const PauseMenu = {
   isOpen: false, page: 'main', handlers: null, panel: false,
+  capture: null, bindMsg: '',      // the action waiting for its new key (Settings → Keys), and the last remap's note
   /** handlers.onQuit() returns to the main menu (it restarts the adventure); onPanelClosed() after a title-screen panel. */
   init(handlers) {
     this.handlers = handlers;
@@ -92,7 +112,7 @@ export const PauseMenu = {
   },
   close() {
     if (!this.isOpen) return;
-    this.isOpen = false; dom.pause.style.display = 'none';
+    this.isOpen = false; dom.pause.style.display = 'none'; this.capture = null; this.bindMsg = '';
     if (this.panel) { this.panel = false; this.handlers.onPanelClosed?.(); return; }
     ctx.paused = false; audio.duck(false); document.body.classList.remove('paused');
   },
@@ -102,13 +122,29 @@ export const PauseMenu = {
     this.page = page; dom.pause.innerHTML = `<div class="panel ${page}">${PAGES[page]()}</div>`;
     if (same) { const sc = dom.pause.querySelector('.scroll'); if (sc) sc.scrollTop = scroll; } else dom.pause.querySelector('.primary')?.focus();
   },
-  /** Keys while paused (play input is ignored). */
+  /** Keys while paused (play input is ignored). While an action waits for its new key, the key goes to it. */
   key(code) {
+    if (this.capture) { this.assign(code); return; }
     if (code === 'Escape') { if (this.page === 'main' || this.panel) this.close(); else this.show('main'); }
-    else if (code === 'KeyP' && this.page === 'main') this.close();
+    else if (is('pause', code) && this.page === 'main') this.close();
+  },
+  /** Gives the waiting action `code`. */
+  assign(code) {
+    const id = this.capture; this.capture = null;
+    const label = KEYBINDS.find(b => b.id === id).label;
+    if (code === 'Escape') this.bindMsg = '';
+    else if (!bindable(code)) this.bindMsg = `${keyLabel(code)} can't be used: ${/^Digit/.test(code) ? 'the number keys hold hotbar items' : 'it is reserved'}.`;
+    else {
+      const swapped = rebind(id, code);
+      this.bindMsg = `${label}: ${keyLabel(code)}${swapped ? ` (${KEYBINDS.find(b => b.id === swapped).label} moved to ${bindLabel(swapped)})` : ''}.`;
+    }
+    this.show('settings');
   },
   onClick(e) {
-    const go = e.target.closest('[data-go]')?.dataset.go, set = e.target.closest('button[data-set]');
+    const go = e.target.closest('[data-go]')?.dataset.go, set = e.target.closest('button[data-set]'), bind = e.target.closest('button[data-bind]');
+    if (bind) { this.capture = this.capture === bind.dataset.bind ? null : bind.dataset.bind; this.bindMsg = ''; this.show('settings'); return; }
+    this.capture = null;
+    if (go === 'reset-keys') { resetBinds(); this.bindMsg = 'Keys are back to their defaults.'; this.show('settings'); return; }
     if (go === 'resume') this.close();
     else if (go === 'confirm-quit') { this.close(); this.handlers.onQuit(); }
     else if (go === 'reset') { resetSettings(); this.show('settings'); }

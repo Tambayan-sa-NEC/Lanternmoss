@@ -2,18 +2,23 @@
    row (buffs, Guard, regeneration), the ability bar (drawn icons, cooldown sweep + seconds left, a flash when a move is
    ready again, the ultimate in its own gold slot, a hover tooltip), floating enemy health bars, the boss bar (phase
    ticks, damage trail, a flash when a phase starts), the lock-on reticle, the collapsible controls panel and UI scale,
-   and the quick-use bar (keys 6-8: src/gameplay/quickSlots.js). */
+   and the hotbar (keys 1-9: src/gameplay/hotbar.js).
+   Layout: vitals (health, level, mana / stamina / focus, XP) above the hotbar at the bottom centre, skills on the
+   lower right, the pet card on the lower left (ui/petHud.js), the boss bar at the top. */
 import * as THREE from 'three';
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
-import { QUICK_SLOTS } from '../config/items.js';
+import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
+import { HOTBAR, RARITIES } from '../config/items.js';
 import { PLANET_RADIUS as R } from '../config/game.js';
 import { ctx } from '../core/context.js';
 import { setSetting, settings } from '../core/settings.js';
 import { aim } from '../combat/aiming.js';
 import { ENGAGED } from '../entities/enemies/states.js';
 import { buffs } from '../gameplay/buffs.js';
-import { Quick } from '../gameplay/quickSlots.js';
+import { bindKbd, onBindsChange } from '../core/keybinds.js';
+import { Hotbar } from '../gameplay/hotbar.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
+import { itemRarity } from '../items/gear.js';
 import { damageMultiplier, xpToNext } from '../progression/leveling.js';
 import { camera } from '../render/scene.js';
 import { clamp } from '../utils/math.js';
@@ -60,32 +65,54 @@ export function buildSpellBar(abilities) {
     dom.spells.appendChild(el); slots[id] = { el, cd: el.querySelector('.cd'), cdt: el.querySelector('.cdt'), was: 0, text: '' };
   }
 }
-// ---------------------------------------------------------------- quick-use bar
-let quick = [];
-export function buildQuickBar() {
-  dom.quick.innerHTML = '';
-  quick = QUICK_SLOTS.labels.map((label, i) => {
-    const el = document.createElement('div'); el.className = 'qslot empty';
-    el.innerHTML = `<kbd>${label}</kbd><div class="qi"></div><span class="qn"></span><div class="cd"></div>`;
-    el.addEventListener('click', () => Quick.use(i)); dom.quick.appendChild(el);
-    return { el, qi: el.querySelector('.qi'), qn: el.querySelector('.qn'), cd: el.querySelector('.cd'), id: undefined, n: -1 };
+// ---------------------------------------------------------------- hotbar
+let hot = [];
+export function buildHotbar() {
+  dom.hotbar.innerHTML = '';
+  hot = HOTBAR_KEYS.slice(0, HOTBAR.size).map((code, i) => {
+    const el = document.createElement('div'); el.className = 'hslot';
+    el.innerHTML = `<kbd>${keyLabel(code)}</kbd><div class="hi"></div><span class="hn"></span><div class="cd"></div>`;
+    el.addEventListener('click', () => Hotbar.select(i)); dom.hotbar.appendChild(el);
+    return { el, hi: el.querySelector('.hi'), hn: el.querySelector('.hn'), cd: el.querySelector('.cd'), key: '' };
   });
 }
-function updateQuickBar() {
-  quick.forEach((q, i) => {
-    const id = Quick.ids[i];
-    if (id !== q.id) {
-      q.id = id; q.el.classList.toggle('empty', !id);
-      q.qi.innerHTML = id ? itemIconHtml(itemRegistry.get(id)) : '';
-      q.el.title = id ? `${itemRegistry.get(id).name} (key ${QUICK_SLOTS.labels[i]})` : `Quick slot ${QUICK_SLOTS.labels[i]}: choose a food or tonic in the bag`;
+let heldKey = '';
+function updateHotbar() {
+  const inv = ctx.player.inventory;
+  hot.forEach((h, i) => {
+    const s = inv.getSlot(i), def = s && itemRegistry.get(s.itemId), key = s ? `${s.itemId}|${s.quantity}|${s.props?.rarity ?? ''}` : '';
+    if (key !== h.key) {
+      h.key = key; h.el.classList.toggle('filled', !!s);
+      h.hi.innerHTML = def ? itemIconHtml(def) : ''; h.hn.textContent = s && s.quantity > 1 ? s.quantity : '';
+      const r = def && itemRarity(def, s.props); h.el.style.setProperty('--rc', r && r !== 'common' ? RARITIES[r].color : 'transparent');
+      h.el.title = def ? def.name : '';
     }
-    const n = Quick.count(i);
-    if (n !== q.n) { q.n = n; q.qn.textContent = id ? n : ''; q.el.classList.toggle('out', !!id && !n); }
-    q.cd.style.transform = `scaleY(${Quick.cd / QUICK_SLOTS.cooldown})`;
+    h.el.classList.toggle('held', i === Hotbar.selected);
+    h.cd.style.transform = `scaleY(${i === Hotbar.selected ? Hotbar.cd / HOTBAR.useCooldown : 0})`;
   });
+  // the held item's name, for a moment after it changes (like Minecraft)
+  const def = Hotbar.heldDef(), s = Hotbar.held(), name = def ? def.name : '', k = `${Hotbar.selected}|${name}`;
+  if (k !== heldKey) { heldKey = k; Hotbar.changedAt = ctx.time; dom.heldName.textContent = name; dom.heldName.style.color = def ? RARITIES[itemRarity(def, s.props)].color : ''; }
+  dom.heldName.classList.toggle('show', !!def && ctx.time - Hotbar.changedAt < 2.2);
 }
 
-export function setSkillHint(html) { dom.hintSkills.innerHTML = html; }
+// ---------------------------------------------------------------- the controls panel (top left), from the live keybinds
+let hintAbilities = null;
+const join = list => list.map(([k, what]) => `<span class="hk">${k} ${what}</span>`).join(' ');
+function renderHint() {
+  const a = hintAbilities ? Object.values(hintAbilities) : [];
+  dom.hintKeys.innerHTML =
+    `<div>${join([[`${bindKbd('moveForward')}${bindKbd('moveLeft')}${bindKbd('moveBack')}${bindKbd('moveRight')}`, 'move'], [bindKbd('sprint'), 'sprint'], [bindKbd('jump'), 'jump']])}</div>` +
+    `<div>${join([[bindKbd('interact'), 'talk / use'], [bindKbd('decline'), 'decline'], [bindKbd('bag'), 'bag'], ['<kbd>1</kbd>–<kbd>9</kbd>', 'hold item'], ['<kbd>RMB</kbd>', 'use it']])}</div>` +
+    `<div>${join([[bindKbd('petCommand'), 'pet command'], [bindKbd('petAbility'), 'pet ability'], [bindKbd('mute'), 'mute'], [bindKbd('heroSelect'), 'change hero']])}</div>` +
+    `<div>${join([['<kbd>Drag</kbd>', 'camera'], ['<kbd>Wheel</kbd>', 'zoom']])}</div>` +
+    (a.length ? `<div class="hs">${join(a.map(s => [`${s.mouse ? '<kbd>Click</kbd>/' : ''}<kbd>${s.label}</kbd>`, s.name.toLowerCase()]))}</div>` : '');
+  dom.hintHide.innerHTML = `${bindKbd('toggleHint')} hide`; dom.hintMini.innerHTML = `${bindKbd('toggleHint')} Controls`;
+}
+/** The hero's abilities for the controls panel. */
+export function setSkillHint(abilities) { hintAbilities = abilities; renderHint(); }
+onBindsChange(() => { renderHint(); if (hintAbilities) buildSpellBar(hintAbilities); });
+renderHint();
 
 const titleCase = w => w.charAt(0) + w.slice(1).toLowerCase();
 /** Tooltip body: what the ability does, its key, numbers at the hero's current level, cost and cooldown. */
@@ -166,7 +193,7 @@ function screenPos(p, el) {
 /** The planet boss's big health bar: shown while it fights or the hero is near its lair. Ticks mark its phase thresholds. */
 function updateBossBar(dt) {
   const b = ctx.boss, show = !!b && b.alive && (ENGAGED.has(b.state) || b.pos.distanceTo(ctx.player.pos) < 24);
-  dom.bossBar.style.display = show ? 'block' : 'none';
+  dom.bossBar.style.display = show ? 'block' : 'none'; document.body.classList.toggle('bossfight', show);
   if (!show) return;
   if (b !== boss.ref) {                                                        // a new boss: lay out its phase ticks
     boss.ref = b; boss.phase = b.bossPhase; boss.k = boss.trail = b.hp / b.def.hp;
@@ -206,7 +233,8 @@ export function updateCombatHud(dt, spellState, aimTarget) {
   setBar(bars.mp, P.mana / C.maxMana, `${Math.floor(P.mana)} / ${C.maxMana}`, dt);
   const need = xpToNext(P.level);
   setBar(bars.xp, need ? P.xp / need : 1, need ? `${P.xp} / ${need}` : 'MAX', dt);
-  updateQuickBar();
+  updateHotbar();
+  dom.combat.classList.toggle('talking', dom.dialog.classList.contains('show'));   // the dialogue box takes the bottom centre
   if (shownLevel !== P.level) { if (shownLevel) flashEl(dom.level.parentElement, 'pop'); shownLevel = P.level; dom.level.textContent = P.level; }
   const low = !P.dead && P.hp / C.maxHp < HUD.lowHp;
   bars.hp.el.classList.toggle('low', low); dom.lowHp.classList.toggle('on', low);

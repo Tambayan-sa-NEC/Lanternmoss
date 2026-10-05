@@ -35,7 +35,7 @@ export function equipFromSlot(inv, slot) {
   if (problem) return { ok: false, message: problem };
   const where = def.equip.slot, taken = inv.removeFromSlot(slot, 1), prev = P.equipment[where];
   P.equipment[where] = { itemId: taken.itemId, props: taken.props };
-  if (prev) inv.add(prev.itemId, 1, prev.props);                     // the slot it came from is free now
+  if (prev && !inv.insertAt(slot, prev.itemId, 1, prev.props)) inv.add(prev.itemId, 1, prev.props);   // swapped into the slot it came from
   refreshStats(P); audio.clang();
   inv.notify('change', { slots: [slot] });
   return { ok: true, message: prev ? `Equipped ${def.name} (${itemRegistry.get(prev.itemId).name} went back in the bag).` : `Equipped ${def.name}.` };

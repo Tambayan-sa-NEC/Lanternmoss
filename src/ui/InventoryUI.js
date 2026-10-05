@@ -4,14 +4,17 @@
      Bag    the grid, the worn gear (weapon / armour / trinket: click one to take it off) with the stats it adds, and
             the details of the hovered or selected item. Selection works like a simple drag-and-drop: click an item,
             then click where it should go (empty slot = move, same item = merge, different item = swap).
-            Double-click or the first button uses / equips it; "Quick 6/7/8" puts a consumable on a quick key.
+            Double-click or the first button uses / equips it. Under the grid is the hotbar row (the same slots as the
+            hotbar at the bottom of the screen, keys 1-9): move things there to hold them.
     Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have.
     Pets   every pet (config/pets.js): take one along, rename it, give it a command; locked ones say how to find them. */
 import { CHARACTERS } from '../config/characters.js';
 import { RECIPES } from '../config/crafting.js';
-import { PET_COMMANDS, PET_KEYS, PETS } from '../config/pets.js';
-import { EQUIP_SLOTS, INVENTORY, QUICK_SLOTS, RARITIES } from '../config/items.js';
+import { PET_COMMANDS, PETS } from '../config/pets.js';
+import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
+import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { ctx } from '../core/context.js';
+import { bindKbd } from '../core/keybinds.js';
 import { craftProblem, recipesFor, requirements } from '../items/crafting.js';
 import { formatStat, gearTotals } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
@@ -47,21 +50,22 @@ export const InventoryUI = {
     }
     this.gearStats = document.createElement('div'); this.gearStats.className = 'inv-gear-stats'; gear.appendChild(this.gearStats);
     root.querySelector('.inv-body').before(gear); this.gearRow = gear;
-    // the grid
+    // the bag grid (inventory slots HOTBAR.size and up) and, under it, the hotbar row (slots 0 .. HOTBAR.size - 1)
     dom.invGrid.style.setProperty('--cols', INVENTORY.columns);
-    for (let i = 0; i < inventory.size; i++) {
+    const hotRow = document.createElement('div'); hotRow.className = 'inv-hotbar';
+    hotRow.innerHTML = '<div class="inv-hot-label">Hotbar</div>';
+    const hotGrid = document.createElement('div'); hotGrid.className = 'inv-hot-grid'; hotRow.appendChild(hotGrid);
+    const left = document.createElement('div'); left.className = 'inv-left'; dom.invGrid.before(left); left.append(dom.invGrid, hotRow);
+    const slotEl = (i, parent) => {
       const el = document.createElement('button'); el.className = 'inv-slot'; el.type = 'button';
       el.addEventListener('mouseenter', () => { this.hovered = i; this.renderDetail(); });
       el.addEventListener('mouseleave', () => { if (this.hovered === i) { this.hovered = -1; this.renderDetail(); } });
       el.addEventListener('click', () => this.clickSlot(i));
       el.addEventListener('dblclick', () => this.use(i));
-      dom.invGrid.appendChild(el); this.slotEls.push(el);
-    }
-    // quick-slot buttons
-    for (let i = 0; i < QUICK_SLOTS.keys.length; i++) {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'inv-quick'; b.textContent = `Quick ${QUICK_SLOTS.labels[i]}`;
-      b.addEventListener('click', () => this.quick(i)); dom.invMsg.before(b); this.quickBtns.push(b);
-    }
+      parent.appendChild(el); this.slotEls[i] = el;
+    };
+    for (let i = HOTBAR.size; i < inventory.size; i++) slotEl(i, dom.invGrid);
+    for (let i = 0; i < HOTBAR.size; i++) { slotEl(i, hotGrid); this.slotEls[i].dataset.key = keyLabel(HOTBAR_KEYS[i]); this.slotEls[i].classList.add('hot'); }
     // crafting
     this.craftEl = document.createElement('div'); this.craftEl.className = 'inv-craft';
     this.craftEl.addEventListener('click', e => { const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe); });
@@ -108,11 +112,6 @@ export const InventoryUI = {
     this.message = this.commands.drop(i) ? `Dropped ${name}.` : `${name} can't be dropped.`;
     this.selected = -1; this.render();
   },
-  quick(i) {
-    const s = this.inventory.getSlot(this.selected); if (!s) return;
-    this.commands.quick(i, s.itemId);
-    this.message = `${this.inventory.registry.get(s.itemId).name} is on key ${QUICK_SLOTS.labels[i]}.`; this.render();
-  },
   craft(id) {
     const r = RECIPES.find(x => x.id === id); if (!r) return;
     this.message = this.commands.craft(r).message; this.render();
@@ -124,7 +123,9 @@ export const InventoryUI = {
     dom.inventory.classList.toggle('crafting', this.tab === 'craft');
     dom.inventory.classList.toggle('petting', this.tab === 'pets');
     const inv = this.inventory;
-    dom.invCount.textContent = `${inv.size - inv.freeSlots()} / ${inv.size}`;
+    const bagUsed = inv.getSlots().slice(HOTBAR.size).filter(Boolean).length;
+    dom.invCount.textContent = `${bagUsed} / ${inv.size - HOTBAR.size}`;
+    dom.invHint.innerHTML = `click an item, then another slot to move / swap (the hotbar row too) · double-click to use · ${bindKbd('bag')} or <kbd>Esc</kbd> to close`;
     if (this.tab === 'craft') { this.renderCraft(); return; }
     if (this.tab === 'pets') { this.renderPets(); return; }
     const slots = inv.getSlots();
@@ -134,9 +135,9 @@ export const InventoryUI = {
       el.classList.toggle('filled', !!s); el.classList.toggle('selected', i === this.selected);
       const col = def && rarityColor(def, s.props);
       el.style.borderColor = def && col !== rarityColor({ rarity: 'common' }) ? col : '';
-      const q = def ? this.commands.quickIds().indexOf(s.itemId) : -1;
-      el.innerHTML = def ? itemIconHtml(def) + (s.quantity > 1 ? `<span class="inv-qty">${s.quantity}</span>` : '') +
-        (q >= 0 ? `<span class="inv-qk">${QUICK_SLOTS.labels[q]}</span>` : '') : '';
+      el.innerHTML = (def ? itemIconHtml(def) + (s.quantity > 1 ? `<span class="inv-qty">${s.quantity}</span>` : '') : '') +
+        (el.dataset.key ? `<span class="inv-qk">${el.dataset.key}</span>` : '');
+      el.classList.toggle('held', i === this.commands.held());
       el.title = def ? def.name : '';
     });
     this.renderGear();
@@ -170,14 +171,12 @@ export const InventoryUI = {
     dom.invUse.textContent = action ? ITEM_ACTIONS[action].label : 'Use';
     dom.invUse.disabled = !action || !ITEM_ACTIONS[action].supported;
     dom.invDrop.disabled = !def || !def.droppable;
-    const quickable = action === 'use';
-    this.quickBtns.forEach((b, i) => { b.style.display = quickable ? '' : 'none'; b.classList.toggle('on', quickable && this.commands.quickIds()[i] === sel.itemId); });
     dom.invMsg.textContent = this.message;
   },
 
   renderPets() {
     if (this.petsEl.contains(document.activeElement)) return;               // don't redraw under someone typing a name
-    const v = this.commands.pets(), key = c => c.replace('Key', '');
+    const v = this.commands.pets();
     const modes = Object.entries(PET_COMMANDS).map(([m, c]) => `<button type="button" data-mode="${m}" class="${v.mode === m ? 'on' : ''}" title="${c.text}">${c.label}</button>`).join('');
     const rows = Object.entries(PETS).map(([id, p]) => {
       const open = v.unlocked.has(id), out = v.active === id, a = p.ability;
@@ -186,10 +185,10 @@ export const InventoryUI = {
         `<div class="pet-main"><div class="pet-head">${open ? `<input data-rename="${id}" value="${v.nameOf(id)}" maxlength="14" aria-label="Name">` : '<b>???</b>'}` +
         `<small>${p.name} · Lv ${v.level}</small>${hp}</div>` +
         `<p>${open ? p.blurb : `<em>Locked:</em> ${p.unlock.text}`}</p>` +
-        (open ? `<div class="pet-ab">${icon(a.id)}<b>${a.name}</b> <kbd>${key(PET_KEYS.ability)}</kbd> ${a.cooldown}s · ${a.text}</div>` : '') + '</div>' +
+        (open ? `<div class="pet-ab">${icon(a.id)}<b>${a.name}</b> ${bindKbd('petAbility')} ${a.cooldown}s · ${a.text}</div>` : '') + '</div>' +
         (open ? (out ? `<span class="pet-with">${v.fainted ? 'Resting' : 'With you'}</span>` : `<button type="button" data-pet="${id}">Take along</button>`) : '') + '</div>';
     });
-    this.petsEl.innerHTML = `<div class="pet-cmds"><b>Command</b> ${modes} <span class="dim">(<kbd>${key(PET_KEYS.command)}</kbd> cycles · stand still by your pet and press <kbd>E</kbd> to pet them)</span></div>` +
+    this.petsEl.innerHTML = `<div class="pet-cmds"><b>Command</b> ${modes} <span class="dim">(${bindKbd('petCommand')} cycles · stand still by your pet and press ${bindKbd('interact')} to pet them)</span></div>` +
       `<div class="pet-list">${rows.join('')}</div>`;
   },
 

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lanternmoss · type specimen</title>
+<!-- Compares candidate font pairings for the title, banners, HUD numbers and dialogue (TODO 10.1, docs/typography.md).
+     Open it over the dev server (npm start → /docs/type-specimen.html). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Grandstander:wght@600;700;800&family=Fraunces:opsz,wght,SOFT@9..144,600..800,100&family=Nunito:wght@600;700;800;900&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#3a2340; --pink:#ff8fb1; }
+  body { margin:0; padding:18px; background:linear-gradient(#ffd9ae,#f6b1c8); color:var(--ink); font-family:Nunito, sans-serif; }
+  .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+  .card { position:relative; background:linear-gradient(#a8dc8f, #7fc574); border:4px solid var(--ink); border-radius:22px; padding:16px 16px 14px; overflow:hidden; }
+  .tag { position:absolute; top:10px; right:12px; font:800 11px Nunito, sans-serif; background:#fff; border:2px solid var(--ink); border-radius:999px; padding:1px 9px; }
+  h1 { margin:6px 0 0; font-size:64px; line-height:1; color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill; text-shadow:0 5px 0 var(--ink); text-align:center; }
+  .tagline { margin:8px auto 14px; width:max-content; max-width:100%; background:rgba(255,248,238,.9); border-radius:999px; padding:3px 14px; font-size:14px; font-weight:800; }
+  .banner { text-align:center; margin:4px 0 12px; }
+  .banner b { display:block; font-size:30px; color:#fff; -webkit-text-stroke:2.5px var(--ink); paint-order:stroke fill; text-shadow:0 3px 0 var(--ink); }
+  .banner small { font-size:13px; font-weight:800; background:#fff8ee; border-radius:999px; padding:1px 10px; }
+  .dlg { background:linear-gradient(#fffdf8,#fff0e2); border:4px solid var(--ink); border-radius:20px; padding:22px 16px 12px; position:relative; margin:14px 0 12px; }
+  .dlg .nm { position:absolute; top:-15px; left:16px; background:#8a6ae0; color:#fff; border:3px solid var(--ink); border-radius:12px; padding:1px 12px; font-size:16px; transform:rotate(-2.5deg); }
+  .dlg p { margin:0; font-size:16px; line-height:1.45; font-weight:700; }
+  .hud { display:flex; align-items:center; gap:8px; }
+  .bar { flex:1; height:18px; border:3px solid var(--ink); border-radius:999px; background:#fff; position:relative; overflow:hidden; font-size:11px; font-weight:800; }
+  .bar i { position:absolute; inset:0; transform-origin:left; } .bar > span { position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center; padding:0 9px; }
+  .hp i { background:linear-gradient(#ff9fb4,#f2557c); transform:scaleX(.72); } .mp i { background:linear-gradient(#ffd08a,#ef8a2c); transform:scaleX(.9); }
+  .lvl { width:44px; height:44px; border-radius:50%; border:3px solid var(--ink); background:radial-gradient(circle at 35% 30%, #fff6d6, #ffd36b 70%); display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; }
+  .lvl small { font-size:8px; font-weight:900; opacity:.7; } .lvl b { font-size:20px; }
+  .slots { display:flex; gap:4px; margin-top:8px; }
+  .slot { position:relative; width:40px; height:40px; border:3px solid var(--ink); border-radius:10px; background:#fff8ee; }
+  .slot kbd { position:absolute; top:1px; left:2px; font:800 9px Nunito, sans-serif; background:#fff; border:1.5px solid var(--ink); border-radius:4px; padding:0 3px; }
+  .slot em { position:absolute; right:3px; bottom:0; font-style:normal; font-size:14px; }
+  .slot.held { border-color:var(--pink); transform:translateY(-4px); }
+  .tip { margin-top:10px; background:#fffdf8; border:3px solid var(--ink); border-radius:12px; padding:6px 10px; font-size:12px; line-height:1.4; font-weight:600; }
+  .tip h4 { margin:0 0 2px; font-size:15px; }
+  .dmg { position:absolute; right:26px; top:318px; font-size:34px; color:#ffd36b; -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; transform:rotate(8deg); }
+  /* the three pairings */
+  .a .d { font-family:Fredoka, sans-serif; font-weight:600; }
+  .b .d { font-family:Grandstander, cursive; font-weight:800; }
+  .c .d { font-family:Fraunces, serif; font-weight:800; font-variation-settings:'SOFT' 100, 'opsz' 96; }
+  .num { font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <!-- each card: display font on .d, body = Nunito -->
+  <div class="card a"><span class="tag">A · Fredoka + Nunito</span></div>
+  <div class="card b"><span class="tag">B · Grandstander + Nunito</span></div>
+  <div class="card c"><span class="tag">C · Fraunces (soft) + Nunito</span></div>
+</div>
+<template id="sample">
+  <h1 class="d">Lanternmoss</h1>
+  <div class="tagline">a tiny cozy planet of lanterns, moss &amp; friendly critters</div>
+  <div class="banner"><b class="d">Planet 2 · Emberfall</b><small>warm winds, ember ponds and quicker foes</small></div>
+  <div class="dmg d num">+24 ✦</div>
+  <div class="dlg"><div class="nm d">Old Bramble</div><p>Ah, a traveler! Mind the moss. It hums on full moons, and it is terribly off-key. Level 7 already?</p></div>
+  <div class="hud"><div class="bar hp"><i></i><span><span>HP</span><span class="d num">101 / 140</span></span></div>
+    <div class="lvl"><small>LV</small><b class="d num">7</b></div>
+    <div class="bar mp"><i></i><span><span>Stamina</span><span class="d num">90 / 100</span></span></div></div>
+  <div class="slots"><div class="slot held"><kbd>1</kbd><em class="d num">4</em></div><div class="slot"><kbd>2</kbd><em class="d num">12</em></div><div class="slot"><kbd>3</kbd></div><div class="slot"><kbd>4</kbd><em class="d num">2</em></div><div class="slot"><kbd>5</kbd></div><div class="slot"><kbd>6</kbd></div></div>
+  <div class="tip"><h4 class="d">Shoulder Charge</h4>Charge forward through enemies, stunning them. Invulnerable while charging. 20 Stamina · 3s cooldown</div>
+</template>
+<script>
+  const t = document.getElementById('sample');
+  for (const c of document.querySelectorAll('.card')) c.appendChild(t.content.cloneNode(true));
+</script>
+</body>
+</html>

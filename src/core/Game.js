@@ -29,7 +29,7 @@ import { bagCommands } from '../gameplay/bagCommands.js';
 import { Chests } from '../gameplay/Chests.js';
 import '../gameplay/drops.js';
 import { Pets } from '../gameplay/Pets.js';
-import { Quick } from '../gameplay/quickSlots.js';
+import { Hotbar } from '../gameplay/hotbar.js';
 import { computeStats, emptyEquipment } from '../gameplay/equipment.js';
 import { Houses } from '../gameplay/Houses.js';
 import { resetCompanion } from '../gameplay/characters.js';
@@ -46,7 +46,7 @@ import { keys, releaseAllKeys } from '../systems/InputSystem.js';
 import { RenderSystem } from '../systems/RenderSystem.js';
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { Dialog } from '../ui/Dialog.js';
-import { applyUiScale, buildQuickBar, buildSpellBar, setSkillHint } from '../ui/hud.js';
+import { applyUiScale, buildHotbar, buildSpellBar, setSkillHint } from '../ui/hud.js';
 import { buildPetCard, updatePetCard } from '../ui/petHud.js';
 import { updateWaypoints } from '../ui/waypoints.js';
 import { updateOverlay } from '../ui/overlay.js';
@@ -78,7 +78,7 @@ export class Game {
     spawnWildlife(this.world);
     ctx.npcs = createNpcDefs(this.world).map(d => new NPC(d));
     resetCooldowns(COMBAT.spells);
-    buildSpellBar(COMBAT.spells); setSkillHint(CHARACTERS.witch.hint);
+    buildSpellBar(COMBAT.spells); setSkillHint(COMBAT.spells);
     this.planets = new PlanetProgression(this.world);
     this.planets.populate();
 
@@ -94,8 +94,7 @@ export class Game {
     const bag = ctx.player.inventory;
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
-    bag.addEventListener('itemadded', e => Quick.autoAssign(e.detail.itemId));   // new consumables fill an empty quick key
-    buildQuickBar(); buildPetCard();
+    buildHotbar(); buildPetCard();
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -131,7 +130,7 @@ export class Game {
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
-    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Quick.update(dt);
+    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt);
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -159,7 +158,7 @@ export class Game {
   resetRun() {
     const P = ctx.player, world = this.world;
     Dialog.close(); InventoryUI.close();
-    Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Quick.reset(); Pets.reset();
+    Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs(); dayClock.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
@@ -180,7 +179,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Chests, Quick, Pets, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

@@ -5,8 +5,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CHARACTERS } from '../src/config/characters.js';
 import { RECIPES } from '../src/config/crafting.js';
-import { EQUIP_SLOTS, ITEM_ART_KINDS, ITEM_DEFINITIONS, QUICK_SLOTS, RARITIES, STATS } from '../src/config/items.js';
-import { Inventory } from '../src/inventory/Inventory.js';
+import { HOTBAR_KEYS } from '../src/config/controls.js';
+import { EQUIP_SLOTS, HOTBAR, INVENTORY, ITEM_ART_KINDS, ITEM_DEFINITIONS, RARITIES, STATS } from '../src/config/items.js';
+import { hotbarFirst, Inventory } from '../src/inventory/Inventory.js';
 import { itemRegistry } from '../src/items/ItemRegistry.js';
 import { craft, craftProblem, recipesFor } from '../src/items/crafting.js';
 import { applyGear, equipProblem, formatStat, gearStats, gearTotals, itemRarity } from '../src/items/gear.js';
@@ -100,8 +101,19 @@ test('crafting takes the ingredients and coins, gives the result at its rarity, 
   assert.equal(craftProblem(RECIPES.find(x => x.id === 'glowTonic'), tight, 0), 'space');
 });
 
-test('quick slots sit clear of the ability keys', () => {
+test('the hotbar: its own keys, clear of the ability keys; things you hold land on it first, the rest in the bag', () => {
   const abilityKeys = new Set(Object.values(CHARACTERS).flatMap(c => Object.values(c.abilities).flatMap(a => a.keys)));
-  assert.equal(QUICK_SLOTS.keys.length, QUICK_SLOTS.labels.length);
-  for (const k of QUICK_SLOTS.keys) assert.ok(!abilityKeys.has(k), `${k} is an ability key`);
+  assert.ok(HOTBAR.size >= 1 && HOTBAR.size <= HOTBAR_KEYS.length);
+  for (const k of HOTBAR_KEYS) assert.ok(!abilityKeys.has(k), `${k} is an ability key`);
+  const size = HOTBAR.size + INVENTORY.slots, inv = new Inventory(size, itemRegistry, { fillOrder: hotbarFirst(HOTBAR.size, size, HOTBAR.holdCategories) });
+  inv.add('honeyBun', 1); inv.add('glowcap', 1); inv.add('emberAxe', 1, { rarity: 'rare' });
+  const at = id => inv.getSlots().findIndex(s => s?.itemId === id);
+  assert.ok(at('honeyBun') < HOTBAR.size && at('emberAxe') < HOTBAR.size, 'food and gear on the hotbar');
+  assert.ok(at('glowcap') >= HOTBAR.size, 'materials in the bag');
+  assert.equal(inv.count('glowcap') + inv.count('honeyBun'), 2, 'counts cover the hotbar and the bag');
+  for (let i = 0; i < HOTBAR.size; i++) inv.add('frostDraught', 10);
+  assert.ok(at('glowcap') >= HOTBAR.size, 'a full hotbar spills into the bag');
+  assert.equal(inv.insertAt(at('emberAxe'), 'mossAxe'), false, 'insertAt needs an empty slot');
+  const free = inv.getSlots().findIndex(s => !s); assert.equal(inv.insertAt(free, 'mossAxe', 1, { rarity: 'uncommon' }), true);
+  assert.equal(inv.getSlot(free).props.rarity, 'uncommon');
 });

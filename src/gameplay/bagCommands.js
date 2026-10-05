@@ -6,8 +6,8 @@ import { unequip } from './equipment.js';
 import { useItemInSlot } from './itemUse.js';
 import { lootName } from './loot.js';
 import { dropFromSlot } from './pickups.js';
+import { Hotbar } from './hotbar.js';
 import { Pets } from './Pets.js';
-import { Quick } from './quickSlots.js';
 import { spendCoins } from './wallet.js';
 
 const PROBLEM = { materials: 'You need more materials for that.', coins: 'Not enough coins for that.', space: 'No room in the bag for it.' };
@@ -18,8 +18,7 @@ export function bagCommands(bag) {
     drop: slot => dropFromSlot(slot),
     unequip: where => unequip(bag, where),
     worn: () => ctx.player.equipment,
-    quick: (i, itemId) => Quick.assign(i, itemId),
-    quickIds: () => Quick.ids,
+    held: () => Hotbar.selected,
     pets: () => ({ active: Pets.id, mode: Pets.mode, level: Pets.level, unlocked: Pets.unlocked, nameOf: id => Pets.nameOf(id),
       hp: id => (id === Pets.id ? Pets.hp ?? Pets.maxHp(id) : Pets.maxHp(id)), maxHp: id => Pets.maxHp(id), fainted: Pets.fainted }),
     choosePet: id => Pets.choose(id),

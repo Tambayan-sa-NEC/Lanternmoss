@@ -5,8 +5,10 @@ import { BUFFS, PLAYER } from '../../config/game.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buffs } from '../../gameplay/buffs.js';
-import { INVENTORY } from '../../config/items.js';
-import { Inventory } from '../../inventory/Inventory.js';
+import { HOTBAR, INVENTORY } from '../../config/items.js';
+import { hotbarFirst, Inventory } from '../../inventory/Inventory.js';
+import { held } from '../../core/keybinds.js';
+import { itemRegistry } from '../../items/ItemRegistry.js';
 import { HERO_BUILDERS } from '../../models/heroes.js';
 import { addDyn } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
@@ -37,7 +39,9 @@ export class Player extends Walker {
     Object.assign(this, { charId: 'witch', stats: COMBAT.player, hp: COMBAT.player.maxHp, mana: COMBAT.player.maxMana, invuln: 0, hurtT: 0,
       dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, coins: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS });
     this.equipment = { weapon: null, armor: null, charm: null };   // worn gear (src/gameplay/equipment.js)
-    this.inventory = new Inventory(INVENTORY.slots);   // the hero's bag (kept across planets and fainting; emptied on a new adventure)
+    // the hero's items: slots 0-8 are the hotbar, the rest the bag (kept across planets and fainting; emptied on a new adventure)
+    this.inventory = new Inventory(HOTBAR.size + INVENTORY.slots, itemRegistry,
+      { fillOrder: hotbarFirst(HOTBAR.size, HOTBAR.size + INVENTORY.slots, HOTBAR.holdCategories) });
   }
 
   /** Replaces the visible model; every part key the old build added is removed first. */
@@ -69,13 +73,13 @@ export class Player extends Walker {
     }
     let f = 0, s = 0;
     if (enabled && !this.dead) {
-      if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1;
-      if (keys.KeyD || keys.ArrowRight) s += 1; if (keys.KeyA || keys.ArrowLeft) s -= 1;
+      if (held('moveForward', keys)) f += 1; if (held('moveBack', keys)) f -= 1;
+      if (held('moveRight', keys)) s += 1; if (held('moveLeft', keys)) s -= 1;
     }
     // Camera-relative input, built in the player's CURRENT tangent plane: W always = away from the camera.
     _cf.copy(viewFwd); projectTangent(_cf, this.up).normalize(); _cr.crossVectors(_cf, this.up);
     _wish.set(0, 0, 0).addScaledVector(_cf, f).addScaledVector(_cr, s); if (_wish.lengthSq() > 1) _wish.normalize();
-    const sprint = keys.ShiftLeft || keys.ShiftRight;
+    const sprint = held('sprint', keys);
     const speed = (sprint ? PLAYER.sprintSpeed : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1) * (1 + (this.stats.moveSpeed || 0));
     _tv.copy(_wish).multiplyScalar(speed);
     this.vel.lerp(_tv, damp(this.grounded ? PLAYER.accelGround : PLAYER.accelAir, dt));
@@ -85,7 +89,7 @@ export class Player extends Walker {
       this.vy = PLAYER.jumpVel * (buffs.moon > 0 ? BUFFS.moonJump : 1); this.grounded = false; this.coyote = 0; this.jumpBuf = 0; this.squash = 0.22; audio.jump();
       sparkles.emit(this.pos, { count: 6, color: 0xfff0e0, speed: 1.2, up: this.up, upBias: 0.3, life: 0.45, size: 0.3 });
     }
-    const g = (this.vy > 0 && keys.Space) ? PLAYER.gravityRise * (buffs.moon > 0 ? BUFFS.moonGravity : 1) : PLAYER.gravityFall;
+    const g = (this.vy > 0 && held('jump', keys)) ? PLAYER.gravityRise * (buffs.moon > 0 ? BUFFS.moonGravity : 1) : PLAYER.gravityFall;
     const wasGrounded = this.grounded, vyBefore = this.vy, spd = this.vel.length();
     _tv2.copy(this.vel).add(this.knock);                         // knockback from hits rides on top of steering
     const n = this.step(_tv2, dt, g);

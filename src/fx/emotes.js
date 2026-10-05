@@ -15,7 +15,7 @@ function emoteTexture(sym, color) {
   if (sym === 'heart') { g.beginPath(); g.moveTo(64, 84); g.bezierCurveTo(20, 56, 36, 22, 64, 42); g.bezierCurveTo(92, 22, 108, 56, 64, 84); g.fill(); g.stroke(); }
   else if (sym === 'star') { g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 11 : 32, a = i / 8 * Math.PI * 2 - Math.PI / 2; g.lineTo(64 + Math.cos(a) * r, 58 + Math.sin(a) * r); } g.closePath(); g.fill(); g.stroke(); }
   else {
-    g.font = 'bold 62px "M PLUS Rounded 1c","Segoe UI Symbol","DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '800 62px "Grandstander","Nunito","Segoe UI Symbol","DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.strokeText(sym, 64, 62); g.fillText(sym, 64, 62);
   }
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; emoteCache[key] = t; return t;
