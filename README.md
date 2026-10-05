@@ -57,7 +57,7 @@ src/
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, owl
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
 │   ├── items.js           item definitions, categories, rarities, effects, bag size and pickup settings
-│   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips)
+│   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips, selection profile)
 │   ├── settings.js        player settings schema (drives the Settings screen, defaults and validation)
 │   ├── controls.js        the fixed key list shown on the pause menu's Controls page
 │   ├── credits.js         the Credits page text

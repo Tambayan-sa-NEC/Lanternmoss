@@ -29,6 +29,8 @@ export function dragCamera(dx, dy) {
   cam.fwd.applyAxisAngle(cam.up, -dx * 0.005 * k); cam.pitch = clamp(cam.pitch + dy * 0.004 * k * sy, -0.05, 1.15); cam.lastDrag = ctx.time;
 }
 export function zoomCamera(sign) { cam.dist = clamp(cam.dist * (1 + sign * 0.1), CAMERA.minDist, CAMERA.maxDist); }
+/** Turns the view around the hero by `rad` (dragging on the character-select screen). */
+export function spinCamera(rad) { cam.fwd.applyAxisAngle(cam.up, rad); }
 /** Slow showcase orbit behind the menus: eases to `dist` and `pitch` while turning at `speed` rad/s. */
 export function orbitCamera(dt, dist = 5.5, speed = 0.3, pitch = CAMERA.pitch) {
   cam.fwd.applyAxisAngle(cam.up, dt * speed); cam.dist += (dist - cam.dist) * damp(1.5, dt); cam.pitch += (pitch - cam.pitch) * damp(1.5, dt);

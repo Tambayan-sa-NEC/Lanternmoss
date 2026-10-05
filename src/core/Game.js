@@ -16,7 +16,7 @@ import { Player } from '../entities/player/Player.js';
 import { spawnWildlife, updatePonds } from '../entities/wildlife/wildlife.js';
 import { updateEmotes } from '../fx/emotes.js';
 import { createSparkles, sparkles } from '../fx/sparkles.js';
-import { applyCharacter } from '../gameplay/characters.js';
+import { applyCharacter, showcaseHero } from '../gameplay/characters.js';
 import { buffs, resetBuffs, updateBuffs } from '../gameplay/buffs.js';
 import { useItemInSlot } from '../gameplay/itemUse.js';
 import { dropFromSlot, spawnWorldItem, updateWorldItems } from '../gameplay/pickups.js';
@@ -77,7 +77,8 @@ export class Game {
     const bag = ctx.player.inventory;
     installItemNotices(bag);
     InventoryUI.init(bag, { use: slot => useItemInSlot(bag, slot), drop: slot => dropFromSlot(slot) });
-    CharacterSelect.init({ onPick: applyCharacter, onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
+    CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
+      onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
     PauseMenu.init({ onQuit: () => MainMenu.showTitle(true), onPanelClosed: () => MainMenu.onPanelClosed() });   // quitting restarts the run
     MainMenu.init({ onReset: () => this.resetRun() });
@@ -114,6 +115,7 @@ export class Game {
     Challenges.update(dt);
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
+    CharacterSelect.update(dt);                                    // the picked hero shows off now and then
     updateCamera(dt);
     updateWaypoints();                                             // after the camera: bearings are relative to the view
     this.world.update(dt, ctx.time, ctx.player, cam.up, camera);

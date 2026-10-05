@@ -12,7 +12,7 @@ import { CharacterSelect } from './CharacterSelect.js';
 import { dom } from './dom.js';
 import { PauseMenu } from './PauseMenu.js';
 
-const ORBIT = { title: { dist: 13, speed: 0.1, pitch: 0.55 }, select: { dist: 5.5, speed: 0.3 } };
+const ORBIT = { title: { dist: 13, speed: 0.1, pitch: 0.55 }, select: { dist: 4.6, speed: 0.22, pitch: 0.3 } };
 const hex = c => `#${c.toString(16).padStart(6, '0')}`;
 
 export const MainMenu = {
@@ -68,6 +68,6 @@ export const MainMenu = {
   /** The showcase camera orbit behind the menus: wide and high on the title screen, close on the hero for selection. */
   update(dt) {
     if (ctx.started) return; const o = ORBIT[this.screen];
-    orbitCamera(dt, o.dist, o.speed, o.pitch);
+    orbitCamera(dt, o.dist, CharacterSelect.dragging ? 0 : o.speed, o.pitch);          // holds still after you drag the hero
   },
 };

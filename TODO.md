@@ -67,16 +67,19 @@ Code: `src/ui/MainMenu.js`, `index.html` (`#title`, `#start`), `src/ui/Character
 - [x] Campaign strip: Lanternmoss → Emberfall → Frostveil with each planet's colour and boss (from `config/planets.js`).
 - [x] "Quit to menu" in the pause menu now returns to the title screen (restarting the run).
 
-## 4. Character selection **(core)**
+## 4. Character selection **(core)** ✓
 
 **Goal:** choosing a hero feels like a moment, and the differences between heroes are obvious.
-Code: `src/ui/CharacterSelect.js`, `src/config/characters.js`, `src/models/heroes.js`.
+Code: `src/ui/CharacterSelect.js`, `src/config/characters.js` (`profile`), `src/gameplay/characters.js` (`showcaseHero`).
 
-- [ ] Show the selected hero's 3D model large on screen, playing an idle or showcase animation (with drag to rotate).
-- [ ] Hero card with role, difficulty, a stat summary (HP, resource, range) and their companion.
-- [ ] Ability preview: the 5 abilities with icon, key, short description, and the ultimate highlighted.
-- [ ] Switching heroes plays a short swap animation and voice-like sound cue.
-- [ ] Optional: colour variants / outfits per hero.
+- [x] The picked hero's live model, framed close in the middle; drag the stage to turn it (the slow orbit pauses
+      meanwhile). The hero does their signature move (staff flourish / axe spin / bow draw) when picked and every 6 s.
+- [x] Picker cards (portrait, role, difficulty stars) on the left; a detail panel on the right with role, difficulty,
+      health, resource, armor, 1–5 ratings (damage, toughness, range, mobility) and what the companion does.
+- [x] All 5 abilities with icon, keys and description; the ultimate in a gold row.
+- [x] Switching heroes: the panel slides in, the hero hops in a burst of their colour, and a short per-hero voice chirp
+      plays (`profile.voice`). The screen opens with your current hero already picked.
+- [ ] Optional: colour variants / outfits per hero (the hero builders in `src/models/heroes.js` would need palettes first).
 
 ## 5. Better NPCs **(core)**
 
