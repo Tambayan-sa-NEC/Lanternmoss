@@ -1,12 +1,85 @@
 # Lanternmoss
 
 A tiny cozy planet of lanterns, moss and friendly critters: a third-person browser game built with
-[Three.js](https://threejs.org/) (r160) and plain ES modules. Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore a
-spherical planet, chat with villagers, take on their mini-challenges and fight the monsters beyond the village lanterns.
+[Three.js](https://threejs.org/) (r160) and plain ES modules, with no asset files (every model, icon and sound is made in
+code). Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore a little round planet, help the villagers, open
+treasure chests, gear up, raise a pet, and fight the monsters beyond the village lanterns.
 
-**Campaign:** every planet has a boss in a lair on its far side, marked by a shaft of light. Defeat it and the hero
-travels on to the next, harder planet (Lanternmoss, then Emberfall, then Frostveil), keeping their level, XP and treats.
-Each boss is its own fight: Gloomcap the Moss King, Pyrrhax the red dragon, and Malgrath, the two-phase Winged Demon Lord.
+![The village of Lanternmoss](docs/screenshots/village.jpg)
+
+**Campaign:** every planet has a boss in a lair on its far side, marked by a shaft of light. Defeat it, open the treasure
+chest it leaves, and the hero travels on to the next, harder planet (Lanternmoss, then Emberfall, then Frostveil),
+keeping their level, gear, bag, coins and pets. Each boss is its own fight: Gloomcap the Moss King, Pyrrhax the red
+dragon, and Malgrath, the two-phase Winged Demon Lord.
+
+## A tour of the game
+
+*Screenshots of the current version (retaken after every major update: see [Refreshing the screenshots](#refreshing-the-screenshots)).*
+
+<p>
+  <img src="docs/screenshots/title.jpg" width="49%" alt="Title screen">
+  <img src="docs/screenshots/select.jpg" width="49%" alt="Character select">
+</p>
+
+**Three heroes.** The title screen shows the campaign ahead; the hero select compares the Girl Witch (arcane spells),
+the Boy Warrior (a two-handed axe and a guard) and the Elf Archer (a longbow), with every ability, its keys and a
+rating chart. Each hero has four abilities plus an aimed ultimate (Meteor, Leap Slam, Arrow Rain).
+
+<p>
+  <img src="docs/screenshots/dialogue.jpg" width="49%" alt="Talking to Fern">
+  <img src="docs/screenshots/night.jpg" width="49%" alt="The village at night">
+</p>
+
+**A living village.** Villagers keep a daily schedule on a day / night clock, sleep at night (some go home to bed),
+remember your adventure, talk with portraits and expressions, and hand out mini-challenges and multi-step quests.
+Pim runs the bakery shop by day; each later planet has a local of its own.
+
+<p>
+  <img src="docs/screenshots/house.jpg" width="49%" alt="Inside Pim's bakery">
+  <img src="docs/screenshots/chest.jpg" width="49%" alt="Opening a Lantern chest">
+</p>
+
+**Houses and treasure.** Walk into the village houses: furniture to use (a bed to nap or sleep till morning, chests,
+bookshelves with lore, a kettle, an oven), and the people who live there. Out in the wilds, Mossy chests, locked
+Lantern chests (find a Lantern Key) and a boss treasure chest after every boss.
+
+<p>
+  <img src="docs/screenshots/combat.jpg" width="49%" alt="A fight with goblins">
+  <img src="docs/screenshots/boss-dragon.jpg" width="49%" alt="Pyrrhax, the red dragon">
+</p>
+
+**Combat.** Soft lock-on, quick abilities with cooldowns and a resource bar, aimed ultimates, damage numbers and
+hit-stop. Monsters range from goblin packs and charging ramhorns to burrowing thornmoles and shielding hexlanterns,
+and every boss has telegraphed attacks to read and dodge.
+
+<p>
+  <img src="docs/screenshots/boss-demon.jpg" width="49%" alt="Malgrath, the Winged Demon Lord">
+  <img src="docs/screenshots/bag.jpg" width="49%" alt="The bag with gear">
+</p>
+
+**Gear.** Weapons, armour and trinkets with stat bonuses, each piece with its own rolled rarity (Common to Legendary)
+that scales its stats. Monsters drop food, materials and gear; quick keys `6` `7` `8` use food and tonics mid-fight.
+
+<p>
+  <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab">
+  <img src="docs/screenshots/pets.jpg" width="49%" alt="The Pets tab">
+</p>
+
+**Crafting and pets.** Glowcaps, Ember Shards and Frost Petals craft into tonics, keys and gear. Pets fight beside you,
+grow with you, take commands (follow, stay, attack, passive), have an ability of their own, can be renamed and petted,
+and new ones are found through quests and chests: an owl, a wolf, a fox, a wisp and a dragon whelp.
+
+## What's new
+
+Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
+
+- **Pets:** five pets with commands, abilities, levels, health and fainting, naming and petting; any hero, any pet.
+- **Better items:** equipment slots, rarity-scaled gear, monster drops, crafting, per-item art, quick-use keys.
+- **Treasure chests:** loot tables, locked chests and keys, a boss chest that holds the trophy.
+- **Enterable houses:** interiors with furniture to use, residents, and villagers asleep in their beds.
+- **Livelier villagers:** day / night schedules, story-aware dialogue with portraits, quests, coins and a shop.
+- **Character select, title screen, pause menu and settings, and a new HUD** (bars, ability tooltips, boss bar, compass).
+- **Boss overhaul:** Pyrrhax the dragon and Malgrath the two-phase Demon Lord, aimed ultimates, quicker dodges.
 
 ## Running
 
@@ -23,6 +96,19 @@ UI font come from CDNs, declared in the import map in `index.html`.
 ```sh
 npm test             # unit tests (Node's built-in test runner, no dependencies)
 ```
+
+### Refreshing the screenshots
+
+The pictures above live in `docs/screenshots/` and are retaken after every major update by playing staged scenes in
+headless Chrome (a few minutes with software rendering):
+
+```sh
+npm i --no-save puppeteer-core     # once; not a project dependency
+node scripts/screenshots.mjs       # all shots, or e.g. `node scripts/screenshots.mjs bag,pets` for some
+```
+
+`CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
+gets a scene in `scripts/screenshots.mjs` and a spot in the tour above.
 
 ### Controls
 
@@ -51,7 +137,10 @@ npm test             # unit tests (Node's built-in test runner, no dependencies)
 index.html                 markup only: HUD, dialogue box, challenge panel, character-select overlay
 styles/main.css            all styling
 scripts/serve.mjs          zero-dependency dev server
-tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config
+scripts/screenshots.mjs    retakes the README screenshots (headless Chrome)
+docs/screenshots/          the README screenshots
+tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
+                           heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets
 src/
 ├── main.js                entry point: builds the Game, starts the loop, exposes window.LANTERNMOSS
 ├── errorOverlay.js        classic script that shows load/runtime errors on screen
@@ -81,6 +170,7 @@ src/
 │   ├── GameLoop.js        requestAnimationFrame loop with a clamped timestep
 │   ├── context.js         the shared live state (time, player, enemies, NPCs, paused...)
 │   ├── settings.js        live player settings: validated, saved to localStorage, change listeners
+│   ├── events.js          game-wide events (quest completed, chest opened) other systems react to
 │   └── controls.js        key bindings: what each input does
 ├── systems/               engine-level services
 │   ├── RenderSystem.js    WebGL renderer, bloom + storybook post-processing, resize
@@ -147,7 +237,7 @@ src/
 │   ├── characters.js      switching heroes (model, stats, abilities, pet)
 │   ├── Pets.js            the pet system: unlocked pets, the one out, names, commands, health and fainting, petting
 │   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst) and their lasting effects
-│   ├── buffs.js           Moon-Hop / Feather-Step timers
+│   ├── buffs.js           Moon-Hop / Feather-Step / Howl timers
 │   ├── dayClock.js        the village clock (phase, day, light)
 │   ├── storyState.js      what villagers know about your adventure (dialogue conditions and placeholders)
 │   ├── wallet.js          coins: earning, spending, shop prices
@@ -169,7 +259,8 @@ src/
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
 │                          ShopUI (buy / sell), portraits (dialogue faces),
 │                          dialogue, challenge panel, banner + travel fade,
-│                          InventoryUI + itemTooltip (the bag window: gear, Craft tab), itemArt (SVG item pictures),
+│                          InventoryUI + itemTooltip (the bag window: gear, Craft and Pets tabs), itemArt (SVG item
+│                          pictures), petHud (the pet card beside the ability bar),
 │                          itemNotices (item toasts),
 │                          overlay (planet chip), toast, character select (reached from the title, or C in play)
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
@@ -188,9 +279,10 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
 2. Moving bodies resolve collisions in the order they were created, so the player, critters, villagers and enemies are
    created in that order.
 
-**Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → combat (vitals, casting + area aim, aim,
-projectiles, enemies, hazards, companion, effects, combat HUD) → planet progression → challenges → knight upkeep → menu orbit → camera → world →
-particles and emotes → dialogue → overlay, buffs, toast. Rendering follows each update.
+**Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → world items → combat (vitals, casting +
+area aim, aim, projectiles, enemies, hazards, pet body, pet system, effects, combat HUD) → planet progression → challenges,
+quests, shop, houses, chests, quick keys → knight upkeep → menu orbit → camera → compass → day clock → world → particles and
+emotes → dialogue → overlay, buffs, toast, pet card. Rendering follows each update.
 
 **Dependencies flow one way:** `config` and `utils` depend on nothing. `render` and `physics` build on them, and
 `world` on those. Entities, combat and gameplay sit above, and `core/Game.js` wires everything. UI modules receive the
@@ -305,6 +397,17 @@ A new picture = a drawing in `ui/itemArt.js` and a model in `models/items.js` un
 A new gear stat = an entry in `STATS` plus where it's read (like `damageBonus` in `combat/damage.js`). Save / load can use `inventory.toJSON()` and
 `inventory.load()`. The bag is kept across planets and fainting, and emptied on a new adventure (there is no save system).
 
+## Pets
+
+`config/pets.js` defines every pet: its body (`fly`: owl, wisp, dragon whelp; `walk`: wolf, fox), attack, ability,
+health and how it's unlocked. `gameplay/Pets.js` owns what outlives one pet body (bodies are rebuilt after travel, a
+house or a swap): which pets are unlocked and which one is out, names, the command, health and fainting, the ability
+cooldown. Bodies (`entities/companions/`) ask it what to do; `petBrain.js` picks targets by command and lands hits
+(`source: 'pet'`, which also earns XP). Pet level = hero level. Unlocks listen on `core/events.js` (`questcomplete`,
+`chestopened`), so quests and chests don't know pets exist. A new pet = an entry in `PETS`, a model (a critter look or
+a flyer builder), an ability handler in `gameplay/petAbilities.js` and two glyphs in `ui/icons.js`; `npm test` checks
+all of that is in place.
+
 ## Monsters and bosses
 
 | Monster | AI | Planets | How it fights |
@@ -327,7 +430,8 @@ Bosses are immune to stagger and knockback, and only feel stuns between attacks 
 roster, boss). Nothing else needs to change. `npm test` checks that every planet is complete and harder than the one before.
 
 **Quick test from the console** (after starting a game): `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
-whole victory → travel sequence, or `LANTERNMOSS.goToPlanet(2)` to jump straight to Frostveil.
+victory, open the treasure chest that falls, and travel on; or `LANTERNMOSS.goToPlanet(2)` to jump straight to
+Frostveil. `LANTERNMOSS.Pets.unlock('whelp')`, `LANTERNMOSS.spawnItem('emberAxe')` and friends help try features out.
 
 ## Refactor notes
 

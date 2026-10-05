@@ -194,7 +194,7 @@ body.menu #toast, body.menu #prompt { visibility:hidden; }
 @keyframes ultglow { 50% { box-shadow:0 0 18px 4px rgba(255,190,70,.95); transform:scale(1.06) } }
 .slot.aiming { outline:3px solid #ffd36b; outline-offset:2px; animation:aimpulse .8s infinite alternate; }
 @keyframes aimpulse { to { outline-color:#ff8fb1 } }
-#aimhint { position:fixed; left:50%; bottom:118px; transform:translateX(-50%) scale(var(--ui,1)); transform-origin:bottom center; padding:4px 14px;
+#aimhint { position:fixed; left:50%; bottom:calc(14px + 160px * var(--ui,1)); transform:translateX(-50%) scale(var(--ui,1)); transform-origin:bottom center; padding:4px 14px;
   background:#fff8ee; border:3px solid var(--ink); border-radius:999px; box-shadow:0 3px 0 var(--ink); font-size:12px; font-weight:800; pointer-events:none; display:none; white-space:nowrap; }
 .slot.pop, .bar.pop { animation:slotpop .22s; }
 @keyframes slotpop { 50% { transform:scale(1.12); background:#fff } }
@@ -304,7 +304,8 @@ body.menu #lowhp { visibility:hidden; }     /* gameplay HUD hidden while choosin
 #start .keys { position:absolute; bottom:3.5vh; left:0; right:0; font-size:12px; font-weight:800; opacity:.75; }
 #err { position:fixed; bottom:12px; left:12px; right:12px; color:#a0203a; font-weight:800; display:none; }
 /* ---------- boss + planet travel ---------- */
-#bossbar { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) scale(var(--ui,1)); transform-origin:bottom center; width:min(480px,70vw);
+#bossbar { position:fixed; bottom:calc(14px + 96px * var(--ui,1));   /* just above the ability / quick / pet row */
+   left:50%; transform:translateX(-50%) scale(var(--ui,1)); transform-origin:bottom center; width:min(480px,70vw);
   text-align:center; display:none; pointer-events:none; }
 #bossbar .bn { display:inline-block; padding:2px 14px; margin-bottom:4px; background:#fff8ee; border:3px solid var(--ink); border-radius:999px;
   box-shadow:0 3px 0 var(--ink); font-weight:800; font-size:14px; }
