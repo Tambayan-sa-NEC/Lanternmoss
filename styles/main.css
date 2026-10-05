@@ -362,6 +362,7 @@ img.item-icon { background:none; border:none; object-fit:contain; }
 .shape-gem { width:22px; height:22px; border-radius:4px; transform:rotate(45deg); }
 .shape-petal { border-radius:0 75% 0 75%; }
 .shape-charm { border-radius:50%; border:5px solid #ffd36b; box-shadow:0 0 0 2px var(--ink); }
+.shape-key { border:none; height:22px; clip-path:polygon(30% 0, 70% 0, 70% 38%, 58% 38%, 58% 62%, 78% 62%, 78% 74%, 58% 74%, 58% 84%, 72% 84%, 72% 96%, 42% 100%, 42% 38%, 30% 38%); filter:drop-shadow(0 0 1px var(--ink)); }
 .shape-crown { border:none; clip-path:polygon(0 100%, 0 22%, 25% 55%, 50% 8%, 75% 55%, 100% 22%, 100% 100%); filter:drop-shadow(0 0 1px var(--ink)); }
 /* ---------- pause menu (src/ui/PauseMenu.js) ---------- */
 .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:20; cursor:default;
@@ -427,6 +428,7 @@ body.paused #tip, body.paused #aimhint { display:none !important; }
 .chip.quest span { display:block; font-size:12.5px; }
 .chip.quest i { font-style:normal; padding:0 6px; margin-left:4px; border-radius:999px; background:#ffd36b; border:2px solid var(--ink); font-size:11px; }
 #compass .cm.quest svg, #markers .wm.quest svg { color:#d0567e; }
+#compass .cm.chest svg, #markers .wm.chest svg { color:#d8820a; } #markers .wm.chest { animation:wmbob 1.4s ease-in-out infinite; }
 /* the shop (src/ui/ShopUI.js), styled like the other .modal panels */
 #shop { display:none; }
 .modal .panel.shop { width:min(560px,94vw); }

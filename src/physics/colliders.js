@@ -18,6 +18,11 @@ export function addCollider(dir, r, cam = null) {
   }
   colliders.push(c); return c;
 }
+/** Removes one static collider (a chest that's taken away). */
+export function removeCollider(c) {
+  let i = colliders.indexOf(c); if (i >= 0) colliders.splice(i, 1);
+  i = camColliders.indexOf(c); if (i >= 0) camColliders.splice(i, 1);
+}
 /** Forgets all scenery colliders (the planet is being replaced). Moving bodies keep theirs. */
 export function clearStaticColliders() { colliders.length = 0; camColliders.length = 0; }
 /** A moving collider that tracks dirRef (the body's own `up` vector, shared by reference). */

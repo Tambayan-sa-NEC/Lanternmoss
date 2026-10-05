@@ -64,6 +64,7 @@ src/
 │   ├── day.js             the village clock: day length, phases, light per phase
 │   ├── shop.js            coins per monster, the shop's keeper, hours, stock and prices
 │   ├── houses.js          enterable houses per planet: layout, furniture, owner / resident, note, chest gift
+│   ├── chests.js          treasure chests: kinds, loot tables, Lantern Key drops, the boss chest
 │   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
@@ -100,6 +101,7 @@ src/
 │   └── sky.js             sky dome, clouds, fireflies
 ├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
+│   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
 ├── items/                 ItemRegistry (validated item catalogue) and itemActions (what each category does)
@@ -114,7 +116,8 @@ src/
 │   │                      (places, schedules, story-aware dialogue, a local villager per later planet)
 │   ├── wildlife/          critters, birds, pond fish and their spawning
 │   ├── Projectile.js      surface-hugging projectiles
-│   └── WorldItem.js       an item stack lying on the ground
+│   ├── Chest.js           a treasure chest in the world: collider, falling in, opening, rattling when locked
+│   └── WorldItem.js       an item stack lying on the ground (can hop out of a chest)
 ├── combat/
 │   ├── CombatSystem.js    per-frame combat update order
 │   ├── casting.js         cooldowns, input buffering, hold-to-repeat, ability dispatch
@@ -141,6 +144,8 @@ src/
 │   ├── Houses.js          entering / leaving houses, walking indoors, using furniture, the E-prompt target
 │   ├── quests/            quest runtime (offers, steps, tracker, rewards)
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
+│   ├── Chests.js          placing a planet's chests, opening them, keys from monsters, the boss chest
+│   ├── loot.js            rolling a loot table into coins and item stacks
 │   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
@@ -232,6 +237,8 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Day length, phases and light | `src/config/day.js` |
 | Coins per monster, shop stock, prices and hours | `src/config/shop.js` |
 | Houses: who lives where, furniture, notes, chest gifts, nap healing | `src/config/houses.js` |
+| Chests: kinds, loot tables, key drop chance, boss chest timings | `src/config/chests.js` |
+| How many chests each planet has, its loot material | `src/config/planets.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |

@@ -49,11 +49,13 @@ const F = {
     addTo(g, part(G.cyl(0.11, 0.09, 0.16, 7), 0xffffff), [0.25, 0.91, 0.1]);
   },
   rug(g) { addTo(g, part(G.cyl(1.6, 1.6, 0.03, 16), 0xe07a8a), [0, 0.02, 0]); addTo(g, part(G.cyl(1.2, 1.2, 0.035, 16), 0xffd36b), [0, 0.025, 0]); },
-  chest(g) {
+  chest(g) {                                                       // lid hinged at the back (g.userData.lid; opens with rotation.x < 0)
     addTo(g, part(G.box(1.0, 0.55, 0.65), 0xb0703a), [0, 0.28, 0]);
-    addTo(g, part(G.cyl(0.33, 0.33, 1.0, 8, 1), 0xc07e44), [0, 0.56, 0], [0, 0, Math.PI / 2], [1, 1, 1]);
-    for (const x of [-0.35, 0.35]) addTo(g, part(G.box(0.08, 0.62, 0.68), 0xffd36b), [x, 0.33, 0]);
-    addTo(g, part(G.box(0.14, 0.16, 0.06), 0xffd36b), [0, 0.5, 0.34]);
+    for (const x of [-0.35, 0.35]) addTo(g, part(G.box(0.08, 0.57, 0.68), 0xffd36b), [x, 0.29, 0]);
+    addTo(g, part(G.box(0.14, 0.16, 0.06), 0xffd36b), [0, 0.47, 0.34]);
+    const lid = new THREE.Group(); lid.position.set(0, 0.55, -0.33); g.add(lid); g.userData.lid = lid;
+    addTo(lid, part(new THREE.CylinderGeometry(0.33, 0.33, 1.0, 8, 1, false, 0, Math.PI), 0xc07e44), [0, 0, 0.33], [0, 0, Math.PI / 2]);
+    for (const x of [-0.35, 0.35]) addTo(lid, part(new THREE.CylinderGeometry(0.36, 0.36, 0.08, 8, 1, false, 0, Math.PI), 0xffd36b), [x, 0, 0.33], [0, 0, Math.PI / 2]);
   },
   lamp(g) {
     addTo(g, part(G.cyl(0.05, 0.08, 1.6, 6), WOOD_DK), [0, 0.8, 0]);
@@ -167,7 +169,7 @@ export function buildRoom(def, layout) {
     const g = new THREE.Group(); g.position.set(at[0], 0, at[1]); g.rotation.y = at[2]; root.add(g); F[kind](g);
     if (g.userData.fire) fires.push(g.userData.fire);
     if (SOLID[kind]) obstacles.push({ x: at[0], z: at[1], r: SOLID[kind] });
-    if (INTERACTIVE.has(kind)) spots.push({ kind, x: at[0], z: at[1], index: k });
+    if (INTERACTIVE.has(kind)) spots.push({ kind, x: at[0], z: at[1], index: k, obj: g });
   }
   const tableAt = A.table, bedAt = A.bed;
   return {

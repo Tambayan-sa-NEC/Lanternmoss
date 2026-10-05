@@ -23,6 +23,7 @@ import { buildRoom, ROOM_UP } from '../world/interiors.js';
 import { groundHeight } from '../world/terrain.js';
 import { buff } from './buffs.js';
 import { Challenges } from './challenges/Challenges.js';
+import { Chests } from './Chests.js';
 import { dayClock } from './dayClock.js';
 import { grantItem } from './pickups.js';
 import { gainCoins } from './wallet.js';
@@ -79,6 +80,8 @@ export const Houses = {
       room.root.add(parts.root); state.sleeper = { parts, zT: 1 };
     } else if (def.note) state.noteAt = room.tableAt;                // nobody home: a note on the table
     ctx.indoors = def.name;
+    const chest = room.spots.find(p => p.kind === 'chest');            // emptied earlier this adventure: lid's still up
+    if (chest && this.opened.has(`${ctx.planet}:${index}`)) chest.obj.userData.lid.rotation.x = -1.9;
     if (ctx.companion) { ctx.companion.root.visible = false; if (ctx.companion.shadow) ctx.companion.shadow.visible = false; }
     setRoomView({ up: ROOM_UP, back: BACK });
   },
@@ -185,10 +188,10 @@ export const Houses = {
       }
       case 'chest': {
         if (this.opened.has(key)) { this.read('Storage chest', "Empty. Someone's already had a rummage. (It was you.)"); return; }
-        this.opened.add(key); const g = def.gift ?? {}, got = [];
+        this.opened.add(key); s.lidOpen = { lid: spot.obj.userData.lid, t: 0 }; audio.chestOpen(); const g = def.gift ?? {}, got = [];
         if (g.coins) { gainCoins(g.coins); got.push(`${g.coins} coins`); }
         for (const [id, n] of g.items ?? []) { grantItem(id, n); got.push(`${n > 1 ? `${n}x ` : ''}${itemRegistry.get(id)?.name ?? id}`); }
-        audio.sparkle(); sparkles.emit(s.room.toWorld(spot.x, spot.z, 0.8), { count: 30, color: 0xffd36b, speed: 2, up: ROOM_UP, upBias: 1, life: 0.9, size: 0.32 });
+        sparkles.emit(s.room.toWorld(spot.x, spot.z, 0.8), { count: 30, color: 0xffd36b, speed: 2, up: ROOM_UP, upBias: 1, life: 0.9, size: 0.32 });
         this.read('Storage chest', got.length ? `A note on top: "Take what you need, traveller." Inside: ${got.join(', ')}.` : 'Just old socks.');
         return;
       }
@@ -220,6 +223,7 @@ export const Houses = {
     }
     const s = this.inside; if (!s) return;
     const t = ctx.time;
+    if (s.lidOpen && s.lidOpen.t < 1) { const k = s.lidOpen.t = Math.min(1, s.lidOpen.t + dt / 0.45); s.lidOpen.lid.rotation.x = -1.9 * (1 + 2.4 * (k - 1) ** 3 + 1.4 * (k - 1) ** 2); }
     for (const fire of s.room.fires) fire.scale.setScalar(1 + Math.sin(t * 9) * 0.08 + Math.sin(t * 23) * 0.04);
     s.room.light.intensity = 18 + Math.sin(t * 7) * 0.8;
     if (s.resident) {                                                // turns to look at you when you come over
@@ -234,11 +238,13 @@ export const Houses = {
   },
 };
 
-/** What E does here: talk to the nearest villager, or the door / furniture / resident Houses offers, whichever is closer. */
+/** What E does here: talk to the nearest villager, or the door / furniture / resident Houses offers, or a chest
+    (./Chests.js), whichever is closest. */
 export function currentInteraction() {
   if (!ctx.started || Dialog.open || Houses.fade) return null;
-  const h = Houses.target();
+  let h = Houses.target();
   if (Houses.inside) return h;
+  const c = Chests.target(); if (c && (!h || c.dist < h.dist)) h = c;
   const P = ctx.player, n = nearestNPC(P, ctx.npcs);
   if (n && (!h || n.pos.distanceTo(P.pos) <= h.dist)) {
     return { label: `Talk to ${n.name}${Challenges.tagFor(n)}`, at: _w.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).clone(), run: () => Dialog.start(n) };

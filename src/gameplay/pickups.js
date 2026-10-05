@@ -61,7 +61,7 @@ export function updateWorldItems(dt) {
   for (let i = ctx.worldItems.length - 1; i >= 0; i--) {
     const w = ctx.worldItems[i]; w.update(dt);
     const near = arcDist(P.up, w.up) < INVENTORY.pickupRadius;
-    if (!w.armed) { w.delay -= dt; if (w.delay <= 0 && !near) w.armed = true; continue; }    // dropped: wait, then step away first
+    if (!w.armed) { w.delay -= dt; if (w.delay <= 0 && (!near || !w.stepAway)) w.armed = true; continue; }    // dropped: wait, then step away first
     if (!near) { w.blocked = false; continue; }
     if (!canCollect || w.blocked) continue;
     const r = P.inventory.add(w.itemId, w.quantity, w.props);

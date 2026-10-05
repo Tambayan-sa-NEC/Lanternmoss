@@ -116,16 +116,21 @@ Code: `src/config/houses.js`, `src/world/interiors.js`, `src/gameplay/Houses.js`
       found asleep in their bed at night.
 - [x] No combat indoors (abilities are blocked, monsters ignore you, the companion waits outside).
 
-## 7. Chests **(core)**
+## 7. Chests **(core)** ✓
 
 **Goal:** rewarding exploration with loot.
-Code: new `src/entities/Chest.js`, `src/gameplay/pickups.js` (`grantItem` / `spawnWorldItem`), `src/config/items.js`, `src/config/planets.js`.
+Code: `src/config/chests.js`, `src/entities/Chest.js`, `src/models/chest.js`, `src/gameplay/Chests.js`, `src/gameplay/loot.js`.
 
-- [ ] Chest entity with an opening animation, sparkle burst and sound.
-- [ ] Loot tables per chest type (common / rare / boss chest), defined in config.
-- [ ] Placement per planet in config (like `forage`), plus chests inside houses and a boss chest after each boss.
-- [ ] Opened state remembered for the run, so chests don't refill when you come back.
-- [ ] Optional: locked chests that need a key dropped by a monster or given by an NPC.
+- [x] Chest entity with an opening animation (the lid swings up, a squash, a glow inside), sparkle burst and sound; loot
+      hops out onto the ground around it and coins go straight to the wallet.
+- [x] Loot tables per chest type (Mossy / locked Lantern / boss Treasure chest) in config, with guaranteed items,
+      weighted rolls, coins that grow per planet and planet-specific materials.
+- [x] Placement per planet in config (`chests` in `config/planets.js`), away from the village and the boss lair, in the
+      same spots every visit. House chests open their lids too. A boss chest falls where each boss is beaten: it
+      holds the trophy, and the journey to the next planet waits until you open it (marked on the compass).
+- [x] Opened state remembered for the adventure, so chests don't refill when you come back.
+- [x] Locked Lantern chests need a Lantern Key: monsters drop one now and then while a locked chest waits (guaranteed
+      after a few kills), and Old Bramble hands you his spare once.
 
 ## 8. Better items **(core)**
 

@@ -68,6 +68,14 @@ export const audio = {
   // --- knight + wolf sfx ---
   clang() { this.tone(1400, 0.18, 'square', 0.03, 0, 0.7); this.tone(2100, 0.3, 'sine', 0.03, 0.02); },
   whoosh() { this.noise(0.25, 0.08, 2600); },
+  /** A creaky lid, then a glittering run (grander for the boss chest). */
+  chestOpen(grand = false) {
+    this.tone(140, 0.3, 'sawtooth', 0.025, 0, 1.6); this.noise(0.18, 0.04, 1800);
+    const notes = grand ? [523, 659, 784, 1047, 1319, 1568] : [784, 988, 1175, 1568];
+    notes.forEach((f, i) => this.tone(f, 0.5, 'sine', 0.04, 0.18 + i * 0.07));
+  },
+  chestLocked() { this.tone(220, 0.07, 'square', 0.03); this.tone(200, 0.07, 'square', 0.03, 0.09); this.noise(0.1, 0.04, 1200, 0.02); },
+  unlock() { this.tone(1800, 0.05, 'square', 0.025); this.tone(1200, 0.08, 'triangle', 0.03, 0.08); },
   howl() { this.tone(520, 0.9, 'sine', 0.04, 0, 1.35); this.tone(700, 0.7, 'sine', 0.02, 0.5, 0.8); },
   /** A tiny voice-like chirp when a hero is picked: voice = CHARACTERS[id].profile.voice { pitch, slide }. */
   heroCue({ pitch, slide }) {

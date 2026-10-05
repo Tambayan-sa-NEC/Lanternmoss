@@ -10,6 +10,11 @@ const SHAPES = {
   gem: (g, c) => { addTo(g, part(G.oct(0.2), c, { glow: true, intensity: 2.2 }), [0, 0, 0], [0, 0, 0], [0.8, 1.3, 0.8]); },
   petal: (g, c) => { for (let i = 0; i < 5; i++) addTo(g, part(G.cone(0.08, 0.26, 4), c, { glow: true, intensity: 1.6 }), [Math.cos(i * 1.26) * 0.1, 0, Math.sin(i * 1.26) * 0.1], [Math.PI / 2, 0, -i * 1.26 + Math.PI / 2]); },
   charm: (g, c) => { addTo(g, part(new THREE.TorusGeometry(0.17, 0.035, 4, 12), 0xffd36b), [0, 0, 0]); addTo(g, part(G.oct(0.09), c, { glow: true, intensity: 2.6 }), [0, 0, 0]); },
+  key: (g, c) => {
+    addTo(g, part(new THREE.TorusGeometry(0.1, 0.035, 5, 12), c, { glow: true, intensity: 1.6 }), [0, 0.14, 0]);
+    addTo(g, part(G.box(0.05, 0.3, 0.05), c), [0, -0.07, 0]);
+    for (const y of [-0.17, -0.1]) addTo(g, part(G.box(0.1, 0.04, 0.05), c), [0.06, y, 0]);
+  },
   crown: (g, c) => {
     addTo(g, part(G.cyl(0.2, 0.2, 0.12, 8), c), [0, -0.05, 0]);
     for (let i = 0; i < 5; i++) addTo(g, part(G.cone(0.05, 0.16, 4), 0xffd36b), [Math.cos(i * 1.26) * 0.18, 0.08, Math.sin(i * 1.26) * 0.18]);

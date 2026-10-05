@@ -41,7 +41,7 @@ export const ITEM_EFFECTS = {
 };
 
 /** Procedural icon / world-model shapes (CSS in styles/main.css, meshes in src/models/items.js). */
-export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', 'crown'];
+export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', 'crown', 'key'];
 
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width
@@ -72,6 +72,9 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xff8a4a }, maxStack: 30, rarity: 'uncommon', value: 6 },
   { id: 'frostPetal', name: 'Frost Petal', description: 'A flower petal that never melts, from Frostveil.', category: 'material',
     icon: { shape: 'petal', color: 0xbff4ff }, maxStack: 30, rarity: 'uncommon', value: 6 },
+  // ---- keys ----
+  { id: 'lanternKey', name: 'Lantern Key', description: 'A little brass key with a glowing bow. It opens one locked Lantern chest.', category: 'misc',
+    icon: { shape: 'key', color: 0xffd36b }, maxStack: 5, rarity: 'rare', value: 12, tags: ['key'] },
   // ---- quest items: one per defeated boss ----
   { id: 'mossCrown', name: "Gloomcap's Crown", description: 'Proof that you freed Lanternmoss from the Moss King.', category: 'quest',
     icon: { shape: 'crown', color: 0xb48cff }, rarity: 'legendary', value: 0 },

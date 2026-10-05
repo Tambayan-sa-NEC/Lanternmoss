@@ -14,6 +14,7 @@ import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
 import { burstAt, sparkles } from '../../fx/sparkles.js';
 import { buff } from '../../gameplay/buffs.js';
+import { Chests } from '../../gameplay/Chests.js';
 import { giftItem } from '../../gameplay/pickups.js';
 import { buildBaker, buildBard, buildSmith, buildSnowKeeper, buildSprite, buildWizard } from '../../models/villagers.js';
 import { audio } from '../../systems/AudioSystem.js';
@@ -58,6 +59,9 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { once: true, when: s => s.hero === 'knight', t: "That axe is nearly as big as my hat. Nearly. Don't let it get ideas." },
         { once: true, when: s => s.hero === 'ranger', t: 'An elf! Then you can hear the moss humming too. Lucky you. Unlucky ears.' },
         { once: true, when: s => s.level >= 5, t: 'Level {level} already? The stones are humming your name. Off-key, but with feeling.', e: 'excited' },
+        { once: true, when: () => Chests.lockedWaiting() && !Chests.hasKey(), e: 'excited',
+          t: "Found a Lantern chest out there, have you? Locked, of course. Here, my spare key. I keep it in my hat. Don't ask what else is in the hat.",
+          a: n => giftItem(n, 'lanternKey') },
         { once: true, when: s => s.planet === 1, t: "So you toppled Gloomcap AND carried an old wizard across the stars. Emberfall tastes of cinnamon and danger." },
         { once: true, when: s => s.planet === 2, t: 'Frostveil. My beard has opinions about this cold, {hero}. None of them polite.', e: 'sad' },
         { once: true, when: s => s.bosses >= 2, t: 'Two dark kings down. One more, and the lanterns of every world will sing together.', e: 'excited' },

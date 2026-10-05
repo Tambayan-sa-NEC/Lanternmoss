@@ -29,6 +29,7 @@ const GLYPHS = {
   regen: `<path ${F} d="M12 20.5S3.5 15.3 3.5 9.2A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8.5 2.2c0 6.1-8.5 11.3-8.5 11.3z"/><path fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" d="M12 9.5v6M9 12.5h6"/>`,
   // ---- waypoints
   boss: `<path ${F} d="M12 3c-4.7 0-8 3.2-8 7.5 0 2.4 1.1 4.3 2.8 5.4V19h2.4v-2h1.6v2h2.4v-2h1.6v2h2.4v-3.1c1.7-1.1 2.8-3 2.8-5.4C20 6.2 16.7 3 12 3z"/><circle fill="#fff" cx="8.8" cy="11" r="1.9"/><circle fill="#fff" cx="15.2" cy="11" r="1.9"/>`,
+  chest: `<path ${F} d="M3 10.5C3 6.5 6 4 12 4s9 2.5 9 6.5zM3 12h18v7.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5z"/><rect fill="#fff" x="10.3" y="10.2" width="3.4" height="4.2" rx="1"/>`,
   home: `<path ${F} d="M12 3.5L2.5 11.5h2.8V20h5v-5h3.4v5h5v-8.5h2.8z"/>`,
   star: `<path ${F} d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/>`,
   quest: `<path ${F} d="M6 3.5h10.5a3 3 0 0 1 3 3V19a2 2 0 0 1-2 2H7.5a3 3 0 0 1-3-3V5a1.5 1.5 0 0 1 1.5-1.5z"/><path fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" d="M8 8h8M8 11.5h8M8 15h5"/>`,
