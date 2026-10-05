@@ -181,8 +181,14 @@ the hero's vitals right above it, and skills on the lower right.
 Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/controls.js`, `src/config/characters.js`
 (ability keys), `src/gameplay/quickSlots.js`, `index.html`, `styles/main.css`.
 
-- [ ] **10.1 Better fonts:** a stronger type pairing (a display font for names and numbers, a very readable body
-      font), consistent sizes and weights across the HUD, menus and dialogue.
+- [ ] **10.1 Fonts that fit Lanternmoss:** type chosen to express the game's identity, not just any nice-looking
+      font. Lanternmoss is a cozy, storybook world of lanterns, moss and little planets, so the lettering should feel
+      handmade, warm and a little magical. The choice should hold up on the title, the planet banners, names and
+      numbers.
+  - Pair it with a very readable body font for dialogue, tooltips and small HUD text.
+  - Keep sizes and weights consistent across the HUD, menus and dialogue.
+  - Before picking, write a short brief on the game's look and feel (mood words, references), and compare 2–3
+    candidate pairings in a mock-up of the HUD and the title screen.
 - [ ] **10.2 Item hotbar** at the lower centre of the screen:
   - Numbered slots (`1`–`9`). Pressing a number selects that slot and the hero **holds** that item; clicking a slot does
     the same.
