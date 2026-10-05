@@ -68,6 +68,7 @@ export const audio = {
   // --- knight + wolf sfx ---
   clang() { this.tone(1400, 0.18, 'square', 0.03, 0, 0.7); this.tone(2100, 0.3, 'sine', 0.03, 0.02); },
   whoosh() { this.noise(0.25, 0.08, 2600); },
+  splash(big = true) { this.noise(big ? 0.45 : 0.15, big ? 0.1 : 0.03, 2400); if (big) this.tone(300, 0.25, 'sine', 0.035, 0.02, 0.55); },
   /** A creaky lid, then a glittering run (grander for the boss chest). */
   chestOpen(grand = false) {
     this.tone(140, 0.3, 'sawtooth', 0.025, 0, 1.6); this.noise(0.18, 0.04, 1800);

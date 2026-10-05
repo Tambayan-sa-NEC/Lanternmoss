@@ -1,7 +1,7 @@
 /* The hero: a surface Walker driven by camera-relative input, with combat state and a swappable model. */
 import * as THREE from 'three';
 import { COMBAT } from '../../config/combat.js';
-import { BUFFS, PLAYER } from '../../config/game.js';
+import { BUFFS, PLAYER, WORLD } from '../../config/game.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buffs } from '../../gameplay/buffs.js';
@@ -62,6 +62,15 @@ export class Player extends Walker {
     return t1;
   }
 
+  /** Water: a splash on the way in, ripples while wading or swimming (the Walker slows and floats the hero). */
+  splashes(dt) {
+    if (this.waterDepth <= 0.15) { this.wet = false; return; }
+    const surf = this.swimming ? this.r + WORLD.water.swimDepth : this.r + this.waterDepth, moving = this.vel.lengthSq() > 0.6;
+    const burst = (count, speed) => { _tv.copy(this.up).multiplyScalar(surf);
+      sparkles.emit(_tv, { count, color: 0xe8fbff, speed, up: this.up, upBias: 0.9, life: 0.55, size: 0.3 }); };
+    if (!this.wet) { this.wet = true; this.rippleT = 0.2; burst(26, 3); audio.splash(); return; }
+    if (moving && (this.rippleT -= dt) < 0) { this.rippleT = this.swimming ? 0.32 : 0.24; burst(5, 1.2); if (Math.random() < 0.35) audio.splash(false); }
+  }
   /** Movement for one frame. input: { keys, viewFwd (camera heading), enabled (false while menus own the keys) }.
       While a scripted move runs (this.motion(player, dt) -> false when finished, e.g. Leap Slam) it replaces steering and physics. */
   update(dt, { keys, viewFwd, enabled }) {
@@ -93,6 +102,7 @@ export class Player extends Walker {
     const wasGrounded = this.grounded, vyBefore = this.vy, spd = this.vel.length();
     _tv2.copy(this.vel).add(this.knock);                         // knockback from hits rides on top of steering
     const n = this.step(_tv2, dt, g);
+    this.splashes(dt);
     projectTangent(this.knock, this.up).multiplyScalar(Math.exp(-6 * dt));
     // transport velocity into the new tangent plane, then remove the part pushing into obstacles => smooth sliding
     projectTangent(this.vel, this.up); if (this.vel.lengthSq() > 1e-8) this.vel.setLength(spd);

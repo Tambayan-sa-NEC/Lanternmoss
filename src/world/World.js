@@ -3,18 +3,19 @@
    ORDER MATTERS in generate(): each step draws from the seeded world rand, and later steps avoid what
    earlier ones placed. Reordering steps changes the whole layout. */
 import * as THREE from 'three';
+import { WORLD } from '../config/game.js';
 import { clearStaticColliders } from '../physics/colliders.js';
 import { Batcher } from '../render/Batcher.js';
 import { releasePointsMaterial } from '../render/materials.js';
 import { disposeTree, G, part } from '../render/meshes.js';
 import { scene, setFogColor } from '../render/scene.js';
-import { seedWorld } from '../utils/random.js';
+import { rand, rr, seedWorld } from '../utils/random.js';
 import { arcDist, frameQuat, offsetDir, projectTangent, randomDir, tangentFrame } from '../utils/sphere.js';
 import { buildPlanet } from './planet.js';
 import { isFree, placed } from './placement.js';
 import { decoratePonds, createGrass, scatterFlora } from './scatter.js';
 import { CLOUD_AXIS, createClouds, createFireflies, createSky } from './sky.js';
-import { addPond, computeWaterLevel, groundHeight, ponds } from './terrain.js';
+import { addFlat, addPond, bakeTerrain, computeWaterLevel, groundHeight, ponds, setTerrain } from './terrain.js';
 import { buildVillage } from './village.js';
 import { createWater } from './water.js';
 
@@ -40,23 +41,38 @@ export class World {
     this.sun = new THREE.DirectionalLight(0xffd9a6, 2.35);
     this.add(this.hemi, this.sun, this.sun.target);
 
-    // ponds first: they carve the terrain everything else stands on
-    const spawnDir = this.spawnDir;
+    // the planet's shape, then everything that needs level ground (the village, the stones, the boss lair, the ponds and
+    // lakes) before the height field is baked; ponds carve into it after
+    const spawnDir = this.spawnDir, F = WORLD.flats;
+    setTerrain(planet.terrain, planet.seed);
     this.pond1 = addPond(offsetDir(spawnDir, -0.55, 13), 4.3);
     this.stoneCenter = offsetDir(spawnDir, 2.75, 40);
+    this.lairDir = offsetDir(spawnDir, rand() * Math.PI * 2, rr(...WORLD.lairArc));
     placed.push({ dir: spawnDir.clone(), r: 3 }, { dir: this.stoneCenter, r: 6.8 });
-    for (const pr of [3.7, 5.0]) {
-      for (let i = 0; i < 200; i++) {
+    const pondSpot = (pr, minFromVillage) => {
+      for (let i = 0; i < 300; i++) {
         const d = randomDir();
-        if (arcDist(d, spawnDir) > 22 && isFree(d, pr + 8) && ponds.every(p => arcDist(d, p.dir) > p.r + pr + 16)) { addPond(d, pr); break; }
+        if (arcDist(d, spawnDir) > minFromVillage && arcDist(d, this.lairDir) > F.lair[0] + pr + 4 && isFree(d, pr + 8)
+          && ponds.every(p => arcDist(d, p.dir) > p.r + pr + 16)) return d;
       }
+      return null;
+    };
+    for (const pr of [3.7, 5.0, 4.2, 3.4, 4.6]) { const d = pondSpot(pr, 22); if (d) addPond(d, pr); }
+    for (let i = 0; i < (planet.terrain?.lakes ?? 0); i++) { const pr = rr(8, 11), d = pondSpot(pr, 34); if (d) addPond(d, pr, 3.2); }
+    addFlat(spawnDir, ...F.village); addFlat(this.stoneCenter, ...F.stones); addFlat(this.lairDir, ...F.lair);
+    for (const p of ponds) addFlat(p.dir, p.r + 3, 7);
+    this.outerHouses = [];                                             // a hamlet beyond the square, each house on level ground
+    for (let k = 0; k < 3; k++) for (let i = 0; i < 200; i++) {
+      const d = offsetDir(spawnDir, rand() * Math.PI * 2, rr(30, 58));
+      if (isFree(d, 5) && arcDist(d, this.stoneCenter) > 14 && this.outerHouses.every(o => arcDist(o, d) > 14)) { this.outerHouses.push(d); addFlat(d, 5, 6); break; }
     }
+    bakeTerrain();
     ponds.forEach(computeWaterLevel);
 
-    this.add(buildPlanet(palette));
+    this.add(buildPlanet(palette));                                   // (the height field is baked: placement may sample it now)
 
     const B = new Batcher();
-    Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter));   // houses, houseA, cottage
+    Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses));   // houses, houseA, cottage
     decoratePonds(B);
     scatterFlora(B);
     this.add(B.build());

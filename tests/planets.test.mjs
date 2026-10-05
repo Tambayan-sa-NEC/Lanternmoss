@@ -82,3 +82,16 @@ test('scaleEnemyDef returns the base table untouched for a planet with no scalin
   const hex = scaleEnemyDef(COMBAT.enemies.hexlantern, PLANETS[2].scale);
   assert.equal(hex.heal, COMBAT.enemies.hexlantern.heal * PLANETS[2].scale.hp);   // healing keeps pace with health
 });
+
+test('every planet has a shape of its own: valid terrain parts and cliff / peak colours', () => {
+  const shapes = new Set();
+  for (const p of PLANETS) {
+    const t = p.terrain; assert.ok(t && (t.hills || t.ridges || t.plateaus), `${p.name}: terrain`);
+    for (const k of ['hills', 'ridges', 'plateaus']) if (t[k]) assert.ok(t[k].amp > 0 && t[k].freq > 0, `${p.name}: ${k} amp / freq`);
+    if (t.plateaus) assert.ok(t.plateaus.step > 0 && t.plateaus.sharp >= 0 && t.plateaus.sharp <= 1, `${p.name}: plateau steps`);
+    assert.ok(Number.isInteger(t.lakes ?? 0), `${p.name}: lakes`);
+    assert.ok(Number.isInteger(p.palette.cliff) && Number.isInteger(p.palette.peak), `${p.name}: cliff and peak colours`);
+    shapes.add(Object.keys(t).filter(k => k !== 'lakes').sort().join('+'));
+  }
+  assert.ok(shapes.size >= 2, 'planets differ in shape, not just colour');
+});

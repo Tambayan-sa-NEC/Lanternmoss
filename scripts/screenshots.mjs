@@ -72,6 +72,14 @@ try {
   await wait(5000); await shot('night');
   await run(async () => { const { dayClock } = await import('/src/gameplay/dayClock.js'); dayClock.t = 0.25 * 300; });
 
+  // swimming in a lake
+  await run(() => { const L = window.LANTERNMOSS, P = L.player;
+    import('/src/world/terrain.js').then(T => import('/src/utils/sphere.js').then(S => {
+      const lake = T.ponds.filter(p => p.r >= 8).sort((a, b) => S.arcDist(a.dir, P.up) - S.arcDist(b.dir, P.up))[0] ?? T.ponds[0];
+      P.placeAt(S.dirAlong(lake.dir, lake.t1, lake.r * 0.4)); window.__frame(lake.dir, { pitch: 0.3, dist: 7 }); L.cam.fwd.negate();
+      L.keys.KeyW = true; setTimeout(() => { L.keys.KeyW = false; }, 2600); })); });
+  await wait(2600); await shot('swim');
+
   // a fight: the hero among goblins, mid-spell
   await run(() => {
     const L = window.LANTERNMOSS, g = L.enemies.filter(e => e.alive && e.type === 'goblin');
@@ -118,6 +126,13 @@ try {
     await wait(9000);
     await run(turn => { const L = window.LANTERNMOSS; window.__frame(L.boss.up, { turn, pitch: 0.32, dist: 12 }); }, turn);
     await wait(3000); await shot(name);
+    if (planet === 1) {                                                // Emberfall's mesas: look from low ground at the highest nearby
+      await run(() => import('/src/world/terrain.js').then(T => import('/src/utils/sphere.js').then(S => {
+        const L = window.LANTERNMOSS, P = L.player, base = S.offsetDir(L.planets.world.spawnDir, 2.2, 44);
+        let best = base, bh = -1e9; for (let i = 0; i < 400; i++) { const d = S.offsetDir(base, i * 0.157, 10 + (i % 20) * 2); const h = T.groundHeight(d); if (h > bh) { bh = h; best = d; } }
+        P.placeAt(base); window.__frame(best, { pitch: 0.16, dist: 9 }); })));
+      await wait(5000); await shot('mesas');
+    }
   }
   console.log('errors:', errors.length ? errors : 'none');
 } finally {

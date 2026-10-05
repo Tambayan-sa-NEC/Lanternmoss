@@ -2,7 +2,7 @@
 
 A tiny cozy planet of lanterns, moss and friendly critters: a third-person browser game built with
 [Three.js](https://threejs.org/) (r160) and plain ES modules, with no asset files (every model, icon and sound is made in
-code). Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore a little round planet, help the villagers, open
+code). Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore hilly little planets, help the villagers, open
 treasure chests, gear up, raise a pet, and fight the monsters beyond the village lanterns.
 
 ![The village of Lanternmoss](docs/screenshots/village.jpg)
@@ -53,6 +53,16 @@ hit-stop. Monsters range from goblin packs and charging ramhorns to burrowing th
 and every boss has telegraphed attacks to read and dodge.
 
 <p>
+  <img src="docs/screenshots/mesas.jpg" width="49%" alt="Emberfall's mesas">
+  <img src="docs/screenshots/swim.jpg" width="49%" alt="Swimming in a lake">
+</p>
+
+**Bigger, varied worlds.** Each planet has its own shape: Lanternmoss rolls with grassy hills, Emberfall rises in mesas
+with sheer cliffs, Frostveil in ridged snowy mountains. Ground too steep to walk is a cliff (go round or jump), rocks and
+boulders can be climbed and stood on, and ponds and lakes can be waded into and swum across. The village, the stone
+circle and each boss arena sit on level ground.
+
+<p>
   <img src="docs/screenshots/boss-demon.jpg" width="49%" alt="Malgrath, the Winged Demon Lord">
   <img src="docs/screenshots/bag.jpg" width="49%" alt="The bag with gear">
 </p>
@@ -82,6 +92,8 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Bigger, varied planets:** nearly 3x the ground, with rolling hills, Emberfall's mesas and cliffs, and Frostveil's
+  ridged mountains. Rocks and boulders you can jump onto, and lakes you can wade and swim in.
 - **A new HUD:** a Minecraft-style hotbar on `1`–`9` with vitals above it, skills on the lower right on letter keys,
   every key remappable, and new type chosen for the game's storybook feel ([docs/typography.md](docs/typography.md)).
 - **Pets:** five pets with commands, abilities, levels, health and fainting, naming and petting; any hero, any pet.
@@ -160,7 +172,7 @@ src/
 ├── main.js                entry point: builds the Game, starts the loop, exposes window.LANTERNMOSS
 ├── errorOverlay.js        classic script that shows load/runtime errors on screen
 ├── config/                every tunable number and authored data table (no logic, no Three.js)
-│   ├── game.js            planet radius, world seed, movement, buff multipliers, camera
+│   ├── game.js            planet radius, world generation (WORLD: scatter, flats, slopes, water), movement, buffs, camera
 │   ├── render.js          pixel ratio, fog, bloom, outline width
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, pet marks
 │   ├── pets.js            every pet: body, attack, ability, unlock; pet growth, care, commands, keys, motion
@@ -200,12 +212,13 @@ src/
 │   └── Batcher.js         merges static scenery into a few draw calls
 ├── physics/
 │   ├── colliders.js       static, moving and camera colliders; overlap resolution
-│   └── Walker.js          surface movement under spherical gravity (base class for every walker)
+│   └── Walker.js          surface movement under spherical gravity: cliffs, standing on rocks, wading and swimming
 ├── world/                 the planet (generated once, in a fixed order, from a seeded RNG)
 │   ├── World.js           generation order, landmarks, per-frame sun / sky / ambient animation
-│   ├── terrain.js         height function, ponds, ground-placement matrices
+│   ├── terrain.js         each planet's shape (seeded hills / ridges / plateaus), flats, the baked height field, ponds,
+│   │                      slopes, water depth, ground-placement matrices
 │   ├── placement.js       free-spot searches for scenery and spawns
-│   ├── planet.js          the planet mesh
+│   ├── planet.js          the planet mesh (cliff faces and high ground coloured from the palette)
 │   ├── props.js           prop builders (houses, trees, rocks, lanterns, flowers...)
 │   ├── village.js         houses, standing-stone circle, lantern paths
 │   ├── interiors.js       house interiors: room shells and furniture, built away from the planet
@@ -354,6 +367,8 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Victory / fade timings, heal on arrival | `src/config/planets.js` → `TRANSITION` |
 | Items (stats, stack sizes, effects, icons), bag size, keys, pickup radius | `src/config/items.js` |
 | What lies around each planet | `src/config/planets.js` → `forage` |
+| Each planet's shape: hills, ridges, plateaus / cliffs, lakes | `src/config/planets.js` → `terrain` (cliff / peak colours: `palette`) |
+| Planet size, scenery density, flattened areas, steepest walkable slope, swimming | `src/config/game.js` → `PLANET_RADIUS`, `WORLD` |
 | Hero stats and abilities | `src/config/characters.js` |
 | XP curve, level cap, stat / damage growth | `src/config/leveling.js` |
 | Challenges and their dialogue | `src/config/challenges.js` |

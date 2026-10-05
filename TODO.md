@@ -218,24 +218,39 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
       boss bar at the top (toasts move below it). The centre slides left on narrow screens so it never reaches the
       skills. The Controls page, the character-select key chips, the README and the screenshots are updated too.
 
-## 11. Better and bigger planets **(core)**
+## 11. Better and bigger planets **(core)** ✓
 
 **Goal:** worlds that feel like places, not balls: varied ground, more room, and terrain you can climb and wade into.
 Code: `src/world/` (terrain, planet, placement, scatter, water), `src/physics/` (Walker, colliders),
 `src/config/planets.js`, `src/systems/CameraSystem.js`.
 
-- [ ] **Not a perfect sphere:** stronger height variation (hills, valleys, cliffs, plateaus, ridges), different per
+- [x] **Not a perfect sphere:** stronger height variation (hills, valleys, cliffs, plateaus, ridges), different per
       planet, with smooth walking on slopes and limits on how steep a slope can be climbed.
-- [ ] **Bigger maps,** big enough that the planet no longer looks like a ball from the ground: a larger radius, a lower
+  - Done: each planet's shape comes from seeded noise (`terrain` in `config/planets.js`): Lanternmoss has rolling
+    hills, Emberfall has terraced mesas with cliffs, and Frostveil has ridged mountains (about -5 to +11 m). It's baked
+    into a cube-map height field, so it's cheap to sample. Ground steeper than `WORLD.maxSlope` can't be walked up:
+    you slide along it or jump. Cliff faces and peaks get their own colours.
+- [x] **Bigger maps,** big enough that the planet no longer looks like a ball from the ground: a larger radius, a lower
       camera horizon, fog and draw distance tuned to match.
+  - Done: the radius went from 40 to 72 (about 3x the ground), the fog was pushed out, and the hills break up the
+    horizon. There's 3.2x the scenery, 1.5x the monsters, and more chests, forage and ponds plus big lakes. The boss lair
+    is 100–130 m from the village. Three outer houses form a hamlet 30–58 m out.
   - Watch the performance budget (batching, culling, level of detail for scenery).
   - Spread spawns, chests and landmarks over the extra space.
-- [ ] **Rocks you can climb:** jump onto rocks and stand on them, using real tops and collision shapes instead of
+- [x] **Rocks you can climb:** jump onto rocks and stand on them, using real tops and collision shapes instead of
       today's push-out cylinders.
-- [ ] **Water you can enter:** wade into ponds and lakes (slower movement, ripples and splashes, maybe swimming in
+- [x] **Water you can enter:** wade into ponds and lakes (slower movement, ripples and splashes, maybe swimming in
       deep water), instead of ponds acting as walls.
-- [ ] Re-check everything that assumes the current sphere: the boss arenas, waypoints and compass, house doors,
+- [x] Re-check everything that assumes the current sphere: the boss arenas, waypoints and compass, house doors,
       villager paths and the camera's collision lift.
+  - Done:
+    - Rocks are solids with a top: you jump onto one and stand on it, and only rocks taller than a step block you.
+    - Ponds have no wall any more: you wade (slower), then swim in deep water, with splashes and ripples. Their banks
+      are gentle enough to walk out of.
+    - The village, the stone circle, each boss arena, every pond and the outer houses are flattened.
+    - Spawns, chests and forage stay off cliffs.
+    - Aiming rays reach over the taller hills.
+    - Shadows lie on rock tops and water.
 
 ## 12. Pet selection **(core)**
 

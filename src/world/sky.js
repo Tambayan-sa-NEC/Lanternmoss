@@ -45,7 +45,7 @@ export function createSky({ horizon, mid, zenith }) {
 
 export function createClouds() {
   const cb = new Batcher();
-  for (let i = 0; i < 18; i++) { const d = randomDir(), rad = R + rr(19, 27), [t1] = tangentFrame(d);
+  for (let i = 0; i < 40; i++) { const d = randomDir(), rad = R + rr(26, 38), [t1] = tangentFrame(d);
     const M = matrixAt(d.clone().multiplyScalar(rad), d, t1), col = rpick([0xfff6f0, 0xffe4ee, 0xfff0dc]);
     const n = 3 + Math.floor(rand() * 3);
     for (let k = 0; k < n; k++) { const s = rr(1.3, 2.4) * (k === 0 ? 1.3 : 1);

@@ -7,7 +7,7 @@ import { ctx } from '../core/context.js';
 import { colliders } from '../physics/colliders.js';
 import { camera } from '../render/scene.js';
 import { arcDist, dirAlong, tangentToward } from '../utils/sphere.js';
-import { groundHeight, ponds } from '../world/terrain.js';
+import { groundHeight, maxRelief, ponds } from '../world/terrain.js';
 
 const V3 = THREE.Vector3;
 const _ray = new THREE.Ray(), _ndc = new V3(), _sphere = new THREE.Sphere(new V3(), R), _hit = new V3(), _u = new V3();
@@ -61,11 +61,12 @@ const below = p => p.length() < groundHeight(_u.copy(p).normalize());
 export function groundUnderScreen(nx, ny) {
   _ndc.set(nx, ny, 0.5).unproject(camera);
   _ray.origin.copy(camera.position); _ray.direction.copy(_ndc).sub(camera.position).normalize();
-  _sphere.radius = R + 1.5;                                       // above the highest hill: skip the empty sky
+  const top = R + maxRelief();
+  _sphere.radius = top;                                           // above the highest hill: skip the empty sky
   if (!_ray.intersectSphere(_sphere, _hit)) return null;
   let a = Math.max(0, _hit.distanceTo(_ray.origin) - 0.01), b = -1;
-  if (_ray.origin.length() < R + 1.5) a = 0;
-  for (let t = a; t < a + 80; t += 0.5) if (below(_ray.at(t, _hit))) { b = t; break; }
+  if (_ray.origin.length() < top) a = 0;
+  for (let t = a; t < a + 140; t += 0.5) if (below(_ray.at(t, _hit))) { b = t; break; }
   if (b < 0) return null;
   for (let i = 0, lo = Math.max(a, b - 0.5); i < 10; i++) {       // bisect to the ground
     const mid = (lo + b) / 2; if (below(_ray.at(mid, _hit))) b = mid; else lo = mid;

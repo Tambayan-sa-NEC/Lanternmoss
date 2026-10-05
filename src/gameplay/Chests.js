@@ -18,7 +18,7 @@ import { toast } from '../ui/toast.js';
 import { mr, mulberry32 } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir, tangentFrame, tangentToward } from '../utils/sphere.js';
 import { spawnSpot } from '../world/placement.js';
-import { ponds } from '../world/terrain.js';
+import { ponds, slopeAt } from '../world/terrain.js';
 import { SPAWN_DIR } from '../world/World.js';
 import { lootName, rollLoot } from './loot.js';
 import { grantItem, spawnWorldItem } from './pickups.js';
@@ -51,7 +51,7 @@ export const Chests = {
       const d = randomDir(rng), relax = i > 200 ? 0.6 : 1;                // after many tries, accept a little closer
       if (arcDist(d, SPAWN_DIR) < def.minFromVillage * relax) continue;
       if (lair && arcDist(d, lair) < def.minFromLair * relax) continue;
-      if (!freeOfColliders(d, 1.3) || ponds.some(p => arcDist(d, p.dir) < p.r + 1.5)) continue;
+      if (!freeOfColliders(d, 1.3) || ponds.some(p => arcDist(d, p.dir) < p.r + 1.5) || slopeAt(d) > 0.5) continue;
       if (this.list.some(c => arcDist(d, c.up) < MIN_APART * relax)) continue;
       return d;
     }
