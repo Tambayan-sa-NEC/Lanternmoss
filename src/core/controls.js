@@ -19,6 +19,7 @@ import { toggleHint } from '../ui/hud.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
 import { PetMenu } from '../ui/PetMenu.js';
+import { JournalUI } from '../ui/JournalUI.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
 
@@ -27,6 +28,7 @@ const GAME_KEYS = { has: code => code === 'Escape' || HOTBAR_KEYS.includes(code)
 
 function onKey(code) {
   const player = ctx.player;
+  if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens
   if (PetMenu.isOpen) { PetMenu.key(code); return; }      // the pet menu pauses too
   if (ctx.transitioning) return;                       // travelling between planets
@@ -40,6 +42,7 @@ function onKey(code) {
   }
   if (is('bag', code)) { if (Dialog.open) Dialog.close(); InventoryUI.toggle(); return; }
   if (is('petMenu', code)) { PetMenu.open(); return; }
+  if (is('journal', code)) { JournalUI.open(); return; }
   const slot = HOTBAR_KEYS.indexOf(code); if (slot >= 0) { Hotbar.select(slot); return; }   // hold / use a hotbar item (bag open or not)
   if (is('jump', code) && !player.dead) player.jumpBuf = 0.14;
   if (is('mute', code)) toast(audio.toggle() ? 'Sound off' : 'Sound on');

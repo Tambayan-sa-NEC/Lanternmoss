@@ -1,5 +1,6 @@
 /* What the bag window (ui/InventoryUI.js) can ask the game to do. Kept here so the UI never reaches into gameplay. */
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { craft } from '../items/crafting.js';
 import { audio } from '../systems/AudioSystem.js';
 import { unequip } from './equipment.js';
@@ -21,7 +22,7 @@ export function bagCommands(bag) {
     craft: recipe => {
       const r = craft(recipe, bag, ctx.player.coins, n => spendCoins(n));
       if (!r.ok) return { ok: false, message: PROBLEM[r.problem] };
-      audio.sparkle();
+      audio.sparkle(); emit('crafted', { itemId: recipe.result, qty: recipe.qty ?? 1, rarity: recipe.rarity ?? null });
       return { ok: true, message: `Crafted ${lootName(recipe.result, recipe.qty ?? 1, recipe.rarity ? { rarity: recipe.rarity } : null)}!` };
     },
   };

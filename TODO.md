@@ -283,25 +283,44 @@ Code: `src/ui/CharacterSelect.js`, `src/gameplay/Pets.js`, `src/ui/InventoryUI.j
     the pet, so its hops don't move it. If a lamppost, house or hill would block the view, the hero turns to a clear
     heading first, and wandering critters keep out of the shot. Only the title screen still orbits.
 
-## 13. Achievements and bestiary **(core)**
+## 13. Achievements and bestiary **(core)** ✓
 
 **Goal:** a journal that rewards exploring and fighting, and teaches you about the monsters.
 Code: new `src/config/achievements.js`, `src/gameplay/Journal.js`, `src/ui/` (journal screen, toasts); listens on
 `src/combat/events.js` and `src/core/events.js`.
 
-- [ ] **Achievements:**
+- [x] **Achievements:**
   - Firsts: the first boss, the first Legendary piece, the first crafted item, every pet found.
   - Counts: monsters defeated, chests opened, quests done.
   - Challenges: beat a boss without being hit, at a low level, without a pet.
   - A toast and sound when one unlocks; maybe small rewards (titles, coins, cosmetics).
-- [ ] **Bestiary:**
+  - Done: 20 achievements in `config/achievements.js`.
+    - Firsts: monster, boss, all three bosses, chest, craft, Legendary, every pet, every monster.
+    - Counts: monsters, chests, quests, crafts, kinds of item.
+    - Challenges: no hit, no pet, a low level (3 / 5 / 7, by planet, measured when the fight begins). Kills of a
+      boss's summoned helpers don't count, so they can't be farmed.
+    - Each one pays coins. A banner slides in with a fanfare, and several in a row queue up.
+- [x] **Bestiary:**
   - An entry per monster and boss, filled in as you meet and defeat them.
   - Each entry has a 3D or portrait view, where it lives, its stats, its attacks and how to counter them, what it drops,
     and how many you've defeated.
   - Unseen monsters show as silhouettes.
-- [ ] A journal screen (from the pause menu, or its own key) with tabs: Achievements, Bestiary, and maybe a Collection
+  - Done: a page per monster and boss, with the words in `config/bestiary.js`.
+    - Portraits are rendered once from the real models (`ui/monsterPortraits.js`), and are silhouettes until you meet
+      the monster (within 16 m).
+    - Once met: where it lives, how it fights and how to beat it. Once beaten: stats per planet it lives on, drops,
+      and how many you've defeated.
+- [x] A journal screen (from the pause menu, or its own key) with tabs: Achievements, Bestiary, and maybe a Collection
       of the items found.
+  - Done: `J` (remappable), Journal on the pause menu, or Journal on the title screen. During play it pauses the
+    game. The tabs:
+    - Achievements: progress bars, rewards, the date earned, and lifetime totals.
+    - Bestiary: the pages above.
+    - Collection: every item, with the ones found in colour and a gem on gear found at Legendary rarity.
+    - "Start the journal over" erases it (it asks twice).
 - [ ] Saved with the rest of the game (needs Save / load).
+  - For now: the journal saves itself to localStorage (`lanternmoss.journal`, cleaned on load) and is kept across
+    adventures, so it doesn't wait on Save / load. Fold it into the save system when that arrives.
 
 ## 14. Better fights **(core)**
 

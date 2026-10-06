@@ -22,6 +22,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { releaseAllKeys } from '../systems/InputSystem.js';
 import { dom } from './dom.js';
 import { icon } from './icons.js';
+import { JournalUI } from './JournalUI.js';
 
 const keys = list => list.map(k => `<kbd>${k}</kbd>`).join(' ');
 const fmt = (def, v) => `${v}${def.unit ?? ''}`;
@@ -53,6 +54,7 @@ const PAGES = {
     return `<h2>Paused</h2><div class="sub">${PLANETS[ctx.planet].name} · ${hero.title} · level ${ctx.player.level}</div>
       <div class="menu">
         <button type="button" class="primary" data-go="resume">Resume</button>
+        <button type="button" data-go="journal">Journal</button>
         <button type="button" data-go="settings">Settings</button>
         <button type="button" data-go="controls">Controls</button>
         <button type="button" class="quiet" data-go="quit">Quit to menu</button>
@@ -146,6 +148,7 @@ export const PauseMenu = {
     this.capture = null;
     if (go === 'reset-keys') { resetBinds(); this.bindMsg = 'Keys are back to their defaults.'; this.show('settings'); return; }
     if (go === 'resume') this.close();
+    else if (go === 'journal') JournalUI.open();                         // on top; closing it comes back here
     else if (go === 'confirm-quit') { this.close(); this.handlers.onQuit(); }
     else if (go === 'reset') { resetSettings(); this.show('settings'); }
     else if (go === 'main' && this.panel) this.close();                  // a title-screen panel's Back

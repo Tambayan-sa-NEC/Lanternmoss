@@ -177,7 +177,7 @@ test('events: change / itemadded / itemremoved fire with the right details', () 
   for (const t of ['change', 'itemadded', 'itemremoved']) inv.addEventListener(t, e => log.push([t, e.detail]));
   inv.add('ore', 4); inv.remove('ore', 1); inv.clear();
   assert.deepEqual(log.map(([t]) => t), ['itemadded', 'change', 'itemremoved', 'change', 'change']);
-  assert.deepEqual(log[0][1], { itemId: 'ore', quantity: 4 });
+  assert.deepEqual(log[0][1], { itemId: 'ore', quantity: 4, props: null });
   assert.deepEqual(log[1][1], { slots: [0, 1] });
 });
 

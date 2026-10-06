@@ -60,6 +60,10 @@ import { onSettingsChange, settings } from './settings.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
 import { PetMenu } from '../ui/PetMenu.js';
+import { JournalUI } from '../ui/JournalUI.js';
+import { installAchievementToast } from '../ui/achievementToast.js';
+import { setPortraitRenderer } from '../ui/monsterPortraits.js';
+import { Journal, watchBag } from '../gameplay/Journal.js';
 import { showBanner } from '../ui/banner.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
@@ -96,6 +100,7 @@ export class Game {
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
     buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init();
+    watchBag(bag); JournalUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -131,7 +136,7 @@ export class Game {
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
-    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt);
+    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt); Journal.update(dt);
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -153,6 +158,7 @@ export class Game {
     toast(CHARACTERS[ctx.player.charId].welcome); this.renderSystem.canvas.focus();
     showBanner(`Planet ${ctx.planet + 1} · ${PLANETS[ctx.planet].name}`, PLANETS[ctx.planet].tagline);
     this.planets.onBegin();
+    Journal.noteStart();                                           // the starter pets and the bag count as found
   }
 
   /** Back to a fresh adventure: clears everything the previous character left behind. */
@@ -180,7 +186,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

@@ -17,6 +17,7 @@ import { Dialog } from '../ui/Dialog.js';
 import { showPlayerHurt } from '../ui/hud.js';
 import { toast } from '../ui/toast.js';
 import { projectTangent } from '../utils/sphere.js';
+import { encounterEvents } from './events.js';
 import { noteHit } from './targeting.js';
 
 const _tv = new THREE.Vector3();
@@ -44,6 +45,7 @@ export function damageEnemy(e, amount, o = {}) {
   if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
   if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
+  encounterEvents.dispatchEvent(new CustomEvent('enemyhit', { detail: { enemy: e, amount, source: o.source ?? 'player' } }));
   const marked = e.markT > 0 && o.source !== 'pet', big = amount >= BIG_HIT;
   if (settings.damageNumbers) floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
     o.source === 'pet' ? '#c7a8ff' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
@@ -72,6 +74,7 @@ export function hurtPlayer(amount, from, knock = 0, o = {}) {
   } else amount = Math.max(1, Math.round(amount));
   const heavy = amount >= P.stats.maxHp * 0.25;
   P.hp -= amount; P.invuln = P.hurtT = COMBAT.player.invuln; P.lastHurt = ctx.time; P.squash = -0.2;
+  encounterEvents.dispatchEvent(new CustomEvent('playerhurt', { detail: { amount } }));
   if (settings.damageNumbers) floatText(_tv.copy(P.pos).addScaledVector(P.up, 2.3), `-${amount}`, '#ff5a7a', heavy ? 1.5 : 1);
   showPlayerHurt(); audio.hurt(); shakeCamera(heavy ? 0.5 : 0.25); if (heavy) hitStop(0.08);
   if (knock && from) { P.knock.addScaledVector(knockDir(from, P, _tv), knock); if (P.grounded) { P.vy = knock * 0.5; P.grounded = false; } }

@@ -2,6 +2,7 @@
      Play       -> character selection (#start, src/ui/CharacterSelect.js): the hero, then the pet; Back / Esc
                    goes back a step, then returns here
      Settings / Controls / Credits -> single pages of the pause menu (PauseMenu.openPanel), no pausing involved
+     Journal    the journal (src/ui/JournalUI.js): achievements, bestiary and collection, kept across adventures
    The campaign strip lists the planets in order with their bosses (config/planets.js). Music starts on the first
    click or key press (browsers only allow audio after a gesture). Screens: title / select / null (playing). */
 import { COMBAT } from '../config/combat.js';
@@ -11,6 +12,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { orbitCamera } from '../systems/CameraSystem.js';
 import { CharacterSelect } from './CharacterSelect.js';
 import { dom } from './dom.js';
+import { JournalUI } from './JournalUI.js';
 import { PauseMenu } from './PauseMenu.js';
 
 const ORBIT = { dist: 13, speed: 0.1, pitch: 0.55 };      // the title screen (character select holds a still framing)
@@ -58,13 +60,14 @@ export const MainMenu = {
   onBegin() { dom.title.classList.remove('enter', 'leave'); dom.title.style.display = 'none'; },
   act(name) {
     audio.init();
-    if (name === 'play') this.play(); else PauseMenu.openPanel(name);
+    if (name === 'play') this.play(); else if (name === 'journal') JournalUI.open(); else PauseMenu.openPanel(name);
   },
   setFocus(i) { this.focus = i; this.buttons.forEach((b, k) => b.classList.toggle('focus', k === i)); },
   onPanelClosed() { this.setFocus(this.focus); },
 
   /** Keys while no game is running (InputSystem onMenuKey). */
   key(code) {
+    if (JournalUI.isOpen) { JournalUI.key(code); return; }
     if (PauseMenu.isOpen) { PauseMenu.key(code); return; }
     if (this.screen === 'select') { if (code === 'Escape') this.back(); else CharacterSelect.key(code); return; }
     const n = this.buttons.length;

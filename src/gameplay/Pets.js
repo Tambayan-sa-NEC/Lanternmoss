@@ -9,7 +9,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { PET_CARE, PET_COMMANDS, PET_LEVELS, PETS } from '../config/pets.js';
 import { ctx } from '../core/context.js';
-import { gameEvents } from '../core/events.js';
+import { emit, gameEvents } from '../core/events.js';
 import { bindLabel } from '../core/keybinds.js';
 import { FlyingPet } from '../entities/companions/FlyingPet.js';
 import { WalkingPet } from '../entities/companions/WalkingPet.js';
@@ -147,7 +147,7 @@ export const Pets = {
   // ---------------------------------------------------------------- unlocking
   unlock(id) {
     if (!PETS[id] || this.unlocked.has(id)) return false;
-    this.unlocked.add(id);
+    this.unlocked.add(id); emit('petfound', { id });
     showBanner(`New pet: ${this.nameOf(id)} the ${PETS[id].name.toLowerCase()}!`, `Open the pet menu (${bindLabel('petMenu')}, or click the pet card) to bring them along.`);
     audio.melody();
     return true;

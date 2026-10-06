@@ -3,7 +3,7 @@
    always comes from the item registry, never copied into slots.
    Pure storage + rules (stacking, capacity, moving); no UI, input or world code. Every change is announced:
      'change'      { slots: [indices] }     anything changed (the UI re-renders on this)
-     'itemadded'   { itemId, quantity }
+     'itemadded'   { itemId, quantity, props }
      'itemremoved' { itemId, quantity }
      'full'        { itemId, remaining }    an add did not fit completely
      'itemused'    { itemId, slot, message } raised by the item-use layer through notify()
@@ -80,7 +80,7 @@ export class Inventory extends EventTarget {
       this.#slots[i] = { itemId, quantity: n, props: copyProps(props) }; left -= n; changed.push(i);
     }
     const added = want - left;
-    if (added) { this.notify('itemadded', { itemId, quantity: added }); this.notify('change', { slots: changed }); }
+    if (added) { this.notify('itemadded', { itemId, quantity: added, props }); this.notify('change', { slots: changed }); }
     if (left) this.notify('full', { itemId, remaining: left });
     return { added, remaining: left };
   }
@@ -90,7 +90,7 @@ export class Inventory extends EventTarget {
     const def = this.#registry.get(itemId), q = toCount(quantity);
     if (!def || !this.isValidSlot(i) || this.#slots[i] || !q || q > def.maxStack) return false;
     this.#slots[i] = { itemId, quantity: q, props: copyProps(props) };
-    this.notify('itemadded', { itemId, quantity: q }); this.notify('change', { slots: [i] });
+    this.notify('itemadded', { itemId, quantity: q, props }); this.notify('change', { slots: [i] });
     return true;
   }
 

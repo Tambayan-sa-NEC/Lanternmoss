@@ -20,9 +20,10 @@ const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new'
 const page = await browser.newPage(); await page.setViewport({ width: 1280, height: 720 });
 const errors = []; page.on('pageerror', e => errors.push(String(e)));
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const shot = async (name, { keepToast = false } = {}) => {
+const shot = async (name, { keepToast = false, keepBanner = false } = {}) => {
   if (only && !only.has(name)) return;
   if (!keepToast) await page.evaluate(() => { document.getElementById('toast').style.opacity = 0; });
+  await page.evaluate(keep => { const a = document.getElementById('achv'); if (a) a.style.visibility = keep ? '' : 'hidden'; }, keepBanner);
   await page.screenshot({ path: `${out}${name}.jpg`, type: 'jpeg', quality: 84 }); console.log('saved', name);
 };
 const run = (fn, ...args) => page.evaluate(fn, ...args);
@@ -118,6 +119,21 @@ try {
   await run(() => { const L = window.LANTERNMOSS, P = L.player; L.PetMenu.close();     // and out with the whelp (pet card lower left)
     L.cam.fwd.copy(P.fwd).applyAxisAngle(P.up, 2.5); L.cam.pitch = 0.3; L.cam.dist = 6.5; L.cam.init = false; L.cam.lastDrag = 1e9; });
   await wait(5000); await shot('pet-field');
+
+  // the journal: an achievement unlocking, then the Achievements and Bestiary tabs (a journal partway through)
+  await run(() => {
+    const J = window.LANTERNMOSS.Journal, d = J.data;
+    Object.assign(d.defeated, { goblin: 31, ogre: 4, wisp: 9, slime: 12, slimeling: 20, puffcap: 6, ramhorn: 3, gloomcap: 1 });
+    for (const t of ['goblin', 'ogre', 'wisp', 'slime', 'slimeling', 'puffcap', 'ramhorn', 'gloomcap', 'thornmole']) d.seen[t] = true;
+    Object.assign(d.stats, { monsters: 24, bosses: 1, chests: 7, quests: 2, crafted: 3 }); d.flags.petless = true;
+    for (const id of ['glowcap', 'emberShard', 'mossCloak', 'glowStaff', 'mossCrown', 'moonberryTart']) d.found[id] = true;
+    J.changed();                                                     // unlocks what that adds up to (banners queue up)
+    J.add('monsters');                                               // and the 25th monster: Monster Tamer
+  });
+  await wait(2500); await shot('achievement', { keepBanner: true });
+  await run(() => { const L = window.LANTERNMOSS; L.JournalUI.open('achievements'); }); await wait(1500); await shot('journal');
+  await run(() => { const L = window.LANTERNMOSS; L.JournalUI.page = 'ogre'; L.JournalUI.setTab('bestiary'); }); await wait(2000); await shot('bestiary');
+  await run(() => window.LANTERNMOSS.JournalUI.close()); await wait(600);
 
   // the pause menu: Settings → Keys (remapping), and the Controls page
   await run(() => window.LANTERNMOSS.PauseMenu.open()); await wait(800);

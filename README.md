@@ -91,6 +91,18 @@ grow with you, take commands (follow, stay, attack, passive), have an ability of
 and new ones are found through quests and chests: an owl, a wolf, a fox, a wisp and a dragon whelp.
 
 <p>
+  <img src="docs/screenshots/journal.jpg" width="49%" alt="The journal: achievements">
+  <img src="docs/screenshots/bestiary.jpg" width="49%" alt="The journal: bestiary">
+</p>
+
+**A journal.** `J` (or Journal on the pause menu or the title screen) opens your journal. **Achievements** cover
+firsts, running counts and three boss challenges: no hit taken, no help from your pet, and a low level. Each one pays a
+few coins and pops a banner when it unlocks. The **Bestiary** has a page for every monster and boss, drawn from its real
+model. Pages start as silhouettes, then show where it lives, how it fights and how to beat it once you've met it, and
+its stats per planet and its drops once you've beaten one. The **Collection** shows every item you've found. The journal
+is kept on your device across adventures.
+
+<p>
   <img src="docs/screenshots/keys.jpg" width="49%" alt="Settings: Keys">
   <img src="docs/screenshots/controls.jpg" width="49%" alt="The Controls page">
 </p>
@@ -102,6 +114,9 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **The journal:** 20 achievements (with three boss challenges), a bestiary page for every monster and boss with 3D
+  portraits, attacks, counters, stats and drops, and a collection of every item found. `J` opens it, and it's kept
+  across adventures.
 - **Choosing a pet:** a pet step after the hero on character select, and a pet menu during play (`B`, or click the pet
   card) to see, swap, rename and command your pets. Each hero remembers their pet, and the camera holds still on these
   screens instead of orbiting.
@@ -164,6 +179,7 @@ over). The defaults:
 | `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
 | `B` (or click the pet card) | the pet menu: see, swap, rename and command your pets (the world pauses) |
 | `T` | pet command: follow → stay → attack my target → passive |
+| `J` | the journal: achievements, bestiary and collection (pauses; also on the pause menu and title screen) |
 | `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
 | drag / wheel | rotate / zoom camera |
 | `Esc` / `P` | pause menu: resume, settings, controls, quit (Esc first closes the bag, aiming or dialogue) |
@@ -280,6 +296,9 @@ src/
 │   ├── characters.js      switching heroes (model, stats, abilities, pet)
 │   ├── Pets.js            the pet system: unlocked pets, the one out, names, commands, health and fainting, petting
 │   ├── petPicks.js        which pet each hero last took (saved in the browser)
+│   ├── Journal.js         the journal: fills in achievements, the bestiary and the collection from game events, boss
+│   │                      challenges, rewards; saved in the browser across adventures
+│   ├── journalRules.js    the journal's saved shape, cleaning it on load, counters and achievement progress (pure)
 │   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst) and their lasting effects
 │   ├── buffs.js           Moon-Hop / Feather-Step / Howl timers
 │   ├── dayClock.js        the village clock (phase, day, light)
@@ -307,7 +326,9 @@ src/
 │                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play),
 │                          petViews (pet cards and detail panels for both pet screens), showcase (the menus' still
 │                          camera framings of the hero and pet, and finding a clear view for them),
-│                          itemNotices (item toasts),
+│                          itemNotices (item toasts), JournalUI (the journal screen: achievements, bestiary,
+│                          collection), monsterPortraits (bestiary pictures rendered from the real models),
+│                          achievementToast (the unlock banner),
 │                          overlay (planet chip), toast, character select (hero, then pet; from the title, or C in play).
 │                          HUD layout: vitals + hotbar bottom centre, skills lower right, pet card lower left, boss bar top
 └── utils/                 math helpers, seeded / runtime random, sphere geometry
@@ -400,6 +421,8 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
+| Achievements: goals, rewards, boss challenge levels, banner timing, when a monster counts as met | `src/config/achievements.js` |
+| Bestiary pages: blurbs, attacks, how to beat each monster, drop notes | `src/config/bestiary.js` |
 | Default keys, hotbar keys | `src/config/controls.js` → `KEYBINDS`, `HOTBAR_KEYS` |
 | Hotbar size, use cooldown, which items land on it first | `src/config/items.js` → `HOTBAR` |
 | Fonts | `styles/main.css` → `--font-display`, `--font-body` (and the font link in `index.html`; see `docs/typography.md`) |
@@ -465,6 +488,23 @@ the pet menu (`ui/PetMenu.js`, which pauses the world; bodies then idle through 
 `ui/petViews.js`, and `Pets.presenting` brings the pet round in front of the hero for the camera. A new pet = an entry in `PETS`, a model (a critter look or
 a flyer builder), an ability handler in `gameplay/petAbilities.js` and two glyphs in `ui/icons.js`; `npm test` checks
 all of that is in place.
+
+## The journal
+
+`gameplay/Journal.js` listens on the event buses and fills in the journal:
+- `combat/events.js`: `enemydefeated`, `bossdefeated`, plus `enemyhit` and `playerhurt`, which were added for the boss
+  challenges.
+- `core/events.js`: `chestopened`, `questcomplete`, plus `crafted` and `petfound`, which are new.
+- The bag's `itemadded`, whose detail now carries the item's `props`, so Legendary finds count.
+
+Nothing else knows the journal exists. Its saved shape, the counters and achievement progress are pure functions in
+`gameplay/journalRules.js` (unit-tested). It's written to localStorage (`lanternmoss.journal`) a moment after each
+change, and cleaned on load. A boss fight starts when the boss engages. A win then sets `flawless` if no hit landed on
+the hero, `petless` if the pet never struck the boss, and `underdog` if the fight began at or under the planet's
+`BOSS_CHALLENGES.lowLevel`.
+
+To add an achievement, add an entry to `ACHIEVEMENTS` with a goal on one of the `JOURNAL_STATS` counters (or a flag) and
+a glyph in `ui/icons.js`. A new monster needs a page in `BESTIARY_ENTRIES`. `npm test` checks both.
 
 ## Monsters and bosses
 

@@ -83,6 +83,7 @@ export const audio = {
     this.tone(pitch, 0.12, 'triangle', 0.06, 0, slide); this.tone(pitch * 1.26, 0.22, 'sine', 0.05, 0.11, slide * 0.92);
     this.noise(0.05, 0.02, 3200);
   },
+  achievement() { [659, 784, 988, 1319].forEach((f, i) => this.tone(f, i === 3 ? 0.9 : 0.25, 'triangle', 0.05, i * 0.11)); this.tone(1976, 0.8, 'sine', 0.02, 0.45); },
   coin() { this.tone(1320, 0.09, 'square', 0.025); this.tone(1760, 0.16, 'sine', 0.035, 0.07); },
   // --- ranger sfx ---
   bowShot() { this.tone(190, 0.14, 'triangle', 0.05, 0, 0.55); this.noise(0.1, 0.04, 4200); },
