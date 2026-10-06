@@ -1,21 +1,23 @@
 /* AREA TARGETING for abilities with target: 'ground' (the ultimates). Pressing the key enters aim mode instead of
-   casting: a ground marker follows the mouse cursor (clamped to the ability's range; with no cursor over the game it
-   sits on the locked-on monster or ahead of the hero), showing the radius it will cover. Click or press the key again
-   to cast there; Esc, right click or any other ability cancels. Abilities with landing: true (Leap Slam) snap to the
+   casting: a ground marker sits IN FRONT OF THE HERO (on the locked-on monster when there is one in range), showing the
+   radius it will cover. Aim by turning the hero (move); the mouse wheel brings the marker nearer or farther. The camera
+   plays no part. Click or press the key again to cast there; Esc, right click or any other ability cancels. Abilities with landing: true (Leap Slam) snap to the
    nearest spot the hero can stand on; when there is none the marker turns red and the cast is refused.
    Cooldown and cost are only paid when the cast is confirmed (src/combat/casting.js). */
 import { ctx } from '../core/context.js';
 import { GroundDecal } from '../fx/groundDecals.js';
-import { pointer } from '../systems/InputSystem.js';
 import { dom } from '../ui/dom.js';
+import { clamp } from '../utils/math.js';
 import { arcDist, dirAlong, tangentToward } from '../utils/sphere.js';
-import { clampRange, groundUnderScreen, nearestLandable } from './area.js';
+import { clampRange, nearestLandable } from './area.js';
 import { aimDirection, targeting } from './targeting.js';
 
 const BAD = 0xff4d6d;
+const START = 0.6, STEP = 0.1, NEAREST = 0.15;   // marker distance as a share of the ability's range: first, per wheel step, closest
 
-/** id/s = the ability being aimed; target = chosen surface direction; valid = it can be cast there. */
-export const aim = { id: null, s: null, target: null, valid: false };
+/** id/s = the ability being aimed; target = chosen surface direction; valid = it can be cast there; reach = how far
+    ahead the marker sits (share of the ability's range). */
+export const aim = { id: null, s: null, target: null, valid: false, reach: START };
 let marks = null;
 
 function ensureMarks() {
@@ -30,20 +32,21 @@ function hideMarks() { if (marks) for (const m of Object.values(marks)) m.hide()
 export function isAiming(id = null) { return id ? aim.id === id : aim.id !== null; }
 
 export function beginAim(id, s) {
-  Object.assign(aim, { id, s, target: null, valid: false });
-  dom.aimHint.innerHTML = `<b>${s.name}</b> · <kbd>Click</kbd> or <kbd>${s.label}</kbd> to cast · <kbd>Esc</kbd> / right click to cancel`;
+  Object.assign(aim, { id, s, target: null, valid: false, reach: START });
+  dom.aimHint.innerHTML = `<b>${s.name}</b> · move to turn, <kbd>Wheel</kbd> nearer / farther · <kbd>Click</kbd> or <kbd>${s.label}</kbd> to cast · <kbd>Esc</kbd> / right click to cancel`;
   dom.aimHint.style.display = 'block';
   updateAiming();
 }
+/** Mouse wheel while aiming: the marker comes nearer (sign < 0) or goes farther. */
+export function nudgeAim(sign) { if (aim.id) aim.reach = clamp(aim.reach + sign * STEP, NEAREST, 1); }
 export function cancelAim() { aim.id = aim.s = aim.target = null; aim.valid = false; hideMarks(); dom.aimHint.style.display = 'none'; }
 
-/** Where the marker wants to be this frame (before range clamping and landing checks). */
+/** Where the marker wants to be this frame (before range clamping and landing checks): on the locked-on monster, or
+    ahead of the hero at the chosen reach. */
 function rawTarget(s) {
-  const P = ctx.player;
-  if (pointer.over) { const d = groundUnderScreen(pointer.x, pointer.y); if (d) return d; }
-  const t = targeting.aim;
+  const P = ctx.player, t = targeting.aim;
   if (t && t.alive && arcDist(P.up, t.up) <= s.range) return t.up.clone();
-  return dirAlong(P.up, aimDirection(), Math.min(s.range, 8));
+  return dirAlong(P.up, aimDirection(), s.range * aim.reach);
 }
 
 /** Per-frame: follows the cursor and redraws the marker. Drops the aim if the hero can no longer cast. */

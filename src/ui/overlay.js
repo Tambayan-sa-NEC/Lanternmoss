@@ -1,11 +1,12 @@
-/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, time of day, coins, the tracked
-   quest, treats, challenges).
+/* World overlay: the floating "E Talk to ..." prompt and the status chips (planet, time of day, coins, the sealed
+   boss lair's conditions, the tracked quest, treats, challenges).
    Active buffs show in the HUD's status row (src/ui/hud.js). */
 import * as THREE from 'three';
 import { CHALLENGES } from '../config/challenges.js';
 import { bindKbd } from '../core/keybinds.js';
 import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
+import { BossGate } from '../gameplay/BossGate.js';
 import { dayClock } from '../gameplay/dayClock.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { currentInteraction } from '../gameplay/Houses.js';
@@ -35,6 +36,7 @@ function updateChips(dt) {
   chipsT = 0.25; let h = `<div class="chip" style="background:#e8eeff">Planet ${ctx.planet + 1}/${PLANETS.length} · ${PLANETS[ctx.planet].name}</div>`;
   h += `<div class="chip time ${dayClock.phase}">${dayClock.phase === 'night' ? '☾' : '☀'} ${dayClock.label} · Day ${dayClock.day}</div>`;
   h += `<div class="chip coins">✦ ${ctx.player.coins} coins</div>`;
+  h += BossGate.chipHtml();                                          // the sealed lair: what's still needed
   const q = Quests.trackerInfo();
   if (q) h += `<div class="chip quest"><b>Quest · ${q.title}</b><span>${q.text}${q.progress ? ` <i>${q.progress}</i>` : ''}</span></div>`;
   const treats = TREATS.reduce((n, id) => n + ctx.player.inventory.count(id), 0);

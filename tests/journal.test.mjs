@@ -30,7 +30,7 @@ test('achievements are complete and reachable', () => {
 });
 
 test('every monster and boss has a bestiary page', () => {
-  assert.deepEqual([...BESTIARY_ORDER].sort(), Object.keys(COMBAT.enemies).sort());
+  assert.deepEqual([...BESTIARY_ORDER].sort(), Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object).sort(), 'every monster (lair objects aside)');
   assert.ok(BESTIARY_ORDER.findIndex(isBoss) === BESTIARY_ORDER.filter(t => !isBoss(t)).length, 'bosses come last');
   for (const t of BESTIARY_ORDER) {
     const e = BESTIARY_ENTRIES[t];

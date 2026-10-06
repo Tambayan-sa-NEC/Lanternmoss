@@ -15,6 +15,7 @@ import { PLANETS } from '../config/planets.js';
 import { scaleEnemyDef } from '../combat/enemyDefs.js';
 import { ctx } from '../core/context.js';
 import { bindKbd, is } from '../core/keybinds.js';
+import { describeSummon } from '../gameplay/BossGate.js';
 import { Journal } from '../gameplay/Journal.js';
 import { BESTIARY_ORDER, isBoss, pageName, progress, statValue } from '../gameplay/journalRules.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
@@ -138,6 +139,8 @@ export const JournalUI = {
         <div class="where">${e.from ? e.from + ' ' : ''}${where.length ? `Found on ${where.map(i => PLANETS[i].name).join(', ')}` : ''}</div>
         <div class="kills">${beaten ? `Defeated <b>${beaten}</b>×` : 'Not defeated yet'}</div></div></div>
       <p class="bl">${e.blurb ?? ''}</p>
+      ${e.lore ? `<h4>Lore</h4><p class="bl">${e.lore}</p>` : ''}
+      ${isBoss(type) ? list('To wake it', describeSummon(PLANETS[where[0]]?.boss.summon).map(t => `<li>${t}</li>`)) : ''}
       ${list('How it fights', (e.attacks ?? []).map(([n, t]) => `<li><b>${n}</b> ${t}</li>`))}
       ${list('How to beat it', (e.counters ?? []).map(t => `<li>${t}</li>`))}
       ${beaten ? `<h4>Stats</h4><table class="bst-stats"><tr><th>Planet</th><th>Health</th><th>Damage</th><th>Speed</th><th>XP</th></tr>${stats}</table>

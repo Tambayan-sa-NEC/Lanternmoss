@@ -6,7 +6,7 @@ import { COMBAT } from '../config/combat.js';
 import { PETS } from '../config/pets.js';
 
 /** Every bestiary page, in order: the monsters, then the bosses. */
-export const BESTIARY_ORDER = Object.keys(COMBAT.enemies).sort((a, b) => (COMBAT.enemies[a].ai === 'boss') - (COMBAT.enemies[b].ai === 'boss'));
+export const BESTIARY_ORDER = Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object).sort((a, b) => (COMBAT.enemies[a].ai === 'boss') - (COMBAT.enemies[b].ai === 'boss'));
 export const isBoss = type => COMBAT.enemies[type]?.ai === 'boss';
 /** A bestiary page's title: the monster's name, or the boss's (without its epithet). */
 export const pageName = type => BESTIARY_ENTRIES[type]?.name ?? COMBAT.enemies[type]?.name?.split(',')[0] ?? type;

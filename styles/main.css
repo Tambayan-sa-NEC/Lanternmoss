@@ -677,3 +677,22 @@ body.bossfight #toast { top:120px; }
 #achv b { display:block; font-family:var(--font-display); font-size:17px; font-weight:700; }
 #achv span { display:block; font-size:11.5px; opacity:.75; line-height:1.25; }
 #achv em { flex:none; font-style:normal; font-weight:800; color:#a8641a; }
+
+/* ---------- boss summoning (src/gameplay/BossGate.js): the lair chip, elite bars, the name card ---------- */
+.chip.lair { max-width:300px; background:#f3ecff; border-radius:16px; text-align:right; line-height:1.35; }
+.chip.lair b { display:block; font-size:11.5px; color:#7a4ab8; }
+.chip.lair span { display:block; font-size:12px; opacity:.85; } .chip.lair span.ok { color:#3f9a5a; opacity:1; }
+.chip.lair i { font-style:normal; padding:0 6px; margin-left:4px; border-radius:999px; background:#e8dcff; border:2px solid var(--ink); font-size:11px; }
+.chip.lair.ready { background:#ffe2d6; animation:bob 1.4s ease-in-out infinite; } .chip.lair.ready b { color:#d0305a; }
+#ebars .eb.elite { width:58px; height:9px; border-color:#a8641a; box-shadow:0 0 0 2px #ffd36b; } #ebars .eb.elite i { background:#ffb03d; }
+#bosscard { position:fixed; left:50%; bottom:20vh; z-index:25; transform:translateX(-50%); text-align:center; pointer-events:none; opacity:0; }
+#bosscard.show { animation:bosscard 2.4s ease-out forwards; }
+#bosscard small { display:block; font-weight:800; font-size:13px; letter-spacing:2px; text-transform:uppercase; color:#fff; text-shadow:0 2px 0 var(--ink); }
+#bosscard b { display:block; font-family:var(--font-display); font-weight:800; font-size:clamp(46px,7vw,84px); line-height:1; color:#fff;
+  -webkit-text-stroke:4px var(--ink); paint-order:stroke fill; text-shadow:0 6px 0 var(--ink), 0 0 40px var(--c,#ff4d6d); }
+#bosscard span { display:inline-block; margin-top:8px; padding:3px 16px; border-radius:999px; background:var(--c,#ff4d6d); border:3px solid var(--ink);
+  font-weight:800; font-size:17px; color:#fff; text-shadow:0 1px 0 var(--ink); }
+#bosscard span:empty { display:none; }
+@keyframes bosscard { 0% { opacity:0; transform:translate(-50%,30px) scale(1.25); letter-spacing:12px; } 18% { opacity:1; transform:translate(-50%,0) scale(1); letter-spacing:0; }
+  85% { opacity:1; } 100% { opacity:0; transform:translate(-50%,-10px); } }
+body.cutscene #combat, body.cutscene #hint, body.cutscene #compass, body.cutscene #markers, body.cutscene #hud, body.cutscene #prompt { visibility:hidden; }

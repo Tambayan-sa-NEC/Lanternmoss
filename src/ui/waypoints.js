@@ -1,7 +1,8 @@
 /* WAYFINDING: the compass strip (top centre) and arrows at the screen edge toward what matters right now.
    Bearings are measured in the hero's tangent plane against the camera heading, which works anywhere on the round
    planet. Points of interest:
-     village  always (compass)                               boss     while it lives (compass + edge arrow)
+     village  always (compass)                               boss     while it lives (compass + edge arrow); while it
+                                                                      sleeps, its lair (+ elites carrying sigils)
      goal     the active challenge's next target (compass + edge arrow; CHALLENGE_KINDS[kind].target)
      giver    villagers with a challenge or quest to offer, when no challenge is running (compass)
      quest    the villager your tracked quest needs next (compass + edge arrow)
@@ -12,6 +13,7 @@ import * as THREE from 'three';
 import { ctx } from '../core/context.js';
 import { settings } from '../core/settings.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
+import { BossGate } from '../gameplay/BossGate.js';
 import { Chests } from '../gameplay/Chests.js';
 import { petEffects } from '../gameplay/petAbilities.js';
 import { Quests } from '../gameplay/quests/Quests.js';
@@ -35,7 +37,8 @@ function bearing(dir) { const t = tangentToward(ctx.player.up, dir); return Math
 function pointsOfInterest() {
   const list = [{ key: 'village', dir: SPAWN_DIR, icon: 'home', label: 'Village', far: true }];
   const B = ctx.boss;
-  if (B && B.alive) list.push({ key: 'boss', dir: B.up, icon: 'boss', label: B.def.name.split(',')[0], edge: true, far: true, point: B.center() });
+  list.push(...BossGate.waypoints());                                   // the sealed lair, and elites carrying sigils
+  if (B && B.alive && !B.dormant) list.push({ key: 'boss', dir: B.up, icon: 'boss', label: B.def.name.split(',')[0], edge: true, far: true, point: B.center() });
   const run = Challenges.run;
   if (run) {
     const d = run.kind.target?.(run);

@@ -7,6 +7,7 @@
      attacks   [name, what it does]
      counters  tips for beating it
      from      where it comes from, for monsters no planet's roster lists (a slimeling)
+     lore      bosses: their story (the page also lists what wakes them, from PLANETS[i].boss.summon)
    Keys must match COMBAT.enemies; `npm test` checks every monster has a page.
    --------------------------------------------------------------------- */
 
@@ -57,18 +58,24 @@ export const BESTIARY_ENTRIES = {
     counters: ['Defeat it first: everything else gets easier.', 'It hangs back, so reach it with ranged attacks or a dash.'],
   },
   gloomcap: {
+    lore: 'Once the gentlest mushroom of the old woods, it drank the gloom that pooled under the lanterns until it grew a crown of it. '
+      + 'The villagers sealed its glade with three thorn stones, and it has been sulking behind them ever since.',
     blurb: 'The Moss King of Lanternmoss, grown huge and gloomy in the shade of the old woods. Faster and angrier as it weakens.',
     attacks: [['Slam', 'A ground slam with a warning circle.'], ['Charge', 'Rushes in a straight line; a crash leaves it dazed.'],
       ['Spore volley', 'A fan of homing spores.'], ['Shockwave', 'A ring that rolls outward (from 60% health).'], ['Summon', 'Calls slimelings and wisps to help (from 60% health).']],
     counters: ['Jump over the shockwave ring.', 'Bait the charge into a tree or rock, then hit it while it\'s dazed.', 'Clear the summons quickly with an area attack.'],
   },
   pyrrhax: {
+    lore: 'Pyrrhax hatched in Emberfall\'s first eruption and has been counting its hoard ever since. Its elites carry ember sigils: '
+      + 'bring three to the lair and it comes to see who dares, because a dragon never ignores a knock on its door.',
     blurb: 'The Red Wyrm of Emberfall, guarding its hoard among the mesas. At half health it becomes an Inferno.',
     attacks: [['Bite', 'A quick snap in front of it.'], ['Tail sweep', 'A spin all around it.'], ['Fire breath', 'A long cone of fire that sweeps across.'],
       ['Fireballs', 'Lobbed fireballs that leave burning pools.'], ['Leap', 'Leaps high and crashes down where you stood.']],
     counters: ['Jump over the tail sweep.', 'Get behind or beside it for the breath: it sweeps, so keep going round.', 'Keep moving when it leaps; punish the landing.'],
   },
   malgrath: {
+    lore: 'A fallen star-lord who froze Frostveil to keep its warmth for himself. He hides from friendship like other monsters hide from fire, '
+      + 'so he only answers a hero the village trusts, and only under the stars.',
     blurb: 'The Winged Demon Lord of Frostveil, the last and strongest boss. Fights on foot, then takes to the air at half health.',
     attacks: [['Greatsword combo', 'Two wide swings and a slam.'], ['Fissure', 'A crack racing along the ground.'], ['Hellfire', 'Pillars of fire around you.'],
       ['Doom', 'A huge circle that kills outright: leave it!'], ['Dive', 'Swoops down onto you from the sky.'], ['Barrage', 'Waves of homing bolts.'],

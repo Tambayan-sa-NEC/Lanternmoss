@@ -192,7 +192,7 @@ function screenPos(p, el) {
 // ---------------------------------------------------------------- boss bar
 /** The planet boss's big health bar: shown while it fights or the hero is near its lair. Ticks mark its phase thresholds. */
 function updateBossBar(dt) {
-  const b = ctx.boss, show = !!b && b.alive && (ENGAGED.has(b.state) || b.pos.distanceTo(ctx.player.pos) < 24);
+  const b = ctx.boss, show = !!b && b.alive && !b.dormant && (ENGAGED.has(b.state) || b.pos.distanceTo(ctx.player.pos) < 24);
   dom.bossBar.style.display = show ? 'block' : 'none'; document.body.classList.toggle('bossfight', show);
   if (!show) return;
   if (b !== boss.ref) {                                                        // a new boss: lay out its phase ticks

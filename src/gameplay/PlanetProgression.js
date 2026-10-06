@@ -25,6 +25,7 @@ import { toast } from '../ui/toast.js';
 import { Challenges } from './challenges/Challenges.js';
 import { Quests } from './quests/Quests.js';
 import { Chests } from './Chests.js';
+import { BossGate } from './BossGate.js';
 import { Houses } from './Houses.js';
 import { resetCompanion } from './characters.js';
 import { clearWorldItems, spawnForage } from './pickups.js';
@@ -46,6 +47,7 @@ export class PlanetProgression {
     spawnRoster(this.world, this.planet.roster);
     const boss = spawnBoss(this.world, this.planet.boss, this.lairs[ctx.planet]);
     this.lairs[ctx.planet] = boss.home.clone();
+    BossGate.setup(ctx.planet, boss);                                   // it sleeps until the planet's conditions are met
     spawnForage(this.planet.forage);
     Chests.spawnFor(ctx.planet, boss.home);
   }
@@ -134,6 +136,6 @@ export class PlanetProgression {
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
     ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0;
     if (ctx.planet !== 0) this.load(0);
-    else { spawnBoss(this.world, this.planet.boss, this.lairs[0]); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]); }
+    else { BossGate.setup(0, spawnBoss(this.world, this.planet.boss, this.lairs[0])); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]); }
   }
 }

@@ -4,7 +4,7 @@
 import { mpick } from '../utils/random.js';
 
 export const audio = {
-  ctx: null, master: null, fx: null, music: null, muted: false, ducked: false,
+  ctx: null, master: null, fx: null, music: null, muted: false, ducked: false, pad: null, battleOn: false, battleTimer: null,
   vol: { master: 1, music: 1, sfx: 1 },      // player volume settings (0..1), see setVolumes
   init() {
     if (this.ctx) return; const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
@@ -14,11 +14,11 @@ export const audio = {
     this.fx = ctx.createGain(); this.fx.gain.value = this.vol.sfx; this.fx.connect(this.master); this.fx.connect(delay);
     this.music = ctx.createGain(); this.music.gain.value = this.vol.music; this.music.connect(this.master); this.music.connect(delay);
     const pad = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850;
-    pad.gain.setValueAtTime(0, ctx.currentTime); pad.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 5); lp.connect(pad); pad.connect(this.music);
+    pad.gain.setValueAtTime(0, ctx.currentTime); pad.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 5); lp.connect(pad); pad.connect(this.music); this.pad = pad;
     [130.81, 196.0, 261.63, 329.63, 392.0].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
       o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (Math.random() - 0.5) * 10; g.gain.value = 0.22;
       lfo.frequency.value = 0.05 + i * 0.031; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(g.gain); o.connect(g); g.connect(lp); o.start(); lfo.start(); });
-    const chime = () => { setTimeout(() => { const s = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; const f = mpick(s);
+    const chime = () => { setTimeout(() => { if (this.battleOn) { chime(); return; } const s = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; const f = mpick(s);
       this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (Math.random() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, 2500 + Math.random() * 5000); };
     chime();
   },
@@ -103,6 +103,22 @@ export const audio = {
   // --- boss + planet travel (procedural placeholders) ---
   roar() { this.tone(80, 0.9, 'sawtooth', 0.05, 0, 0.6); this.tone(120, 0.7, 'square', 0.025, 0.05, 0.7); this.noise(0.8, 0.12, 700); },
   warp() { [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.9, 'sine', 0.04, i * 0.12, 1.5)); this.noise(1.2, 0.04, 5000); },
+  /** Boss-fight music: the cozy pad fades down and a drum and bass ostinato takes over (off = back to the pad). */
+  battle(on) {
+    if (on === this.battleOn) return; this.battleOn = on;
+    if (!this.ctx) return; const t = this.ctx.currentTime;
+    this.pad?.gain.setTargetAtTime(on ? 0.01 : 0.055, t, on ? 0.6 : 2);
+    clearInterval(this.battleTimer); this.battleTimer = null;
+    if (!on) return;
+    const bass = [110, 110, 130.81, 98, 110, 110, 146.83, 123.47]; let step = 0;
+    this.battleTimer = setInterval(() => {
+      if (!this.battleOn) return; const i = step++ % 16;
+      if (i % 4 === 0) this.tone(70, 0.28, 'sine', 0.11, 0, 0.45, this.music);                   // kick
+      if (i % 8 === 4) this.noise(0.14, 0.045, 1800);                                           // snare
+      if (i % 2 === 0) this.tone(bass[(i / 2) % 8], 0.32, 'triangle', 0.05, 0, 0, this.music);   // bass
+      if (i === 14) this.tone(bass[step % 8] * 4, 0.5, 'sawtooth', 0.012, 0, 1.01, this.music);
+    }, 190);
+  },
   /** Output level from the master volume, the mute toggle and pause ducking. */
   level() { return this.muted ? 0 : 0.55 * this.vol.master * (this.ducked ? 0.3 : 1); },
   applyLevels() {

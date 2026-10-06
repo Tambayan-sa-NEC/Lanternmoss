@@ -1,18 +1,19 @@
-/* Who the hero is aiming at (soft lock-on) and who they hit last (the owl follows up on it). */
+/* Who the hero is aiming at (soft lock-on) and who they hit last (the owl follows up on it). Aiming follows where the
+   hero FACES, never the camera: turn the hero (move, or click the ground: core/controls.js) to aim; turning the camera
+   only changes the view. */
 import * as THREE from 'three';
 import { COMBAT } from '../config/combat.js';
 import { ctx } from '../core/context.js';
-import { cam } from '../systems/CameraSystem.js';
 import { projectTangent, tangentTo } from '../utils/sphere.js';
 
 const V3 = THREE.Vector3;
 export const targeting = { aim: null, lastHit: null, lastHitT: -99 };
 
 const _aim = new V3(), _a2 = new V3();
-/** Nearest living enemy inside a cone around the camera direction. */
+/** Nearest living enemy inside a cone around the hero's facing. */
 function findAimTarget() {
   const player = ctx.player;
-  _aim.copy(cam.fwd); projectTangent(_aim, player.up).normalize();
+  _aim.copy(player.fwd); projectTangent(_aim, player.up).normalize();
   const cosMax = Math.cos(THREE.MathUtils.degToRad(COMBAT.autoAimAngle)); let best = null, bestScore = Infinity;
   for (const e of ctx.enemies) {
     if (!e.alive || e.hidden) continue; const d = tangentTo(player.pos, player.up, e.pos, _a2);
@@ -21,10 +22,10 @@ function findAimTarget() {
   }
   return best;
 }
-/** Tangent direction to cast in: toward the locked target, else along the camera. */
+/** Tangent direction to cast in: toward the locked target, else straight ahead of the hero. */
 export function aimDirection() {
   const out = new V3(), player = ctx.player, t = targeting.aim;
-  if (t && t.alive) tangentTo(player.pos, player.up, t.pos, out); else { out.copy(cam.fwd); projectTangent(out, player.up).normalize(); }
+  if (t && t.alive) tangentTo(player.pos, player.up, t.pos, out); else { out.copy(player.fwd); projectTangent(out, player.up).normalize(); }
   return out;
 }
 export function updateAim() { targeting.aim = ctx.player.dead ? null : findAimTarget(); }

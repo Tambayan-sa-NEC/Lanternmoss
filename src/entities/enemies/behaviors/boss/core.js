@@ -49,7 +49,7 @@ export function bossDecal(e, shape, color, o) {
 export function predictHero(lead) { const P = ctx.player; return _tv.copy(P.pos).addScaledVector(P.vel, lead).normalize().clone(); }
 
 /** dir pulled back inside the boss's arena, so no move carries it past its leash (which would end the fight). */
-export function keepInArena(e, dir) { return clampRange(e.home, dir, e.def.leash - 4); }
+export function keepInArena(e, dir) { return clampRange(e.home, dir, Math.min(e.def.leash - 4, (e.arenaRadius ?? 99) - 2)); }   // (arenaRadius: the ring, BossGate)
 
 export function roar(e, angrier = false, msg = null) {
   emote(e, '!', '#ff4d6d'); audio.roar(); shakeCamera(0.4);

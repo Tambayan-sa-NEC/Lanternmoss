@@ -58,9 +58,24 @@ Lantern chests (find a Lantern Key) and a boss treasure chest after every boss.
   <img src="docs/screenshots/boss-dragon.jpg" width="49%" alt="Pyrrhax, the red dragon">
 </p>
 
-**Combat.** Soft lock-on, quick abilities with cooldowns and a resource bar, aimed ultimates, damage numbers and
-hit-stop. Monsters range from goblin packs and charging ramhorns to burrowing thornmoles and shielding hexlanterns,
+**Combat.** Attacks go where your hero faces, with a soft lock-on in front of them. Turn by moving, or click the ground
+to face it; the camera only changes the view. Quick abilities have cooldowns and a resource bar. Aimed ultimates place
+their marker ahead of you (the wheel sets the distance). Damage numbers and hit-stop round it off. Monsters range from goblin packs and charging ramhorns to burrowing thornmoles and shielding hexlanterns,
 and every boss has telegraphed attacks to read and dodge.
+
+<p>
+  <img src="docs/screenshots/summon.jpg" width="49%" alt="Gloomcap wakes">
+  <img src="docs/screenshots/arena.jpg" width="49%" alt="Inside the ring of thorns">
+</p>
+
+**Bosses you earn.** Each boss sleeps in a sealed lair until you've earned the fight:
+- **Gloomcap:** break the three thorn seals around its glade.
+- **Pyrrhax:** bring three sigils carried by Emberfall's golden elites.
+- **Malgrath:** finish Tuva's quest, and come at night.
+
+Each also needs a minimum level. A chip by the status bar, the compass and the villagers tell you what's still missing.
+When you walk in ready, the camera turns to the lair, the boss rises with its name card and the music changes. Then a
+ring of thorns or fire closes around the arena until one of you falls.
 
 <p>
   <img src="docs/screenshots/mesas.jpg" width="49%" alt="Emberfall's mesas">
@@ -114,6 +129,10 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Better fights:** attacks and aiming follow where your hero faces, not the camera. Bosses sleep in sealed lairs until
+  you meet their conditions (level, seals, elite sigils, a villager's quest, night). They wake in a short sequence with a
+  name card and battle music, and fight you inside a ring of thorns or fire. Villagers hint at what's needed, and the
+  bestiary has boss lore.
 - **The journal:** 20 achievements (with three boss challenges), a bestiary page for every monster and boss with 3D
   portraits, attacks, counters, stats and drops, and a collection of every item found. `J` opens it, and it's kept
   across adventures.
@@ -171,9 +190,9 @@ over). The defaults:
 | `W A S D` / arrows | move (camera-relative) |
 | `Shift` | sprint |
 | `Space` | jump (hold for a floatier rise) |
-| click / `Z` | skill 1: the basic attack (hold to repeat) |
+| click / `Z` | skill 1: the basic attack (hold to repeat). A click turns the hero to face the clicked ground first |
 | `Q` `R` `F` | skills 2–4 |
-| `G` | skill 5, the ultimate: a marker follows the cursor; click (or `G` again) to cast there, `Esc` / right click cancels |
+| `G` | skill 5, the ultimate: a marker appears ahead of the hero (on the monster in front, if any). Turn to aim, wheel for nearer / farther, click (or `G` again) to cast, `Esc` / right click cancels |
 | `1` – `9` | hold the item in that hotbar slot (or click it); press the number again, or right click, to use it |
 | `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them) |
 | `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
@@ -181,7 +200,7 @@ over). The defaults:
 | `T` | pet command: follow → stay → attack my target → passive |
 | `J` | the journal: achievements, bestiary and collection (pauses; also on the pause menu and title screen) |
 | `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
-| drag / wheel | rotate / zoom camera |
+| drag / wheel | rotate / zoom camera (the view only: aiming follows the hero's facing) |
 | `Esc` / `P` | pause menu: resume, settings, controls, quit (Esc first closes the bag, aiming or dialogue) |
 | `H` | show / hide the controls panel (it folds away by itself after a while) |
 | `M` | mute |
@@ -293,6 +312,8 @@ src/
 │   └── levelFeedback.js   float text, burst, jingle and toast on those events
 ├── gameplay/
 │   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
+│   ├── BossGate.js        the sealed lair: summon conditions (level, seals, elites' sigils, a quest, night), the waking
+│   │                      sequence, the arena ring, villager hints, the lair chip and compass marks
 │   ├── characters.js      switching heroes (model, stats, abilities, pet)
 │   ├── Pets.js            the pet system: unlocked pets, the one out, names, commands, health and fainting, petting
 │   ├── petPicks.js        which pet each hero last took (saved in the browser)
@@ -417,6 +438,9 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Chests: kinds, loot tables, key drop chance, boss chest timings | `src/config/chests.js` |
 | Gear: stats per piece, rarity multipliers, stat caps, gear slots | `src/config/items.js` → `equip`, `RARITIES`, `STATS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
+| What wakes each boss, its arena wall | `src/config/planets.js` → `boss.summon`, `boss.arena` |
+| The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |
+| Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
@@ -524,10 +548,27 @@ a glyph in `ui/icons.js`. A new monster needs a page in `BESTIARY_ENTRIES`. `npm
 
 Bosses are immune to stagger and knockback, and only feel stuns between attacks (shortened by `stunResist`).
 
+**Waking a boss** (`gameplay/BossGate.js`, `config/bossSummon.js`). A planet's boss is spawned dormant: hidden,
+untouchable and still. It wakes once its planet's `boss.summon` conditions hold:
+
+| Boss | Conditions |
+|---|---|
+| Gloomcap | level 2; break the 3 Thorn Seals around its lair |
+| Pyrrhax | level 4; bring 3 Ember Sigils, dropped by 4 golden elites |
+| Malgrath | level 6; Tuva's quest *Warm Hearts* done; only at night |
+
+How each kind of condition works:
+- **Seals** are lair objects (`object: true`): they never move, drop nothing and aren't counted as monsters.
+- **Elites** are some of the planet's own monsters, made tougher (`Enemy.makeElite`).
+
+Once the conditions hold, walking into the lair plays the waking sequence. During it the hero can't act or be hurt.
+While the boss fights, the ring around the arena keeps the hero inside (it drops if you faint). The boss's moves are
+kept inside the ring too (`keepInArena`). In the console, `LANTERNMOSS.wakeBoss()` skips straight to the fight.
+
 **Adding a planet:** append an entry to `PLANETS` in `src/config/planets.js` (new seed, palette, a higher `scale`,
 roster, boss). Nothing else needs to change. `npm test` checks that every planet is complete and harder than the one before.
 
-**Quick test from the console** (after starting a game): `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
+**Quick test from the console** (after starting a game): `LANTERNMOSS.wakeBoss()`, then `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
 victory, open the treasure chest that falls, and travel on; or `LANTERNMOSS.goToPlanet(2)` to jump straight to
 Frostveil. `LANTERNMOSS.Pets.unlock('whelp')`, `LANTERNMOSS.spawnItem('emberAxe')` and friends help try features out.
 

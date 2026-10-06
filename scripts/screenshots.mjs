@@ -142,10 +142,26 @@ try {
   await page.click('[data-go="main"]'); await wait(400); await page.click('[data-go="controls"]'); await wait(800); await shot('controls');
   await run(() => window.LANTERNMOSS.PauseMenu.close()); await wait(600);
 
+  // Gloomcap's sealed lair (the seals and the status chip), its waking (the name card), and the arena ring
+  await run(async () => { const S = await import('/src/utils/sphere.js'), L = window.LANTERNMOSS, G = L.BossGate;
+    window.__at = (dir, metres, turn = 0) => {          // stand `metres` from dir (along the surface), facing it
+      const t = S.tangentFrame(dir)[0].applyAxisAngle(dir, turn), at = S.dirAlong(dir, t, metres);
+      L.player.placeAt(at); L.player.fwd.copy(S.tangentToward(at, dir)); window.__frame(dir, { pitch: 0.36, dist: 8 }); };
+    for (const e of L.enemies) if (e.alive && e !== L.boss && !e.def.object && S.arcDist(e.up, G.lair) < 40) e.vanish();
+    window.__at(G.lair, 22, 0.6); window.__frame(G.lair, { turn: 0.2, pitch: 0.3, dist: 7 }); });
+  await ff(1); await wait(2500); await shot('lair');
+  await run(async () => { const L = window.LANTERNMOSS, G = L.BossGate, { damageEnemy } = await import('/src/combat/damage.js');
+    L.player.level = Math.max(L.player.level, 2); for (const s of G.seals) while (s.alive) damageEnemy(s, 200); });
+  await ff(0.5); await run(() => { document.getElementById('cresult').classList.remove('show'); window.__at(window.LANTERNMOSS.BossGate.lair, 14, 0.6); });
+  await ff(2.0); await wait(900); await shot('summon');
+  await ff(2.5); await run(() => { const L = window.LANTERNMOSS, B = L.boss; L.Pets.command('passive'); window.__at(B.home, 10, 2.2); B.aggro(); });
+  await ff(1.5); await run(() => { const L = window.LANTERNMOSS; window.__frame(L.boss.up, { turn: 0.35, pitch: 0.5, dist: 16 }); });
+  await ff(0.3); await wait(2500); await shot('arena');
+
   // bosses: Pyrrhax on Emberfall, then Malgrath on Frostveil
   for (const [planet, name, turn] of [[1, 'boss-dragon', -0.5], [2, 'boss-demon', 0.45]]) {
     await run(p => window.LANTERNMOSS.goToPlanet(p), planet); await wait(4000);
-    await run(turn => { const L = window.LANTERNMOSS, B = L.boss; window.__stand(B.home, 11); B.aggro(); window.__frame(B.home, { turn, pitch: 0.32, dist: 12 }); }, turn);
+    await run(turn => { const L = window.LANTERNMOSS, B = L.boss; L.wakeBoss(); window.__stand(B.home, 11); B.aggro(); window.__frame(B.home, { turn, pitch: 0.32, dist: 12 }); }, turn);
     await wait(9000);
     await run(turn => { const L = window.LANTERNMOSS; window.__frame(L.boss.up, { turn, pitch: 0.32, dist: 12 }); }, turn);
     await wait(3000); await shot(name);

@@ -19,7 +19,7 @@ export function gainCoins(n, at = null) {
 export function spendCoins(n) { const P = ctx.player; if (P.coins < n) return false; P.coins -= n; return true; }
 
 /** Coins for defeating a monster (summoned helpers of a boss are worth nothing, so they can't be farmed). */
-export function coinsForKill(e) { return e.owner ? 0 : Math.max(1, Math.round(e.def.xp * COINS.perXp)); }
+export function coinsForKill(e) { return e.owner || e.def.object ? 0 : Math.max(1, Math.round(e.def.xp * COINS.perXp)); }
 
 /** Shop prices from an item's value: what it costs to buy (stock entry may override) and what selling one gives (0 = can't sell). */
 export function buyPrice(stockEntry) { return stockEntry.price ?? Math.max(1, Math.round(itemRegistry.get(stockEntry.item).value * SHOP.buyMarkup)); }

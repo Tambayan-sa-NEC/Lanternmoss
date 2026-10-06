@@ -7,7 +7,7 @@ import { sparkles } from '../../fx/sparkles.js';
 import { Projectile, touchesEnemy } from '../../entities/Projectile.js';
 import { resolveCollisions } from '../../physics/colliders.js';
 import { audio } from '../../systems/AudioSystem.js';
-import { cam, shakeCamera } from '../../systems/CameraSystem.js';
+import { shakeCamera } from '../../systems/CameraSystem.js';
 import { clamp } from '../../utils/math.js';
 import { dirAlong, projectTangent } from '../../utils/sphere.js';
 import { groundHeight } from '../../world/terrain.js';
@@ -30,7 +30,7 @@ export const WITCH_ABILITIES = {
     audio.castFire(); },
   nova(s) { const c = ctx.player.pos.clone();
     ringFX(c, s.radius, s.color, 0.5); ringFX(c, s.radius * 0.6, 0xffffff, 0.35);
-    for (let i = 0; i < 24; i++) { _tv.copy(cam.fwd).applyAxisAngle(ctx.player.up, i / 24 * Math.PI * 2); projectTangent(_tv, ctx.player.up).normalize();
+    for (let i = 0; i < 24; i++) { _tv.copy(ctx.player.fwd).applyAxisAngle(ctx.player.up, i / 24 * Math.PI * 2); projectTangent(_tv, ctx.player.up).normalize();
       sparkles.emit(_tv2.copy(c).addScaledVector(ctx.player.up, 0.5).addScaledVector(_tv, 0.8), { count: 2, color: s.color, speed: 0.4, up: _tv, upBias: s.radius * 2, life: 0.55, size: 0.36 }); }
     for (const e of ctx.enemies) if (e.alive && e.hover <= AREA_MAX_ALT && e.pos.distanceTo(c) < s.radius + e.def.radius) damageEnemy(e, s.damage, { from: c, knock: s.knockback, slow: s.slow, slowTime: s.slowTime });
     shakeCamera(0.18); audio.nova(); },

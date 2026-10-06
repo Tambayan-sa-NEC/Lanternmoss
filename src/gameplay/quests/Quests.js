@@ -85,6 +85,7 @@ export const Quests = {
     }
   },
   onDefeat(e) {
+    if (e.def.object) return;                                         // a lair seal isn't a monster
     for (const id of this.active()) {
       const st = this.step(id), s = this.st(id);
       if (st.kind === 'defeat' && (st.enemy === 'any' || st.enemy === e.type) && ++s.n >= st.count) this.advance(id);

@@ -2,7 +2,10 @@
    ('melee' goblins & ogres, 'ranged' wisps, 'hopper' slimes here; newer AIs such as 'bomber', 'charger', 'burrower',
    'support' and 'boss' are behaviour modules in ./behaviors). Balance numbers live in COMBAT.enemies, scaled per planet.
    States: idle / wander / return (out of combat) and chase / windup / recover / charge / flee, plus the bosses'
-   active / transition (ENGAGED). */
+   active / transition (ENGAGED).
+   dormant: a planet boss asleep in its sealed lair (src/gameplay/BossGate.js): hidden, untouchable and still; 'show'
+   while it rises during its waking sequence. def.static: an object that never moves or attacks (lair seals).
+   elite: a tougher, golden-haloed monster (makeElite) that carries a sigil. */
 import * as THREE from 'three';
 import { COMBAT } from '../../config/combat.js';
 import { ctx } from '../../core/context.js';
@@ -63,7 +66,7 @@ export class Enemy extends Walker {
     this.behavior?.reset?.(this);
   }
   center() { return this._c.copy(this.pos).addScaledVector(this.up, this.hover + this.height * 0.5); }
-  aggro() { if (!this.alive || ENGAGED.has(this.state) || playerSafe()) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
+  aggro() { if (!this.alive || this.dormant || this.def.static || ENGAGED.has(this.state) || playerSafe()) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
   hideTele() { if (this.tele) this.tele.visible = false; for (const m of this.fxMeshes) m.visible = false; }
   interrupt(t) {
     if (this.def.staggerImmune) return;
@@ -106,8 +109,27 @@ export class Enemy extends Walker {
     this.behavior?.dispose?.(this);
     removeDyn(this.selfCollider);
   }
+  /** Turns this monster into an elite: tougher, bigger, worth more, with a golden halo (it never respawns as one). */
+  makeElite(k) {
+    const d = this.def;
+    this.def = { ...d, hp: d.hp * k.hp, damage: (d.damage ?? 0) * k.damage, xp: Math.round(d.xp * k.xp), respawn: 0, elite: true };
+    this.elite = true; this.hp = this.def.hp; this.baseScale *= k.scale; this.root.scale.setScalar(this.baseScale);
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.06, 6, 20), fxMaterial(k.halo, 2.2));
+    halo.rotation.x = Math.PI / 2; halo.position.y = d.height / this.baseScale * k.scale + 0.25 + (d.hover ?? 0); this.root.add(halo); this.halo = halo;
+    this.bar.classList.add('elite');
+  }
   update(dt) {
     const d = this.def;
+    if (this.dormant) {                                            // asleep in its lair (or rising, while 'show')
+      const show = this.dormant === 'show'; this.root.visible = this.shadow.visible = show; this.bar.style.display = 'none';
+      if (show) { this.animate(dt); this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.hover + this.r - groundHeight(this.up)); }
+      return;
+    }
+    if (this.alive && d.static) {                                  // a lair seal: just stands there, glowing
+      this.hitPop = Math.max(0, this.hitPop - dt * 6); this.animate(dt); this.place(this.root);
+      updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up)); return;
+    }
+    if (this.halo) this.halo.rotation.z += dt * 1.5;
     if (!this.alive) {
       this.deadT += dt; const k = Math.min(1, this.deadT / 0.45);
       this.root.scale.setScalar(this.baseScale * Math.max(0.01, 1 - k)); this.root.visible = this.shadow.visible = k < 1;

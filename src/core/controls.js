@@ -5,13 +5,15 @@ import { HOTBAR_KEYS } from '../config/controls.js';
 import { ctx } from './context.js';
 import { boundCodes, is } from './keybinds.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
-import { cancelAim, isAiming } from '../combat/aiming.js';
+import { cancelAim, isAiming, nudgeAim } from '../combat/aiming.js';
+import { groundUnderScreen } from '../combat/area.js';
 import { Hotbar } from '../gameplay/hotbar.js';
 import { currentInteraction } from '../gameplay/Houses.js';
 import { Pets } from '../gameplay/Pets.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
-import { initInput } from '../systems/InputSystem.js';
+import { initInput, pointer } from '../systems/InputSystem.js';
+import { arcDist, tangentToward } from '../utils/sphere.js';
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { Dialog } from '../ui/Dialog.js';
@@ -32,6 +34,7 @@ function onKey(code) {
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens
   if (PetMenu.isOpen) { PetMenu.key(code); return; }      // the pet menu pauses too
   if (ctx.transitioning) return;                       // travelling between planets
+  if (ctx.cutscene && code !== 'Escape' && !is('pause', code)) return;   // a boss is waking: only pausing works
   if (code === 'Escape' || is('pause', code)) {         // Esc closes what's open first (bag, aiming, dialogue), then pauses
     if (code === 'Escape' && ShopUI.isOpen) ShopUI.close();
     else if (code === 'Escape' && InventoryUI.isOpen) InventoryUI.close();
@@ -56,11 +59,17 @@ function onKey(code) {
   if (is('decline', code) && Dialog.choice) Dialog.choose(false);
 }
 
-/** Clicking casts the active hero's mouse ability, or the area ability being aimed. */
+/** Clicking casts the active hero's mouse ability (the hero first turns to face the clicked ground: that's how the
+    mouse aims, since the camera doesn't), or the area ability being aimed. */
 function onClick() {
   if (ctx.inventoryOpen) return;
   if (isAiming()) { confirmAim(); return; }
+  faceClick();
   for (const id in kit()) if (kit()[id].mouse) tryCast(id);
+}
+function faceClick() {
+  const P = ctx.player; if (!pointer.over || P.dead || P.motion || !ctx.started || ctx.cutscene) return;
+  const d = groundUnderScreen(pointer.x, pointer.y); if (d && arcDist(P.up, d) > 0.4) P.fwd.copy(tangentToward(P.up, d));
 }
 /** Right click: cancels aiming, otherwise uses the held hotbar item. */
 function onRightClick() {
@@ -76,6 +85,6 @@ export function initControls(canvas) {
     onKey, onClick,
     onCancel: onRightClick,
     onDrag: dragCamera,
-    onZoom: zoomCamera,
+    onZoom: sign => (isAiming() ? nudgeAim(-sign) : zoomCamera(sign)),   // wheel up = farther while aiming
   });
 }

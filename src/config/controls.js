@@ -43,8 +43,8 @@ export const FIXED_CONTROLS = [
     [['Right click'], 'use the held item: eat or drink it, or equip a weapon, armour or trinket'],
   ] },
   { group: 'Camera', rows: [
-    [['Drag'], 'rotate the camera'],
-    [['Wheel'], 'zoom in / out'],
+    [['Drag'], 'rotate the camera (it only changes the view: attacks go where the hero faces)'],
+    [['Wheel'], 'zoom in / out (while aiming an ultimate: the marker nearer / farther)'],
   ] },
   { group: 'Always', rows: [
     [['Esc'], 'close the shop, bag, dialogue or aiming first; otherwise open the pause menu'],

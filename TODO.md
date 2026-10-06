@@ -322,7 +322,7 @@ Code: new `src/config/achievements.js`, `src/gameplay/Journal.js`, `src/ui/` (jo
   - For now: the journal saves itself to localStorage (`lanternmoss.journal`, cleaned on load) and is kept across
     adventures, so it doesn't wait on Save / load. Fold it into the save system when that arrives.
 
-## 14. Better fights **(core)**
+## 14. Better fights **(core)** ✓
 
 **Goal:** fighting feels natural, and bosses feel earned and part of the world, not just a lair at the far side of the
 planet.
@@ -330,26 +330,50 @@ Code: `src/combat/targeting.js` (`aimDirection`, soft lock-on), `src/combat/aimi
 `src/gameplay/PlanetProgression.js`, `src/combat/spawning.js`, `src/config/planets.js`,
 `src/entities/enemies/behaviors/boss/`.
 
-- [ ] **Aim where the hero is facing, not where the camera looks.** Today, aiming and attacks follow the camera angle.
+- [x] **Aim where the hero is facing, not where the camera looks.** Today, aiming and attacks follow the camera angle.
       Instead:
   - Attacks, projectiles and the soft lock-on go in the direction the character faces.
   - Aimed abilities place their marker in front of the hero.
   - Turning the hero (with movement keys or the mouse) is how you aim.
   - Rotating the camera only changes the view.
+  - Done:
+    - The soft lock-on cone and every attack follow the hero's facing (`combat/targeting.js`).
+    - A click turns the hero to face the clicked ground before the basic attack.
+    - Aimed ultimates put their marker ahead of the hero, or on the monster in line; the wheel moves it nearer or
+      farther (`combat/aiming.js`).
+    - Dragging the camera never moves the aim.
 
-- [ ] **Conditions before a boss appears**, set per boss in config:
+- [x] **Conditions before a boss appears**, set per boss in config:
   - a minimum hero level (e.g. Pyrrhax won't show below level 4);
   - a quest done or villagers helped;
   - sigils or keys collected from the planet's elites;
   - lair seals to break;
   - a time of day (Malgrath only rises at night).
-- [ ] Until a boss's conditions are met, its lair is sealed or empty. Show what's still needed (on the compass, in
+  - Done: `PLANETS[i].boss.summon` (`config/bossSummon.js` explains each kind; runtime `gameplay/BossGate.js`).
+    - Gloomcap: level 2 and 3 Thorn Seals (lair objects) to break.
+    - Pyrrhax: level 4 and 3 Ember Sigils, carried by 4 golden elites (the planet's farthest monsters, made tougher).
+    - Malgrath: level 6, Tuva's quest done, and only at night (a ready lair slips back to sealed if morning comes).
+- [x] Until a boss's conditions are met, its lair is sealed or empty. Show what's still needed (on the compass, in
       villager dialogue, on a lair marker).
-- [ ] **More immersion:**
+  - Done:
+    - The boss sleeps hidden and untouchable. The lair has a grey beacon and a rune ring, which glow in its colour once
+      it can be woken.
+    - A status chip lists each condition with progress. The compass points at the sealed lair, and at elites while
+      sigils are needed.
+    - Each villager gives a hint once per planet about what's still missing.
+- [x] **More immersion:**
   - A summoning or arrival sequence: the camera frames the boss, its name card appears, the music changes.
   - Arena boundaries during the fight (a ring of fire or thorns); villagers who react before and after.
   - Boss lore in the bestiary.
+  - Done:
+    - The waking sequence: the camera frames the lair, the boss rises, its name card shows, and battle music (drums
+      and bass) replaces the cozy pad until the fight ends. The hero can't act or be hurt during it.
+    - A ring of thorns (Lanternmoss) or fire (Emberfall, Frostveil) rises around the arena while the boss fights, and
+      holds you in.
+    - Villagers hint before the fight and cheer after.
+    - Bestiary boss pages have lore and "To wake it".
 - [ ] Optional harder versions (rematches through portals, at a higher difficulty) with better loot.
+  - Waits on portals (19): today a beaten planet is left behind, so there's nowhere to rematch from yet.
 
 ## 15. Better environments **(core)**
 

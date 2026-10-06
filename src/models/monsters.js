@@ -109,6 +109,23 @@ export function buildHexlantern() {
 }
 
 /** COMBAT.enemies key -> builder (called with the enemy's stats, which most builders ignore). */
+/** Thorn Seal: a standing stone wrapped in thorny vines, a glowing rune crystal on top. Parts: body, crystal. */
+export function buildThornSeal(def = {}) {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const glow = def.color ?? 0xb48cff;
+  addTo(body, part(G.cyl(0.62, 0.78, 0.35, 6), 0x8a8478), [0, 0.17, 0]);
+  addTo(body, part(G.cyl(0.42, 0.55, 1.9, 6), 0x9a9488), [0, 1.2, 0]);
+  addTo(body, part(G.cone(0.42, 0.45, 6), 0x9a9488), [0, 2.37, 0]);
+  addTo(body, part(G.box(0.08, 0.9, 0.04), glow, { glow: true, intensity: 1.8, outline: false }), [0, 1.25, 0.47]);     // the rune
+  for (let i = 0; i < 9; i++) {                                                                                       // thorny vines
+    const a = i * 2.4, y = 0.35 + i * 0.2, r = 0.5 - i * 0.012;
+    addTo(body, part(G.cone(0.06, 0.32, 4), 0x5a7a2a), [Math.cos(a) * r, y, Math.sin(a) * r], [Math.PI / 2, -a, 0.6]);
+    addTo(body, part(G.ico(0.11, 0), 0x6a8a3a), [Math.cos(a) * (r - 0.05), y, Math.sin(a) * (r - 0.05)]);
+  }
+  const crystal = part(G.ico(0.3, 0), glow, { glow: true, intensity: 2.4 }); crystal.position.set(0, 2.85, 0); body.add(crystal);
+  return { root, body, crystal };
+}
+
 export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buildWisp, slime: () => buildSlime(1), slimeling: () => buildSlime(0.55),
   puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern,
-  gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord };
+  gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord, thornSeal: buildThornSeal };

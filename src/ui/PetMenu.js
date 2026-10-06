@@ -43,7 +43,7 @@ export const PetMenu = {
   },
   toggle() { if (this.isOpen) this.close(); else this.open(); },
   open() {
-    if (this.isOpen || !ctx.started || ctx.transitioning || ctx.paused || ctx.player.dead) return;
+    if (this.isOpen || !ctx.started || ctx.transitioning || ctx.cutscene || ctx.paused || ctx.player.dead) return;
     if (ShopUI.isOpen) ShopUI.close(); if (InventoryUI.isOpen) InventoryUI.close(); if (Dialog.open) Dialog.close();
     cancelAim(); releaseAllKeys();
     this.isOpen = true; ctx.paused = true; Pets.presenting = true; audio.duck(true); audio.blip();

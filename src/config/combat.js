@@ -7,7 +7,7 @@ export const COMBAT = {
     safeRadius: 17 },          // enemies never fight within this distance of the village centre
   globalCooldown: 0.12,        // short lockout between any two casts
   inputBuffer: 0.2,            // a press this close to "ready" is queued instead of dropped
-  autoAimAngle: 35,            // soft lock-on cone (degrees either side of the camera direction)
+  autoAimAngle: 40,            // soft lock-on cone (degrees either side of where the hero faces; the camera doesn't aim)
   autoAimRange: 20,
   castFaceTime: 0.35,          // seconds the magician keeps facing her target after casting
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
@@ -50,6 +50,9 @@ export const COMBAT = {
     hexlantern:{ ai: 'support', color: 0x8fffc0, hp: 40, speed: 3.6, radius: 0.4, height: 1.0, hover: 1.4, aggro: 15, leash: 22,
                  keepDistance: 10, healRadius: 9, heal: 18, healCooldown: 2.5, shieldTime: 4, shieldReduction: 0.5, shieldCooldown: 6,
                  cooldown: 1, respawn: 50, xp: 20 },
+    // ---- lair seals: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
+    thornSeal: { ai: 'seal', object: true, static: true, name: 'Thorn Seal', color: 0xb48cff, hp: 90, speed: 0, radius: 0.75, height: 2.6,
+                 aggro: 0, leash: 99, respawn: 0, xp: 12, knockResist: 1, slowResist: 1, staggerImmune: true },
     // ---- planet bosses: ai 'boss' + behavior = their own AI kit (src/entities/enemies/behaviors/boss/) ----
     // attacks: windup = warning time; recover = pause after (the punish window); cooldown = extra wait before the next
     // move; reuse = seconds before that same move can be picked again. phases: the last whose `below` (fraction of max HP)

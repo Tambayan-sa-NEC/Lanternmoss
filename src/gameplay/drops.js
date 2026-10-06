@@ -12,7 +12,7 @@ import { spawnWorldItem } from './pickups.js';
 export function dropChance(def) { return Math.min(MONSTER_DROPS.max, MONSTER_DROPS.chance + (def.xp ?? 0) * MONSTER_DROPS.perXp); }
 
 export function dropLoot(e, rng = Math.random) {
-  if (e.owner || e === ctx.boss || e.def.ai === 'boss') return [];
+  if (e.owner || e === ctx.boss || e.def.ai === 'boss' || e.def.object) return [];
   if (rng() >= dropChance(e.def)) return [];
   const { items } = rollLoot(MONSTER_DROPS.table, ctx.planet, rng, ctx.player.charId);
   return items.map(({ item, qty, props }) =>

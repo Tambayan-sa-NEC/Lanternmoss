@@ -64,6 +64,7 @@ import { JournalUI } from '../ui/JournalUI.js';
 import { installAchievementToast } from '../ui/achievementToast.js';
 import { setPortraitRenderer } from '../ui/monsterPortraits.js';
 import { Journal, watchBag } from '../gameplay/Journal.js';
+import { BossGate } from '../gameplay/BossGate.js';
 import { showBanner } from '../ui/banner.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
@@ -90,7 +91,7 @@ export class Game {
     Dialog.init();
     // what a villager says first: a quest hand-in, a running challenge, the shop greeting, a fresh story reaction,
     // then quest / challenge offers, then their ordinary chatter (Dialog falls back to npc.nextLine())
-    const chat = npc => npc.reaction() || Quests.offerFor(npc) || Challenges.lineFor(npc);
+    const chat = npc => npc.reaction() || Quests.offerFor(npc) || BossGate.lineFor(npc) || Challenges.lineFor(npc);
     Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
       || shopLineFor(npc, n => chat(n) || n.nextLine()) || chat(npc);
     Quests.init(); ShopUI.init();
@@ -128,7 +129,7 @@ export class Game {
     if (ctx.paused) { if (PetMenu.isOpen) PetMenu.update(dt); return; }   // pause / pet menu open: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
-    ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning });
+    ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
     for (const c of ctx.critters) c.update(dt);
     for (const b of ctx.birds) b.update(dt);
     updatePonds(dt);
@@ -136,6 +137,7 @@ export class Game {
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
+    BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
     Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt); Journal.update(dt);
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
@@ -186,7 +188,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

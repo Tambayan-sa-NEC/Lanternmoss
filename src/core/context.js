@@ -6,6 +6,7 @@ export const ctx = {
   planet: 0,          // index into PLANETS (config/planets.js)
   transitioning: false,  // true while fading between planets (input is locked)
   paused: false,      // the pause menu is open: the simulation is frozen (src/ui/PauseMenu.js)
+  cutscene: false,    // a boss is waking (src/gameplay/BossGate.js): the hero can't act, the camera is on the lair
   indoors: null,      // name of the house the hero is inside (src/gameplay/Houses.js), or null
   inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
   showcase: false,    // a menu holds the camera on the hero or pet (CameraSystem.setShowcase): critters keep out of the shot

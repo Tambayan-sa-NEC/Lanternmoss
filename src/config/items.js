@@ -134,6 +134,9 @@ export const ITEM_DEFINITIONS = [
   // ---- keys ----
   { id: 'lanternKey', name: 'Lantern Key', description: 'A little brass key with a glowing bow. It opens one locked Lantern chest.', category: 'misc',
     icon: { shape: 'key', color: 0xffd36b, art: 'key' }, maxStack: 5, rarity: 'rare', value: 12, tags: ['key'] },
+  // ---- sigils: carried by elites, offered at a boss's lair (config/bossSummon.js) ----
+  { id: 'emberSigil', name: 'Ember Sigil', description: 'A warm, humming seal-stone carried by an Emberfall elite. Three of them wake Pyrrhax.', category: 'quest',
+    icon: { shape: 'gem', color: 0xff7a3a, art: 'shard' }, maxStack: 9, rarity: 'rare', value: 0 },
   // ---- quest items: one per defeated boss ----
   { id: 'mossCrown', name: "Gloomcap's Crown", description: 'Proof that you freed Lanternmoss from the Moss King.', category: 'quest',
     icon: { shape: 'crown', color: 0xb48cff, art: 'crown' }, rarity: 'legendary', value: 0 },

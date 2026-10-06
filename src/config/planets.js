@@ -8,6 +8,7 @@
      roster   enemies spawned on arrival, in order. { type, count } spreads them over the wilds,
               { type, groups, size } makes camps, near: 'ponds' gathers them around far ponds
      boss     { type } from COMBAT.enemies (ai 'boss'), plus optional overrides (name, colours, look = model palette + motif);
+              summon = what wakes it and arena = its ring (config/bossSummon.js explains both);
               each planet has its own boss type, and with it its own AI (gloomcap -> pyrrhax the dragon -> malgrath);
               trophy = item id (config/items.js) given to the hero when it falls
      forage   items lying around the planet to pick up: { item, count }
@@ -39,10 +40,10 @@ export const PLANETS = [
     roster: [
       { type: 'goblin', groups: 2, size: 3 }, { type: 'ogre', count: 2 }, { type: 'wisp', count: 3 }, { type: 'slime', count: 4, near: 'ponds' },
     ],
-    boss: { type: 'gloomcap', trophy: 'mossCrown' },
+    boss: { type: 'gloomcap', trophy: 'mossCrown', summon: { level: 2, seals: { count: 3, type: 'thornSeal' } }, arena: { wall: 'thorns' } },
     material: 'glowcap', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
     forage: [{ item: 'glowcap', count: 18 }, { item: 'moonberry', count: 14 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
-    arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Defeat it to travel on!',
+    arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to travel on!',
   },
   {
     name: 'Emberfall', tagline: 'warm winds, ember ponds and quicker foes', seed: 77412,
@@ -55,10 +56,10 @@ export const PLANETS = [
       { type: 'goblin', groups: 2, size: 4 }, { type: 'ramhorn', count: 3 }, { type: 'puffcap', count: 5 }, { type: 'wisp', count: 3 },
       { type: 'slime', count: 3, near: 'ponds' },
     ],
-    boss: { type: 'pyrrhax', trophy: 'emberCrown' },
+    boss: { type: 'pyrrhax', trophy: 'emberCrown', summon: { level: 4, sigils: { count: 3, item: 'emberSigil', elites: 4 } }, arena: { wall: 'fire' } },
     material: 'emberShard', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
     forage: [{ item: 'emberShard', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
-    arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Pyrrhax the red dragon waits under the orange light.',
+    arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Pyrrhax the red dragon sleeps under the orange light: the golden elites carry the sigils that wake it.',
   },
   {
     name: 'Frostveil', tagline: 'the last, coldest and fiercest planet', seed: 31415,
@@ -71,9 +72,9 @@ export const PLANETS = [
       { type: 'goblin', groups: 2, size: 3 }, { type: 'ogre', count: 3 }, { type: 'thornmole', count: 4 }, { type: 'hexlantern', count: 3 },
       { type: 'ramhorn', count: 3 }, { type: 'puffcap', count: 4 }, { type: 'wisp', count: 2 },
     ],
-    boss: { type: 'malgrath', trophy: 'frostCrown' },
+    boss: { type: 'malgrath', trophy: 'frostCrown', summon: { level: 6, quest: 'frostHearts', night: true }, arena: { wall: 'hellfire' } },
     material: 'frostPetal', chests: [{ kind: 'common', count: 8 }, { kind: 'rare', count: 3 }],
     forage: [{ item: 'frostPetal', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
-    arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, waits under the crimson light.',
+    arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, only rises at night for a hero Tuva trusts.',
   },
 ];

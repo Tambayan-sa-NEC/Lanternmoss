@@ -41,6 +41,7 @@ export const Journal = {
   // ---------------------------------------------------------------- the bestiary
   meet(type) { if (this.data.seen[type]) return; this.data.seen[type] = true; toast(`New in your bestiary: ${pageName(type)}`); this.changed(); },
   defeat(e) {
+    if (e.def.object) return;                                       // lair seals aren't monsters
     const type = e.type, first = !this.data.defeated[type];
     this.data.seen[type] = true; this.data.defeated[type] = (this.data.defeated[type] ?? 0) + 1;
     if (!isBoss(type) && !e.owner) this.data.stats.monsters++;          // (a boss's summons can't be farmed)
@@ -64,7 +65,7 @@ export const Journal = {
     if (!ctx.started) return;
     if ((this.scanT -= dt) <= 0) {
       this.scanT = SCAN_EVERY; const P = ctx.player;
-      for (const e of ctx.enemies) if (e.alive && !this.data.seen[e.type] && arcDist(P.up, e.up) < BESTIARY.meetDistance) this.meet(e.type);
+      for (const e of ctx.enemies) if (e.alive && !e.hidden && !e.def.object && !this.data.seen[e.type] && arcDist(P.up, e.up) < BESTIARY.meetDistance) this.meet(e.type);
     }
     const b = ctx.boss, engaged = !!b?.alive && ENGAGED.has(b.state);
     if (engaged && this.fight?.boss !== b) this.fight = { boss: b, hit: false, pet: false, level: ctx.player.level };
