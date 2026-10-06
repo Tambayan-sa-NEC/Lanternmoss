@@ -61,7 +61,7 @@ Code: `src/ui/MainMenu.js`, `index.html` (`#title`, `#start`), `src/ui/Character
       the first click or key press (browsers block audio until then).
 - [x] Buttons: **Play**, **Settings**, **Controls**, **Credits** (credits text in `src/config/credits.js`); mouse or
       ↑ ↓ + Enter. Settings / Controls / Credits open as panels of the pause menu (`PauseMenu.openPanel`).
-- [ ] **Continue**: needs the save system (see "Suggested"); add the button then.
+- [ ] **Continue**: needs the save system (see 20); add the button then.
 - [x] Animated transitions: the title lifts away as the hero cards slide in (and the camera moves in close); character
       select has Back / Esc; starting fades the overlay while the camera swoops into play, with the planet banner.
 - [x] Campaign strip: Lanternmoss → Emberfall → Frostveil with each planet's colour and boss (from `config/planets.js`).
@@ -171,7 +171,7 @@ Code: `src/config/pets.js`, `src/gameplay/Pets.js`, `src/gameplay/petAbilities.j
 
 Second batch of features (requested after TODO 1–9 landed). Several of them change the controls or the world itself,
 so the order matters: **10** reworks the key layout that later items build on, **11** changes the planets that
-**14**, **15**, **16**, **18** and **19** place things on, and **Save / load** (Suggested additions) becomes a must-have
+**14**, **15**, **16**, **18** and **19** place things on, and **Save / load** (**20**) becomes a must-have
 once players can build (**18**) and travel back and forth (**19**).
 
 ## 10. A much better HUD **(core)** ✓
@@ -318,7 +318,7 @@ Code: new `src/config/achievements.js`, `src/gameplay/Journal.js`, `src/ui/` (jo
     - Bestiary: the pages above.
     - Collection: every item, with the ones found in colour and a gem on gear found at Legendary rarity.
     - "Start the journal over" erases it (it asks twice).
-- [ ] Saved with the rest of the game (needs Save / load).
+- [ ] Saved with the rest of the game (needs Save / load, 20).
   - For now: the journal saves itself to localStorage (`lanternmoss.journal`, cleaned on load) and is kept across
     adventures, so it doesn't wait on Save / load. Fold it into the save system when that arrives.
 
@@ -419,7 +419,7 @@ Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js`
 
 **Goal:** players shape their own spot on the planet.
 Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (placement on terrain), hotbar
-(10.2); needs Save / load.
+(10.2); needs Save / load (20).
 
 - [ ] **Placeables:** furniture, lights, fences, paths, walls, floors and roofs, chests for storage, crafting stations
       (17) and farm plots (16).
@@ -449,11 +449,57 @@ Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/w
 - [ ] Bosses you've beaten stay beaten (or offer a harder rematch, see 14). Travelling through a portal has its own
       fade and sound.
 
+## 20. Save / load **(core)**
+
+**Goal:** an adventure survives closing the browser: come back and carry on where you left off.
+Code: new `src/core/save.js` (format, versions, cleaning on load), `src/core/Game.js` (gathering and restoring state),
+`src/ui/MainMenu.js` (Continue), `src/ui/PauseMenu.js`; every system with state gets a `toJSON()` / `load()` pair
+(the inventory already has one).
+Needed by 13 (journal), 18 (building) and 19 (per-planet state); unlocks **Continue** on the title screen (3).
+
+- [ ] **What's saved:**
+  - The adventure: current planet, hero, level, XP, coins, health and mana.
+  - The bag, the hotbar and the gear worn.
+  - Pets: unlocked, names, the one out, the command, health.
+  - Progress: quests and challenges, story state (what villagers know), opened chests, bosses beaten, the day clock.
+  - Later: each planet's own state (19) and what's been built (18).
+- [ ] **When:** autosave on arriving at a planet, after a boss, on quitting to the menu, and every few minutes; a
+      "Save" button on the pause menu too. A small "Saved" note when it happens.
+- [ ] **Continue** on the title screen loads the save (and starts a new adventure only after asking, if one exists).
+- [ ] **A safe format:** versioned, and cleaned on load like the settings (unknown items, pets or planets dropped,
+      numbers clamped), so an old or broken save never crashes the game. Unit-tested.
+- [ ] Settings, keys, the journal and remembered pets already save themselves; decide whether they join the save
+      or stay separate (they're per device, not per adventure).
+- [ ] Maybe: more than one save slot, and export / import a save as a file.
+
+## 21. Mobile support **(core)**
+
+**Goal:** the game is playable in a phone or tablet browser, with touch controls.
+Code: `src/systems/InputSystem.js`, `src/core/controls.js`, new `src/ui/touchControls.js`, `styles/main.css`,
+`index.html` (viewport), `src/config/settings.js` (defaults for mobile).
+
+- [ ] **Detect a touch device** (`pointer: coarse`, touch events) and switch the touch layout on; keep a setting to
+      turn it on or off by hand.
+- [ ] **Touch controls:**
+  - A virtual joystick on the left to move (pushed all the way = sprint).
+  - Drag on the right half of the screen to turn the camera; pinch to zoom.
+  - Buttons on the right for jump and the five skills, showing cooldowns; aimed ultimates aim by dragging from
+    their button and cast on release.
+  - A contextual button for talk / use / pet (the `E` prompt becomes tappable), and taps for the hotbar, the pet card,
+    the bag, the journal and pause.
+- [ ] **Menus by touch:** character select, the bag, the shop, the pet menu, the journal and settings all work with
+      taps (no hover-only details; long-press for tooltips).
+- [ ] **Fit small screens:** HUD scale and layout for phones, landscape preferred (a "turn your phone" hint in
+      portrait), no page scrolling or pinch-zooming of the page, full screen when possible.
+- [ ] **Performance:** lower default quality on mobile (pixel ratio, bloom, shadows, scenery density) and a frame-rate
+      check.
+- [ ] Facing-based aiming (14) suits the joystick: attacks go where the hero faces.
+
 ---
 
 ## Suggested additions
 
-- [ ] **Save / load (suggested, high priority, needed by 13, 18 and 19):** persist the current planet, level, XP, bag, gear, pets, settings and opened chests (and, later, journal progress, buildings and each planet's state) in `localStorage`. Several features above (Continue, chests, pets) depend on it. The inventory already has `toJSON()` / `load()`.
+- [~] **Save / load (suggested):** promoted to item 20.
 - [ ] **Balance pass on the new bosses (suggested, high priority):** playtest Pyrrhax and Malgrath with each hero. In particular, check how often the Doom Blade is used, the damage of the Demon Lord's flying phase, and the 50% transition timing.
 - [x] **Minimap or compass (suggested):** the compass strip and off-screen arrows landed with TODO 1 (a minimap could follow once planets get bigger, see 11).
 - [ ] **Tutorial / onboarding (suggested):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
