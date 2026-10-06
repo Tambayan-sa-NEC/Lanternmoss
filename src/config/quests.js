@@ -9,6 +9,7 @@
                  defeat   { enemy ('any' or a type), count }
                  reach    { planet }                   travel to that planet (index)
                any step may also give: [[itemId, n]] items to the hero when it completes
+     give      optional [[itemId, n]] handed over when the quest is accepted
      reward    { coins, xp, items: [[itemId, n]] } when the last step is done
      text      offer / accept / decline (the giver), done (the giver's last words, said with the reward)
    A quest whose giver stays behind on a planet you leave is dropped. Text may use {hero} {planet} ...
@@ -48,6 +49,22 @@ export const QUESTS = {
       accept: 'Bless you! Moonberries glow purple in the wilds, you can\'t miss them.',
       decline: 'Oh, alright. Maybe I can make a... beige tart. Hm.',
       done: 'Two honey buns, warm from the oven. For the road!',
+    },
+  },
+  firstHarvest: {
+    giver: 'Pim', title: 'First Harvest',
+    give: [['carrotSeeds', 4]],
+    steps: [
+      { kind: 'collect', item: 'moonCarrot', count: 3, text: 'Grow 3 Moon Carrots in the farm by the village' },
+      { kind: 'deliver', to: 'Pim', item: 'moonCarrot', count: 3, text: 'Bring the Moon Carrots to Pim',
+        say: "Look at them! Crunchy, silvery, perfect. These are going straight into a stew. Well. After I admire them." },
+    ],
+    reward: { coins: 25, xp: 40, items: [['strawHat', 1]] },
+    text: {
+      offer: "The little farm plot past the houses has been empty all year. Fancy growing something? I'll give you seeds!",
+      accept: 'Here: moon carrot seeds. Till a plot with a hoe, plant, and water them. Rain helps too! A hoe is on my shelf.',
+      decline: 'Maybe another day. The soil will wait. Soil is very patient.',
+      done: 'Every farmer needs a hat. This one was my granny\'s. Wear it well!',
     },
   },
   songsAfar: {

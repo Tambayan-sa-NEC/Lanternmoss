@@ -5,7 +5,7 @@ export const dom = {
   hint: $('hint'), hintKeys: $('hint-keys'), hintHide: document.querySelector('#hint .hide-tip'), hintMini: document.querySelector('#hint .mini'),
   hud: $('hud'), prompt: $('prompt'), toast: $('toast'),
   // combat HUD
-  hpBar: document.querySelector('.bar.hp'), mpBar: document.querySelector('.bar.mp'), xpBar: document.querySelector('.bar.xp'),
+  hpBar: document.querySelector('.bar.hp'), mpBar: document.querySelector('.bar.mp'), xpBar: document.querySelector('.bar.xp'), enBar: document.querySelector('.bar.en'),
   spells: $('spells'), hotbar: $('hotbar'), heldName: $('heldname'), center: $('center'), skills: $('skills'), enemyBars: $('ebars'), reticle: $('reticle'), hurt: $('hurt'), aimHint: $('aimhint'),
   combat: $('combat'), status: $('status'), level: document.querySelector('#combat .lvl b'), tip: $('tip'), lowHp: $('lowhp'),
   compass: $('compass'), compassTrack: document.querySelector('#compass .track'), markers: $('markers'),

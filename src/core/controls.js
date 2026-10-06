@@ -7,6 +7,7 @@ import { boundCodes, is } from './keybinds.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
 import { cancelAim, isAiming, nudgeAim } from '../combat/aiming.js';
 import { groundUnderScreen } from '../combat/area.js';
+import { Fishing } from '../gameplay/Fishing.js';
 import { Hotbar } from '../gameplay/hotbar.js';
 import { currentInteraction } from '../gameplay/Houses.js';
 import { Pets } from '../gameplay/Pets.js';
@@ -64,6 +65,7 @@ function onKey(code) {
     mouse aims, since the camera doesn't), or the area ability being aimed. */
 function onClick() {
   if (ctx.inventoryOpen) return;
+  if (Fishing.active) { Fishing.press(); return; }      // fishing: a click reels in
   if (isAiming()) { confirmAim(); return; }
   faceClick();
   for (const id in kit()) if (kit()[id].mouse) tryCast(id);

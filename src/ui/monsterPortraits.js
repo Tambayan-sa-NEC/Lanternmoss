@@ -1,9 +1,12 @@
-/* Bestiary portraits: each monster's real model (src/models), posed and lit on its own, rendered once by the game's
-   renderer into an image the journal can show (and darken into a silhouette for monsters not met yet). Without a
-   renderer (the headless test harness) there are no portraits and the journal shows a glyph instead. */
+/* Portraits: a real model (src/models), posed and lit on its own, rendered once by the game's renderer into an image.
+   The journal's bestiary shows the monsters (darkened into a silhouette for monsters not met yet); the bag's equipment
+   side shows the hero in their hat and cape (heroPortrait). Without a renderer (the headless test harness) there are
+   no portraits and the UI shows a glyph instead. */
 import * as THREE from 'three';
 import { COMBAT } from '../config/combat.js';
+import { HERO_BUILDERS } from '../models/heroes.js';
 import { ENEMY_BUILDERS } from '../models/monsters.js';
+import { dressHero } from '../models/vanity.js';
 import { outlineMat } from '../render/materials.js';
 import { disposeTree } from '../render/meshes.js';
 
@@ -28,16 +31,28 @@ export function monsterPortrait(type) {
   if (cache.has(type)) return cache.get(type);
   let url = null;
   if (renderer && ENEMY_BUILDERS[type]) {
-    try { url = render(type); } catch { url = null; }
+    try { url = render(ENEMY_BUILDERS[type]({ ...COMBAT.enemies[type] }).root, VIEW); } catch { url = null; }
   }
   cache.set(type, url);
   return url;
 }
 
-function render(type) {
+const HERO_VIEW = { turn: 0.45, lift: 0.08, fov: 30, margin: 1.08 };
+/** The hero `model` (HERO_BUILDERS key) dressed in hatDef / backDef (item definitions or null), as a data URL. */
+export function heroPortrait(model, hatDef = null, backDef = null) {
+  const key = `hero|${model}|${hatDef?.id ?? ''}|${backDef?.id ?? ''}`;
+  if (cache.has(key)) return cache.get(key);
+  let url = null;
+  if (renderer && HERO_BUILDERS[model]) {
+    try { const parts = HERO_BUILDERS[model](); if (parts.bubble) parts.bubble.visible = false; dressHero(parts, hatDef, backDef); url = render(parts.root, HERO_VIEW); } catch { url = null; }
+  }
+  cache.set(key, url);
+  return url;
+}
+
+function render(root, VIEW) {
   stage ??= makeStage();
   const { scene, camera, target, canvas, pixels } = stage;
-  const model = ENEMY_BUILDERS[type]({ ...COMBAT.enemies[type] }), root = model.root;
   scene.add(root); root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
   const r = Math.max(s.x, s.y, s.z) * 0.5 * VIEW.margin, d = r / Math.sin(THREE.MathUtils.degToRad(VIEW.fov) / 2);

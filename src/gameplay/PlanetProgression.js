@@ -29,6 +29,9 @@ import { BossGate } from './BossGate.js';
 import { Houses } from './Houses.js';
 import { resetCompanion } from './characters.js';
 import { clearWorldItems, spawnForage } from './pickups.js';
+import { Farm } from './Farm.js';
+import { Fishing } from './Fishing.js';
+import { Gathering } from './Gathering.js';
 
 export class PlanetProgression {
   constructor(world) {
@@ -51,6 +54,13 @@ export class PlanetProgression {
     BossGate.setup(ctx.planet, boss);                                   // it sleeps until the planet's conditions are met
     spawnForage(this.planet.forage);
     Chests.spawnFor(ctx.planet, boss.home);
+    this.spawnResources();
+  }
+
+  /** The village farm, then the planet's resource nodes (they keep clear of the farm). */
+  spawnResources() {
+    const farm = Farm.setup(this.world, ctx.planet);
+    Gathering.spawnFor(this.world, ctx.planet, farm ? [farm] : []);
   }
 
   /** First adventure only: once play starts, point the hero at the boss after a moment. */
@@ -111,7 +121,7 @@ export class PlanetProgression {
     Dialog.close(); Challenges.cancel(); Houses.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
-    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear();
+    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear();
     world.dispose(); world.generate(this.planet);
     Object.assign(P, { dead: false, deadT: 0, vy: 0 }); P.clearTimers();
     const fwd = P.placeAt(world.spawnDir); P.root.visible = true; P.shadow.visible = true;
@@ -137,6 +147,9 @@ export class PlanetProgression {
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
     ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0;
     if (ctx.planet !== 0) this.load(0);
-    else { BossGate.setup(0, spawnBoss(this.world, this.planet.boss, this.lairs[0])); spawnMiniBosses(this.world, this.planet.miniBosses); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]); }
+    else {
+      BossGate.setup(0, spawnBoss(this.world, this.planet.boss, this.lairs[0])); spawnMiniBosses(this.world, this.planet.miniBosses); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]);
+      this.spawnResources();
+    }
   }
 }

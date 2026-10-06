@@ -435,29 +435,67 @@ Code: `src/world/scatter.js`, `src/world/props.js`, `src/world/sky.js`, `src/ent
       - Caveat: the reference image couldn't be viewed from here, so the look follows the name. Tell me what to
         change.
 
-## 16. Resources and survival **(core)**
+## 16. Resources and survival **(core)** ✓
 
 **Goal:** the hero needs supplies to survive and thrive, so gathering and cooking matter.
 Code: `src/config/items.js`, new gathering systems in `src/gameplay/`, `src/world/` (resource nodes),
 `src/gameplay/itemUse.js`.
 
-- [ ] **Needs:** a hunger or energy meter (gentle, cozy-friendly: running low slows regeneration and sprinting rather
+- [x] **Needs:** a hunger or energy meter (gentle, cozy-friendly: running low slows regeneration and sprinting rather
       than killing you), plus potions and food that matter more in long expeditions.
-- [ ] **Expand the consumables:**
+  - Done (`config/survival.js`, `gameplay/Needs.js`): an Energy bar beside the XP bar.
+    - It drains slowly while you play (full to empty in about 17 minutes), faster sprinting or swimming.
+    - Under 30% you're Hungry: half healing and a slower sprint, a status chip and a pulsing bar. Empty means no
+      healing and a sprint barely faster than walking. It never hurts you. Fainting wakes you with some energy.
+- [x] **Expand the consumables:**
   - Meals with buffs, potions (healing, mana, resistance, speed).
   - Planet-specific foods; spoil-free by default.
-- [ ] **Gathering** with tools (held from the hotbar, 10.2):
+  - Done: every food fills energy.
+    - Meals: grilled fish, sun bread, veggie stew (Mending), pumpkin pie (Mighty), koi feast (Stoneskin, heals, fills
+      you up).
+    - Planet foods: fire peppers and the Ember Skewer on Emberfall, snow plums and Plum Porridge (Quickstep) on Frostveil.
+    - Potions: Healing, Starwater (mana), Stoneskin Tonic (resistance), Quickstep Tonic (speed).
+    - New buffs (`config/game.js` `BUFFS`) show in the status row. Nothing spoils.
+- [x] **Gathering** with tools (held from the hotbar, 10.2):
   - Foraging: herbs, berries, mushrooms.
   - Woodcutting: trees give wood.
   - Mining: rocks and ore veins give stone, ores and gems.
   - Fishing: ponds, with a small catch timing game.
-- [ ] **Farming:** till soil, plant seeds, water them, and harvest over day / night cycles; a plot in the village.
-- [ ] Resource nodes regrow over time; the rarer nodes are on later planets or behind challenges.
-- [ ] **Equipment system:** players can pick up, craft or be given armour, vanity items and accessories, and equip
+  - Done (`config/resources.js`, `gameplay/Gathering.js`, `Fishing.js`):
+    - By hand: fallen branches (wood) and loose stones (stone) near each village, so your first tools need no tools.
+      Also sweetleaf (sometimes seeds), berry bushes (moonberries, fire peppers, snow plums), glowcaps, frost flowers.
+    - Tools are held from the hotbar. `E` uses the right one from the hotbar (and holds it); right click / its number
+      again works whatever is in front of you. The hero swings it, the thing wobbles, chips fly.
+    - Axe: every tree but crystal spires gives wood, then rests. Pickaxe: rocks give stone. Copper and ember veins need
+      a Stone Pickaxe; iron and gem veins need a Copper Pickaxe.
+    - Fishing: cast at a pond or lake and wait for the float to dip. Press `E` (or click), then stop the swinging needle
+      in the green. Each planet has its own fish, and a rare Golden Koi (likelier in lakes) with a smaller zone.
+- [x] **Farming:** till soil, plant seeds, water them, and harvest over day / night cycles; a plot in the village.
+  - Done (`gameplay/Farm.js`): a fenced farm of six plots by each village, with a scarecrow.
+    - Till with a hoe, plant seeds (moon carrots, sun wheat, pumpkins), water with a can. Rain and snow water every plot.
+    - A crop grows only on a day it's watered; a new day dries the soil. It takes 0.6 to 1.3 days, and sleeping
+      through the night counts.
+    - Seeds come from Pim's shelf, sweetleaf and chests. Pim's new quest, First Harvest, starts you off and ends with
+      a straw hat.
+- [x] Resource nodes regrow over time; the rarer nodes are on later planets or behind challenges.
+  - Done: nodes regrow in 2 to 10 minutes (fruit first, or the whole thing).
+    - Iron veins appear from Emberfall on.
+    - The gem veins (amethyst, fire opal, frost diamond) sit by each planet's mini boss and need a Copper Pickaxe.
+- [x] **Equipment system:** players can pick up, craft or be given armour, vanity items and accessories, and equip
       them. (Today there are three slots: weapon, armour and trinket, from TODO 8.)
-- [ ] **The right side of the inventory is the equipment side,** like Minecraft: the worn pieces sit in slots beside
+  - Done: eight worn slots (`config/items.js` `EQUIP_SLOTS`): head, body, feet, weapon, two trinkets, and the vanity
+    hat and cape.
+    - New pieces: hoods, helms and circlets, boots, gem trinkets. Vanity: straw hat, flower crown, toad cap, leaf
+      cape, starry cape.
+    - Vanity is drawn on the hero (`models/vanity.js`; the witch's hat comes off for it) and adds no stats.
+    - Found in chests (the starry cape), dropped (the Hydra's toad cap), crafted, or given (Pim's straw hat).
+- [x] **The right side of the inventory is the equipment side,** like Minecraft: the worn pieces sit in slots beside
       the bag grid.
-- [ ] **Move the item description window** that shows now so it sits right under the whole inventory window.
+  - Done: your hero, rendered in their hat and cape, stands between the head / body / feet and weapon / trinket
+    columns, with the vanity row and the gear's totals under them. Select a bag item and the slots it fits light up;
+    click one to wear it there.
+- [x] **Move the item description window** that shows now so it sits right under the whole inventory window.
+  - Done: it's its own little window under the bag.
 
 ## 17. More crafting **(core)**
 

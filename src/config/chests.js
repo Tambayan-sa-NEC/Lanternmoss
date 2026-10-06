@@ -38,6 +38,8 @@ export const LOOT_TABLES = {
       { item: 'featherCharm', qty: 1, weight: 0.6 },
       { item: 'moonHopCharm', qty: 1, weight: 0.6 },
       { item: '@gear', rarity: 'chest', weight: 1.2 },
+      { item: 'carrotSeeds', qty: [2, 3], weight: 1.5 },
+      { item: 'wheatSeeds', qty: [2, 3], weight: 1 },
     ],
   },
   rare: {
@@ -49,6 +51,8 @@ export const LOOT_TABLES = {
       { item: 'honeyBun', qty: 2, weight: 2 },
       { item: '@material', qty: [3, 5], weight: 2 },
       { item: '@gear', rarity: 'rare', weight: 4 },
+      { item: 'starryCape', qty: 1, weight: 1 },
+      { item: 'pumpkinSeeds', qty: 2, weight: 1 },
     ],
   },
   boss: {
@@ -78,8 +82,9 @@ export const GEAR_RARITY = {
   boss:    { rare: 65, legendary: 35 },
 };
 
-/** What a mini boss (hydra, basilisk) leaves where it falls: one roll of this table, every time. */
-export const MINI_BOSS_LOOT = { table: 'rare' };
+/** What a mini boss (hydra, basilisk) leaves where it falls: one roll of this table, every time, plus its own
+    `extra` items (by monster type). */
+export const MINI_BOSS_LOOT = { table: 'rare', extra: { hydra: [['frogHat', 1]] } };
 
 export const MONSTER_DROPS = {
   chance: 0.1,             // base chance a defeated monster drops something...

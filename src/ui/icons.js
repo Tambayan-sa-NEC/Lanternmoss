@@ -57,6 +57,13 @@ Object.assign(GLYPHS, {
   sprout: `<path ${F} d="M11.2 12.5C6 13 3.5 9.8 3.5 5.5c4.5 0 7.6 2.4 7.7 7zM12.8 10.5c.4-4 3-6.4 7.7-6.4 0 4-2.4 6.8-7.7 6.4z"/><path ${S} d="M12 21v-9.5"/>`,
 });
 GLYPHS.eye = GLYPHS.scout; GLYPHS.paw = GLYPHS.fetch;   // compass marks for what a pet spotted or sniffed out
+// ---- gathering and needs (TODO 16)
+Object.assign(GLYPHS, {
+  fish: `<path ${F} d="M2.5 12c3-4.5 9.5-6 14-1.5l5-4v11l-5-4C12 18 5.5 16.5 2.5 12z"/><circle fill="#fff" cx="7" cy="11.2" r="1.3"/>`,
+  leaf: `<path ${F} d="M4 20C4 10 10 4 20.5 3.5 20.5 14 14 20 4 20z"/><path fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" d="M5.5 18.5L15 9"/>`,
+  hungry: `<path ${F} d="M4 13c0-4.6 3.6-7.5 8-7.5s8 2.9 8 7.5v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M8.5 10l1.5 2.4M12 9.4l1.5 2.4M15.5 10l1.5 2.4"/>`,
+});
+GLYPHS.might = GLYPHS.flame; GLYPHS.ward = GLYPHS.guard; GLYPHS.swift = GLYPHS.dash;   // food and potion buffs (the status row)
 
 /** Inline SVG markup for an ability / status / waypoint id. */
 export function icon(id) {

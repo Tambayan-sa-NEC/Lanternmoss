@@ -3,13 +3,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { BOSS_CHEST, CHEST_KINDS, GEAR_RARITY, KEYS, LOOT, LOOT_TABLES, MONSTER_DROPS } from '../src/config/chests.js';
-import { ITEM_DEFINITIONS } from '../src/config/items.js';
+import { GEAR_KINDS, ITEM_DEFINITIONS } from '../src/config/items.js';
 import { PLANETS } from '../src/config/planets.js';
 import { resolveLootItem, rollGear, rollLoot } from '../src/gameplay/loot.js';
 
 const ITEMS = new Set(ITEM_DEFINITIONS.map(d => d.id));
 const TOKENS = new Set(['@material', '@trophy', '@gear']);
-const GEAR = new Map(ITEM_DEFINITIONS.filter(d => d.equip).map(d => [d.id, d]));
+const GEAR = new Map(ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity).map(d => [d.id, d]));   // rolled gear (vanity is a plain item)
 const seeded = (seed = 1) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 
 test('chest kinds name a loot table and a full look', () => {

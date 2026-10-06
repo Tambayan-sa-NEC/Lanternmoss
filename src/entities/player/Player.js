@@ -5,7 +5,8 @@ import { BUFFS, PLAYER, WORLD } from '../../config/game.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buffs } from '../../gameplay/buffs.js';
-import { HOTBAR, INVENTORY } from '../../config/items.js';
+import { EQUIP_SLOTS, HOTBAR, INVENTORY } from '../../config/items.js';
+import { NEEDS } from '../../config/survival.js';
 import { hotbarFirst, Inventory } from '../../inventory/Inventory.js';
 import { held } from '../../core/keybinds.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
@@ -38,7 +39,8 @@ export class Player extends Walker {
     // combat
     Object.assign(this, { charId: 'witch', stats: COMBAT.player, hp: COMBAT.player.maxHp, mana: COMBAT.player.maxMana, invuln: 0, hurtT: 0,
       dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, coins: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS });
-    this.equipment = { weapon: null, armor: null, charm: null };   // worn gear (src/gameplay/equipment.js)
+    this.equipment = Object.fromEntries(Object.keys(EQUIP_SLOTS).map(k => [k, null]));   // worn gear (src/gameplay/equipment.js)
+    this.energy = NEEDS.start; this.regenK = 1; this.sprintK = 1;                      // gameplay/Needs.js
     // the hero's items: slots 0-8 are the hotbar, the rest the bag (kept across planets and fainting; emptied on a new adventure)
     this.inventory = new Inventory(HOTBAR.size + INVENTORY.slots, itemRegistry,
       { fillOrder: hotbarFirst(HOTBAR.size, HOTBAR.size + INVENTORY.slots, HOTBAR.holdCategories) });
@@ -48,6 +50,7 @@ export class Player extends Walker {
   swapModel(parts) {
     if (this.root) { scene.remove(this.root); disposeTree(this.root); }
     for (const k of this.partKeys) delete this[k];
+    this.vanityHat = this.vanityCape = this.capeKids = this.heldTool = null;     // they belonged to the old model
     this.partKeys = Object.keys(parts); Object.assign(this, parts); scene.add(this.root);
   }
 
@@ -90,7 +93,9 @@ export class Player extends Walker {
     _cf.copy(viewFwd); projectTangent(_cf, this.up).normalize(); _cr.crossVectors(_cf, this.up);
     _wish.set(0, 0, 0).addScaledVector(_cf, f).addScaledVector(_cr, s); if (_wish.lengthSq() > 1) _wish.normalize();
     const sprint = held('sprint', keys);
-    const speed = (sprint ? PLAYER.sprintSpeed : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1) * (1 + (this.stats.moveSpeed || 0));
+    const run = PLAYER.walkSpeed + (PLAYER.sprintSpeed - PLAYER.walkSpeed) * (this.sprintK ?? 1);    // a hungry hero sprints slower (gameplay/Needs.js)
+    const speed = (sprint ? run : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1) * (buffs.swift > 0 ? BUFFS.swiftSpeed : 1) * (1 + (this.stats.moveSpeed || 0));
+    this.sprinting = sprint && _wish.lengthSq() > 0.01;
     _tv.copy(_wish).multiplyScalar(speed);
     this.vel.lerp(_tv, damp(this.grounded ? PLAYER.accelGround : PLAYER.accelAir, dt));
     // jump with coyote time + input buffer

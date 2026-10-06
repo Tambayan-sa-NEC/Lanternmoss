@@ -15,9 +15,12 @@ export const SHOP = {
   stock: [
     { item: 'honeyBun' }, { item: 'moonberryTart' }, { item: 'moonberry' },
     { item: 'featherCharm' }, { item: 'moonHopCharm' },
+    // the garden shelf: seeds for the farm plot and a few simple tools (TODO 16)
+    { item: 'carrotSeeds' }, { item: 'wheatSeeds' }, { item: 'pumpkinSeeds' },
+    { item: 'hoe' }, { item: 'wateringCan' }, { item: 'fishingRod' }, { item: 'woodAxe' }, { item: 'stonePick' },
   ],
   text: {
-    greet: 'Welcome to the bakery, {hero}! Fresh buns, tarts and a charm or two. Want a look?',
+    greet: 'Welcome to the bakery, {hero}! Fresh buns, tarts, a charm or two, and seeds and tools for the farm. Want a look?',
     closed: "Mmh... the bakery's closed for the night. Come back in the morning, I'll have buns...",
     browse: 'Browse the shop', chat: 'Just chatting',
   },

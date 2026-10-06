@@ -25,6 +25,9 @@ import { groundHeight } from '../world/terrain.js';
 import { buff } from './buffs.js';
 import { Challenges } from './challenges/Challenges.js';
 import { Chests } from './Chests.js';
+import { Farm } from './Farm.js';
+import { Fishing } from './Fishing.js';
+import { Gathering } from './Gathering.js';
 import { Pets } from './Pets.js';
 import { rareTarget } from '../entities/wildlife/wildlife.js';
 import { dayClock } from './dayClock.js';
@@ -181,11 +184,12 @@ export const Houses = {
       case 'bed': {
         const night = dayClock.phase === 'night' || dayClock.phase === 'evening' && dayClock.frac > 0.7;
         this.fadeThen(() => {
-          if (night) {                                               // sleep through to the morning
+          if (night) {                                               // sleep through to the morning (watered crops grow overnight)
+            Farm.growBy(((dayClock.frac > REST.wakeAt ? 1 : 0) + REST.wakeAt - dayClock.frac) * DAY.length);
             if (dayClock.frac > REST.wakeAt) dayClock.day++;
             dayClock.t = REST.wakeAt * DAY.length; P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
             showBanner(`Day ${dayClock.day}`, 'You wake up rested and ready.');
-          } else { dayClock.update(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
+          } else { dayClock.update(20); Farm.growBy(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
         });
         return;
       }
@@ -245,9 +249,10 @@ export const Houses = {
     (./Chests.js), whichever is closest. */
 export function currentInteraction() {
   if (!ctx.started || Dialog.open || Houses.fade) return null;
+  if (Fishing.active) return Fishing.target();                      // fishing: E reels in
   let h = Houses.target();
   if (Houses.inside) return h;
-  for (const c of [Chests.target(), Pets.target(), rareTarget()]) if (c && (!h || c.dist < h.dist)) h = c;
+  for (const c of [Chests.target(), Pets.target(), rareTarget(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
   const P = ctx.player, n = nearestNPC(P, ctx.npcs);
   if (n && (!h || n.pos.distanceTo(P.pos) <= h.dist)) {
     return { label: `Talk to ${n.name}${Challenges.tagFor(n)}`, at: _w.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).clone(), run: () => Dialog.start(n) };

@@ -16,6 +16,7 @@ export const JOURNAL_STATS = {
   monsters: 'Monsters defeated', bosses: 'Bosses defeated', bossKinds: 'Different bosses defeated', chests: 'Chests opened',
   quests: 'Quests finished', crafted: 'Items crafted', legendary: 'Kinds of Legendary gear found', petsFound: 'Pets found',
   kinds: 'Kinds of monster defeated', items: 'Kinds of item found', minibosses: 'Mini bosses defeated', rareFriends: 'Rare creatures befriended',
+  gathered: 'Things gathered', fish: 'Fish caught', harvests: 'Crops harvested',
 };
 
 export const ACHIEVEMENTS = [
@@ -30,6 +31,8 @@ export const ACHIEVEMENTS = [
   { id: 'allKinds', group: 'Firsts', icon: 'book', name: 'Field Notes', text: 'Defeat one of every kind of monster and boss.', goal: { stat: 'kinds', at: 'allKinds' }, reward: { coins: 120 } },
   { id: 'giantSlayer', group: 'Firsts', icon: 'boss', name: 'Giant Slayer', text: 'Defeat a mini boss: the Hydra or the Basilisk.', goal: { stat: 'minibosses', at: 1 }, reward: { coins: 40 } },
   { id: 'gentleHands', group: 'Firsts', icon: 'paw', name: 'Gentle Hands', text: 'Befriend a rare creature (walk up to it slowly).', goal: { stat: 'rareFriends', at: 1 }, reward: { coins: 25 } },
+  { id: 'firstFish', group: 'Firsts', icon: 'fish', name: 'Hooked', text: 'Catch a fish.', goal: { stat: 'fish', at: 1 }, reward: { coins: 10 } },
+  { id: 'firstHarvest', group: 'Firsts', icon: 'sprout', name: 'Green Thumb', text: 'Harvest a crop from your farm plot.', goal: { stat: 'harvests', at: 1 }, reward: { coins: 15 } },
   // ---- counts
   { id: 'monsters25', group: 'Counts', icon: 'slash', name: 'Monster Tamer', text: 'Defeat 25 monsters.', goal: { stat: 'monsters', at: 25 }, reward: { coins: 15 } },
   { id: 'monsters100', group: 'Counts', icon: 'slash', name: 'Lantern Warden', text: 'Defeat 100 monsters.', goal: { stat: 'monsters', at: 100 }, reward: { coins: 40 } },
@@ -40,6 +43,9 @@ export const ACHIEVEMENTS = [
   { id: 'quests10', group: 'Counts', icon: 'quest', name: 'Pillar of the Village', text: 'Finish 10 quests.', goal: { stat: 'quests', at: 10 }, reward: { coins: 50 } },
   { id: 'crafted10', group: 'Counts', icon: 'craft', name: 'Workbench Regular', text: 'Craft 10 items.', goal: { stat: 'crafted', at: 10 }, reward: { coins: 30 } },
   { id: 'collector', group: 'Counts', icon: 'star', name: 'Collector', text: 'Find 20 different kinds of item.', goal: { stat: 'items', at: 20 }, reward: { coins: 30 } },
+  { id: 'gatherer', group: 'Counts', icon: 'leaf', name: 'Forager', text: 'Gather 50 times: pick, chop or mine.', goal: { stat: 'gathered', at: 50 }, reward: { coins: 30 } },
+  { id: 'angler', group: 'Counts', icon: 'fish', name: 'Angler', text: 'Catch 15 fish.', goal: { stat: 'fish', at: 15 }, reward: { coins: 40 } },
+  { id: 'farmer', group: 'Counts', icon: 'sprout', name: 'Harvest Festival', text: 'Harvest 12 crops.', goal: { stat: 'harvests', at: 12 }, reward: { coins: 40 } },
   // ---- challenges (planet bosses)
   { id: 'flawless', group: 'Challenges', icon: 'guard', name: 'Not a Scratch', text: 'Defeat a boss without being hit once.', goal: { flag: 'flawless' }, reward: { coins: 100 } },
   { id: 'underdog', group: 'Challenges', icon: 'sprout', name: 'Underdog', text: 'Defeat a boss at a low level (Gloomcap at 3 or lower, Pyrrhax at 5, Malgrath at 7).', goal: { flag: 'underdog' }, reward: { coins: 80 } },

@@ -101,17 +101,21 @@ try {
     window.__stand(c.up, 2.2); window.__frame(c.up, { turn: 0.9, pitch: 0.55, dist: 5.5 }); window.__chest = c; });
   await wait(3500); await run(() => window.LANTERNMOSS.Chests.open(window.__chest)); await wait(2600); await shot('chest', { keepToast: true });
 
-  // the bag: gear, a full grid, then the Craft tab
+  // the bag: the equipment side (worn gear round the hero, the vanity slots), a full grid, the details window under it;
+  // then the Craft tab
   await run(() => {
     const L = window.LANTERNMOSS, inv = L.inventory; L.player.coins = 140;
-    for (const [id, n, r] of [['honeyBun', 4], ['moonberryTart', 2], ['glowTonic', 2], ['emberStew', 1], ['frostDraught', 1], ['glowcap', 14], ['emberShard', 9],
-      ['frostPetal', 6], ['moonberry', 7], ['starStaff', 1, 'legendary'], ['frostMantle', 1, 'rare'], ['emberRing', 1, 'rare'], ['glowStaff', 1, 'uncommon'],
-      ['mossCloak', 1, 'uncommon'], ['lanternPendant', 1], ['frostLocket', 1, 'legendary'], ['featherCharm', 1], ['mossCrown', 1]]) inv.add(id, n, r ? { rarity: r } : null);
-    L.InventoryUI.open(); L.InventoryUI.use(inv.find('starStaff')); L.InventoryUI.use(inv.find('frostMantle'));
+    for (const [id, n, r] of [['honeyBun', 4], ['pumpkinPie', 2], ['healingPotion', 2], ['woodAxe', 1], ['fishingRod', 1], ['starwater', 1], ['glowcap', 14], ['emberShard', 9],
+      ['wood', 12], ['stone', 9], ['copperOre', 4], ['sweetleaf', 6], ['carrotSeeds', 3], ['moonberry', 7], ['starStaff', 1, 'legendary'], ['frostMantle', 1, 'rare'],
+      ['mossHood', 1, 'uncommon'], ['wanderBoots', 1, 'uncommon'], ['lanternPendant', 1], ['strawHat', 1], ['leafCape', 1],
+      ['emberRing', 1, 'rare'], ['frostLocket', 1, 'legendary'], ['glowStaff', 1, 'uncommon'], ['amethyst', 1], ['mossCrown', 1]]) inv.add(id, n, r ? { rarity: r } : null);
+    L.InventoryUI.open();
+    for (const id of ['starStaff', 'frostMantle', 'mossHood', 'wanderBoots', 'lanternPendant', 'strawHat', 'leafCape']) L.InventoryUI.use(inv.find(id));
     L.InventoryUI.selected = inv.find('emberRing'); L.InventoryUI.message = ''; L.InventoryUI.render();
   });
-  await wait(2000); await shot('bag');
+  await wait(2500); await shot('bag');
   await page.click('[data-tab="craft"]'); await wait(1500); await shot('crafting');
+  await run(() => { const L = window.LANTERNMOSS; L.InventoryUI.setTab('bag'); L.InventoryUI.commands.unequip('hat'); L.InventoryUI.commands.unequip('back'); });
   await run(() => { const Pt = window.LANTERNMOSS.Pets; for (const id of ['fox', 'wisp', 'whelp']) Pt.unlocked.add(id); });
   // the pet menu (B): the world pauses, the camera holds on the pet
   await run(() => { const L = window.LANTERNMOSS; L.InventoryUI.close(); L.PetMenu.open(); L.PetMenu.pick('whelp'); });
@@ -169,6 +173,39 @@ try {
   await ff(1.5); await run(() => { const L = window.LANTERNMOSS; L.player.invuln = 0; document.getElementById('cresult').classList.remove('show'); L.Pets.choose('dragontoad'); L.PetMenu.open(); L.PetMenu.pick('dragontoad'); });
   await ff(3); await wait(2500); await shot('dragontoad');
   await run(() => { const L = window.LANTERNMOSS; L.PetMenu.close(); L.Pets.command('follow'); }); await wait(600);
+
+  // TODO 16: the farm (plots at every stage, the hero in the straw hat), fishing (the reeling meter), mining a vein
+  await run(() => { const L = window.LANTERNMOSS, F = L.Farm, inv = L.inventory; window.__sky('clear');
+    const looks = [{ tilled: true, crop: 'pumpkin', growth: 1, watered: false }, { tilled: true, crop: 'wheat', growth: 1, watered: false },
+      { tilled: true, crop: 'carrot', growth: 1, watered: false }, { tilled: true, crop: 'carrot', growth: 0.7, watered: true },
+      { tilled: true, crop: 'wheat', growth: 0.3, watered: true }, { tilled: false, crop: null, growth: 0, watered: false }];
+    F.plots.forEach((p, i) => { Object.assign(p.s, looks[i]); p.stage = -1; F.look(p); });
+    for (const k of ['hat', 'back']) { const id = k === 'hat' ? 'strawHat' : 'leafCape', s = inv.find(id); if (s >= 0) L.InventoryUI.commands.equip(s, k); }
+    if (inv.find('wateringCan') < 0) inv.add('wateringCan', 1);
+    const p = F.plots[3]; window.__at(p.dir, 1.6, 2.6); L.player.vel.set(0, 0, 0); L.Hotbar.selected = inv.find('wateringCan');
+    for (const e of L.critters) if (e.up.distanceTo(F.center) < 0.25) e.root.visible = false;
+    window.__frame(F.center, { turn: 2.2, pitch: 0.42, dist: 9 }); });
+  await ff(0.5); await wait(3000); await shot('farm');
+  await run(() => { const L = window.LANTERNMOSS, inv = L.inventory, p = L.ponds.filter(q => q.r < 6).sort((a, b) => a.dir.distanceTo(L.player.up) - b.dir.distanceTo(L.player.up))[0];
+    if (inv.find('fishingRod') < 0) inv.add('fishingRod', 1);
+    window.__at(p.dir, p.r + 0.9, 0.6); L.player.vel.set(0, 0, 0); L.Fishing.start(p); window.__pond = p; });
+  await ff(0.8); await run(() => { const L = window.LANTERNMOSS, Fi = L.Fishing; Fi.s.biteAt = 0; L.update(1 / 30); Fi.press(); Fi.s.t = 0.35;
+    Fi.drawMeter(0.42); window.__frame(Fi.s.dir, { turn: 1.3, pitch: 0.75, dist: 8 }); });
+  await ff(0.1); await run(async () => { const Fi = window.LANTERNMOSS.Fishing, { ctx } = await import('/src/core/context.js');
+    Fi.s.t = 0.2; Fi.s.centre = 0.5; Fi.showMeter(true); Fi.drawMeter(0.47); ctx.paused = true; });   // hold the moment (the world pauses, drawing goes on)
+  await wait(2500); await shot('fishing');
+  await run(async () => { const L = window.LANTERNMOSS, { ctx } = await import('/src/core/context.js'); ctx.paused = false;
+    L.Fishing.end(); const inv = L.inventory, G = L.Gathering;
+    if (inv.find('stonePick') < 0) inv.add('stonePick', 1);
+    const v = G.nodes.filter(n => n.kind === 'copperVein').sort((a, b) => a.up.distanceTo(L.player.up) - b.up.distanceTo(L.player.up))[0];
+    window.__at(v.up, v.def.r + 0.7, 1.2); L.player.vel.set(0, 0, 0); window.__vein = v; });
+  await ff(2); await run(() => { const L = window.LANTERNMOSS; L.Gathering.work({ node: window.__vein });
+    window.__frame(window.__vein.up, { turn: 0.85, pitch: 0.36, dist: 6.5 }); });
+  await ff(0.2);
+  await ff(0.05); await run(async () => { (await import('/src/core/context.js')).ctx.paused = true; });
+  await wait(2500); await shot('gathering');
+  await run(async () => { (await import('/src/core/context.js')).ctx.paused = false; });
+  await run(() => { const L = window.LANTERNMOSS; L.Gathering.stop(); L.InventoryUI.commands.unequip('hat'); L.InventoryUI.commands.unequip('back'); });
 
   // Gloomcap's sealed lair (the seals and the status chip), its waking (the name card), and the arena ring
   await run(async () => { const S = await import('/src/utils/sphere.js'), L = window.LANTERNMOSS, G = L.BossGate;

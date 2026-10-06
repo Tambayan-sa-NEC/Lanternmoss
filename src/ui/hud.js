@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
 import { HOTBAR, RARITIES } from '../config/items.js';
+import { NEEDS } from '../config/survival.js';
 import { PLANET_RADIUS as R } from '../config/game.js';
 import { ctx } from '../core/context.js';
 import { setSetting, settings } from '../core/settings.js';
@@ -48,7 +49,7 @@ function setBar(b, frac, text, dt) {
   }
   if (text !== b.text) { b.text = text; b.value.textContent = text; }
 }
-const bars = { hp: makeBar(dom.hpBar), mp: makeBar(dom.mpBar), xp: makeBar(dom.xpBar) };
+const bars = { hp: makeBar(dom.hpBar), mp: makeBar(dom.mpBar), xp: makeBar(dom.xpBar), en: makeBar(dom.enBar) };
 const boss = { el: dom.bossBar, fill: dom.bossFill, lag: dom.bossLag, value: dom.bossPct, k: 1, trail: 1, hold: 0, text: '', ref: null, phase: 0 };
 let shownLevel = 0, shownRes = '';
 
@@ -151,6 +152,11 @@ const STATUSES = [
   { id: 'moon', name: 'Moon-Hop', left: () => buffs.moon },
   { id: 'feather', name: 'Feather-Step', left: () => buffs.feather },
   { id: 'howl', name: 'Howl (+damage)', left: () => buffs.howl },
+  { id: 'might', name: 'Mighty (+damage)', left: () => buffs.might },
+  { id: 'ward', name: 'Stoneskin (less damage taken)', left: () => buffs.ward },
+  { id: 'swift', name: 'Quickstep (faster)', left: () => buffs.swift },
+  { id: 'mend', name: 'Mending (healing)', left: () => buffs.mend },
+  { id: 'hungry', name: 'Hungry: slower healing and sprinting (eat something)', active: P => !P.dead && P.energy / NEEDS.max < NEEDS.hungry.below },
   { id: 'guard', name: 'Guard', left: P => P.guardT },
   { id: 'regen', name: 'Regenerating', active: P => !P.dead && P.hp < P.stats.maxHp && ctx.time - P.lastHurt > P.stats.hpRegenDelay },
 ];
@@ -246,6 +252,8 @@ export function updateCombatHud(dt, spellState, aimTarget) {
   setBar(bars.mp, P.mana / C.maxMana, `${Math.floor(P.mana)} / ${C.maxMana}`, dt);
   const need = xpToNext(P.level);
   setBar(bars.xp, need ? P.xp / need : 1, need ? `${P.xp} / ${need}` : 'MAX', dt);
+  setBar(bars.en, P.energy / NEEDS.max, `${Math.ceil(P.energy)}`, dt);
+  bars.en.el.classList.toggle('low', P.energy / NEEDS.max < NEEDS.hungry.below);
   updateHotbar();
   dom.combat.classList.toggle('talking', dom.dialog.classList.contains('show'));   // the dialogue box takes the bottom centre
   if (shownLevel !== P.level) { if (shownLevel) flashEl(dom.level.parentElement, 'pop'); shownLevel = P.level; dom.level.textContent = P.level; }

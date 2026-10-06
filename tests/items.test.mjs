@@ -7,7 +7,9 @@ import { readFileSync } from 'node:fs';
 import { CHARACTERS } from '../src/config/characters.js';
 import { RECIPES } from '../src/config/crafting.js';
 import { HOTBAR_KEYS } from '../src/config/controls.js';
-import { EQUIP_SLOTS, HOTBAR, INVENTORY, ITEM_ART_KINDS, ITEM_DEFINITIONS, RARITIES, STATS } from '../src/config/items.js';
+import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, ITEM_ART_KINDS, ITEM_DEFINITIONS, RARITIES, STATS } from '../src/config/items.js';
+import { LOOT_TABLES, MINI_BOSS_LOOT } from '../src/config/chests.js';
+import { QUESTS } from '../src/config/quests.js';
 import { hotbarFirst, Inventory } from '../src/inventory/Inventory.js';
 import { itemRegistry } from '../src/items/ItemRegistry.js';
 import { craft, craftProblem, recipesFor } from '../src/items/crafting.js';
@@ -15,6 +17,7 @@ import { applyGear, equipProblem, formatStat, gearStats, gearTotals, itemRarity 
 
 const get = id => itemRegistry.get(id);
 const GEAR = ITEM_DEFINITIONS.filter(d => d.equip);
+const VANITY_SRC = readFileSync(new URL('../src/models/vanity.js', import.meta.url), 'utf8');
 
 test('every item has its own art kind, and every art kind has an SVG icon and a world model', () => {
   for (const d of ITEM_DEFINITIONS) assert.ok(ITEM_ART_KINDS.includes(d.icon.art), `${d.id}: icon.art "${d.icon.art}"`);
@@ -26,9 +29,12 @@ test('every item has its own art kind, and every art kind has an SVG icon and a 
   }
 });
 
-test('gear: a slot, real stats, a tier, and weapons for every hero at each tier', () => {
+test('gear: a kind, real stats (vanity: none), a tier, a worn slot it fits, and weapons for every hero at each tier', () => {
   for (const d of GEAR) {
-    assert.ok(d.equip.slot in EQUIP_SLOTS && Object.keys(d.equip.stats).length, `${d.id}: slot and stats`);
+    const vanity = GEAR_KINDS[d.equip.slot]?.vanity;
+    assert.ok(d.equip.slot in GEAR_KINDS && (vanity ? !Object.keys(d.equip.stats).length : Object.keys(d.equip.stats).length), `${d.id}: kind and stats`);
+    assert.ok(Object.values(EQUIP_SLOTS).some(s => s.fits === d.equip.slot), `${d.id}: a worn slot takes ${d.equip.slot}`);
+    if (vanity) assert.match(VANITY_SRC, new RegExp(`\\n  ${d.icon.art}: \\(`), `${d.id}: drawn on the hero (models/vanity.js)`);
     for (const k of Object.keys(d.equip.stats)) assert.ok(k in STATS, `${d.id}: stat ${k}`);
     assert.ok(!d.equip.hero || CHARACTERS[d.equip.hero], `${d.id}: hero ${d.equip.hero}`);
     assert.ok([1, 2, 3].includes(d.equip.tier ?? 1), `${d.id}: tier`);
@@ -38,7 +44,8 @@ test('gear: a slot, real stats, a tier, and weapons for every hero at each tier'
     assert.ok(GEAR.filter(d => d.equip.slot === 'weapon' && d.equip.hero === hero).length >= 2, `${hero}: at least two weapons`);
     assert.ok(GEAR.some(d => d.equip.slot === 'weapon' && d.equip.hero === hero && d.equip.tier === 1), `${hero}: a first-planet weapon`);
   }
-  for (const s of Object.keys(EQUIP_SLOTS)) assert.ok(GEAR.some(d => d.equip.slot === s && (d.equip.tier ?? 1) === 1), `a tier-1 ${s}`);
+  for (const k of Object.keys(GEAR_KINDS)) assert.ok(GEAR.some(d => d.equip.slot === k && (d.equip.tier ?? 1) === 1), `a tier-1 ${k}`);
+  for (const s of Object.values(EQUIP_SLOTS)) assert.ok(s.fits in GEAR_KINDS && s.label, `worn slot ${s.label}`);
 });
 
 test('rarity multiplies gear stats; better rarities are always stronger', () => {
@@ -79,8 +86,11 @@ test('recipes only use real items, and every material crafts something', () => {
   }
   for (const d of ITEM_DEFINITIONS.filter(d => d.category === 'material')) assert.ok(RECIPES.some(r => r.needs.some(([i]) => i === d.id)), `${d.id} is used by a recipe`);
   const gifts = new Set(Object.values(CRITTER_DEFS).filter(c => c.rare).map(c => c.rare.gift));   // rare creatures' charms are gifts, not recipes
-  for (const d of GEAR) assert.ok(gifts.has(d.id) || RECIPES.some(r => r.result === d.id), `${d.id} can be crafted`);
+  const given = new Set([...Object.values(QUESTS).flatMap(q => (q.reward?.items ?? []).map(([i]) => i)),                // quest rewards, loot keepsakes
+    ...Object.values(MINI_BOSS_LOOT.extra ?? {}).flat().map(([i]) => i), ...Object.values(LOOT_TABLES).flatMap(t => [...(t.pool ?? []), ...(t.guaranteed ?? [])].map(e => e.item))]);
+  for (const d of GEAR) assert.ok(gifts.has(d.id) || given.has(d.id) || RECIPES.some(r => r.result === d.id), `${d.id} can be crafted, found or given`);
   for (const g of gifts) assert.ok(ids.has(g) && get(g).equip, `rare gift ${g} is gear`);
+  for (const d of ITEM_DEFINITIONS.filter(d => d.category === 'tool')) assert.ok(RECIPES.some(r => r.result === d.id), `${d.id}: a tool can be crafted`);
   const witch = recipesFor('witch', itemRegistry).map(r => r.result);
   assert.ok(witch.includes('glowStaff') && !witch.includes('mossAxe') && witch.includes('mossCloak'), 'weapons only for their hero');
 });

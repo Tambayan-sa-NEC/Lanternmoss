@@ -1,8 +1,8 @@
 /* ITEM REGISTRY: the validated, read-only catalogue of item definitions (config/items.js), looked up by id.
    Pure (no scene / DOM), unit-tested. Invalid or duplicate definitions are reported and skipped, never half-loaded. */
-import { EQUIP_SLOTS, INVENTORY, ITEM_CATEGORIES, ITEM_DEFINITIONS, ITEM_EFFECTS, RARITIES, STATS } from '../config/items.js';
+import { GEAR_KINDS, INVENTORY, ITEM_CATEGORIES, ITEM_DEFINITIONS, ITEM_EFFECTS, RARITIES, STATS, TOOL_KINDS } from '../config/items.js';
 
-const NOT_STACKABLE = new Set(['equipment', 'weapon', 'quest']);
+const NOT_STACKABLE = new Set(['equipment', 'weapon', 'quest', 'tool']);
 const NOT_DROPPABLE = new Set(['quest']);
 
 /** Builds a registry from definitions. warn(message) is told about every rejected definition. */
@@ -34,9 +34,10 @@ function validate(d) {
   if (d.stackable === false && d.maxStack > 1) return 'a non-stackable item cannot have maxStack > 1';
   for (const e of d.use || []) if (!e || !(e.effect in ITEM_EFFECTS)) return `unknown use effect "${e && e.effect}"`;
   if (d.equip !== undefined) {
-    if (!d.equip || !(d.equip.slot in EQUIP_SLOTS)) return `unknown equip slot "${d.equip && d.equip.slot}"`;
+    if (!d.equip || !(d.equip.slot in GEAR_KINDS)) return `unknown gear kind "${d.equip && d.equip.slot}"`;
     for (const [k, v] of Object.entries(d.equip.stats || {})) if (!(k in STATS) || typeof v !== 'number') return `bad gear stat "${k}"`;
   }
+  if (d.tool !== undefined && (!d.tool || !(d.tool.kind in TOOL_KINDS))) return `unknown tool kind "${d.tool && d.tool.kind}"`;
   return null;
 }
 
@@ -52,7 +53,9 @@ function normalize(d, defaultStackSize) {
     droppable: d.droppable ?? !NOT_DROPPABLE.has(d.category),
     tags: Object.freeze([...(d.tags || [])]),
     props: Object.freeze({ ...(d.props || {}) }),
-    equip: d.equip ? Object.freeze({ slot: d.equip.slot, hero: d.equip.hero ?? null, tier: d.equip.tier ?? 1, stats: Object.freeze({ ...(d.equip.stats || {}) }) }) : null,
+    equip: d.equip ? Object.freeze({ slot: d.equip.slot, hero: d.equip.hero ?? null, tier: d.equip.tier ?? 1, vanity: !!GEAR_KINDS[d.equip.slot].vanity,
+      stats: Object.freeze({ ...(d.equip.stats || {}) }) }) : null,
+    tool: d.tool ? Object.freeze({ kind: d.tool.kind, tier: d.tool.tier ?? 1 }) : null,
   });
 }
 

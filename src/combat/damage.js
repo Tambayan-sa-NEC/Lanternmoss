@@ -1,6 +1,8 @@
 /* Damage in both directions, plus fainting and respawning. */
 import * as THREE from 'three';
 import { COMBAT } from '../config/combat.js';
+import { BUFFS } from '../config/game.js';
+import { NEEDS } from '../config/survival.js';
 import { PETS } from '../config/pets.js';
 import { LEVELING } from '../config/leveling.js';
 import { ctx } from '../core/context.js';
@@ -42,6 +44,7 @@ export function damageEnemy(e, amount, o = {}) {
   if (!o.source) amount *= damageMultiplier(ctx.player.level) * (1 + (ctx.player.stats.damageBonus || 0));   // no source = the hero's own abilities (level + gear)
   if (o.source !== 'pet' && e.markT > 0) amount *= 1 + COMBAT.mark.bonus;
   if (!o.source && buffs.howl > 0) amount *= 1 + PETS.wolf.ability.damage;   // a pet's Howl (gameplay/petAbilities.js)
+  if (!o.source && buffs.might > 0) amount *= 1 + BUFFS.mightDamage;          // Mighty: a pie, a skewer, a fire pepper
   if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
   if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
@@ -68,8 +71,8 @@ export function damageEnemy(e, amount, o = {}) {
 export function hurtPlayer(amount, from, knock = 0, o = {}) {
   const P = ctx.player; if (P.dead || P.invuln > 0) return;
   if (o.lethal) amount = Math.max(Math.round(amount), Math.ceil(P.hp));
-  else if (P.stats.armor || P.guardT > 0) {     // armour (the knight's own, plus gear), and Guard blocks knockback
-    amount = Math.max(1, Math.round(amount * (1 - (P.stats.armor || 0)) * (P.guardT > 0 ? 1 - P.guardReduction : 1)));
+  else if (P.stats.armor || P.guardT > 0 || buffs.ward > 0) {   // armour (the knight's own, plus gear), Stoneskin; Guard blocks knockback
+    amount = Math.max(1, Math.round(amount * (1 - (P.stats.armor || 0)) * (P.guardT > 0 ? 1 - P.guardReduction : 1) * (buffs.ward > 0 ? 1 - BUFFS.wardReduction : 1)));
     if (P.guardT > 0) { knock = 0; audio.clang(); }
   } else amount = Math.max(1, Math.round(amount));
   const heavy = amount >= P.stats.maxHp * 0.25;
@@ -90,6 +93,7 @@ function faint() {
 function respawnPlayer(world) {
   const P = ctx.player;
   Object.assign(P, { dead: false, hp: P.stats.maxHp, mana: P.stats.maxMana, invuln: 1.5, vy: 0 });
+  P.energy = Math.max(P.energy ?? 0, NEEDS.afterFaint);            // a nap does you good
   const fwd = P.placeAt(world.spawnDir);
   snapCamera(world.spawnDir, fwd); world.resetSun();
   P.root.visible = true; sparkles.emit(P.pos, { count: 40, color: 0xfff0a0, speed: 2, up: P.up, upBias: 1, life: 1, size: 0.35 });
@@ -103,7 +107,8 @@ export function updatePlayerVitals(dt, world) {
   if (P.dead) { if ((P.deadT -= dt) <= 0) respawnPlayer(world); }
   else {
     P.mana = Math.min(C.maxMana, P.mana + C.manaRegen * dt);
-    if (ctx.time - P.lastHurt > C.hpRegenDelay) P.hp = Math.min(C.maxHp, P.hp + C.hpRegen * dt);
+    if (ctx.time - P.lastHurt > C.hpRegenDelay) P.hp = Math.min(C.maxHp, P.hp + C.hpRegen * (P.regenK ?? 1) * dt);   // energy runs low: slower (gameplay/Needs.js)
+    if (buffs.mend > 0) P.hp = Math.min(C.maxHp, P.hp + BUFFS.mendRegen * dt);
     P.root.visible = !(P.hurtT > 0 && Math.floor(ctx.time * 18) % 2);
   }
   P.shadow.visible = !P.dead;

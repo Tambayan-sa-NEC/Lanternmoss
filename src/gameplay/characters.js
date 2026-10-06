@@ -5,7 +5,7 @@ import { ctx } from '../core/context.js';
 import { resetCooldowns } from '../combat/casting.js';
 import { sparkles } from '../fx/sparkles.js';
 import { HERO_BUILDERS } from '../models/heroes.js';
-import { computeStats } from './equipment.js';
+import { applyVanity, computeStats } from './equipment.js';
 import { Pets } from './Pets.js';
 import { buildSpellBar, setSkillHint } from '../ui/hud.js';
 
@@ -29,7 +29,7 @@ export function showcaseHero(picked = false) {
 export function applyCharacter(id) {
   const C = CHARACTERS[id], P = ctx.player;
   if (P.charId !== id) P.swapModel(HERO_BUILDERS[C.model]());
-  P.charId = id; P.stats = computeStats(P); P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
+  P.charId = id; applyVanity(P); P.stats = computeStats(P); P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
   P.clearTimers();
   resetCooldowns(C.abilities);
   buildSpellBar(C.abilities); setSkillHint(C.abilities);

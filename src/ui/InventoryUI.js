@@ -1,33 +1,39 @@
 /* The bag window. Renders the inventory's current state and turns clicks into commands; all rules (stacking,
    moving, using, equipping, crafting) live in the inventory, items and gameplay layers. Re-renders whenever the
    inventory changes. Two tabs (pets have a menu of their own: src/ui/PetMenu.js):
-     Bag    the grid, the worn gear (weapon / armour / trinket: click one to take it off) with the stats it adds, and
-            the details of the hovered or selected item. Selection works like a simple drag-and-drop: click an item,
-            then click where it should go (empty slot = move, same item = merge, different item = swap).
-            Double-click or the first button uses / equips it. Under the grid is the hotbar row (the same slots as the
-            hotbar at the bottom of the screen, keys 1-9): move things there to hold them.
+     Bag    the grid on the left, with the hotbar row under it (the same slots as the hotbar at the bottom of the
+            screen, keys 1-9: move things there to hold them). The equipment side on the right, like Minecraft: the
+            hero (in their hat and cape) between the worn slots (head, body, feet / weapon, two trinkets), the vanity
+            slots under them, and what the gear adds. The details window sits under the whole bag window.
+            Selection works like a simple drag-and-drop: click an item, then click where it should go (empty slot =
+            move, same item = merge, different item = swap, a worn slot it fits = wear it there). Click a worn piece
+            to take it off. Double-click or the first button uses / equips it.
     Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have. */
 import { CHARACTERS } from '../config/characters.js';
 import { RECIPES } from '../config/crafting.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
-import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
+import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { ctx } from '../core/context.js';
 import { bindKbd } from '../core/keybinds.js';
 import { craftProblem, recipesFor, requirements } from '../items/crafting.js';
 import { formatStat, gearTotals } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { dom } from './dom.js';
+import { icon } from './icons.js';
 import { describeItem, itemIconHtml, rarityColor } from './itemTooltip.js';
+import { heroPortrait } from './monsterPortraits.js';
 
 const PROBLEM = { materials: 'Not enough materials.', coins: 'Not enough coins.', space: 'No room in the bag.' };
 const titleCase = w => w.charAt(0) + w.slice(1).toLowerCase();
+/** The equipment side's layout: worn slots left of the hero, right of the hero, and the vanity row under them. */
+const SIDE = { left: ['head', 'armor', 'feet'], right: ['weapon', 'charm', 'charm2'], vanity: ['hat', 'back'] };
 
 export const InventoryUI = {
   isOpen: false, tab: 'bag', selected: -1, hovered: -1, hoveredGear: null, message: '', inventory: null, commands: null,
   slotEls: [], gearEls: {}, quickBtns: [],
 
-  /** commands (supplied by the game): use(slot) / unequip(where) / craft(recipe) -> { ok, message }, drop(slot) -> boolean,
-      quick(i, itemId), quickIds() -> [itemId | null], worn() -> P.equipment. */
+  /** commands (supplied by the game): use(slot) / equip(slot, where) / unequip(where) / craft(recipe) -> { ok, message },
+      drop(slot) -> boolean, held() -> the held hotbar slot, worn() -> P.equipment. */
   init(inventory, commands) {
     this.inventory = inventory; this.commands = commands;
     const root = dom.inventory;
@@ -36,17 +42,6 @@ export const InventoryUI = {
     tabs.innerHTML = '<button type="button" data-tab="bag">Bag</button><button type="button" data-tab="craft">Craft</button>';
     tabs.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t) this.setTab(t.dataset.tab); });
     root.querySelector('.inv-head b').after(tabs); this.tabsEl = tabs;
-    // worn gear
-    const gear = document.createElement('div'); gear.className = 'inv-gear';
-    for (const [k, label] of Object.entries(EQUIP_SLOTS)) {
-      const el = document.createElement('button'); el.type = 'button'; el.className = 'inv-slot gear'; el.dataset.label = label;
-      el.addEventListener('click', () => { this.message = this.commands.unequip(k).message; this.render(); });
-      el.addEventListener('mouseenter', () => { this.hoveredGear = k; this.renderDetail(); });
-      el.addEventListener('mouseleave', () => { if (this.hoveredGear === k) { this.hoveredGear = null; this.renderDetail(); } });
-      gear.appendChild(el); this.gearEls[k] = el;
-    }
-    this.gearStats = document.createElement('div'); this.gearStats.className = 'inv-gear-stats'; gear.appendChild(this.gearStats);
-    root.querySelector('.inv-body').before(gear); this.gearRow = gear;
     // the bag grid (inventory slots HOTBAR.size and up) and, under it, the hotbar row (slots 0 .. HOTBAR.size - 1)
     dom.invGrid.style.setProperty('--cols', INVENTORY.columns);
     const hotRow = document.createElement('div'); hotRow.className = 'inv-hotbar';
@@ -63,6 +58,23 @@ export const InventoryUI = {
     };
     for (let i = HOTBAR.size; i < inventory.size; i++) slotEl(i, dom.invGrid);
     for (let i = 0; i < HOTBAR.size; i++) { slotEl(i, hotGrid); this.slotEls[i].dataset.key = keyLabel(HOTBAR_KEYS[i]); this.slotEls[i].classList.add('hot'); }
+    // the equipment side: worn slots round the hero, the vanity row, the gear's totals
+    const side = document.createElement('div'); side.className = 'inv-equip';
+    side.innerHTML = '<div class="eq-title">Equipment</div><div class="eq-doll"><div class="eq-col l"></div><div class="eq-hero"></div><div class="eq-col r"></div></div>' +
+      '<div class="eq-vanity"><span class="eq-sub">Look</span></div><div class="inv-gear-stats"></div>';
+    const gearEl = (k, parent) => {
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'inv-slot gear'; el.dataset.label = EQUIP_SLOTS[k].label;
+      if (GEAR_KINDS[EQUIP_SLOTS[k].fits].vanity) el.classList.add('vanity');
+      el.addEventListener('click', () => this.clickGear(k));
+      el.addEventListener('mouseenter', () => { this.hoveredGear = k; this.renderDetail(); });
+      el.addEventListener('mouseleave', () => { if (this.hoveredGear === k) { this.hoveredGear = null; this.renderDetail(); } });
+      parent.appendChild(el); this.gearEls[k] = el;
+    };
+    SIDE.left.forEach(k => gearEl(k, side.querySelector('.eq-col.l')));
+    SIDE.right.forEach(k => gearEl(k, side.querySelector('.eq-col.r')));
+    SIDE.vanity.forEach(k => gearEl(k, side.querySelector('.eq-vanity')));
+    this.heroEl = side.querySelector('.eq-hero'); this.gearStats = side.querySelector('.inv-gear-stats');
+    root.querySelector('.inv-body').appendChild(side);
     // crafting
     this.craftEl = document.createElement('div'); this.craftEl.className = 'inv-craft';
     this.craftEl.addEventListener('click', e => { const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe); });
@@ -85,6 +97,14 @@ export const InventoryUI = {
     else if (this.selected === i) this.selected = -1;
     else { inv.move(this.selected, i); this.selected = -1; }
     this.message = ''; this.render();
+  },
+  /** A worn slot: wear the selected bag item there (if it fits), else take off what's worn. */
+  clickGear(k) {
+    if (this.selected >= 0) {
+      const s = this.inventory.getSlot(this.selected), def = s && this.inventory.registry.get(s.itemId);
+      if (def?.equip) { this.message = this.commands.equip(this.selected, k).message; this.selected = -1; this.render(); return; }
+    }
+    this.message = this.commands.unequip(k).message; this.render();
   },
   use(i) {
     if (!this.inventory.getSlot(i)) return;
@@ -110,7 +130,7 @@ export const InventoryUI = {
     const inv = this.inventory;
     const bagUsed = inv.getSlots().slice(HOTBAR.size).filter(Boolean).length;
     dom.invCount.textContent = `${bagUsed} / ${inv.size - HOTBAR.size}`;
-    dom.invHint.innerHTML = `click an item, then another slot to move / swap (the hotbar row too) · double-click to use · ${bindKbd('bag')} or <kbd>Esc</kbd> to close`;
+    dom.invHint.innerHTML = `click an item, then another slot to move / swap (a worn slot to wear it) · double-click to use · ${bindKbd('bag')} or <kbd>Esc</kbd> to close`;
     if (this.tab === 'craft') { this.renderCraft(); return; }
     const slots = inv.getSlots();
     if (this.selected >= 0 && !slots[this.selected]) this.selected = -1;
@@ -130,17 +150,27 @@ export const InventoryUI = {
 
   renderGear() {
     const worn = this.commands.worn(), reg = this.inventory.registry, P = ctx.player;
+    const sel = this.selected >= 0 ? this.inventory.getSlot(this.selected) : null, selDef = sel && reg.get(sel.itemId);
     for (const [k, el] of Object.entries(this.gearEls)) {
       const w = worn[k], def = w && reg.get(w.itemId);
       el.classList.toggle('filled', !!def);
+      el.classList.toggle('fits', !!selDef?.equip && EQUIP_SLOTS[k].fits === selDef.equip.slot);
       el.style.borderColor = def ? rarityColor(def, w.props) : '';
       el.innerHTML = def ? itemIconHtml(def) : `<span class="gear-empty">${el.dataset.label}</span>`;
       el.title = def ? `${def.name} (click to take off)` : `${el.dataset.label}: nothing worn`;
     }
+    // the hero, dressed (a rendered portrait; a glyph where there's no renderer)
+    const hat = worn.hat && reg.get(worn.hat.itemId), back = worn.back && reg.get(worn.back.itemId), C = CHARACTERS[P.charId];
+    const key = `${C.model}|${hat?.id ?? ''}|${back?.id ?? ''}`;
+    if (this.heroKey !== key) {
+      this.heroKey = key; const url = heroPortrait(C.model, hat, back);
+      this.heroEl.innerHTML = url ? `<img src="${url}" alt="${C.title}">` : `<div class="eq-glyph" style="color:${C.color}">${icon('star')}</div>`;
+      this.heroEl.title = C.title;
+    }
     const pieces = Object.values(worn).filter(Boolean).map(w => ({ def: reg.get(w.itemId), props: w.props }));
     const t = gearTotals(pieces, P.charId), res = titleCase(CHARACTERS[P.charId].resource).toLowerCase();
     const parts = Object.entries(t).filter(([, v]) => v).map(([k, v]) => formatStat(k, v, res));
-    this.gearStats.innerHTML = parts.length ? `<b>Gear:</b> ${parts.join(' · ')}` : '<span class="dim">No gear worn yet: equip a weapon, armour or a trinket.</span>';
+    this.gearStats.innerHTML = parts.length ? `<b>Gear:</b> ${parts.join(' · ')}` : '<span class="dim">Nothing worn yet: equip a weapon, armour, boots or a trinket.</span>';
   },
 
   renderDetail() {
@@ -150,7 +180,7 @@ export const InventoryUI = {
     const shown = this.hovered >= 0 && inv.getSlot(this.hovered) ? this.hovered : this.selected;
     const s = shown >= 0 ? inv.getSlot(shown) : null;
     dom.invDetail.innerHTML = worn ? describeItem(inv.registry.get(worn.itemId), { quantity: 1, props: worn.props }, { hero, worn: true })
-      : s ? describeItem(inv.registry.get(s.itemId), s, { hero }) : '<p class="inv-d-empty">Select an item to see what it is.</p>';
+      : s ? describeItem(inv.registry.get(s.itemId), s, { hero }) : '<p class="inv-d-empty">Point at an item to see what it is.</p>';
     const sel = this.selected >= 0 ? inv.getSlot(this.selected) : null, def = sel && inv.registry.get(sel.itemId), action = def && actionFor(def);
     dom.invUse.textContent = action ? ITEM_ACTIONS[action].label : 'Use';
     dom.invUse.disabled = !action || !ITEM_ACTIONS[action].supported;
@@ -160,13 +190,16 @@ export const InventoryUI = {
 
   renderCraft() {
     const inv = this.inventory, P = ctx.player, reg = inv.registry;
+    let group = '';
     const rows = recipesFor(P.charId, reg).map(r => {
       const out = reg.get(r.result), req = requirements(r, inv, P.coins), problem = craftProblem(r, inv, P.coins);
       const col = rarityColor(out, r.rarity ? { rarity: r.rarity } : null);
       const needs = req.items.map(n => `<span class="need${n.have >= n.need ? ' ok' : ''}">${itemIconHtml(reg.get(n.item))}${Math.min(n.have, 99)}/${n.need}</span>`).join('') +
         (req.coins.need ? `<span class="need coin${req.coins.have >= req.coins.need ? ' ok' : ''}">✦ ${req.coins.need}</span>` : '');
-      return `<div class="recipe${problem ? '' : ' can'}" title="${out.description.replace(/"/g, '&quot;')}">${itemIconHtml(out)}` +
-        `<div class="rc-name" style="color:${col}">${r.qty > 1 ? `${r.qty}x ` : ''}${out.name}<small>${out.equip ? EQUIP_SLOTS[out.equip.slot] : ''}${r.rarity ? ` · ${RARITIES[r.rarity].label}` : ''}</small></div>` +
+      const head = r.group && r.group !== group ? `<div class="rc-group">${(group = r.group)}</div>` : '';
+      const kind = out.equip ? GEAR_KINDS[out.equip.slot].label : out.tool ? 'Tool' : '';
+      return `${head}<div class="recipe${problem ? '' : ' can'}" title="${out.description.replace(/"/g, '&quot;')}">${itemIconHtml(out)}` +
+        `<div class="rc-name" style="color:${col}">${r.qty > 1 ? `${r.qty}x ` : ''}${out.name}<small>${kind}${r.rarity ? ` · ${RARITIES[r.rarity].label}` : ''}</small></div>` +
         `<div class="rc-needs">${needs}</div><button type="button" data-recipe="${r.id}" ${problem ? `disabled title="${PROBLEM[problem]}"` : ''}>Craft</button></div>`;
     });
     this.craftEl.innerHTML = `<div class="rc-list">${rows.join('')}</div><div class="inv-msg rc-msg">${this.message}</div>`;

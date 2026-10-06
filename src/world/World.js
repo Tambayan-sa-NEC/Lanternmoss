@@ -75,7 +75,8 @@ export class World {
     const B = new Batcher();
     Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses));   // houses, houseA, cottage
     decoratePonds(B);
-    this.trees = scatterFlora(B, planet.flora);                       // { kind: count }
+    this.spots = { trees: [], rocks: [] };                            // every tree and rock, to chop and mine (gameplay/Gathering.js)
+    this.trees = scatterFlora(B, planet.flora, this.spots);           // { kind: count }
     this.add(B.build());
     const fl = planet.flora ?? {}, grass = createGrass(palette.grass, fl.grass ?? 1), tall = createTallGrass(fl.tallGrass ?? palette.grass, spawnDir, fl.tallCount ?? 1);
     const [stems, heads] = createMeadowFlowers(fl.flowers ?? [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff], fl.meadow ?? 1);

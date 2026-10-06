@@ -8,6 +8,7 @@ import { ITEM_DEFINITIONS } from '../src/config/items.js';
 import { PLANETS } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 import { SHOP } from '../src/config/shop.js';
+import { planetSources } from '../src/gameplay/resourceRules.js';
 
 const ITEMS = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d]));
 // villager names, read from the defs (they build 3D models, so the module itself needs a browser)
@@ -58,8 +59,8 @@ test('quests are finishable: each planet grows enough of what its quests ask you
   for (const q of Object.values(QUESTS)) for (const s of q.steps) if (s.kind === 'collect') need[s.item] = (need[s.item] ?? 0) + s.count;
   for (const [item, n] of Object.entries(need)) {
     const grows = PLANETS.reduce((sum, p) => sum + (p.forage.find(f => f.item === item)?.count ?? 0), 0);
-    const sold = SHOP.stock.some(s => s.item === item);
-    assert.ok(grows >= n || sold, `${item}: quests ask for ${n}, the planets grow ${grows}`);
+    const sold = SHOP.stock.some(s => s.item === item), gathered = PLANETS.some((p, i) => planetSources(i).has(item));   // regrows: never runs out
+    assert.ok(grows >= n || sold || gathered, `${item}: quests ask for ${n}, the planets grow ${grows}`);
   }
   for (const [id, q] of Object.entries(QUESTS)) for (const s of q.steps) if (s.kind === 'defeat' && s.enemy !== 'any') {
     const from = q.planet ?? 0;

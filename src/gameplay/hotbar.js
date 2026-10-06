@@ -3,6 +3,8 @@
    right click) uses what's held:
      food, tonics, charms   eaten / drunk (never wasted when they'd do nothing)
      weapons, armour, trinkets   equipped (whatever was worn goes into that hotbar slot instead)
+     tools                  used on what's in front: chop, mine, fish, till, water (./Gathering.js, Fishing.js, Farm.js)
+     seeds                  planted in the farm plot you stand at (./Farm.js)
      materials, keys, trophies   nothing to do in your hands: a hint says where they're used
    Placeable things (TODO 17) will be put down from here. */
 import { HOTBAR } from '../config/items.js';
@@ -35,9 +37,9 @@ export const Hotbar = {
     if (!stack) { toast('Your hands are empty: put food or gear on the hotbar from the bag (I).'); return null; }
     if (P.dead || this.cd > 0) return null;
     const def = itemRegistry.get(stack.itemId), action = actionFor(def);
-    if (action === 'use' || action === 'equip') {
+    if (action === 'use' || action === 'equip' || action === 'tool' || action === 'plant') {
       const r = useItemInSlot(P.inventory, this.selected);
-      toast(r.message); if (r.ok) { this.cd = HOTBAR.useCooldown; this.changedAt = ctx.time; }
+      if (r.message) toast(r.message); if (r.ok) { this.cd = action === 'tool' ? 0.3 : HOTBAR.useCooldown; this.changedAt = ctx.time; }
       return r;
     }
     toast(def.category === 'material' ? `${def.name} is for crafting: open the bag (I) and its Craft tab.`

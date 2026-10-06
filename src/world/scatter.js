@@ -60,18 +60,20 @@ function bankSpot() {
 }
 
 /** Trees (the planet's own kinds: flora.trees weights, an occasional giant), rocks, flower clusters and small mushrooms.
-    Returns how many trees of each kind grew. */
-export function scatterFlora(B, flora = {}) {
+    Returns how many trees of each kind grew; every tree and rock is also listed in spots ({ trees, rocks }: { dir, kind,
+    s, r }) so they can be chopped and mined (src/gameplay/Gathering.js). */
+export function scatterFlora(B, flora = {}, spots = { trees: [], rocks: [] }) {
   const trees = flora.trees ?? { blossom: 4, pine: 3, shroom: 2 }, flowerColors = flora.flowers ?? FLOWER_COLORS, grown = {};
   for (let i = 0; i < n(flora.treeCount ?? 52); i++) {
     const kind = weighted(trees), d = kind === 'willow' ? bankSpot() ?? flatSpot(2.1) : flatSpot(2.1); if (!d) continue;
     const s = rand() < (flora.giants ?? 0.07) ? rr(1.6, 2.1) : rr(0.75, 1.35), k = TREE_KINDS[kind];
     propTree(B, surfM(d, rr(0, 6.28), s, -0.1), kind); grown[kind] = (grown[kind] ?? 0) + 1;
+    spots.trees.push({ dir: d, kind, s, r: k.r * s });
     addCollider(d, k.r * s, { r: k.cam.r * s, base: k.cam.base * s, top: k.cam.top * s });
   }
   for (let i = 0; i < n(22); i++) {                                   // rocks: stand on them (the big boulders need a jump)
     const big = rand() < 0.3, d = flatSpot(big ? 2.8 : 1.8, 0.55); if (!d) continue; const s = big ? rr(1.6, 2.3) : rr(0.7, 1.4);
-    propRock(B, surfM(d, rr(0, 6.28), s, -0.05));
+    propRock(B, surfM(d, rr(0, 6.28), s, -0.05)); spots.rocks.push({ dir: d, kind: 'rock', s, r: 1.05 * s });
     addCollider(d, 1.05 * s, s > 1.1 ? { r: 1.1 * s, top: 1.0 * s } : null, 1.0 * s);
   }
   for (let c = 0; c < n(26); c++) {

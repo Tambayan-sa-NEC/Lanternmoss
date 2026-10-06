@@ -1,7 +1,7 @@
 /* Rolling a loot table (config/chests.js) into coins and item stacks: chests, monster drops. Pure: no scene, no state,
    so it can be tested on its own and reused by anything else that hands out random rewards. */
 import { GEAR_RARITY, LOOT, LOOT_TABLES } from '../config/chests.js';
-import { ITEM_DEFINITIONS, RARITIES } from '../config/items.js';
+import { GEAR_KINDS, ITEM_DEFINITIONS, RARITIES } from '../config/items.js';
 import { PLANETS } from '../config/planets.js';
 
 /** '@material' / '@trophy' -> the planet's own item id (null if the planet has none). */
@@ -12,7 +12,7 @@ export function resolveLootItem(item, planet) {
   return item;
 }
 
-const GEAR = ITEM_DEFINITIONS.filter(d => d.equip);
+const GEAR = ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity);   // vanity pieces are found, made or given, not rolled
 const NAMES = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d.name]));
 
 /** "2x Moonberry", "Rare Ember Mail" (for toasts). */

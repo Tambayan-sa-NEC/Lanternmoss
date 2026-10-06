@@ -64,6 +64,25 @@ their marker ahead of you (the wheel sets the distance). Damage numbers and hit-
 and every boss has telegraphed attacks to read and dodge.
 
 <p>
+  <img src="docs/screenshots/farm.jpg" width="32.5%" alt="The village farm">
+  <img src="docs/screenshots/fishing.jpg" width="32.5%" alt="Fishing: the reeling meter">
+  <img src="docs/screenshots/gathering.jpg" width="32.5%" alt="Mining a copper vein">
+</p>
+
+**Living off the land.** Your hero has an energy meter beside the XP bar. It drains slowly as you play, faster when you
+sprint or swim. Food fills it up again. Running low never hurts you: it only slows your healing and your sprint. To
+gather:
+- **By hand:** fallen branches, loose stones, sweetleaf, berry bushes, glowcaps and frost flowers. Nodes regrow over time.
+- **With tools from the hotbar:** chop trees with an axe and mine rocks and ore veins with a pickaxe. Gem veins need a
+  copper pickaxe, and they sit by each planet's mini boss.
+- **Fishing:** cast at a pond or lake, wait for the float to dip, then stop the needle in the green.
+- **Farming:** each village has a plot. Till it with a hoe, plant seeds, and water them (rain helps). Crops grow over the
+  day / night cycle.
+
+Cook what you gather into meals with buffs (Mighty, Stoneskin, Quickstep, Mending). Brew potions that heal, restore
+mana, toughen you or speed you up.
+
+<p>
   <img src="docs/screenshots/storm.jpg" width="49%" alt="A storm over the village">
   <img src="docs/screenshots/meadow.jpg" width="49%" alt="A deer and a bunny in the meadows">
 </p>
@@ -124,16 +143,19 @@ circle and each boss arena sit on level ground.
   <img src="docs/screenshots/bag.jpg" width="49%" alt="The bag with gear">
 </p>
 
-**Gear.** Weapons, armour and trinkets with stat bonuses, each piece with its own rolled rarity (Common to Legendary)
-that scales its stats. Monsters drop food, materials and gear. Food, tonics and gear land on the hotbar (`1`–`9`) at the
-bottom of the screen: hold one, then use it (eat, drink or equip) mid-fight.
+**Gear.** The bag's right side is the equipment side, like Minecraft. Your hero stands between the worn slots: head,
+body and feet, a weapon, and two trinkets. Below them are two vanity slots: a hat and a cape, drawn on your hero. Every
+piece has stat bonuses and its own rolled rarity (Common to Legendary) that scales them. The item details window sits
+right under the bag. Monsters drop food, materials and gear. Food, tonics, gear and tools land on the hotbar (`1`–`9`):
+hold one, then use it (eat, drink, equip, or work with it).
 
 <p>
   <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab">
   <img src="docs/screenshots/pet-field.jpg" width="49%" alt="Out with the dragon whelp">
 </p>
 
-**Crafting and pets.** Glowcaps, Ember Shards and Frost Petals craft into tonics, keys and gear. Pets fight beside you,
+**Crafting and pets.** Wood, stone, ore, gems, herbs and the planets' own materials craft into tools, meals, potions,
+keys and gear (the Craft tab groups them). Pets fight beside you,
 grow with you, take commands (follow, stay, attack, passive), have an ability of their own, can be renamed and petted,
 and new ones are found through quests and chests: an owl, a wolf, a fox, a wisp and a dragon whelp.
 
@@ -161,6 +183,11 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Resources and survival:** an energy meter that food fills. Gathering by hand and with tools (axe, pickaxes,
+  fishing rod, hoe, watering can) from regrowing nodes, trees and rocks, with rare gem veins guarded by mini bosses.
+  Fishing has a timing meter, and each village has a farm plot. Meals and potions give buffs. The bag gets a
+  Minecraft-style equipment side with head, feet, two trinket slots and vanity hats and capes, and the item details
+  window now sits under the bag.
 - **Better environments:** each planet has its own trees, tall grass and swaying wildflowers, plus weather (rain,
   storms, fog, ashfall, snow, blizzards). New animals, rare creatures to befriend for Legendary charms, flocks and lake
   koi. Two mini bosses, the Hydra and the Basilisk. A new pet, the dragontoad, and `N` swaps pets during play.
@@ -228,8 +255,9 @@ over). The defaults:
 | click / `Z` | skill 1: the basic attack (hold to repeat). A click turns the hero to face the clicked ground first |
 | `Q` `R` `F` | skills 2–4 |
 | `G` | skill 5, the ultimate: a marker appears ahead of the hero (on the monster in front, if any). Turn to aim, wheel for nearer / farther, click (or `G` again) to cast, `Esc` / right click cancels |
-| `1` – `9` | hold the item in that hotbar slot (or click it); press the number again, or right click, to use it |
-| `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them) |
+| `1` – `9` | hold the item in that hotbar slot (or click it); press the number again, or right click, to use it (a tool works what's in front of you) |
+| `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them); pick, chop, mine, fish, till, plant, water and harvest (tools come from the hotbar) |
+| `E` or click while fishing | reel in when the float dips, then stop the needle in the green |
 | `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
 | `B` (or click the pet card) | the pet menu: see, swap, rename and command your pets (the world pauses) |
 | `N` | swap to your next pet right away |
@@ -264,7 +292,9 @@ src/
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
 │   │                      stats, the hotbar, effects, bag size and pickup settings
-│   ├── crafting.js        crafting recipes (materials + coins -> food, tonics, keys, gear)
+│   ├── crafting.js        crafting recipes in groups (tools, food, potions, weapons, armour, trinkets, vanity)
+│   ├── resources.js       gathering: node kinds (drops, tools, regrow), trees and rocks, fishing, crops, the farm
+│   ├── survival.js        the energy meter: drain, hungry / starving effects, after fainting
 │   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips, selection profile)
 │   ├── settings.js        player settings schema (drives the Settings screen, defaults and validation)
 │   ├── controls.js        every key: the remappable KEYBINDS (defaults), hotbar keys, fixed controls, key-cap labels
@@ -314,6 +344,8 @@ src/
 ├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
+│   ├── resources.js       resource nodes (bushes, herbs, branches, veins), the farm (fence, plots, scarecrow), crops, the float
+│   ├── vanity.js          hats and capes drawn on the hero
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
 ├── items/                 ItemRegistry (validated item catalogue), itemActions (what each category does),
@@ -331,6 +363,7 @@ src/
 │   │                      fish and lake koi, and their spawning per planet
 │   ├── Projectile.js      surface-hugging projectiles
 │   ├── Chest.js           a treasure chest in the world: collider, falling in, opening, rattling when locked
+│   ├── ResourceNode.js    something to gather: its model, wobble when worked, regrowing
 │   └── WorldItem.js       an item stack lying on the ground (can hop out of a chest)
 ├── combat/
 │   ├── CombatSystem.js    per-frame combat update order
@@ -359,7 +392,14 @@ src/
 │   │                      challenges, rewards; saved in the browser across adventures
 │   ├── journalRules.js    the journal's saved shape, cleaning it on load, counters and achievement progress (pure)
 │   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst) and their lasting effects
-│   ├── buffs.js           Moon-Hop / Feather-Step / Howl timers
+│   ├── buffs.js           buff timers: Moon-Hop, Feather-Step, Howl, and from food Mighty, Stoneskin, Quickstep, Mending
+│   ├── Needs.js           the energy meter: drains while you play, food fills it, low = slower healing and sprint
+│   ├── needsRules.js      energy levels, effects, drain and warnings (pure)
+│   ├── Gathering.js       resource nodes, chopping trees and mining rocks, tool jobs (swing, drops, regrow), tips
+│   ├── Fishing.js         casting, the bite, the reeling meter, catches
+│   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
+│   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)
+│   ├── heldTool.js        the tool in the hero's hand while working
 │   ├── dayClock.js        the village clock (phase, day, light)
 │   ├── storyState.js      what villagers know about your adventure (dialogue conditions and placeholders)
 │   ├── wallet.js          coins: earning, spending, shop prices
@@ -369,10 +409,11 @@ src/
 │   ├── Chests.js          placing a planet's chests, opening them, keys from monsters, the boss chest
 │   ├── loot.js            rolling a loot table into coins and item stacks (gear with a rolled rarity)
 │   ├── drops.js           monster drops
-│   ├── equipment.js       what the hero wears; the hero's stats = base + level + gear
+│   ├── equipment.js       what the hero wears (8 slots: head, body, feet, weapon, two trinkets, hat, cape); stats =
+│   │                      base + level + gear; vanity drawn on the hero
 │   ├── hotbar.js          the hotbar (keys 1-9): which slot the hero holds, using what's held
 │   ├── bagCommands.js     what the bag window can ask the game to do (use, equip, craft...)
-│   ├── itemUse.js         using items: effect handlers (heal, mana, buff)
+│   ├── itemUse.js         using items: effect handlers (heal, mana, energy, buff), tool / seed actions
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
 │                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming)
@@ -381,7 +422,8 @@ src/
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
 │                          ShopUI (buy / sell), portraits (dialogue faces),
 │                          dialogue, challenge panel, banner + travel fade,
-│                          InventoryUI + itemTooltip (the bag window: gear and the Craft tab), itemArt (SVG item
+│                          InventoryUI + itemTooltip (the bag window: the grid, the equipment side, the details
+│                          window under it, and the Craft tab), itemArt (SVG item
 │                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play),
 │                          petViews (pet cards and detail panels for both pet screens), showcase (the menus' still
 │                          camera framings of the hero and pet, and finding a clear view for them),
@@ -474,7 +516,14 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Coins per monster, shop stock, prices and hours | `src/config/shop.js` |
 | Houses: who lives where, furniture, notes, chest gifts, nap healing | `src/config/houses.js` |
 | Chests: kinds, loot tables, key drop chance, boss chest timings | `src/config/chests.js` |
-| Gear: stats per piece, rarity multipliers, stat caps, gear slots | `src/config/items.js` → `equip`, `RARITIES`, `STATS` |
+| Gear: stats per piece, rarity multipliers, stat caps, gear kinds and the worn slots | `src/config/items.js` → `equip`, `RARITIES`, `STATS`, `GEAR_KINDS`, `EQUIP_SLOTS` |
+| Tools and what they do | `src/config/items.js` → `tool`, `TOOL_KINDS` |
+| The energy meter: drain, hungry effects | `src/config/survival.js` → `NEEDS` |
+| What can be gathered, tools needed, drops, regrow times; trees and rocks | `src/config/resources.js` → `NODE_KINDS`, `SCENERY`; trees: `src/config/flora.js` (`wood`) |
+| Each planet's nodes and rare veins | `src/config/planets.js` → `resources` |
+| Fishing: bite timing, the meter, catches per planet | `src/config/resources.js` → `FISHING` |
+| Crops, growing time, the farm plot | `src/config/resources.js` → `CROPS`, `FARM` |
+| Buff strengths (Mighty, Stoneskin, Quickstep, Mending) | `src/config/game.js` → `BUFFS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | What wakes each boss, its arena wall | `src/config/planets.js` → `boss.summon`, `boss.arena` |
 | Each planet's trees, flowers, tall grass, weather mix, animals and mini bosses | `src/config/planets.js` → `flora`, `weather`, `wildlife`, `miniBosses` |

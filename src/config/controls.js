@@ -41,7 +41,7 @@ export const RESERVED_KEYS = ['Escape', 'Enter', ...HOTBAR_KEYS];
 export const FIXED_CONTROLS = [
   { group: 'Hotbar', rows: [
     [['1', '…', '9'], 'hold the item in that hotbar slot (or click it); press the number again to use it'],
-    [['Right click'], 'use the held item: eat or drink it, or equip a weapon, armour or trinket'],
+    [['Right click'], 'use the held item: eat or drink it, equip gear, or work with a tool (chop, mine, fish, till, water)'],
   ] },
   { group: 'Camera', rows: [
     [['Drag'], 'rotate the camera (it only changes the view: attacks go where the hero faces)'],

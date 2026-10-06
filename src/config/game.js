@@ -26,6 +26,10 @@ export const PLAYER = {
 export const BUFFS = {
   featherSpeed: 1.3,                           // Feather-Step: run speed
   moonJump: 1.3, moonGravity: 0.72,            // Moon-Hop: jump velocity, rise gravity
+  mightDamage: 0.2,                            // Mighty (pies, skewers, fire peppers): +damage share
+  wardReduction: 0.25,                         // Stoneskin (tonic, koi feast): -damage taken share
+  swiftSpeed: 1.15,                            // Quickstep (tonic, porridge): move speed
+  mendRegen: 3,                                // Mending (veggie stew): extra HP per second (even mid-fight)
 };
 
 export const CAMERA = { dist: 8.5, pitch: 0.36, minDist: 3.5, maxDist: 15 };

@@ -37,13 +37,14 @@ export function buildWitch() {
   addTo(cape, part(G.box(0.58, 0.82, 0.04), clothDk), [0, -0.41, 0]);
   addTo(cape, part(G.box(0.5, 0.74, 0.02), 0x5a3a98), [0, -0.38, 0.03]);                                           // violet lining
   for (const sx of [-1, 1]) addTo(cape, part(G.cone(0.1, 0.18, 4), clothDk), [sx * 0.19, -0.86, 0], [Math.PI, 0, 0], [1, 1, 0.3]);
-  // witch hat: black, violet band, gold buckle, bent tip and a moon charm
-  addTo(hd, part(G.cyl(0.58, 0.58, 0.05, 9), cloth), [0, 0.4, -0.04], [-0.08, 0, 0]);
-  addTo(hd, part(G.cyl(0.35, 0.36, 0.09, 7), trim), [0, 0.46, -0.05], [-0.08, 0, 0]);
-  addTo(hd, part(G.box(0.1, 0.09, 0.03), gold), [0, 0.46, 0.31], [-0.08, 0, 0]);
-  addTo(hd, part(G.cyl(0.1, 0.34, 0.5, 7), cloth), [0.025, 0.72, -0.1], [-0.18, 0, -0.1]);
-  addTo(hd, part(G.cone(0.1, 0.45, 7), cloth), [0.14, 1.09, -0.31], [-0.9, 0, -0.4]);
-  addTo(hd, part(G.oct(0.07), 0xfff08a, { glow: true, intensity: 2.2 }), [0.3, 0.5, 0.2]);
+  // witch hat: black, violet band, gold buckle, bent tip and a moon charm (its own group: a vanity hat replaces it)
+  const hat = new THREE.Group(); hd.add(hat);
+  addTo(hat, part(G.cyl(0.58, 0.58, 0.05, 9), cloth), [0, 0.4, -0.04], [-0.08, 0, 0]);
+  addTo(hat, part(G.cyl(0.35, 0.36, 0.09, 7), trim), [0, 0.46, -0.05], [-0.08, 0, 0]);
+  addTo(hat, part(G.box(0.1, 0.09, 0.03), gold), [0, 0.46, 0.31], [-0.08, 0, 0]);
+  addTo(hat, part(G.cyl(0.1, 0.34, 0.5, 7), cloth), [0.025, 0.72, -0.1], [-0.18, 0, -0.1]);
+  addTo(hat, part(G.cone(0.1, 0.45, 7), cloth), [0.14, 1.09, -0.31], [-0.9, 0, -0.4]);
+  addTo(hat, part(G.oct(0.07), 0xfff08a, { glow: true, intensity: 2.2 }), [0.3, 0.5, 0.2]);
   // magic staff (held upright by animateWitch): dark wood, gold bands, crescent head cradling the glowing orb
   const staff = new THREE.Group(); staff.position.set(0, -0.4, 0.06); staff.rotation.order = 'ZYX'; h.armR.add(staff);
   addTo(staff, part(G.cyl(0.03, 0.04, 1.9, 6), 0x4a2e3a), [0, 0.35, 0]);
@@ -51,7 +52,7 @@ export function buildWitch() {
   addTo(staff, part(new THREE.TorusGeometry(0.17, 0.03, 4, 10, Math.PI * 1.4), gold), [0, 1.44, 0], [0, 0, -Math.PI * 1.2]);
   for (const sx of [-1, 1]) addTo(staff, part(G.cone(0.03, 0.14, 4), gold), [sx * 0.15, 1.62, 0], [0, 0, -sx * 0.5]);
   h.wandTip = addTo(staff, part(G.ico(0.11, 1), 0xd8a8ff, { glow: true, intensity: 2.6 }), [0, 1.44, 0]);
-  Object.assign(h, { cape, staff, staffTilt: 0 }); return h;
+  Object.assign(h, { cape, staff, staffTilt: 0, hat }); return h;
 }
 
 export function buildKnight() {

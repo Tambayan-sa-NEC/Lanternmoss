@@ -3,7 +3,7 @@ import { ctx } from '../core/context.js';
 import { emit } from '../core/events.js';
 import { craft } from '../items/crafting.js';
 import { audio } from '../systems/AudioSystem.js';
-import { unequip } from './equipment.js';
+import { equipFromSlot, unequip } from './equipment.js';
 import { useItemInSlot } from './itemUse.js';
 import { lootName } from './loot.js';
 import { dropFromSlot } from './pickups.js';
@@ -17,6 +17,7 @@ export function bagCommands(bag) {
     use: slot => useItemInSlot(bag, slot),
     drop: slot => dropFromSlot(slot),
     unequip: where => unequip(bag, where),
+    equip: (slot, where) => equipFromSlot(bag, slot, where),
     worn: () => ctx.player.equipment,
     held: () => Hotbar.selected,
     craft: recipe => {

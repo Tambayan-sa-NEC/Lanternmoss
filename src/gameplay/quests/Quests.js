@@ -15,6 +15,7 @@ import { audio } from '../../systems/AudioSystem.js';
 import { showBanner } from '../../ui/banner.js';
 import { toast } from '../../ui/toast.js';
 import { grantItem } from '../pickups.js';
+import { planetSources } from '../resourceRules.js';
 import { gainCoins } from '../wallet.js';
 
 const DECLINE_WAIT = 45;                       // seconds before a declined quest is offered again
@@ -56,6 +57,7 @@ export const Quests = {
   },
   start(id) {
     const s = this.st(id); Object.assign(s, { status: 'active', step: 0, n: 0 }); this.tracked = id;
+    for (const [item, n] of QUESTS[id].give ?? []) grantItem(item, n);   // something to get started with (seeds...)
     toast(`New quest: ${QUESTS[id].title}`); audio.sparkle(); this.check(id);
   },
   /** Finishes the current step (handing over its `give` items); returns true when that was the last step. */
@@ -91,9 +93,11 @@ export const Quests = {
       if (st.kind === 'defeat' && (st.enemy === 'any' || st.enemy === e.type) && ++s.n >= st.count) this.advance(id);
     }
   },
-  /** Can the hero still get `count` of an item here: in the bag, growing on this planet, or sold at the shop? */
+  /** Can the hero still get `count` of an item here: in the bag, growing on this planet (lying around, gathered,
+      fished or farmed), or sold at the shop? */
   obtainable(item, count) {
-    return ctx.player.inventory.count(item) >= count || PLANETS[ctx.planet].forage.some(f => f.item === item) || SHOP.stock.some(s => s.item === item);
+    return ctx.player.inventory.count(item) >= count || PLANETS[ctx.planet].forage.some(f => f.item === item) || SHOP.stock.some(s => s.item === item)
+      || planetSources(ctx.planet).has(item);
   },
   /** After travelling: quests that still need a villager who stayed behind are dropped; a step whose items can no
       longer be found (they grew on the planet you left) skips to the quest's next planet, or drops the quest. */

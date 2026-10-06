@@ -30,7 +30,11 @@ import { Chests } from '../gameplay/Chests.js';
 import '../gameplay/drops.js';
 import { Pets } from '../gameplay/Pets.js';
 import { Hotbar } from '../gameplay/hotbar.js';
-import { computeStats, emptyEquipment } from '../gameplay/equipment.js';
+import { applyVanity, computeStats, emptyEquipment } from '../gameplay/equipment.js';
+import { Farm } from '../gameplay/Farm.js';
+import { Fishing } from '../gameplay/Fishing.js';
+import { Gathering } from '../gameplay/Gathering.js';
+import { Needs } from '../gameplay/Needs.js';
 import { Houses } from '../gameplay/Houses.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
@@ -139,6 +143,7 @@ export class Game {
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
     BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
     Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt); Journal.update(dt);
+    Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -168,6 +173,7 @@ export class Game {
     const P = ctx.player, world = this.world;
     Dialog.close(); InventoryUI.close(); PetMenu.close();
     resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
+    Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs(); dayClock.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
@@ -177,7 +183,7 @@ export class Game {
     if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
     this.planets.reset();                                          // back to the first planet (and its boss)
     Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, coins: 0, equipment: emptyEquipment() });   // a fresh adventure starts back at level 1
-    P.stats = computeStats(P);
+    P.stats = computeStats(P); applyVanity(P);
     P.clearTimers(); P.inventory.clear();
     const fwd = P.placeAt(world.spawnDir);
     P.root.visible = true; snapCamera(world.spawnDir, fwd);
@@ -188,7 +194,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Gathering, Fishing, Farm, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

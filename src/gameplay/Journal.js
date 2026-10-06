@@ -93,6 +93,9 @@ gameEvents.addEventListener('chestopened', () => Journal.add('chests'));
 gameEvents.addEventListener('questcomplete', () => Journal.add('quests'));
 gameEvents.addEventListener('crafted', () => Journal.add('crafted'));
 gameEvents.addEventListener('rarefriend', () => Journal.add('rareFriends'));
+gameEvents.addEventListener('gathered', () => Journal.add('gathered'));
+gameEvents.addEventListener('fishcaught', () => Journal.add('fish'));
+gameEvents.addEventListener('harvested', () => Journal.add('harvests'));
 gameEvents.addEventListener('petfound', e => { Journal.data.pets[e.detail.id] = true; Journal.changed(); });
 /** The bag: every kind of item found, and every kind found at Legendary rarity (src/core/Game.js hooks this up). */
 export function watchBag(bag) {

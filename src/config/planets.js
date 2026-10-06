@@ -12,6 +12,9 @@
               each planet has its own boss type, and with it its own AI (gloomcap -> pyrrhax the dragon -> malgrath);
               trophy = item id (config/items.js) given to the hero when it falls
      forage   items lying around the planet to pick up: { item, count }
+     resources what can be gathered there (config/resources.js NODE_KINDS): nodes [[kind, count, near]], near = 'village'
+              (a short walk from the square: the first wood, stone and herbs) or none (anywhere in the wilds); rare =
+              the rare gem veins, placed around the planet's mini boss (you have to get past it)
      flora    what grows there: trees ({ kind: weight }, src/world/props.js TREE_KINDS), treeCount, giants (share of
               giant trees), flowers (colours), tallGrass (colours), grass / tallCount / meadow (density multipliers)
      weather  { kind: weight } from config/weather.js WEATHER_KINDS: what blows over it
@@ -54,6 +57,8 @@ export const PLANETS = [
     miniBosses: [{ type: 'hydra', near: 'lake' }],
     material: 'glowcap', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
     forage: [{ item: 'glowcap', count: 18 }, { item: 'moonberry', count: 14 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
+    resources: { nodes: [['branches', 8, 'village'], ['pebbles', 7, 'village'], ['sweetleaf', 7, 'village'], ['branches', 10], ['pebbles', 8],
+      ['sweetleaf', 14], ['moonberryBush', 12], ['glowcaps', 10], ['copperVein', 10]], rare: [['amethystVein', 2]] },
     arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to travel on!',
   },
   {
@@ -77,6 +82,8 @@ export const PLANETS = [
       fish: [{ body: 0xff6a3a, spot: 0xffe08a, fin: 0xffb070 }, { body: 0xffd36b, fin: 0xfff0a0 }] },
     material: 'emberShard', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
     forage: [{ item: 'emberShard', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
+    resources: { nodes: [['branches', 7, 'village'], ['pebbles', 6, 'village'], ['sweetleaf', 6, 'village'], ['branches', 8], ['pebbles', 8],
+      ['sweetleaf', 10], ['pepperBush', 12], ['glowcaps', 4], ['emberVein', 10], ['ironVein', 8], ['copperVein', 5]], rare: [['opalVein', 2]] },
     arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Pyrrhax the red dragon sleeps under the orange light: the golden elites carry the sigils that wake it.',
   },
   {
@@ -101,6 +108,8 @@ export const PLANETS = [
       fish: [{ body: 0x9ad0ff, spot: 0xffffff, fin: 0xd6ecff }, { body: 0xffffff, spot: 0x7fb8ff, fin: 0xe8f4ff }] },
     material: 'frostPetal', chests: [{ kind: 'common', count: 8 }, { kind: 'rare', count: 3 }],
     forage: [{ item: 'frostPetal', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
+    resources: { nodes: [['branches', 7, 'village'], ['pebbles', 6, 'village'], ['sweetleaf', 6, 'village'], ['branches', 8], ['pebbles', 8],
+      ['sweetleaf', 10], ['plumBush', 12], ['frostFlowers', 10], ['ironVein', 10], ['copperVein', 5]], rare: [['diamondVein', 2]] },
     arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, only rises at night for a hero Tuva trusts.',
   },
 ];

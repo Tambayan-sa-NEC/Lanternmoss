@@ -25,6 +25,7 @@ encounterEvents.addEventListener('enemydefeated', ev => dropLoot(ev.detail.enemy
 /** A mini boss always leaves treasure: a rare loot roll (coins and items) scattered around where it fell. */
 export function miniBossLoot(e, rng = Math.random) {
   const { coins, items } = rollLoot(MINI_BOSS_LOOT.table, ctx.planet, rng, ctx.player.charId);
+  for (const [item, qty] of MINI_BOSS_LOOT.extra?.[e.type] ?? []) items.push({ item, qty });   // its own keepsake (the Hydra's toad cap)
   if (coins) gainCoins(coins, e.center());
   return items.map(({ item, qty, props }) => spawnWorldItem(item, qty, spawnSpot(e.up, 1, 3, 0.3), { from: e.up, popTime: 0.6, stepAway: false, props }));
 }
