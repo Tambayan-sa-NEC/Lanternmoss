@@ -5,13 +5,16 @@ import { BESTIARY_ENTRIES } from '../config/bestiary.js';
 import { COMBAT } from '../config/combat.js';
 import { PETS } from '../config/pets.js';
 
-/** Every bestiary page, in order: the monsters, then the bosses. */
-export const BESTIARY_ORDER = Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object).sort((a, b) => (COMBAT.enemies[a].ai === 'boss') - (COMBAT.enemies[b].ai === 'boss'));
-export const isBoss = type => COMBAT.enemies[type]?.ai === 'boss';
+const rank = t => (COMBAT.enemies[t].miniBoss ? 1 : COMBAT.enemies[t].ai === 'boss' ? 2 : 0);
+/** Every bestiary page, in order: the monsters, the mini bosses, then the planet bosses. */
+export const BESTIARY_ORDER = Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object).sort((a, b) => rank(a) - rank(b));
+/** A planet boss (not a mini boss). */
+export const isBoss = type => COMBAT.enemies[type]?.ai === 'boss' && !COMBAT.enemies[type].miniBoss;
+export const isMiniBoss = type => !!COMBAT.enemies[type]?.miniBoss;
 /** A bestiary page's title: the monster's name, or the boss's (without its epithet). */
 export const pageName = type => BESTIARY_ENTRIES[type]?.name ?? COMBAT.enemies[type]?.name?.split(',')[0] ?? type;
 
-const COUNTERS = ['monsters', 'bosses', 'chests', 'quests', 'crafted'];
+const COUNTERS = ['monsters', 'bosses', 'chests', 'quests', 'crafted', 'minibosses', 'rareFriends'];
 const FLAGS = new Set(ACHIEVEMENTS.filter(a => a.goal.flag).map(a => a.goal.flag));
 
 /**   stats     lifetime counters (COUNTERS)

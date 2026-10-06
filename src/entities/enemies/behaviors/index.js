@@ -7,6 +7,8 @@ import { bomber } from './bomber.js';
 import { demonLord } from './boss/demonLord.js';
 import { dragon } from './boss/dragon.js';
 import { gloomcap } from './boss/gloomcap.js';
+import { basilisk } from './boss/basilisk.js';
+import { hydra } from './boss/hydra.js';
 import { burrower } from './burrower.js';
 import { charger } from './charger.js';
 import { support } from './support.js';
@@ -20,4 +22,4 @@ const seal = {
   },
 };
 
-export const BEHAVIORS = { bomber, charger, burrower, support, boss: gloomcap, gloomcap, dragon, demonLord, seal };
+export const BEHAVIORS = { bomber, charger, burrower, support, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk };

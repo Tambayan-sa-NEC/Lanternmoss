@@ -7,7 +7,7 @@
    The body asks Pets what to do (mode, stay spot, damage); Pets tells the body to show / hide and to celebrate.
    Unlocks come from game events: a quest finished, a chest opened (core/events.js). */
 import { CHARACTERS } from '../config/characters.js';
-import { PET_CARE, PET_COMMANDS, PET_LEVELS, PETS } from '../config/pets.js';
+import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_SWAP, PETS } from '../config/pets.js';
 import { ctx } from '../core/context.js';
 import { emit, gameEvents } from '../core/events.js';
 import { bindLabel } from '../core/keybinds.js';
@@ -17,6 +17,7 @@ import { floatText } from '../fx/combatFx.js';
 import { emote } from '../fx/emotes.js';
 import { sparkles } from '../fx/sparkles.js';
 import { levelEvents } from '../progression/experience.js';
+import { encounterEvents } from '../combat/events.js';
 import { audio } from '../systems/AudioSystem.js';
 import { showBanner } from '../ui/banner.js';
 import { toast } from '../ui/toast.js';
@@ -32,7 +33,7 @@ const PET_LINES = ['{name} leans into the scratch.', '{name} looks very pleased 
 
 export const Pets = {
   unlocked: new Set(STARTERS), active: null, names: {}, mode: 'follow', stayDir: null, picks: loadPicks(),
-  hp: null, hpFor: null, faintT: 0, hurtAt: -99, abilityCd: 0, petCool: 0,
+  hp: null, hpFor: null, faintT: 0, hurtAt: -99, abilityCd: 0, petCool: 0, swapCool: 0,
   presenting: false,     // a menu is showing the pet off: it comes round in front of the hero (PET_SHOWCASE)
 
   /** The pet that's out: the one picked (pet step or pet menu), else the hero's own. */
@@ -72,6 +73,17 @@ export const Pets = {
     if (!this.fainted && !ctx.indoors) { emote(ctx.companion, 'heart'); audio.sparkle(); }
     if (!quiet) toast(`${this.nameOf()} the ${PETS[id].name.toLowerCase()} comes along now.`);
     return true;
+  },
+  /** Swap key: the next unlocked pet (in PETS order) comes out right away, with a puff. */
+  cycle() {
+    if (ctx.indoors || ctx.player.dead) return false;
+    const ids = Object.keys(PETS).filter(id => this.unlocked.has(id));
+    if (ids.length < 2) { toast('No other pets yet: find more out in the wilds!'); audio.fizzle(); return false; }
+    if (this.swapCool > 0) return false;
+    const next = ids[(ids.indexOf(this.id) + 1) % ids.length], old = ctx.companion;
+    if (old?.visible) sparkles.emit(old.pos.clone().addScaledVector(old.up, 0.5), { count: 24, color: 0xffffff, speed: 2.4, up: old.up, upBias: 0.8, life: 0.6, size: 0.36 });
+    this.swapCool = PET_SWAP.cooldown;
+    return this.choose(next);
   },
   remember(id, hero = ctx.player.charId) {
     if (id === CHARACTERS[hero].companion) delete this.picks[hero]; else this.picks[hero] = id;
@@ -154,7 +166,7 @@ export const Pets = {
   },
 
   update(dt) {
-    this.abilityCd = Math.max(0, this.abilityCd - dt); this.petCool = Math.max(0, this.petCool - dt);
+    this.abilityCd = Math.max(0, this.abilityCd - dt); this.petCool = Math.max(0, this.petCool - dt); this.swapCool = Math.max(0, this.swapCool - dt);
     if (this.fainted) { if ((this.faintT -= dt) <= 0) { if (ctx.indoors) this.faintT = 0.01; else this.revive(); } }   // (back outside, not in a room)
     else if (this.hp !== null && ctx.time - this.hurtAt > PET_CARE.regenDelay) this.heal(PET_CARE.regen * dt);
     updatePetAbilities(dt);
@@ -169,6 +181,9 @@ export const Pets = {
 
 // unlocks
 gameEvents.addEventListener('questcomplete', e => { for (const [id, p] of Object.entries(PETS)) if (p.unlock?.quest === e.detail.id) Pets.unlock(id); });
+encounterEvents.addEventListener('minibossdefeated', e => {
+  for (const [id, p] of Object.entries(PETS)) if (p.unlock?.miniBoss && p.unlock.miniBoss === e.detail.boss.type) Pets.unlock(id);
+});
 gameEvents.addEventListener('chestopened', e => {
   for (const [id, p] of Object.entries(PETS)) {
     if (p.unlock?.chest && p.unlock.chest === e.detail.kind) Pets.unlock(id);

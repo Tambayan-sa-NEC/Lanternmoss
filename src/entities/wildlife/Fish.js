@@ -15,8 +15,9 @@ const _tv = new V3();
 const SCALES = [{ body: 0xff9a4a, spot: 0xffffff, fin: 0xffc38a }, { body: 0xffffff, spot: 0xff6a5a, fin: 0xffd0c8 }, { body: 0xffd84a, fin: 0xfff0a0 }, { body: 0x9ad0ff, spot: 0xffffff, fin: 0xd6ecff }];
 
 export class Fish {
-  constructor(pond) {
-    this.pond = pond; Object.assign(this, buildFish(mpick(SCALES)));
+  /** looks = colours to pick from (default SCALES); size scales the fish (the lakes' golden koi). */
+  constructor(pond, looks = null, size = 1) {
+    this.pond = pond; Object.assign(this, buildFish(mpick(looks ?? SCALES))); this.root.scale.setScalar(size);
     scene.add(this.root); this.theta = Math.random() * 6.28; this.rad = mr(0.8, pond.r * 0.62); this.radTarget = this.rad;
     this.w = mr(0.35, 0.6) * (Math.random() < 0.5 ? -1 : 1); this.boost = 0; this.jump = -1; this.pos = new V3(); this.up = pond.dir; this.height = 0.3;
   }

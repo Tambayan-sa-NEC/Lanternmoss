@@ -56,6 +56,15 @@ export const PET_ABILITIES = {
     emote(pet, 'heart', '#ffd36b'); audio.sparkle(); toast(`${Pets.nameOf()} glows warm and gold...`);
     return true;
   },
+  /** Dragontoad: a booming croak around you: knocks back, hurts and stuns every monster close by. */
+  bellow(Pets, pet, a) {
+    const P = ctx.player, hit = ctx.enemies.filter(e => alive(e) && e.pos.distanceTo(P.pos) < a.radius + e.hitR);
+    for (const e of hit) { damageEnemy(e, Math.round(a.damage * Pets.power()), { source: 'pet', knock: 6, from: P.pos, color: 0x9ff3a0 }); if (e.alive) e.stun(a.stun); }
+    ringFX(P.pos, a.radius, 0x9ff3a0); ringFX(P.pos, a.radius * 0.6, 0xffffff, 0.35); audio.roar(); audio.howl();
+    sparkles.emit(_p.copy(pet.pos).addScaledVector(pet.up, 0.6), { count: 30, color: 0x9ff3a0, speed: 3, up: pet.up, upBias: 1, life: 0.7, size: 0.36 });
+    pet.celebrate?.(); toast(hit.length ? `${Pets.nameOf()} BELLOWS! ${hit.length} monster${hit.length > 1 ? 's' : ''} reel back.` : `${Pets.nameOf()} bellows at nothing in particular. Very proud of it.`);
+    return true;
+  },
   /** Dragon whelp: a burst of flame around your target (or around you). */
   flame(Pets, pet, a) {
     const P = ctx.player, t = [targeting.aim, targeting.lastHit].find(e => e && alive(e) && arcDist(P.up, e.up) < 16);

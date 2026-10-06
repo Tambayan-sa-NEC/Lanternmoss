@@ -9,7 +9,8 @@
      hp        health at level 1 (+ PET_LEVELS.hpPerLevel per hero level above 1); at 0 it faints for a while
      attack    { damage, cooldown, range, ...damageEnemy options (mark, stagger, slow + slowTime, knock) }
      ability   { id, name, key text, cooldown, ...its numbers } (effects: src/gameplay/petAbilities.js)
-     unlock    null = always yours; { quest: id } | { chest: kind } | { bossChest: planet index }; text = how to find it
+     unlock    null = always yours; { quest: id } | { chest: kind } | { bossChest: planet index } | { miniBoss: type };
+               text = how to find it
    --------------------------------------------------------------------- */
 
 export const PETS = {
@@ -45,6 +46,14 @@ export const PETS = {
       text: 'Glows warm and gold: restores 35% of your HP over 5s (and some of its own).' },
     unlock: { quest: 'humStones', text: 'Befriended when the Humming Stones are tuned (Old Bramble\'s quest).' },
   },
+  dragontoad: {
+    name: 'Dragontoad', defaultName: 'Puddle', role: 'Guardian', body: 'walk', model: 'dragontoad', color: '#5aa86a', hp: 105,
+    blurb: 'Half toad, half dragon, all heart. Lashes monsters with a sticky tongue that slows them down.',
+    attack: { damage: 6, cooldown: 2.3, range: 9, slow: 0.4, slowTime: 2, knock: 1 },
+    ability: { id: 'bellow', name: 'Bellow', cooldown: 28, radius: 6.5, damage: 14, stun: 1.6,
+      text: 'A booming dragon-croak: every monster within 6.5m is knocked back, hurt and stunned for a moment.' },
+    unlock: { miniBoss: 'hydra', text: 'An egg the Hydra guards by its lake (Lanternmoss or Frostveil). Defeat the Hydra to hatch it.' },
+  },
   whelp: {
     name: 'Dragon whelp', defaultName: 'Cinderling', role: 'Firestarter', body: 'fly', model: 'whelp', color: '#ff7a4a', hp: 80,
     blurb: 'Pyrrhax\'s last egg, hatched. Spits little fireballs that hit hard.',
@@ -78,6 +87,9 @@ export const PET_CARE = {
   petReach: 2.2,           // stand this close (and still) to pet them with E
   nameLength: 14,
 };
+
+/** Swapping pets in play with its key (N): a short wait between swaps. */
+export const PET_SWAP = { cooldown: 1.2 };
 
 /** What a pet does when not using its ability. T cycles through them. */
 export const PET_COMMANDS = {

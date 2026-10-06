@@ -119,6 +119,22 @@ export const audio = {
       if (i === 14) this.tone(bass[step % 8] * 4, 0.5, 'sawtooth', 0.012, 0, 1.01, this.music);
     }, 190);
   },
+  /** Weather loops: rain hiss and wind (levels 0..~1.5; called every frame, only re-tuned when they change). */
+  ambience(rain, wind) {
+    if (!this.ctx) return;
+    if (!this.amb) {
+      const c = this.ctx, buf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const loop = (type, freq, q) => { const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+        s.buffer = buf; s.loop = true; f.type = type; f.frequency.value = freq; f.Q.value = q; g.gain.value = 0; s.connect(f); f.connect(g); g.connect(this.fx); s.start(); return { g, f }; };
+      this.amb = { rain: loop('highpass', 1800, 0.3), wind: loop('lowpass', 420, 1.2), r: 0, w: 0 };
+    }
+    const a = this.amb, t = this.ctx.currentTime;
+    if (Math.abs(rain - a.r) > 0.02) { a.r = rain; a.rain.g.gain.setTargetAtTime(rain * 0.05, t, 0.8); }
+    if (Math.abs(wind - a.w) > 0.02) { a.w = wind; a.wind.g.gain.setTargetAtTime(wind * 0.07, t, 0.8); }
+    if (wind > 0.02) a.wind.f.frequency.setTargetAtTime(300 + 260 * (0.5 + 0.5 * Math.sin(t * 0.7)), t, 0.5);
+  },
+  thunder() { this.noise(2.2, 0.16, 260); this.tone(48, 1.8, 'sine', 0.1, 0, 0.6); this.noise(0.6, 0.08, 900, 0.1); },
   /** Output level from the master volume, the mute toggle and pause ducking. */
   level() { return this.muted ? 0 : 0.55 * this.vol.master * (this.ducked ? 0.3 : 1); },
   applyLevels() {

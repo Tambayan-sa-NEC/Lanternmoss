@@ -55,6 +55,7 @@ function onKey(code) {
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
   if (is('petCommand', code)) Pets.cycleCommand();     // follow -> stay -> attack -> passive
   if (is('petAbility', code)) Pets.useAbility();
+  if (is('petSwap', code)) Pets.cycle();                // the next unlocked pet comes out
   if (is('interact', code)) { if (Dialog.open) Dialog.advance(); else currentInteraction()?.run(); }   // talk, enter a house, use furniture
   if (is('decline', code) && Dialog.choice) Dialog.choose(false);
 }

@@ -52,6 +52,8 @@ Object.assign(GLYPHS, {
   trophy: `<path ${F} d="M7 3.5h10v5a5 5 0 0 1-10 0zM10.5 14h3v3.5h2.5v3H8v-3h2.5z"/><path ${S} d="M7 5.5H4.2c0 3 1.2 4.6 3.2 5M17 5.5h2.8c0 3-1.2 4.6-3.2 5"/>`,
   gem: `<path ${F} d="M7 4h10l4 5.5-9 11-9-11z"/><path fill="none" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" d="M3.5 9.5h17M9.5 4.5 12 9.5l2.5-5M12 9.5v10"/>`,
   craft: `<path ${F} d="M13.5 3.5l6.8 6.8-2.3 2.3-2-2-7.6 7.6a1.9 1.9 0 0 1-2.7-2.7L13.3 8l-2-2z"/><path ${S} d="M4 20.5h7"/>`,
+  dragontoad: `<path ${F} d="M12 6c-4.8 0-8.5 3.2-8.5 7.6 0 3.6 3.5 6.4 8.5 6.4s8.5-2.8 8.5-6.4C20.5 9.2 16.8 6 12 6zM5.5 7.5 7 3.5l2.2 3.4M18.5 7.5 17 3.5l-2.2 3.4"/><circle fill="#fff" cx="8.6" cy="10.6" r="1.7"/><circle fill="#fff" cx="15.4" cy="10.6" r="1.7"/><path fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" d="M8 15.2c2.6 1.4 5.4 1.4 8 0"/>`,
+  bellow: `<path ${F} d="M3 9.5h4l5-4v13l-5-4H3z"/><path ${S} d="M15 8.5c1.6 2 1.6 5 0 7M17.8 6c3 3.4 3 8.6 0 12"/>`,
   sprout: `<path ${F} d="M11.2 12.5C6 13 3.5 9.8 3.5 5.5c4.5 0 7.6 2.4 7.7 7zM12.8 10.5c.4-4 3-6.4 7.7-6.4 0 4-2.4 6.8-7.7 6.4z"/><path ${S} d="M12 21v-9.5"/>`,
 });
 GLYPHS.eye = GLYPHS.scout; GLYPHS.paw = GLYPHS.fetch;   // compass marks for what a pet spotted or sniffed out

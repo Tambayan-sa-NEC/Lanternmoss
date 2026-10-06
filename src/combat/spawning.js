@@ -64,6 +64,30 @@ export function spawnBoss(world, { type, trophy: _trophy, summon: _summon, arena
   return e;
 }
 
+/** A planet's mini bosses (PLANETS[i].miniBosses = [{ type, near: 'lake' | 'far', overrides }]): the hydra on the bank
+    of the lake farthest from the village, others far out in the wilds, away from the lair. */
+export function spawnMiniBosses(world, list = []) {
+  const out = [];
+  for (const m of list) {
+    let dir = null;
+    if (m.near === 'lake') {
+      const lakes = ponds.filter(p => p.r >= 6).sort((a, b) => arcDist(b.dir, world.spawnDir) - arcDist(a.dir, world.spawnDir));
+      const lake = lakes[0];
+      if (lake) for (let i = 0; i < 40 && !dir; i++) { const d = offsetDir(lake.dir, rand() * 6.28, lake.r + 3.5); if (freeOfColliders(d, 2) && slopeAt(d) < 0.5) dir = d; }
+    }
+    for (let i = 0; i < 300 && !dir; i++) {
+      const d = randomDir();
+      if (arcDist(d, world.spawnDir) < 60 || (world.lairDir && arcDist(d, world.lairDir) < 45) || slopeAt(d) > 0.4) continue;
+      if (!freeOfColliders(d, 2.5) || ponds.some(p => arcDist(d, p.dir) < p.r + 4) || out.some(e => arcDist(d, e.home) < 40)) continue;
+      dir = d;
+    }
+    if (!dir) continue;
+    const e = new Enemy(m.type, dir, { ...enemyDef(m.type), ...(m.overrides ?? {}) });
+    ctx.enemies.push(e); out.push(e);
+  }
+  return out;
+}
+
 /** Back to the start-of-adventure roster: summoned and non-respawning monsters (bosses too) go, the rest return home. */
 export function resetEnemies() {
   for (let i = ctx.enemies.length - 1; i >= 0; i--) {

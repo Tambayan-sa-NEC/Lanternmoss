@@ -11,7 +11,7 @@ import { ENGAGED } from '../entities/enemies/states.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { arcDist } from '../utils/sphere.js';
 import { toast } from '../ui/toast.js';
-import { emptyJournal, isBoss, newlyDone, pageName, sanitizeJournal } from './journalRules.js';
+import { emptyJournal, isBoss, isMiniBoss, newlyDone, pageName, sanitizeJournal } from './journalRules.js';
 import { Pets } from './Pets.js';
 import { gainCoins } from './wallet.js';
 
@@ -44,7 +44,8 @@ export const Journal = {
     if (e.def.object) return;                                       // lair seals aren't monsters
     const type = e.type, first = !this.data.defeated[type];
     this.data.seen[type] = true; this.data.defeated[type] = (this.data.defeated[type] ?? 0) + 1;
-    if (!isBoss(type) && !e.owner) this.data.stats.monsters++;          // (a boss's summons can't be farmed)
+    if (isMiniBoss(type)) this.data.stats.minibosses++;
+    else if (!isBoss(type) && !e.owner) this.data.stats.monsters++;     // (a boss's summons can't be farmed)
     if (first && !isBoss(type)) toast(`Bestiary: ${pageName(type)} defeated! Its stats and drops are noted.`);
     this.changed();
   },
@@ -91,6 +92,7 @@ globalThis.addEventListener?.('pagehide', () => { if (Journal.saveT > 0) Journal
 gameEvents.addEventListener('chestopened', () => Journal.add('chests'));
 gameEvents.addEventListener('questcomplete', () => Journal.add('quests'));
 gameEvents.addEventListener('crafted', () => Journal.add('crafted'));
+gameEvents.addEventListener('rarefriend', () => Journal.add('rareFriends'));
 gameEvents.addEventListener('petfound', e => { Journal.data.pets[e.detail.id] = true; Journal.changed(); });
 /** The bag: every kind of item found, and every kind found at Legendary rarity (src/core/Game.js hooks this up). */
 export function watchBag(bag) {

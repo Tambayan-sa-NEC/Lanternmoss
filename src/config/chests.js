@@ -78,6 +78,9 @@ export const GEAR_RARITY = {
   boss:    { rare: 65, legendary: 35 },
 };
 
+/** What a mini boss (hydra, basilisk) leaves where it falls: one roll of this table, every time. */
+export const MINI_BOSS_LOOT = { table: 'rare' };
+
 export const MONSTER_DROPS = {
   chance: 0.1,             // base chance a defeated monster drops something...
   perXp: 0.005,            // ...plus this per XP it's worth (a goblin ~15%, an ogre ~30%)

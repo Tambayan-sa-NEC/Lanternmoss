@@ -50,6 +50,34 @@ export const COMBAT = {
     hexlantern:{ ai: 'support', color: 0x8fffc0, hp: 40, speed: 3.6, radius: 0.4, height: 1.0, hover: 1.4, aggro: 15, leash: 22,
                  keepDistance: 10, healRadius: 9, heal: 18, healCooldown: 2.5, shieldTime: 4, shieldReduction: 0.5, shieldCooldown: 6,
                  cooldown: 1, respawn: 50, xp: 20 },
+    // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
+    //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
+    hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,
+                 hp: 620, speed: 1.6, radius: 1.5, height: 3.6, aggro: 14, leash: 18, turnRate: 2.2,
+                 knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 160, cooldown: 1.3,
+                 attacks: {
+                   bite:  { windup: 0.65, range: 6.5, arc: 70, damage: 16, knockback: 6, recover: 0.6, cooldown: 0.6 },
+                   spit:  { windup: 0.8, minRange: 4, count: 3, spread: 50, speed: 9, homing: 0.5, damage: 9, recover: 0.5, cooldown: 1.2, reuse: 3 },
+                   sweep: { windup: 1.0, radius: 7, arc: 200, damage: 14, knockback: 9, recover: 0.9, cooldown: 1.0, reuse: 5 },
+                 },
+                 phases: [   // heads: how many necks are up (it grows one at each threshold)
+                   { below: 1.0, heads: 3, attacks: ['bite', 'spit'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.66, heads: 4, title: 'Four heads', attacks: ['bite', 'spit', 'sweep'], speedMul: 1.1, cooldownMul: 0.9 },
+                   { below: 0.33, heads: 5, title: 'Five heads', attacks: ['bite', 'spit', 'sweep'], speedMul: 1.2, cooldownMul: 0.75 },
+                 ] },
+    basilisk:  { ai: 'boss', behavior: 'basilisk', miniBoss: true, name: 'The Basilisk, Stone-Gazer', color: 0x5a7a3a, capColor: 0xfff066,
+                 hp: 540, speed: 3.4, radius: 1.1, height: 2.0, aggro: 15, leash: 22, turnRate: 3.5,
+                 knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 170, cooldown: 1.1,
+                 attacks: {   // gaze: anyone FACING it when its eyes flare is turned to stone for `petrify` seconds (turn away!)
+                   gaze:  { windup: 1.5, range: 20, damage: 12, petrify: 1.8, recover: 1.2, cooldown: 1.2, reuse: 7 },
+                   whip:  { windup: 0.8, radius: 4.8, damage: 15, knockback: 10, recover: 0.7, cooldown: 0.8 },
+                   lunge: { windup: 0.75, minRange: 5, distance: 12, speed: 16, width: 1.8, damage: 18, knockback: 9, recover: 0.9, cooldown: 1.0, reuse: 3 },
+                   spit:  { windup: 0.7, count: 5, spread: 70, speed: 11, homing: 0.3, damage: 8, recover: 0.5, cooldown: 1.0, reuse: 4 },
+                 },
+                 phases: [
+                   { below: 1.0, attacks: ['gaze', 'whip', 'lunge'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Enraged', attacks: ['gaze', 'whip', 'lunge', 'spit'], speedMul: 1.2, cooldownMul: 0.8 },
+                 ] },
     // ---- lair seals: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
     thornSeal: { ai: 'seal', object: true, static: true, name: 'Thorn Seal', color: 0xb48cff, hp: 90, speed: 0, radius: 0.75, height: 2.6,
                  aggro: 0, leash: 99, respawn: 0, xp: 12, knockResist: 1, slowResist: 1, staggerImmune: true },

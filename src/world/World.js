@@ -13,11 +13,12 @@ import { rand, rr, seedWorld } from '../utils/random.js';
 import { arcDist, frameQuat, offsetDir, projectTangent, randomDir, tangentFrame } from '../utils/sphere.js';
 import { buildPlanet } from './planet.js';
 import { isFree, placed } from './placement.js';
-import { decoratePonds, createGrass, scatterFlora } from './scatter.js';
+import { decoratePonds, createGrass, createMeadowFlowers, createTallGrass, scatterFlora, WIND } from './scatter.js';
 import { CLOUD_AXIS, createClouds, createFireflies, createSky } from './sky.js';
 import { addFlat, addPond, bakeTerrain, computeWaterLevel, groundHeight, ponds, setTerrain } from './terrain.js';
 import { buildVillage } from './village.js';
 import { createWater } from './water.js';
+import { Weather } from './weather.js';
 
 const V3 = THREE.Vector3;
 
@@ -74,9 +75,11 @@ export class World {
     const B = new Batcher();
     Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses));   // houses, houseA, cottage
     decoratePonds(B);
-    scatterFlora(B);
+    this.trees = scatterFlora(B, planet.flora);                       // { kind: count }
     this.add(B.build());
-    const grass = createGrass(palette.grass); this.add(grass);
+    const fl = planet.flora ?? {}, grass = createGrass(palette.grass, fl.grass ?? 1), tall = createTallGrass(fl.tallGrass ?? palette.grass, spawnDir, fl.tallCount ?? 1);
+    const [stems, heads] = createMeadowFlowers(fl.flowers ?? [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff], fl.meadow ?? 1);
+    this.add(grass, tall, stems, heads);
 
     const water = createWater(palette.water); this.waterMat = water.material; this.add(...water.meshes);
 
@@ -89,7 +92,8 @@ export class World {
     this.sky = createSky(palette.sky); this.add(this.sky);
     this.clouds = createClouds(); this.add(this.clouds);
     this.fireflies = createFireflies(); this.add(this.fireflies);
-    this.ownMaterials.push(this.sky.material, this.waterMat, grass.material, this.fireflies.material);   // the rest are shared caches
+    this.weather = new Weather(planet.weather, palette, o => this.add(o));
+    this.ownMaterials.push(...this.weather.materials, this.sky.material, this.waterMat, grass.material, tall.material, stems.material, heads.material, this.fireflies.material);   // the rest are shared caches
 
     this.resetSun();
   }
@@ -99,6 +103,7 @@ export class World {
 
   /** Removes everything generate() created and forgets the terrain, placement and scenery colliders. */
   dispose() {
+    this.weather?.dispose();
     for (const o of this.objects) { scene.remove(o); disposeTree(o); }
     for (const m of this.ownMaterials) { releasePointsMaterial(m); m.dispose(); }
     this.objects = []; this.ownMaterials = [];
@@ -106,7 +111,10 @@ export class World {
   }
 
   /** Time-of-day light (gameplay/dayClock.js light()): sun colour and strength, ambient strength. */
-  setDaylight({ sun, sunIntensity, ambient }) { this.sun.color.copy(sun); this.sun.intensity = sunIntensity; this.hemi.intensity = ambient; }
+  setDaylight({ sun, sunIntensity, ambient }) {
+    const w = this.weather?.now.light ?? 1, flash = this.weather?.flash ?? 0;   // the weather dims it; lightning flashes
+    this.sun.color.copy(sun); this.sun.intensity = sunIntensity * w + flash * 2; this.hemi.intensity = ambient * (0.75 + 0.25 * w) + flash * 2.5;
+  }
 
   /** Puts the sun back at its starting bearing over the village. */
   resetSun() {
@@ -123,8 +131,9 @@ export class World {
     _skySun.copy(viewUp).multiplyScalar(0.2).add(this.sunTan).normalize();
     const su = this.sky.material.uniforms; su.uUp.value.copy(viewUp); su.uSun.value.copy(_skySun); su.uTime.value = time;
     this.sky.position.copy(camera.position);
-    this.fireflies.material.uniforms.uTime.value = time; this.waterMat.uniforms.uTime.value = time;
-    this.clouds.rotateOnWorldAxis(CLOUD_AXIS, dt * 0.008);
+    this.fireflies.material.uniforms.uTime.value = time; this.waterMat.uniforms.uTime.value = time; WIND.uTime.value = time;
+    this.clouds.rotateOnWorldAxis(CLOUD_AXIS, dt * 0.008 * (1 + (this.weather?.now.wind ?? 0) * 2));
+    this.weather.update(dt, time, player, this.sky);
     this.crystal.position.copy(this.crystalBase).addScaledVector(this.stoneCenter, Math.sin(time * 1.4) * 0.25); this.crystal.rotateY(dt * 0.9);
   }
 }

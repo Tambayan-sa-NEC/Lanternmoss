@@ -1,4 +1,5 @@
-/* Little birds: hop and peck on the ground, take off and circle when the hero gets close. */
+/* Little birds: hop and peck on the ground, take off and circle when the hero gets close. Flocks: a loose V of birds
+   wheeling high over the planet. Plumage comes from the planet (PLANETS[i].wildlife.plumage), else the defaults. */
 import * as THREE from 'three';
 import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
@@ -11,7 +12,7 @@ import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
 import { mpick, mr } from '../../utils/random.js';
-import { projectTangent, tangentTo } from '../../utils/sphere.js';
+import { dirAlong, frameQuat, projectTangent, tangentFrame, tangentTo } from '../../utils/sphere.js';
 import { groundHeight } from '../../world/terrain.js';
 
 const V3 = THREE.Vector3;
@@ -19,8 +20,8 @@ const _toP = new V3(), _tv = new V3(), _tv2 = new V3(), _p = new V3();
 const PLUMAGE = [{ body: 0x7fb8ff, belly: 0xfff0e0, wing: 0x5f98e8 }, { body: 0xb08a7a, belly: 0xff9068, wing: 0x8a6a5a }, { body: 0xffe066, belly: 0xfff6d0, wing: 0xf2c440 }, { body: 0xffffff, belly: 0xffe0ea, wing: 0xf0e6ff }];
 
 export class Bird extends Walker {
-  constructor(dir) {
-    super(dir, 0.18); const c = mpick(PLUMAGE);
+  constructor(dir, plumage = null) {
+    super(dir, 0.18); const c = mpick(plumage ?? PLUMAGE);
     Object.assign(this, buildBird(c)); scene.add(this.root); this.shadow = makeShadow(0.25); this.height = 0.45;
     this.state = 'ground'; this.timer = mr(0.5, 2); this.flyTime = 0; this.hopVel = 0; this.peck = 0; this.flap = 0; this.cruise = mr(7.5, 10);
     this.fwd.applyAxisAngle(this.up, Math.random() * 6.28);
@@ -62,5 +63,33 @@ export class Bird extends Walker {
     this.head.rotation.x = this.peck > 0 ? Math.sin(this.peck / 0.35 * Math.PI) * 0.9 : 0;
     this.body.rotation.x = this.state === 'fly' ? -0.15 : 0;
     this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
+  }
+}
+
+/** A flock: a loose V of birds wheeling high over the planet, gliding now and then. */
+export class Flock {
+  constructor(dir, plumage = null) {
+    this.up = dir.clone(); this.fwd = tangentFrame(dir)[0]; this.alt = mr(16, 22); this.turn = mr(-0.15, 0.15); this.t = Math.random() * 10;
+    this.birds = [];
+    const n = 5 + Math.floor(Math.random() * 4), c = mpick(plumage ?? PLUMAGE);
+    for (let i = 0; i < n; i++) {
+      const b = buildBird(c); b.root.scale.setScalar(1.5); scene.add(b.root);
+      const row = Math.ceil(i / 2), side = i === 0 ? 0 : (i % 2 ? 1 : -1);
+      this.birds.push({ ...b, back: row * 1.3 + mr(-0.2, 0.2), side: side * row * 1.1, bob: Math.random() * 6, phase: Math.random() * 6 });
+    }
+  }
+  dispose() { for (const b of this.birds) { scene.remove(b.root); disposeTree(b.root); } }
+  update(dt) {
+    this.t += dt; if (Math.random() < dt * 0.1) this.turn = mr(-0.18, 0.18);
+    this.fwd.applyAxisAngle(this.up, this.turn * dt);
+    this.up.copy(dirAlong(this.up, this.fwd, 5.5 * dt)); projectTangent(this.fwd, this.up).normalize();
+    const side = _tv.crossVectors(this.up, this.fwd).normalize(), glide = Math.sin(this.t * 0.4) > 0.6;
+    for (const b of this.birds) {
+      const d = dirAlong(dirAlong(this.up, this.fwd, -b.back), side, b.side);
+      const h = groundHeight(d) + this.alt + Math.sin(this.t * 1.3 + b.bob) * 0.4;
+      b.root.position.copy(d).multiplyScalar(h); frameQuat(d, _tv2.copy(this.fwd), b.root.quaternion);
+      const flap = glide ? 0.15 : Math.sin(this.t * 11 + b.phase) * 0.9;
+      b.wingL.rotation.z = -flap; b.wingR.rotation.z = flap;
+    }
   }
 }

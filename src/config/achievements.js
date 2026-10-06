@@ -15,7 +15,7 @@
 export const JOURNAL_STATS = {
   monsters: 'Monsters defeated', bosses: 'Bosses defeated', bossKinds: 'Different bosses defeated', chests: 'Chests opened',
   quests: 'Quests finished', crafted: 'Items crafted', legendary: 'Kinds of Legendary gear found', petsFound: 'Pets found',
-  kinds: 'Kinds of monster defeated', items: 'Kinds of item found',
+  kinds: 'Kinds of monster defeated', items: 'Kinds of item found', minibosses: 'Mini bosses defeated', rareFriends: 'Rare creatures befriended',
 };
 
 export const ACHIEVEMENTS = [
@@ -28,6 +28,8 @@ export const ACHIEVEMENTS = [
   { id: 'firstLegendary', group: 'Firsts', icon: 'gem', name: 'The Real Treasure', text: 'Find a Legendary piece of gear.', goal: { stat: 'legendary', at: 1 }, reward: { coins: 50 } },
   { id: 'allPets', group: 'Firsts', icon: 'paw', name: 'Menagerie', text: 'Find every pet.', goal: { stat: 'petsFound', at: 'allPets' }, reward: { coins: 80 } },
   { id: 'allKinds', group: 'Firsts', icon: 'book', name: 'Field Notes', text: 'Defeat one of every kind of monster and boss.', goal: { stat: 'kinds', at: 'allKinds' }, reward: { coins: 120 } },
+  { id: 'giantSlayer', group: 'Firsts', icon: 'boss', name: 'Giant Slayer', text: 'Defeat a mini boss: the Hydra or the Basilisk.', goal: { stat: 'minibosses', at: 1 }, reward: { coins: 40 } },
+  { id: 'gentleHands', group: 'Firsts', icon: 'paw', name: 'Gentle Hands', text: 'Befriend a rare creature (walk up to it slowly).', goal: { stat: 'rareFriends', at: 1 }, reward: { coins: 25 } },
   // ---- counts
   { id: 'monsters25', group: 'Counts', icon: 'slash', name: 'Monster Tamer', text: 'Defeat 25 monsters.', goal: { stat: 'monsters', at: 25 }, reward: { coins: 15 } },
   { id: 'monsters100', group: 'Counts', icon: 'slash', name: 'Lantern Warden', text: 'Defeat 100 monsters.', goal: { stat: 'monsters', at: 100 }, reward: { coins: 40 } },

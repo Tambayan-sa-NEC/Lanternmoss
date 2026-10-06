@@ -11,4 +11,7 @@ scene.fog = new THREE.Fog(FOG_COLOR, RENDER.fog.near, RENDER.fog.far);
 
 export const camera = new THREE.PerspectiveCamera(RENDER.fov, innerWidth / innerHeight, RENDER.near, RENDER.far);
 
+/** Fog distances as shared uniforms (outlines and water read them too), so weather can thicken the fog everywhere. */
+export const FOG_NEAR = { value: RENDER.fog.near }, FOG_FAR = { value: RENDER.fog.far };
 export function setFogColor(hex) { FOG_COLOR.set(hex); scene.fog.color.set(hex); }
+export function setFogRange(near, far) { FOG_NEAR.value = scene.fog.near = near; FOG_FAR.value = scene.fog.far = far; }

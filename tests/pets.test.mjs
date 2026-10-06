@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CHARACTERS } from '../src/config/characters.js';
+import { COMBAT } from '../src/config/combat.js';
 import { CHEST_KINDS } from '../src/config/chests.js';
 import { CRITTER_DEFS } from '../src/config/critters.js';
 import { KEYBINDS } from '../src/config/controls.js';
@@ -35,7 +36,8 @@ test('unlocks point at real quests, chest kinds and planets; every hero starts w
     if (p.unlock.quest) assert.ok(QUESTS[p.unlock.quest], `${id}: quest ${p.unlock.quest}`);
     if (p.unlock.chest) assert.ok(CHEST_KINDS[p.unlock.chest], `${id}: chest ${p.unlock.chest}`);
     if (p.unlock.bossChest !== undefined) assert.ok(PLANETS[p.unlock.bossChest], `${id}: planet ${p.unlock.bossChest}`);
-    assert.ok(p.unlock.quest || p.unlock.chest || p.unlock.bossChest !== undefined, `${id}: unlocked somehow`);
+    if (p.unlock.miniBoss) assert.ok(COMBAT.enemies[p.unlock.miniBoss]?.miniBoss && PLANETS.some(pl => (pl.miniBosses ?? []).some(m => m.type === p.unlock.miniBoss)), `${id}: mini boss ${p.unlock.miniBoss} lives somewhere`);
+    assert.ok(p.unlock.quest || p.unlock.chest || p.unlock.bossChest !== undefined || p.unlock.miniBoss, `${id}: unlocked somehow`);
   }
   for (const [h, c] of Object.entries(CHARACTERS)) assert.ok(PETS[c.companion] && !PETS[c.companion].unlock, `${h}: their own pet ${c.companion} is a starter`);
   assert.ok(Object.values(PETS).filter(p => p.unlock).length >= 3, 'at least three pets to find');

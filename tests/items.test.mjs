@@ -1,5 +1,6 @@
 // Better items: gear stats and rarity (src/items/gear.js), crafting (src/items/crafting.js, config/crafting.js),
 // quick slots config and per-item art coverage. Run with `npm test`.
+import { CRITTER_DEFS } from '../src/config/critters.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -77,7 +78,9 @@ test('recipes only use real items, and every material crafts something', () => {
     assert.ok(!r.rarity || get(r.result).equip, `${r.id}: only gear gets a rarity`);
   }
   for (const d of ITEM_DEFINITIONS.filter(d => d.category === 'material')) assert.ok(RECIPES.some(r => r.needs.some(([i]) => i === d.id)), `${d.id} is used by a recipe`);
-  for (const d of GEAR) assert.ok(RECIPES.some(r => r.result === d.id), `${d.id} can be crafted`);
+  const gifts = new Set(Object.values(CRITTER_DEFS).filter(c => c.rare).map(c => c.rare.gift));   // rare creatures' charms are gifts, not recipes
+  for (const d of GEAR) assert.ok(gifts.has(d.id) || RECIPES.some(r => r.result === d.id), `${d.id} can be crafted`);
+  for (const g of gifts) assert.ok(ids.has(g) && get(g).equip, `rare gift ${g} is gear`);
   const witch = recipesFor('witch', itemRegistry).map(r => r.result);
   assert.ok(witch.includes('glowStaff') && !witch.includes('mossAxe') && witch.includes('mossCloak'), 'weapons only for their hero');
 });

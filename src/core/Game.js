@@ -13,7 +13,7 @@ import { clearTargets } from '../combat/targeting.js';
 import { NPC } from '../entities/npc/NPC.js';
 import { createNpcDefs } from '../entities/npc/npcDefs.js';
 import { Player } from '../entities/player/Player.js';
-import { spawnWildlife, updatePonds } from '../entities/wildlife/wildlife.js';
+import { resetRareGifts, spawnWildlife, updatePonds } from '../entities/wildlife/wildlife.js';
 import { updateEmotes } from '../fx/emotes.js';
 import { createSparkles, sparkles } from '../fx/sparkles.js';
 import { applyCharacter, showcaseHero } from '../gameplay/characters.js';
@@ -49,7 +49,7 @@ import { Dialog } from '../ui/Dialog.js';
 import { applyUiScale, buildHotbar, buildSpellBar, setSkillHint } from '../ui/hud.js';
 import { buildPetCard, updatePetCard } from '../ui/petHud.js';
 import { updateWaypoints } from '../ui/waypoints.js';
-import { updateOverlay } from '../ui/overlay.js';
+import { setOverlayWorld, updateOverlay } from '../ui/overlay.js';
 import { toast, updateToast } from '../ui/toast.js';
 import { offsetDir } from '../utils/sphere.js';
 import { colliders } from '../physics/colliders.js';
@@ -77,11 +77,11 @@ export class Game {
     this.world = new World();
     ctx.planet = 0;
     this.world.generate(PLANETS[0]);
-    createSparkles();
+    createSparkles(); setOverlayWorld(this.world);
 
     ctx.player = new Player(this.world.spawnDir);
     initCamera(ctx.player);
-    spawnWildlife(this.world);
+    spawnWildlife(this.world, PLANETS[0]);
     ctx.npcs = createNpcDefs(this.world).map(d => new NPC(d));
     resetCooldowns(COMBAT.spells);
     buildSpellBar(COMBAT.spells); setSkillHint(COMBAT.spells);
@@ -167,7 +167,7 @@ export class Game {
   resetRun() {
     const P = ctx.player, world = this.world;
     Dialog.close(); InventoryUI.close(); PetMenu.close();
-    Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
+    resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
     for (const n of ctx.npcs) n.resetLines();
     resetBuffs(); dayClock.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
@@ -195,6 +195,7 @@ export class Game {
       spawnItem: (id, qty = 1, arc = 2) => spawnWorldItem(id, qty, offsetDir(ctx.player.up, Math.random() * 6.28, arc)),
       get planet() { return ctx.planet; }, get boss() { return ctx.boss; }, planets: game.planets, PLANETS,
       goToPlanet: i => { game.planets.load(i); game.planets.announceArrival(); },
+      setWeather: kind => game.world.weather.set(kind, true), get weather() { return game.world.weather; },
       begin: () => game.beginGame(), update: dt => game.update(dt),
       spawnEnemy: (type, arc = 7) => addEnemy(type, offsetDir(ctx.player.up, Math.random() * 6.28, arc)) };
   }

@@ -12,6 +12,12 @@
               each planet has its own boss type, and with it its own AI (gloomcap -> pyrrhax the dragon -> malgrath);
               trophy = item id (config/items.js) given to the hero when it falls
      forage   items lying around the planet to pick up: { item, count }
+     flora    what grows there: trees ({ kind: weight }, src/world/props.js TREE_KINDS), treeCount, giants (share of
+              giant trees), flowers (colours), tallGrass (colours), grass / tallCount / meadow (density multipliers)
+     weather  { kind: weight } from config/weather.js WEATHER_KINDS: what blows over it
+     miniBosses optional big fights out in the wilds: [{ type (COMBAT.enemies, miniBoss), near: 'lake' | 'far', overrides }]
+     wildlife its animals: critters [[CRITTER_DEFS key, count, 'ponds' | 'far']], rare (one rare creature), birds,
+              flocks, plumage (bird colours), fish (fish colours)
      material the planet's own crafting material ('@material' in chest loot, config/chests.js)
      chests   treasure chests out in the wilds: { kind (CHEST_KINDS in config/chests.js), count }
      terrain  the planet's shape (src/world/terrain.js), each part optional, heights in metres:
@@ -41,6 +47,11 @@ export const PLANETS = [
       { type: 'goblin', groups: 2, size: 3 }, { type: 'ogre', count: 2 }, { type: 'wisp', count: 3 }, { type: 'slime', count: 4, near: 'ponds' },
     ],
     boss: { type: 'gloomcap', trophy: 'mossCrown', summon: { level: 2, seals: { count: 3, type: 'thornSeal' } }, arena: { wall: 'thorns' } },
+    flora: { trees: { blossom: 3, oak: 3, pine: 2, shroom: 2, willow: 1.5, birch: 1 }, treeCount: 56,
+      flowers: [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff, 0xffa87a], tallGrass: [0x8fd07a, 0x9adb7e, 0x7fc574] },
+    weather: { clear: 5, breezy: 3, rain: 3, storm: 1, fog: 2 },
+    wildlife: { critters: [['bunny', 6], ['deer', 3, 'far'], ['frog', 7, 'ponds']], rare: 'goldBunny', birds: 8, flocks: 2 },
+    miniBosses: [{ type: 'hydra', near: 'lake' }],
     material: 'glowcap', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
     forage: [{ item: 'glowcap', count: 18 }, { item: 'moonberry', count: 14 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
     arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to travel on!',
@@ -57,6 +68,13 @@ export const PLANETS = [
       { type: 'slime', count: 3, near: 'ponds' },
     ],
     boss: { type: 'pyrrhax', trophy: 'emberCrown', summon: { level: 4, sigils: { count: 3, item: 'emberSigil', elites: 4 } }, arena: { wall: 'fire' } },
+    flora: { trees: { ember: 4, crystal: 2, shroom: 1, pine: 1 }, treeCount: 46, flowers: [0xffb03d, 0xff6a4a, 0xffe08a, 0xff8fb1],
+      tallGrass: [0xc98a50, 0xd8a060, 0xb87a40], meadow: 0.6 },
+    weather: { clear: 5, breezy: 3, embers: 4, fog: 1 },
+    miniBosses: [{ type: 'basilisk', near: 'far' }],
+    wildlife: { critters: [['lizard', 7], ['sandHare', 5], ['frog', 3, 'ponds']], rare: 'emberSalamander', birds: 6, flocks: 2,
+      plumage: [{ body: 0xff7a4a, belly: 0xffe0b0, wing: 0xd85a2a }, { body: 0xffc04a, belly: 0xfff0c8, wing: 0xe8a030 }, { body: 0x6a4a5a, belly: 0xffa070, wing: 0x4a3040 }],
+      fish: [{ body: 0xff6a3a, spot: 0xffe08a, fin: 0xffb070 }, { body: 0xffd36b, fin: 0xfff0a0 }] },
     material: 'emberShard', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
     forage: [{ item: 'emberShard', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
     arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Pyrrhax the red dragon sleeps under the orange light: the golden elites carry the sigils that wake it.',
@@ -73,6 +91,14 @@ export const PLANETS = [
       { type: 'ramhorn', count: 3 }, { type: 'puffcap', count: 4 }, { type: 'wisp', count: 2 },
     ],
     boss: { type: 'malgrath', trophy: 'frostCrown', summon: { level: 6, quest: 'frostHearts', night: true }, arena: { wall: 'hellfire' } },
+    flora: { trees: { snowpine: 5, birch: 2, crystal: 2 }, treeCount: 54, flowers: [0xbff4ff, 0xd8b8ff, 0xffffff, 0x9fd8ff],
+      tallGrass: [0xa8d8c8, 0xc8eae0, 0x98ccc0], meadow: 0.5 },
+    weather: { clear: 3, snow: 4, blizzard: 2, fog: 2, breezy: 1 },
+    miniBosses: [{ type: 'hydra', near: 'lake', overrides: { name: 'The Frost Hydra, Ice-Fanged', color: 0x7fb8e0, capColor: 0xbff4ff,
+      look: { skin: 0x7aa8d0, belly: 0xe8f4ff, fin: 0xbff4ff, eye: 0x9ff3ff } } }],
+    wildlife: { critters: [['snowHare', 6], ['reindeer', 3, 'far']], rare: 'auroraHare', birds: 6, flocks: 1,
+      plumage: [{ body: 0xffffff, belly: 0xe8f4ff, wing: 0xc8dcf0 }, { body: 0x7fb8ff, belly: 0xffffff, wing: 0x5f98e8 }, { body: 0x3a3a4a, belly: 0xffffff, wing: 0x2a2a38 }],
+      fish: [{ body: 0x9ad0ff, spot: 0xffffff, fin: 0xd6ecff }, { body: 0xffffff, spot: 0x7fb8ff, fin: 0xe8f4ff }] },
     material: 'frostPetal', chests: [{ kind: 'common', count: 8 }, { kind: 'rare', count: 3 }],
     forage: [{ item: 'frostPetal', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
     arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, only rises at night for a hero Tuva trusts.',

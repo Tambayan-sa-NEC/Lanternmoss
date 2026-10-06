@@ -10,7 +10,7 @@ import { PLANETS, TRANSITION } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { encounterEvents } from '../combat/events.js';
 import { clearHazards } from '../combat/hazards.js';
-import { clearEnemies, spawnBoss, spawnRoster } from '../combat/spawning.js';
+import { clearEnemies, spawnBoss, spawnMiniBosses, spawnRoster } from '../combat/spawning.js';
 import { clearTargets } from '../combat/targeting.js';
 import { NPC } from '../entities/npc/NPC.js';
 import { createLocalDefs, createNpcDefs } from '../entities/npc/npcDefs.js';
@@ -45,6 +45,7 @@ export class PlanetProgression {
       forage and chests. */
   populate() {
     spawnRoster(this.world, this.planet.roster);
+    spawnMiniBosses(this.world, this.planet.miniBosses);                // the hydra / basilisk out in the wilds
     const boss = spawnBoss(this.world, this.planet.boss, this.lairs[ctx.planet]);
     this.lairs[ctx.planet] = boss.home.clone();
     BossGate.setup(ctx.planet, boss);                                   // it sleeps until the planet's conditions are met
@@ -122,7 +123,7 @@ export class PlanetProgression {
     travellers.forEach((n, i) => { n.relocate(homes[i]); n.dress(index); });
     ctx.npcs = [...travellers, ...createLocalDefs(world, index).map(d => new NPC(d))];
     Quests.onPlanetChange();
-    spawnWildlife(world);
+    spawnWildlife(world, this.planet);
     this.populate();
     if (ctx.companion) resetCompanion();
     snapCamera(world.spawnDir, fwd); releaseAllKeys();
@@ -136,6 +137,6 @@ export class PlanetProgression {
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
     ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0;
     if (ctx.planet !== 0) this.load(0);
-    else { BossGate.setup(0, spawnBoss(this.world, this.planet.boss, this.lairs[0])); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]); }
+    else { BossGate.setup(0, spawnBoss(this.world, this.planet.boss, this.lairs[0])); spawnMiniBosses(this.world, this.planet.miniBosses); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]); }
   }
 }

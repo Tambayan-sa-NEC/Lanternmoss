@@ -37,7 +37,7 @@ try {
   await wait(5000); await shot('title');
   await page.click('[data-act="play"]'); await ff(3); await wait(2500); await shot('select');
   await page.keyboard.press('Enter'); await ff(3); await wait(2500); await shot('select-pet');       // the pet step
-  await run(() => { const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); });
+  await run(() => { const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); L.setWeather('clear'); L.weather.timer = 1e9; });   // (weather pinned per scene)
   await wait(2500); await page.keyboard.press('KeyH'); await wait(500);       // fold the controls panel away
 
   // helpers in the page: frame the camera on a surface point, keep the hero safe while scenes are staged
@@ -142,6 +142,34 @@ try {
   await page.click('[data-go="main"]'); await wait(400); await page.click('[data-go="controls"]'); await wait(800); await shot('controls');
   await run(() => window.LANTERNMOSS.PauseMenu.close()); await wait(600);
 
+  // TODO 15: a storm over the village, the wild meadows, a rare creature, the Hydra, the dragontoad
+  await run(async () => { const S = await import('/src/utils/sphere.js'), L = window.LANTERNMOSS;
+    window.__at = (dir, metres, turn = 0) => {          // stand `metres` from dir (along the surface), facing it
+      const t = S.tangentFrame(dir)[0].applyAxisAngle(dir, turn), at = S.dirAlong(dir, t, metres);
+      L.player.placeAt(at); L.player.fwd.copy(S.tangentToward(at, dir)); window.__frame(dir, { pitch: 0.36, dist: 8 }); };
+    window.__put = (c, dir) => { c.up.copy(dir); c.home?.copy?.(dir); c.r = c.r ?? 0; c.pos.copy(dir).multiplyScalar(c.r); c.state = 'idle'; c.timer = 99; c.cool = 99; };
+    window.__sky = kind => { L.setWeather(kind); L.weather.timer = 1e9; }; });
+  await run(() => { const L = window.LANTERNMOSS, pim = L.npcs.find(n => n.name === 'Pim'); window.__sky('storm');
+    window.__stand(pim.up, 6, 1.5); window.__frame(pim.up, { turn: 0.35, pitch: 0.3, dist: 9 }); });
+  await ff(1); await wait(3000); await shot('storm');
+  await run(async () => { const S = await import('/src/utils/sphere.js'), T = await import('/src/world/terrain.js'), L = window.LANTERNMOSS; window.__sky('breezy');
+    const deer = L.critters.find(c => c.kind === 'deer'), bunnies = L.critters.filter(c => c.kind === 'bunny' && !c.rare).slice(0, 2);
+    window.__put(deer, deer.up); bunnies.forEach((b, i) => { const d = S.offsetDir(deer.up, 1.2 + i * 1.1, 3 + i); b.r = T.groundHeight(d); window.__put(b, d); });
+    window.__at(deer.up, 7, 2.1); window.__frame(deer.up, { turn: 0.4, pitch: 0.2, dist: 5.5 }); });
+  await ff(0.4); await wait(3000); await shot('meadow');
+  await run(() => { const L = window.LANTERNMOSS, r = L.critters.find(c => c.rare); window.__sky('clear');
+    window.__at(r.up, 2.1, 0.3); L.player.vel.set(0, 0, 0); r.state = 'sit'; r.timer = 99; window.__frame(r.up, { turn: 1.2, pitch: 0.4, dist: 5.5 }); });
+  await ff(0.4); await wait(2500); await shot('rare', { keepToast: true });
+  await run(() => { const L = window.LANTERNMOSS, h = L.enemies.find(e => e.type === 'hydra'); L.Pets.command('passive');
+    window.__at(h.up, 10, 0.4); L.player.invuln = 1e9; h.aggro(); });
+  await ff(2.5); await run(() => { const L = window.LANTERNMOSS, h = L.enemies.find(e => e.type === 'hydra'); window.__frame(h.up, { turn: 0.55, pitch: 0.3, dist: 12 }); });
+  await ff(0.3); await wait(2500); await shot('hydra');
+  await run(async () => { const L = window.LANTERNMOSS, h = L.enemies.find(e => e.type === 'hydra'), { damageEnemy } = await import('/src/combat/damage.js');
+    while (h.alive) { h.invulnerable = false; damageEnemy(h, 400); } });
+  await ff(1.5); await run(() => { const L = window.LANTERNMOSS; L.player.invuln = 0; document.getElementById('cresult').classList.remove('show'); L.Pets.choose('dragontoad'); L.PetMenu.open(); L.PetMenu.pick('dragontoad'); });
+  await ff(3); await wait(2500); await shot('dragontoad');
+  await run(() => { const L = window.LANTERNMOSS; L.PetMenu.close(); L.Pets.command('follow'); }); await wait(600);
+
   // Gloomcap's sealed lair (the seals and the status chip), its waking (the name card), and the arena ring
   await run(async () => { const S = await import('/src/utils/sphere.js'), L = window.LANTERNMOSS, G = L.BossGate;
     window.__at = (dir, metres, turn = 0) => {          // stand `metres` from dir (along the surface), facing it
@@ -160,7 +188,7 @@ try {
 
   // bosses: Pyrrhax on Emberfall, then Malgrath on Frostveil
   for (const [planet, name, turn] of [[1, 'boss-dragon', -0.5], [2, 'boss-demon', 0.45]]) {
-    await run(p => window.LANTERNMOSS.goToPlanet(p), planet); await wait(4000);
+    await run(p => { window.LANTERNMOSS.goToPlanet(p); window.__sky('clear'); }, planet); await wait(4000);
     await run(turn => { const L = window.LANTERNMOSS, B = L.boss; L.wakeBoss(); window.__stand(B.home, 11); B.aggro(); window.__frame(B.home, { turn, pitch: 0.32, dist: 12 }); }, turn);
     await wait(9000);
     await run(turn => { const L = window.LANTERNMOSS; window.__frame(L.boss.up, { turn, pitch: 0.32, dist: 12 }); }, turn);
@@ -171,6 +199,18 @@ try {
         let best = base, bh = -1e9; for (let i = 0; i < 400; i++) { const d = S.offsetDir(base, i * 0.157, 10 + (i % 20) * 2); const h = T.groundHeight(d); if (h > bh) { bh = h; best = d; } }
         P.placeAt(base); window.__frame(best, { pitch: 0.16, dist: 9 }); })));
       await wait(5000); await shot('mesas');
+      // the Basilisk, eyes blazing as its gaze winds up (turn away!)
+      await run(() => { const L = window.LANTERNMOSS, B = L.enemies.find(e => e.type === 'basilisk'); window.__at(B.up, 9, 3.4); L.player.invuln = 1e9; B.aggro();
+        for (let i = 0; i < 900 && !(B.state === 'windup' && B.attack === 'gaze'); i++) { B.cool = 0; B.moveCd.whip = B.moveCd.lunge = 9; B.lastAttack = 'whip'; L.update(1 / 30); }
+        for (let i = 0; i < 28; i++) L.update(1 / 30);
+        window.__frame(B.up, { turn: -0.45, pitch: 0.3, dist: 8 }); });
+      await wait(2500); await shot('basilisk');
+      await run(() => { window.LANTERNMOSS.player.invuln = 0; });
+    }
+    if (planet === 2) {                                                // a blizzard over Frostveil's village
+      await run(() => { const L = window.LANTERNMOSS; window.__sky('blizzard'); const t = L.npcs.find(n => n.name === 'Tuva') ?? L.npcs[0];
+        window.__stand(t.up, 6, 1.5); window.__frame(t.up, { turn: 0.4, pitch: 0.3, dist: 9 }); });
+      await ff(1); await wait(3000); await shot('blizzard');
     }
   }
   console.log('errors:', errors.length ? errors : 'none');

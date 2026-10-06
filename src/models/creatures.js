@@ -1,4 +1,6 @@
-/* Animals: four-legged critters (cats, dogs, foxes, the wolf), birds, pond fish, and the flying pets (owl, wisp, dragon whelp). */
+/* Animals: four-legged critters (cats, dogs, foxes, the wolf, bunnies and hares, deer, frogs, lizards), birds, pond
+   fish, the flying pets (owl, wisp, dragon whelp) and the dragontoad. buildQuad options (config/critters.js):
+     ear 'point' | 'flop' | 'big' | 'long' | 'none'; tail 'cat' | 'curl' | 'fox' | 'puff' | 'none'; antlers; frogEyes; spines */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
 import { buildDragon } from './dragon.js';
@@ -13,21 +15,73 @@ export function buildQuad(o) {
   const sl = o.snout || 1; addTo(head, part(G.ico(0.1, 1), o.belly || o.fur), [0, -0.06, 0.16 + (sl - 1) * 0.05], [0, 0, 0], [1.1, 0.8, sl]);
   addTo(head, part(G.ico(0.035, 0), 0x2a1830, { outline: false }), [0, -0.03, 0.25 + (sl - 1) * 0.1]);
   for (const sx of [-1, 1]) {
-    addTo(head, part(G.box(0.045, 0.075, 0.03), o.eye || 0x2a1830, o.eyeGlow ? { glow: true, intensity: 2 } : { outline: false }), [sx * 0.09, 0.04, 0.19], [0, sx * 0.4, 0]);
-    addTo(head, part(G.box(0.018, 0.022, 0.01), 0xffffff, { glow: true, intensity: 1 }), [sx * 0.09 + 0.01, 0.06, 0.207], [0, sx * 0.4, 0]);
+    if (o.frogEyes) {                                                    // bulging eyes on top of the head
+      addTo(head, part(G.ico(0.08, 1), o.fur), [sx * 0.11, 0.13, 0.08]);
+      addTo(head, part(G.ico(0.05, 0), 0xffffff, { outline: false }), [sx * 0.12, 0.16, 0.13]);
+      addTo(head, part(G.box(0.03, 0.04, 0.02), 0x2a1830, { outline: false }), [sx * 0.12, 0.16, 0.18]);
+    } else {
+      addTo(head, part(G.box(0.045, 0.075, 0.03), o.eye || 0x2a1830, o.eyeGlow ? { glow: true, intensity: 2 } : { outline: false }), [sx * 0.09, 0.04, 0.19], [0, sx * 0.4, 0]);
+      addTo(head, part(G.box(0.018, 0.022, 0.01), 0xffffff, { glow: true, intensity: 1 }), [sx * 0.09 + 0.01, 0.06, 0.207], [0, sx * 0.4, 0]);
+    }
+    if (o.antlers) {                                                     // branching antlers
+      const ant = new THREE.Group(); ant.position.set(sx * 0.09, 0.16, -0.02); ant.rotation.z = -sx * 0.35; head.add(ant);
+      addTo(ant, part(G.cyl(0.018, 0.028, 0.42 * o.antlers, 4), 0xd8c0a0), [0, 0.2 * o.antlers, 0]);
+      for (const [y, a] of [[0.18, 0.9], [0.32, -0.7]]) addTo(ant, part(G.cyl(0.014, 0.02, 0.18 * o.antlers, 4), 0xd8c0a0), [sx * 0.05, y * o.antlers, 0.03], [0.3, 0, -sx * a]);
+    }
+    if (o.ear === 'none') continue;
     if (o.ear === 'flop') addTo(head, part(G.box(0.09, 0.2, 0.05), o.earCol || o.fur), [sx * 0.19, 0.03, -0.02], [0, 0, sx * 0.55]);
-    else { const big = o.ear === 'big' ? 1.5 : 1; addTo(head, part(G.cone(0.08 * big, 0.18 * big, 4), o.earCol || o.fur), [sx * 0.12, 0.2 + (big - 1) * 0.08, -0.02], [0, 0, -sx * 0.25]);
+    else if (o.ear === 'long') {                                         // bunny ears
+      addTo(head, part(G.box(0.07, 0.34, 0.04), o.earCol || o.fur), [sx * 0.08, 0.3, -0.04], [-0.15, 0, -sx * 0.18]);
+      addTo(head, part(G.box(0.035, 0.26, 0.01), 0xffb3c6, { outline: false }), [sx * 0.08, 0.3, -0.015], [-0.15, 0, -sx * 0.18]);
+    } else { const big = o.ear === 'big' ? 1.5 : 1; addTo(head, part(G.cone(0.08 * big, 0.18 * big, 4), o.earCol || o.fur), [sx * 0.12, 0.2 + (big - 1) * 0.08, -0.02], [0, 0, -sx * 0.25]);
       addTo(head, part(G.cone(0.045 * big, 0.1 * big, 4), 0xffb3c6, { outline: false }), [sx * 0.12, 0.19 + (big - 1) * 0.08, 0.02], [0, 0, -sx * 0.25]); }
   }
   const legs = [];
   for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const g = new THREE.Group(); g.position.set(sx * 0.13 * w, hl + 0.05, sz * 0.24 * L); body.add(g);
     addTo(g, part(G.box(0.09, hl + 0.05, 0.09), o.paw && sz > 0 ? o.paw : o.fur), [0, -(hl + 0.05) / 2, 0]); legs.push(g); }
   const tail = new THREE.Group(); tail.position.set(0, hl + 0.26, -0.4 * L); body.add(tail); let tip = null;
-  if (o.tail === 'cat') { tail.rotation.x = -0.55; addTo(tail, part(G.cyl(0.035, 0.05, 0.55, 5), o.tailCol || o.fur), [0, 0.27, 0]); }
+  if (o.tail === 'none') { /* frogs */ }
+  else if (o.tail === 'puff') addTo(tail, part(G.ico(0.09, 1), o.tailCol || o.belly || 0xffffff), [0, 0, -0.02]);
+  else if (o.tail === 'cat') { tail.rotation.x = -0.55; addTo(tail, part(G.cyl(0.035, 0.05, 0.55, 5), o.tailCol || o.fur), [0, 0.27, 0]); }
   else if (o.tail === 'curl') { tail.rotation.x = -0.3; addTo(tail, part(new THREE.TorusGeometry(0.1, 0.045, 4, 8, Math.PI * 1.5), o.fur), [0, 0.1, 0], [0, Math.PI / 2, 0]); }
   else { tail.rotation.x = -1.15; addTo(tail, part(G.cone(0.17, 0.7, 6), o.fur), [0, 0.35, 0], [Math.PI, 0, 0]);
     tip = addTo(tail, part(G.ico(0.15, 1), o.tip || 0xc7a8ff, { glow: true, intensity: 2.6 }), [0, 0.74, 0]); }
+  if (o.spines) for (let i = 0; i < 4; i++) addTo(body, part(G.cone(0.05, 0.14, 4), o.spines), [0, hl + 0.42, 0.18 - i * 0.14 * L]);
   return { root, body, head, legs, tail, tip };
+}
+
+/** The dragontoad: a round, squat toad with a dragon's horns, a row of back spines, little bat wings and a spade-tipped
+    tail. Same parts as buildQuad (legs, tail, head) so the critter animation drives it; wings flap in WalkingPet. */
+export function buildToad(o) {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const skin = o.fur, belly = o.belly, accent = o.accent ?? 0xffb03d;
+  addTo(body, part(G.ico(0.36, 1), skin), [0, 0.34, 0], [0, 0, 0], [1.25, 0.82, 1.15]);
+  addTo(body, part(G.ico(0.3, 1), belly, { outline: false }), [0, 0.26, 0.12], [0, 0, 0], [1.05, 0.62, 0.9]);
+  for (let i = 0; i < 5; i++) addTo(body, part(G.ico(0.05, 0), accent, { outline: false }), [((i * 37) % 7 - 3) * 0.07, 0.6, ((i * 53) % 5 - 2) * 0.09]);   // warts
+  const head = new THREE.Group(); head.position.set(0, 0.5, 0.32); body.add(head);
+  addTo(head, part(G.ico(0.25, 1), skin), [0, 0, 0], [0, 0, 0], [1.3, 0.75, 1]);
+  addTo(head, part(G.box(0.36, 0.03, 0.04), 0x2a1830, { outline: false }), [0, -0.06, 0.24]);                       // wide grin
+  for (const sx of [-1, 1]) {
+    addTo(head, part(G.ico(0.1, 1), skin), [sx * 0.17, 0.14, 0.04]);
+    addTo(head, part(G.ico(0.065, 0), 0xffe066, { glow: true, intensity: 1.6 }), [sx * 0.18, 0.16, 0.11]);
+    addTo(head, part(G.box(0.02, 0.07, 0.02), 0x2a1830, { outline: false }), [sx * 0.18, 0.16, 0.17]);
+    addTo(head, part(G.cone(0.045, 0.22, 4), 0xf3e6c8), [sx * 0.15, 0.26, -0.08], [-0.6, 0, -sx * 0.3]);                // horns
+  }
+  for (let i = 0; i < 4; i++) addTo(body, part(G.cone(0.06, 0.17, 4), accent), [0, 0.64 - i * 0.03, 0.1 - i * 0.14], [-0.4, 0, 0]);   // back spines
+  const wings = [];
+  for (const sx of [-1, 1]) { const g = new THREE.Group(); g.position.set(sx * 0.2, 0.58, -0.05); body.add(g);
+    addTo(g, part(G.cone(0.2, 0.36, 3), o.wing ?? accent), [sx * 0.18, 0.05, 0], [0, 0, -sx * 1.35], [1, 1, 0.25]); wings.push(g); }
+  const legs = [];
+  for (const [sx, sz, big] of [[-1, 1, 0.8], [1, 1, 0.8], [-1, -1, 1.25], [1, -1, 1.25]]) {
+    const g = new THREE.Group(); g.position.set(sx * 0.26, 0.2, sz * 0.2); body.add(g);
+    addTo(g, part(G.box(0.12 * big, 0.2, 0.14 * big), skin), [0, -0.1, 0]);
+    addTo(g, part(G.box(0.16 * big, 0.04, 0.18 * big), belly), [0, -0.2, 0.04]); legs.push(g);
+  }
+  const tail = new THREE.Group(); tail.position.set(0, 0.32, -0.38); body.add(tail); tail.rotation.x = -1.0;
+  addTo(tail, part(G.cone(0.08, 0.4, 5), skin), [0, 0.2, 0], [Math.PI, 0, 0]);
+  addTo(tail, part(G.cone(0.1, 0.14, 3), accent), [0, 0.42, 0], [0, 0, 0], [1, 1, 0.4]);
+  root.scale.setScalar(o.scale ?? 1);
+  return { root, body, head, legs, tail, tip: null, wingL: wings[0], wingR: wings[1] };
 }
 export function buildBird(c) {
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);

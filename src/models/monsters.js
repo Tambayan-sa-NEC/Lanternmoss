@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
 import { buildDemonLord } from './bosses.js';
 import { buildDragon } from './dragon.js';
+import { buildBasilisk, buildHydra } from './miniBosses.js';
 import { buildHumanoid } from './humanoid.js';
 
 export function buildGoblin() {
@@ -128,4 +129,5 @@ export function buildThornSeal(def = {}) {
 
 export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buildWisp, slime: () => buildSlime(1), slimeling: () => buildSlime(0.55),
   puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern,
-  gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord, thornSeal: buildThornSeal };
+  gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord, thornSeal: buildThornSeal,
+  hydra: buildHydra, basilisk: buildBasilisk };

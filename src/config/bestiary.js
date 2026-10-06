@@ -57,6 +57,22 @@ export const BESTIARY_ENTRIES = {
     attacks: [['Mending light', 'Heals hurt monsters near it.'], ['Ward', 'Shields an ally, halving the damage it takes.']],
     counters: ['Defeat it first: everything else gets easier.', 'It hangs back, so reach it with ranged attacks or a dash.'],
   },
+  hydra: {
+    lore: 'Old Bramble swears the lake hydra was a single, harmless eel until somebody tried to chop it in half. '
+      + 'Now it guards the deep water, and a warm, speckled egg it will not explain.',
+    blurb: 'A mini boss: a heavy, many-headed serpent that keeps to its lake. It grows a new head at two-thirds and one-third of its health.',
+    attacks: [['Bite', 'One head rears back over a wedge in front of it, then snaps.'], ['Acid spit', 'Every head spits a glob that curves after you; more heads, more globs.'],
+      ['Sweep', 'With four heads or more, they all rear and sweep a wide arc in front.']],
+    counters: ['Stay beside or behind it: the bites and the sweep only reach forward.', 'Close in when it spits, back off when the wedge appears.', 'Hit it hard early: every new head means more acid.'],
+  },
+  basilisk: {
+    lore: 'Travellers in Emberfall leave little stone statues by the road. Most of them used to be travellers. '
+      + 'The basilisk does not hunt so much as it waits for somebody to look at it.',
+    blurb: 'A mini boss: a quick serpent-lizard roaming the far wilds. Its gaze turns anyone looking at it to stone.',
+    attacks: [['Petrifying gaze', 'Its eyes blaze brighter and brighter, then flare: if you are facing it, you are turned to stone for a moment.'],
+      ['Tail whip', 'A spin through the marked circle around it.'], ['Lunge', 'It marks a lane and darts along it, jaws first.'], ['Venom', 'Once enraged: a fan of venom.']],
+    counters: ['When its eyes blaze, turn your back: run away from it until they flare, then turn and strike.', 'Jump over the tail whip.', 'Sidestep the lunge, then punish it while it recovers.'],
+  },
   gloomcap: {
     lore: 'Once the gentlest mushroom of the old woods, it drank the gloom that pooled under the lanterns until it grew a crown of it. '
       + 'The villagers sealed its glade with three thorn stones, and it has been sulking behind them ever since.',
@@ -88,4 +104,5 @@ export const BESTIARY_ENTRIES = {
 export const BESTIARY_DROPS = {
   monster: 'Sometimes: moonberries, the planet\'s crafting material, food, tonics or a piece of gear. Now and then a Lantern Key.',
   boss: 'Its treasure chest: the planet\'s crown, rare or legendary gear, coins and more.',
+  miniBoss: 'Always: a rare haul of coins and items where it falls (the Hydra also guards a dragontoad egg).',
 };

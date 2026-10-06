@@ -35,9 +35,9 @@ test('every monster and boss has a bestiary page', () => {
   for (const t of BESTIARY_ORDER) {
     const e = BESTIARY_ENTRIES[t];
     assert.ok(e && e.blurb && e.attacks?.length && e.counters?.length, `${t}: blurb, attacks and counters`);
-    assert.ok(isBoss(t) ? COMBAT.enemies[t].name : e.name, `${t}: a page name`);
+    assert.ok(COMBAT.enemies[t].ai === 'boss' ? COMBAT.enemies[t].name : e.name, `${t}: a page name`);
     assert.ok(pageName(t) && !pageName(t).includes(','), `${t}: a short page title (${pageName(t)})`);
-    const lives = PLANETS.some(p => p.boss.type === t || p.roster.some(r => r.type === t));
+    const lives = PLANETS.some(p => p.boss.type === t || p.roster.some(r => r.type === t) || (p.miniBosses ?? []).some(m => m.type === t));
     assert.ok(lives || e.from, `${t}: lives on a planet, or says where it comes from`);
   }
 });

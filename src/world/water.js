@@ -1,7 +1,6 @@
 /* Pond water: a flat stylized shader with ripple rings, glints and a foam edge (one disc per pond). */
 import * as THREE from 'three';
-import { RENDER } from '../config/render.js';
-import { FOG_COLOR } from '../render/scene.js';
+import { FOG_COLOR, FOG_FAR, FOG_NEAR } from '../render/scene.js';
 import { matrixAt } from '../utils/sphere.js';
 import { ponds } from './terrain.js';
 
@@ -10,7 +9,7 @@ export function createWater({ deep, light }) {
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false,
     uniforms: { uTime: { value: 0 }, uDeep: { value: new THREE.Color(deep) }, uLight: { value: new THREE.Color(light) },
-    uFoam: { value: new THREE.Color(0xf6fffb) }, uFogColor: { value: FOG_COLOR }, uFogNear: { value: RENDER.fog.near }, uFogFar: { value: RENDER.fog.far } },
+    uFoam: { value: new THREE.Color(0xf6fffb) }, uFogColor: { value: FOG_COLOR }, uFogNear: FOG_NEAR, uFogFar: FOG_FAR },
     vertexShader: `varying vec2 vUv; varying float vDepth; void main(){ vUv = uv; vec4 mv = modelViewMatrix * vec4(position,1.0); vDepth = -mv.z; gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uTime, uFogNear, uFogFar; uniform vec3 uDeep, uLight, uFoam, uFogColor; varying vec2 vUv; varying float vDepth;
     void main(){

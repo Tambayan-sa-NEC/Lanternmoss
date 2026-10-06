@@ -190,9 +190,22 @@ function screenPos(p, el) {
 }
 
 // ---------------------------------------------------------------- boss bar
-/** The planet boss's big health bar: shown while it fights or the hero is near its lair. Ticks mark its phase thresholds. */
+/** Whose big bar shows: the planet boss while it fights or the hero is near its lair, else a mini boss (hydra,
+    basilisk) that's fighting or close by. */
+function barTarget() {
+  const P = ctx.player, b = ctx.boss;
+  if (b && b.alive && !b.dormant && (ENGAGED.has(b.state) || b.pos.distanceTo(P.pos) < 24)) return b;
+  let best = null, bd = 20;
+  for (const e of ctx.enemies) {
+    if (!e.def.miniBoss || !e.alive) continue;
+    const d = e.pos.distanceTo(P.pos), k = ENGAGED.has(e.state) ? d - 100 : d;     // a fighting one wins
+    if (k < bd) { bd = k; best = e; }
+  }
+  return best;
+}
+/** The boss's big health bar. Ticks mark its phase thresholds. */
 function updateBossBar(dt) {
-  const b = ctx.boss, show = !!b && b.alive && !b.dormant && (ENGAGED.has(b.state) || b.pos.distanceTo(ctx.player.pos) < 24);
+  const b = barTarget(), show = !!b;
   dom.bossBar.style.display = show ? 'block' : 'none'; document.body.classList.toggle('bossfight', show);
   if (!show) return;
   if (b !== boss.ref) {                                                        // a new boss: lay out its phase ticks
@@ -249,12 +262,13 @@ export function updateCombatHud(dt, spellState, aimTarget) {
     if (s.ult) sl.el.classList.toggle('charged', left <= 0 && P.mana >= s.cost);    // the ultimate glows when it's ready
   }
   for (const e of ctx.enemies) {
-    let show = e.alive && !e.hidden && e !== ctx.boss && (e.hp < e.def.hp || ENGAGED.has(e.state)) && e.pos.distanceTo(camera.position) < 32;
+    let show = e.alive && !e.hidden && e !== ctx.boss && !e.def.miniBoss && (e.hp < e.def.hp || ENGAGED.has(e.state)) && e.pos.distanceTo(camera.position) < 32;
     if (show) show = screenPos(_tv2.copy(e.pos).addScaledVector(e.up, e.hover + e.height + 0.45), e.bar);
     e.bar.style.display = show ? 'block' : 'none';
     if (show) { e.barFill.style.transform = `scaleX(${Math.max(0, e.hp / e.def.hp)})`; e.bar.classList.toggle('marked', e.markT > 0); e.bar.classList.toggle('shielded', e.shieldT > 0); }
   }
   updateBossBar(dt);
+  document.body.classList.toggle('petrified', P.petrifyT > 0);
   updateHint(dt);
   const showRet = aimTarget && screenPos(_tv2.copy(aimTarget.center()), dom.reticle);
   dom.reticle.style.display = showRet ? 'block' : 'none';

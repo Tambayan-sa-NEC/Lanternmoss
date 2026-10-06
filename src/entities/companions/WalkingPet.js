@@ -12,14 +12,14 @@ import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
 import { mr } from '../../utils/random.js';
-import { dirAlong, projectTangent, tangentTo, turnToward } from '../../utils/sphere.js';
+import { arcDist, dirAlong, projectTangent, tangentTo, turnToward } from '../../utils/sphere.js';
 import { groundHeight } from '../../world/terrain.js';
 import { Critter } from '../wildlife/Critter.js';
 import { keepTarget, pickTarget, strike } from './petBrain.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3();
-const SCALE = { wolf: 1.15, fox: 1.0 };
+const SCALE = { wolf: 1.15, fox: 1.0, dragontoad: 1.0 };
 const W_POSE = 4;              // trotting speed into the show-off spot while the world is paused
 
 export class WalkingPet extends Critter {
@@ -31,7 +31,7 @@ export class WalkingPet extends Critter {
     this.root.scale.setScalar(SCALE[id] ?? 1); this.height = 1.0; this.state = 'idle'; this.idleT = 0; this.voiceT = mr(15, 30);
     this.goal = new V3(); this.toGoal = new V3(); this.fwd.copy(P.fwd); projectTangent(this.fwd, this.up).normalize();
     this.target = null; this.atkCool = 1.5; this.spinT = 0; this.visible = true;
-    this.voice = this.kind === 'wolf' ? audio.bark : audio.meow;
+    this.voice = this.kind === 'wolf' ? audio.bark : this.kind === 'toad' ? audio.plip : audio.meow; this.hopT = 0;
   }
   get busy() { return this.state === 'chase'; }
   setVisible(on) { this.visible = on; this.root.visible = this.shadow.visible = on; if (!on) { this.state = 'idle'; this.target = null; } }
@@ -49,6 +49,11 @@ export class WalkingPet extends Critter {
   }
   dispose() { scene.remove(this.root, this.shadow); disposeTree(this.root); removeDyn(this.selfCollider); }
 
+  /** The dragontoad hops as it goes (def.hop) and flaps its little wings in the air. */
+  hopAndFlap(dt) {
+    if (this.def.hop && this.grounded && Math.abs(this.speed) > 0.8 && (this.hopT -= dt) <= 0) { this.vy = this.def.hop; this.grounded = false; this.hopT = 0.28; }
+    if (this.wingL) { const f = this.grounded ? Math.sin(ctx.time * 2) * 0.1 : Math.sin(ctx.time * 28) * 0.7; this.wingL.rotation.z = -f; this.wingR.rotation.z = f; }
+  }
   /** Where it shows off in front of the hero (a menu is presenting it). */
   showSpot(out) { const P = ctx.player; return out.copy(P.pos).addScaledVector(P.fwd, PET_SHOWCASE.walk.ahead); }
   /** While the world is paused for the pet menu (src/ui/PetMenu.js): trots round in front of the hero, then stands
@@ -88,7 +93,7 @@ export class WalkingPet extends Critter {
       else if (Pets.mode === 'stay' && Pets.stayDir) this.goal.copy(Pets.stayDir).multiplyScalar(groundHeight(Pets.stayDir));
       else { _tv.crossVectors(P.up, P.fwd).normalize(); this.goal.copy(P.pos).addScaledVector(_tv, W.sideOffset).addScaledVector(P.fwd, -W.behind); }   // heel spot
       const d = tangentTo(this.pos, this.up, this.goal, this.toGoal);
-      if (d > W.teleportDist && Pets.mode !== 'stay') {                    // after respawning or a long dash, just catch up
+      if (arcDist(this.up, _tv.copy(this.goal).normalize()) > W.teleportDist && Pets.mode !== 'stay') {   // after respawning or a long dash, just catch up (along the surface: a tangent distance shrinks across the planet)
         this.up.copy(this.goal).normalize(); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r);
         this.fwd.copy(P.fwd); projectTangent(this.fwd, this.up).normalize(); }
       const stop = Pets.presenting ? 0.35 : W.stopDist;
@@ -103,6 +108,7 @@ export class WalkingPet extends Critter {
     }
     if (this.spinT > 0) this.fwd.applyAxisAngle(this.up, 12 * dt);
     this.speed += (target - this.speed) * damp(6, dt);
+    this.hopAndFlap(dt);
     _tv2.copy(this.fwd).multiplyScalar(this.speed);
     const n = this.step(_tv2, dt, 24);
     if (n && this.speed > 0.5) { this.fwd.addScaledVector(n, 0.9); projectTangent(this.fwd, this.up).normalize(); }

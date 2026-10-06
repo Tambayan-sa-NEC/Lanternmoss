@@ -375,30 +375,65 @@ Code: `src/combat/targeting.js` (`aimDirection`, soft lock-on), `src/combat/aimi
 - [ ] Optional harder versions (rematches through portals, at a higher difficulty) with better loot.
   - Waits on portals (19): today a beaten planet is left behind, so there's nowhere to rematch from yet.
 
-## 15. Better environments **(core)**
+## 15. Better environments **(core)** ✓
 
 **Goal:** the planets feel alive and varied: more plants, more creatures to meet, rare finds, weather, and a couple of
 fearsome mini bosses out in the wilds. And pets get a little more room to grow.
 Code: `src/world/scatter.js`, `src/world/props.js`, `src/world/sky.js`, `src/entities/wildlife/`,
 `src/config/critters.js`, `src/config/combat.js` (mini bosses), `src/config/pets.js`, `src/models/creatures.js`.
 
-- [ ] **15.1 Environment**
-  - [ ] **More variety in trees:** more shapes, sizes and colours, different per planet.
-  - [ ] **Grasses:** grass tufts, tall grass and flowers across the meadows.
-  - [ ] **More friendly creatures:**
+- [x] **15.1 Environment**
+  - [x] **More variety in trees:** more shapes, sizes and colours, different per planet.
+    - Done: nine kinds (`config/flora.js`, drawn in `world/props.js`), each planet with its own mix (`flora.trees`):
+      - Lanternmoss: blossoms, oaks with fruit, spiral pines, mushroom trees, willows by the water, birches.
+      - Emberfall: glowing ember trees, crystal spires.
+      - Frostveil: snow-capped pines, birches, crystal spires.
+      - About 7% grow as giants.
+  - [x] **Grasses:** grass tufts, tall grass and flowers across the meadows.
+    - Done: more grass tufts, patches of knee-high tall grass out in the wilds, and wildflowers in the planet's colours.
+      All sway with the wind (a shader on the instanced meshes) and lean harder when the weather is windy.
+  - [x] **More friendly creatures:**
     - Fish (in ponds and lakes).
     - Land creatures.
     - Birds.
     - Rare creatures with rare drops.
-  - [ ] **Special mini bosses** out in the wilds, apart from each planet's boss:
+    - Done (`config/critters.js`, `PLANETS[i].wildlife`):
+      - Bunnies and hares that hop away, deer and reindeer that bolt from far off, frogs that ribbit by the ponds, and
+        lizards that scurry in bursts.
+      - Each planet has its own birds, plus flocks wheeling high overhead. Its own fish, and a big golden koi in each
+        lake.
+      - One rare creature per planet (Golden Moonbunny, Ember Salamander, Aurora Hare). It bolts if you run at it;
+        walk up slowly and press `E` to befriend it. The first time in an adventure it gives a Legendary charm
+        (Golden Clover, Ember Scale, Aurora Feather), after that a rare loot roll. Then it turns up elsewhere later.
+  - [x] **Special mini bosses** out in the wilds, apart from each planet's boss:
     - A hydra.
     - A basilisk.
-  - [ ] **Weather:** variations such as rain, snow, fog and wind, different per planet.
-- [ ] **15.2 Pets extension**
-  - [ ] **Swap pets during play.** The pet menu (12) already swaps pets with the world paused; this asks for swapping
+    - Done: both run on the boss framework, with no beacon and no planet progression.
+      - The Hydra keeps to the far lake (Lanternmoss, plus an ice-blue Frost Hydra on Frostveil). It bites, spits
+        homing acid and sweeps its heads, and grows a new head at 66% and 33% health.
+      - The Basilisk roams Emberfall's wilds. Its gaze turns you to stone if you're facing it when its eyes flare, so
+        turn your back: this uses the facing-based aiming from 14. It also has a tail whip, a lane lunge and venom.
+      - Both always leave a rare loot roll, show the big health bar and a compass mark nearby, and have bestiary pages
+        with lore.
+  - [x] **Weather:** variations such as rain, snow, fog and wind, different per planet.
+    - Done (`config/weather.js`, `world/weather.js`): clear, breezy (drifting petals), rain, storm (lightning and
+      thunder), fog, snow, blizzard and ashfall. Each planet has its own mix of these.
+      - A spell lasts 70–150 s and blends into the next.
+      - Weather sets the wind, fog distance and colour, sky tint and light, and plays rain and wind sound loops.
+      - The time chip shows the weather. It's for mood only and changes no rules.
+- [x] **15.2 Pets extension**
+  - [x] **Swap pets during play.** The pet menu (12) already swaps pets with the world paused; this asks for swapping
         right in the game as well (for example a key that cycles through your unlocked pets).
-  - [ ] **A new pet: a dragontoad.**
+    - Done: `N` (remappable) brings out the next unlocked pet right away, with a short wait between swaps.
+  - [x] **A new pet: a dragontoad.**
     Reference: https://preview.redd.it/gah9a6dys5q51.png?width=3000&format=png&auto=webp&s=0648643054a264b4a9f86bdf1e029a3fcdf5e5ab
+    - Done: Puddle the dragontoad (`models/creatures.js` `buildToad`).
+      - Looks: a squat green toad with a cream belly, horns, orange back spines, little bat wings and a spade-tipped tail.
+      - Moves: hops after you and flaps its wings in the air. Its sticky-tongue strike slows monsters.
+      - Bellow: knocks back, hurts and stuns every monster near you.
+      - Unlock: its egg hatches when you defeat the Hydra.
+      - Caveat: the reference image couldn't be viewed from here, so the look follows the name. Tell me what to
+        change.
 
 ## 16. Resources and survival **(core)**
 

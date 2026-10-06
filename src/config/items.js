@@ -131,6 +131,13 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xff6a4a, art: 'ring' }, value: 55, equip: { slot: 'charm', tier: 2, stats: { damage: 0.06 } } },
   { id: 'frostLocket', name: 'Frost Locket', description: 'A cold silver locket. Light on your feet, quick to mend.', category: 'equipment',
     icon: { shape: 'gem', color: 0xbfe8ff, art: 'locket' }, value: 80, equip: { slot: 'charm', tier: 3, stats: { moveSpeed: 0.06, hpRegen: 1 } } },
+  // ---- gifts from rare creatures (config/critters.js): befriend one to get its charm ----
+  { id: 'goldenClover', name: 'Golden Clover', description: 'A four-leaf clover from a Golden Moonbunny. Luck makes you quicker and quick to mend.', category: 'equipment',
+    icon: { shape: 'charm', color: 0xffd36b, art: 'leafCharm' }, value: 70, equip: { slot: 'charm', tier: 1, stats: { hpRegen: 1.2, moveSpeed: 0.05 } } },
+  { id: 'emberScale', name: 'Ember Scale', description: 'A warm scale an Ember Salamander shed for you. Harder hits, a tougher hide.', category: 'equipment',
+    icon: { shape: 'gem', color: 0xff6a3a, art: 'pendant' }, value: 90, equip: { slot: 'charm', tier: 2, stats: { damage: 0.07, armor: 0.04 } } },
+  { id: 'auroraFeather', name: 'Aurora Feather', description: 'A shimmering feather left by an Aurora Hare. Your magic runs deep and returns fast.', category: 'equipment',
+    icon: { shape: 'charm', color: 0x9ff3ff, art: 'moonCharm' }, value: 110, equip: { slot: 'charm', tier: 3, stats: { maxMana: 20, manaRegen: 1.5 } } },
   // ---- keys ----
   { id: 'lanternKey', name: 'Lantern Key', description: 'A little brass key with a glowing bow. It opens one locked Lantern chest.', category: 'misc',
     icon: { shape: 'key', color: 0xffd36b, art: 'key' }, maxStack: 5, rarity: 'rare', value: 12, tags: ['key'] },

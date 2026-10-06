@@ -38,6 +38,8 @@ function pointsOfInterest() {
   const list = [{ key: 'village', dir: SPAWN_DIR, icon: 'home', label: 'Village', far: true }];
   const B = ctx.boss;
   list.push(...BossGate.waypoints());                                   // the sealed lair, and elites carrying sigils
+  for (const e of ctx.enemies) if (e.def.miniBoss && e.alive && arcDist(e.up, ctx.player.up) < 75)   // a mini boss nearby
+    list.push({ key: `mini:${e.type}`, dir: e.up, icon: 'boss', label: e.def.name.split(',')[0] });
   if (B && B.alive && !B.dormant) list.push({ key: 'boss', dir: B.up, icon: 'boss', label: B.def.name.split(',')[0], edge: true, far: true, point: B.center() });
   const run = Challenges.run;
   if (run) {

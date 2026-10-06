@@ -33,7 +33,7 @@ const when = t => new Date(t).toLocaleDateString(undefined, { day: 'numeric', mo
 /** Planets a monster lives on (by roster), as indices. */
 function homes(type) {
   const from = type === 'slimeling' ? 'slime' : type;
-  return PLANETS.map((p, i) => (p.boss.type === type || p.roster.some(r => r.type === from) ? i : -1)).filter(i => i >= 0);
+  return PLANETS.map((p, i) => (p.boss.type === type || p.roster.some(r => r.type === from) || (p.miniBosses ?? []).some(m => m.type === type) ? i : -1)).filter(i => i >= 0);
 }
 /** Damage as shown on a page: a monster's hit, or the range of a boss's attacks (a one-hit kill noted apart). */
 function damageText(def) {
@@ -135,7 +135,7 @@ export const JournalUI = {
     const list = (title, rows) => `<h4>${title}</h4><ul>${rows.join('')}</ul>`;
     const stats = where.map(i => { const d = scaleEnemyDef(base, PLANETS[i].scale);
       return `<tr><td>${PLANETS[i].name}</td><td>${Math.round(d.hp)}</td><td>${damageText(d)}</td><td>${(d.speed ?? 0).toFixed(1)}</td><td>${d.xp}</td></tr>`; }).join('');
-    return `<div class="bp-top">${portraitHtml(type, true, 'big')}<div><h3>${pageName(type)}</h3><div class="sub">${isBoss(type) ? `${esc(base.name.split(', ')[1] ?? 'Boss')} · planet boss` : 'Monster'}</div>
+    return `<div class="bp-top">${portraitHtml(type, true, 'big')}<div><h3>${pageName(type)}</h3><div class="sub">${isBoss(type) ? `${esc(base.name.split(', ')[1] ?? 'Boss')} · planet boss` : base.miniBoss ? `${esc(base.name.split(', ')[1] ?? '')} · mini boss` : 'Monster'}</div>
         <div class="where">${e.from ? e.from + ' ' : ''}${where.length ? `Found on ${where.map(i => PLANETS[i].name).join(', ')}` : ''}</div>
         <div class="kills">${beaten ? `Defeated <b>${beaten}</b>×` : 'Not defeated yet'}</div></div></div>
       <p class="bl">${e.blurb ?? ''}</p>
@@ -144,7 +144,7 @@ export const JournalUI = {
       ${list('How it fights', (e.attacks ?? []).map(([n, t]) => `<li><b>${n}</b> ${t}</li>`))}
       ${list('How to beat it', (e.counters ?? []).map(t => `<li>${t}</li>`))}
       ${beaten ? `<h4>Stats</h4><table class="bst-stats"><tr><th>Planet</th><th>Health</th><th>Damage</th><th>Speed</th><th>XP</th></tr>${stats}</table>
-        <h4>Drops</h4><p>${isBoss(type) ? BESTIARY_DROPS.boss : BESTIARY_DROPS.monster}${type === 'slime' ? ' And two slimelings.' : ''}</p>`
+        <h4>Drops</h4><p>${isBoss(type) ? BESTIARY_DROPS.boss : base.miniBoss ? BESTIARY_DROPS.miniBoss : BESTIARY_DROPS.monster}${type === 'slime' ? ' And two slimelings.' : ''}</p>`
       : '<p class="dim">Defeat one to note its stats and what it drops.</p>'}`;
   },
 

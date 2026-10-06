@@ -108,8 +108,8 @@ export function defineBoss(kit) {
     init(e) {
       const color = glowOf(e);
       e.moveCd = {};
-      // PLACEHOLDER beacon: a tall shaft of light over the lair, visible from across the planet
-      e.beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 60, 10, 1, true), fxMaterial(color, 0.9));
+      // PLACEHOLDER beacon: a tall shaft of light over the lair, visible from across the planet (mini bosses have none)
+      e.beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 60, 10, 1, true), fxMaterial(color, 0.9)); e.beacon.visible = !e.def.miniBoss;
       e.beacon.material.opacity = 0.55; e.beacon.renderOrder = 2;
       e.beacon.position.copy(e.home).multiplyScalar(groundHeight(e.home) + 30); frameQuat(e.home, tangentFrame(e.home)[0], e.beacon.quaternion);
       scene.add(e.beacon);
@@ -118,7 +118,7 @@ export function defineBoss(kit) {
     reset(e) {
       cancelAll(e, kit);
       Object.assign(e, { bossPhase: 0, attack: null, lastAttack: null, introduced: false, fighting: false, invulnerable: false, minCool: 0 });
-      e.moveCd = {}; e.beacon.visible = true;
+      e.moveCd = {}; e.beacon.visible = !e.def.miniBoss;
       kit.reset?.(e);
     },
     think(e, dt, dist) {
@@ -161,7 +161,7 @@ export function defineBoss(kit) {
       [color, 0xfff0a0, 0xffd6f5, 0xbff4ff].forEach((c, i) => sparkles.emit(e.center(), { count: 40, color: c, speed: 3 + i, up: e.up, upBias: 0.8, life: 1.4, size: 0.5 }));
       ringFX(e.pos, 6, color, 0.8); shakeCamera(0.6); audio.roar();
       kit.onDie?.(e);
-      encounterEvents.dispatchEvent(new CustomEvent('bossdefeated', { detail: { boss: e } }));
+      encounterEvents.dispatchEvent(new CustomEvent(e.def.miniBoss ? 'minibossdefeated' : 'bossdefeated', { detail: { boss: e } }));
     },
     dispose(e) {
       clearHazards(e); kit.dispose?.(e); for (const d of e.decals ?? []) { d.geo.dispose(); d.template.dispose(); }   // materials go with fxMeshes

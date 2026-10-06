@@ -696,3 +696,6 @@ body.bossfight #toast { top:120px; }
 @keyframes bosscard { 0% { opacity:0; transform:translate(-50%,30px) scale(1.25); letter-spacing:12px; } 18% { opacity:1; transform:translate(-50%,0) scale(1); letter-spacing:0; }
   85% { opacity:1; } 100% { opacity:0; transform:translate(-50%,-10px); } }
 body.cutscene #combat, body.cutscene #hint, body.cutscene #compass, body.cutscene #markers, body.cutscene #hud, body.cutscene #prompt { visibility:hidden; }
+
+/* turned to stone by the Basilisk's gaze (src/entities/enemies/behaviors/boss/basilisk.js) */
+body.petrified canvas { filter:grayscale(0.85) contrast(1.08) brightness(0.95); transition:filter .2s; }

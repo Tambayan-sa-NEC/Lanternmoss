@@ -52,7 +52,7 @@ export class Player extends Walker {
   }
 
   /** Clears every short-lived combat / ability timer. */
-  clearTimers() { Object.assign(this, { castT: 0, castFaceT: 0, invuln: 0, hurtT: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS }); }
+  clearTimers() { Object.assign(this, { castT: 0, castFaceT: 0, invuln: 0, hurtT: 0, motion: null, leapK: 0, petrifyT: 0, ...KNIGHT_TIMERS }); }
 
   /** Stands the hero on the ground at dir, at rest, facing the first tangent axis there. */
   placeAt(dir) {
@@ -81,6 +81,7 @@ export class Player extends Walker {
       return;
     }
     let f = 0, s = 0;
+    if (this.petrifyT > 0) { this.petrifyT -= dt; enabled = false; }   // turned to stone (the Basilisk's gaze)
     if (enabled && !this.dead) {
       if (held('moveForward', keys)) f += 1; if (held('moveBack', keys)) f -= 1;
       if (held('moveRight', keys)) s += 1; if (held('moveLeft', keys)) s -= 1;

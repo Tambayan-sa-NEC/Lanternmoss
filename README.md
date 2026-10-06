@@ -64,6 +64,38 @@ their marker ahead of you (the wheel sets the distance). Damage numbers and hit-
 and every boss has telegraphed attacks to read and dodge.
 
 <p>
+  <img src="docs/screenshots/storm.jpg" width="49%" alt="A storm over the village">
+  <img src="docs/screenshots/meadow.jpg" width="49%" alt="A deer and a bunny in the meadows">
+</p>
+
+**Living planets.** Each planet grows its own trees: blossoms, oaks, willows by the water and birches on Lanternmoss,
+glowing ember trees and crystal spires on Emberfall, snow-capped pines on Frostveil. Tall grass and wildflowers sway in
+the wind. The weather changes as you play: rain, thunderstorms and fog on Lanternmoss, ashfall on Emberfall, snow and
+blizzards on Frostveil. Bunnies hop away, deer bolt when you get close, frogs ribbit by the ponds, and flocks wheel
+overhead. A golden koi swims in every lake.
+
+<p>
+  <img src="docs/screenshots/rare.jpg" width="49%" alt="Befriending the Golden Moonbunny">
+  <img src="docs/screenshots/dragontoad.jpg" width="49%" alt="Puddle the dragontoad">
+</p>
+
+**Rare creatures and a new pet.** Each planet hides a rare creature: a Golden Moonbunny, an Ember Salamander, an Aurora
+Hare. Run at one and it bolts. Walk up slowly and you can befriend it for a Legendary charm. Defeat the Hydra and its egg
+hatches into the dragontoad, a hopping, croaking pet whose Bellow stuns monsters around you. `N` swaps to your next pet
+mid-adventure.
+
+<p>
+  <img src="docs/screenshots/hydra.jpg" width="49%" alt="The Hydra">
+  <img src="docs/screenshots/basilisk.jpg" width="49%" alt="The Basilisk's gaze">
+</p>
+
+**Mini bosses.** Out in the wilds, away from the planet bosses:
+- **The Hydra** guards its lake and grows a new head at each third of its health.
+- **The Basilisk** turns anyone looking at it to stone: when its eyes blaze, turn your back.
+
+Both always leave a rare haul of loot.
+
+<p>
   <img src="docs/screenshots/summon.jpg" width="49%" alt="Gloomcap wakes">
   <img src="docs/screenshots/arena.jpg" width="49%" alt="Inside the ring of thorns">
 </p>
@@ -129,6 +161,9 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Better environments:** each planet has its own trees, tall grass and swaying wildflowers, plus weather (rain,
+  storms, fog, ashfall, snow, blizzards). New animals, rare creatures to befriend for Legendary charms, flocks and lake
+  koi. Two mini bosses, the Hydra and the Basilisk. A new pet, the dragontoad, and `N` swaps pets during play.
 - **Better fights:** attacks and aiming follow where your hero faces, not the camera. Bosses sleep in sealed lairs until
   you meet their conditions (level, seals, elite sigils, a villager's quest, night). They wake in a short sequence with a
   name card and battle music, and fight you inside a ring of thorns or fire. Villagers hint at what's needed, and the
@@ -197,6 +232,7 @@ over). The defaults:
 | `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them) |
 | `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
 | `B` (or click the pet card) | the pet menu: see, swap, rename and command your pets (the world pauses) |
+| `N` | swap to your next pet right away |
 | `T` | pet command: follow → stay → attack my target → passive |
 | `J` | the journal: achievements, bestiary and collection (pauses; also on the pause menu and title screen) |
 | `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
@@ -268,10 +304,11 @@ src/
 │   │                      slopes, water depth, ground-placement matrices
 │   ├── placement.js       free-spot searches for scenery and spawns
 │   ├── planet.js          the planet mesh (cliff faces and high ground coloured from the palette)
-│   ├── props.js           prop builders (houses, trees, rocks, lanterns, flowers...)
+│   ├── props.js           prop builders (houses, nine kinds of tree, rocks, lanterns, flowers...)
+│   ├── weather.js         weather spells per planet: wind, fog, light, sky tint, rain / snow / ash / petals, lightning
 │   ├── village.js         houses, standing-stone circle, lantern paths
 │   ├── interiors.js       house interiors: room shells and furniture, built away from the planet
-│   ├── scatter.js         pond decoration, trees, rocks, flowers, grass
+│   ├── scatter.js         pond decoration, the planet's trees, rocks, flowers; swaying grass, tall grass, wildflowers
 │   ├── water.js           pond water shader
 │   └── sky.js             sky dome, clouds, fireflies
 ├── models/                procedural character and item art (swap a builder to use real assets)
@@ -290,7 +327,8 @@ src/
 │   ├── companions/        pet bodies: FlyingPet (owl, wisp, dragon whelp), WalkingPet (wolf, fox), petBrain (targets, hits)
 │   ├── npc/               NPC behaviour (schedules, sleep, lines, outfits) and the villager definitions
 │   │                      (places, schedules, story-aware dialogue, a local villager per later planet)
-│   ├── wildlife/          critters, birds, pond fish and their spawning
+│   ├── wildlife/          critters (village pets, wild animals, rare creatures to befriend), birds and flocks, pond
+│   │                      fish and lake koi, and their spawning per planet
 │   ├── Projectile.js      surface-hugging projectiles
 │   ├── Chest.js           a treasure chest in the world: collider, falling in, opening, rattling when locked
 │   └── WorldItem.js       an item stack lying on the ground (can hop out of a chest)
@@ -439,6 +477,11 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Gear: stats per piece, rarity multipliers, stat caps, gear slots | `src/config/items.js` → `equip`, `RARITIES`, `STATS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | What wakes each boss, its arena wall | `src/config/planets.js` → `boss.summon`, `boss.arena` |
+| Each planet's trees, flowers, tall grass, weather mix, animals and mini bosses | `src/config/planets.js` → `flora`, `weather`, `wildlife`, `miniBosses` |
+| Tree kinds and their colliders | `src/config/flora.js` (looks: `src/world/props.js`) |
+| Weather kinds (wind, fog, light, rain / snow / ash, lightning, sound), spell length | `src/config/weather.js` |
+| Animals: looks and behaviour kinds, rare creatures and their gifts, how shy they are | `src/config/critters.js` |
+| Mini bosses (the Hydra, the Basilisk): stats, attacks, phases; their loot | `src/config/combat.js` → `hydra`, `basilisk`; `src/config/chests.js` → `MINI_BOSS_LOOT` |
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |
 | Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |
@@ -544,6 +587,8 @@ a glyph in `ui/icons.js`. A new monster needs a page in `BESTIARY_ENTRIES`. `npm
 | Hexlantern | support | 3 | follows fighting monsters, heals them and shields them (−50% damage). Kill it first |
 | **Gloomcap** (boss) | boss: gloomcap | 1 | the introduction: slam, lane charge, homing volley, shockwave ring (jump it), summons; three phases |
 | **Pyrrhax** (boss) | boss: dragon | 2 | red dragon: bite up front, tail sweep if you flank it (jump it), sweeping fire breath, lobbed fireballs that leave burning patches, a winged leap onto you from afar; Inferno below 50% |
+| **Hydra** (mini boss) | boss: hydra | 1, 3 | by a lake: head bites (wedge), homing acid spit, a wide head sweep; grows a 4th and 5th head at 66% / 33% |
+| **Basilisk** (mini boss) | boss: basilisk | 2 | petrifying gaze (turn your back before its eyes flare), tail whip (jump), lane lunge, venom fan when enraged |
 | **Malgrath** (boss) | boss: demonLord | 3 | Winged Demon Lord. Grounded: greatsword combo, fissure lane, hellfire circles and the **Doom Blade**, a 2 s telegraphed blow that kills anyone left in its circle. At 50% he rises on his wings (immune while transforming): dives, soul-orb barrages, hellstorm, strafing runs |
 
 Bosses are immune to stagger and knockback, and only feel stuns between attacks (shortened by `stunResist`).
