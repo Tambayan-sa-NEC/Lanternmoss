@@ -171,8 +171,8 @@ Code: `src/config/pets.js`, `src/gameplay/Pets.js`, `src/gameplay/petAbilities.j
 
 Second batch of features (requested after TODO 1–9 landed). Several of them change the controls or the world itself,
 so the order matters: **10** reworks the key layout that later items build on, **11** changes the planets that
-**14**, **15**, **17** and **18** place things on, and **Save / load** (Suggested additions) becomes a must-have once
-players can build (**17**) and travel back and forth (**18**).
+**14**, **15**, **16**, **18** and **19** place things on, and **Save / load** (Suggested additions) becomes a must-have
+once players can build (**18**) and travel back and forth (**19**).
 
 ## 10. A much better HUD **(core)** ✓
 
@@ -199,10 +199,10 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
   - **Overrides the current number keys:** the number row no longer casts abilities (`1`–`5`) or quick-uses food
     (`6`–`8`). The hotbar replaces the quick-use slots.
   - Decide what "holding" does for each kind of item: food and tonics are used, weapons and tools are swung, and
-    placeables are put down (needed by 17).
+    placeables are put down (needed by 18).
   - Done: the hotbar is the first 9 slots of the hero's inventory. Food and gear land there first; materials go
     in the bag. Press the held slot's number again, or right click, to use it: food and tonics are eaten, gear is
-    equipped. Materials and keys show a hint about where they're used. Placeables wait for 17, and tools for 15. The held
+    equipped. Materials and keys show a hint about where they're used. Placeables wait for 18, and tools for 16. The held
     item's name shows above the vitals.
 - [x] **10.3 Vitals above the hotbar:** health, mana / stamina / focus, level and XP sit just above the hotbar, centred.
 - [x] **10.4 Skills HUD on the lower right:** skill icons with their names, cooldowns and keys.
@@ -351,7 +351,32 @@ Code: `src/combat/targeting.js` (`aimDirection`, soft lock-on), `src/combat/aimi
   - Boss lore in the bestiary.
 - [ ] Optional harder versions (rematches through portals, at a higher difficulty) with better loot.
 
-## 15. Resources and survival **(core)**
+## 15. Better environments **(core)**
+
+**Goal:** the planets feel alive and varied: more plants, more creatures to meet, rare finds, weather, and a couple of
+fearsome mini bosses out in the wilds. And pets get a little more room to grow.
+Code: `src/world/scatter.js`, `src/world/props.js`, `src/world/sky.js`, `src/entities/wildlife/`,
+`src/config/critters.js`, `src/config/combat.js` (mini bosses), `src/config/pets.js`, `src/models/creatures.js`.
+
+- [ ] **15.1 Environment**
+  - [ ] **More variety in trees:** more shapes, sizes and colours, different per planet.
+  - [ ] **Grasses:** grass tufts, tall grass and flowers across the meadows.
+  - [ ] **More friendly creatures:**
+    - Fish (in ponds and lakes).
+    - Land creatures.
+    - Birds.
+    - Rare creatures with rare drops.
+  - [ ] **Special mini bosses** out in the wilds, apart from each planet's boss:
+    - A hydra.
+    - A basilisk.
+  - [ ] **Weather:** variations such as rain, snow, fog and wind, different per planet.
+- [ ] **15.2 Pets extension**
+  - [ ] **Swap pets during play.** The pet menu (12) already swaps pets with the world paused; this asks for swapping
+        right in the game as well (for example a key that cycles through your unlocked pets).
+  - [ ] **A new pet: a dragontoad.**
+    Reference: https://preview.redd.it/gah9a6dys5q51.png?width=3000&format=png&auto=webp&s=0648643054a264b4a9f86bdf1e029a3fcdf5e5ab
+
+## 16. Resources and survival **(core)**
 
 **Goal:** the hero needs supplies to survive and thrive, so gathering and cooking matter.
 Code: `src/config/items.js`, new gathering systems in `src/gameplay/`, `src/world/` (resource nodes),
@@ -369,8 +394,13 @@ Code: `src/config/items.js`, new gathering systems in `src/gameplay/`, `src/worl
   - Fishing: ponds, with a small catch timing game.
 - [ ] **Farming:** till soil, plant seeds, water them, and harvest over day / night cycles; a plot in the village.
 - [ ] Resource nodes regrow over time; the rarer nodes are on later planets or behind challenges.
+- [ ] **Equipment system:** players can pick up, craft or be given armour, vanity items and accessories, and equip
+      them. (Today there are three slots: weapon, armour and trinket, from TODO 8.)
+- [ ] **The right side of the inventory is the equipment side,** like Minecraft: the worn pieces sit in slots beside
+      the bag grid.
+- [ ] **Move the item description window** that shows now so it sits right under the whole inventory window.
 
-## 16. More crafting **(core)**
+## 17. More crafting **(core)**
 
 **Goal:** turn raw resources into better things through several crafting stations.
 Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js` (Craft tab), new station props.
@@ -382,17 +412,17 @@ Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js`
 - [ ] **Magic:**
   - Enchanting gear with runes or essences (extra stats, elemental effects).
   - Infusing charms; maybe upgrading a piece's rarity.
-- [ ] **Cooking:** meals for the needs and buffs from 15.
+- [ ] **Cooking:** meals for the needs and buffs from 16.
 - [ ] Recipe discovery: recipes are learned from villagers, books, the bestiary, or found as scrolls.
 
-## 17. Building **(core)**
+## 18. Building **(core)**
 
 **Goal:** players shape their own spot on the planet.
 Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (placement on terrain), hotbar
 (10.2); needs Save / load.
 
 - [ ] **Placeables:** furniture, lights, fences, paths, walls, floors and roofs, chests for storage, crafting stations
-      (16) and farm plots (15).
+      (17) and farm plots (16).
 - [ ] **Acquire them** by crafting, buying from villagers, or finding them.
 - [ ] **Place:** hold a placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
       spots (not in the village square, not on paths or in lairs).
@@ -401,7 +431,7 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
       village houses.
 - [ ] Placed things block movement and the camera, and are saved per planet.
 
-## 18. Portals between worlds **(core)**
+## 19. Portals between worlds **(core)**
 
 **Goal:** travel is your choice, not a one-way trip.
 Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/world/` (a portal landmark),
@@ -423,7 +453,7 @@ Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/w
 
 ## Suggested additions
 
-- [ ] **Save / load (suggested, high priority, needed by 13, 17 and 18):** persist the current planet, level, XP, bag, gear, pets, settings and opened chests (and, later, journal progress, buildings and each planet's state) in `localStorage`. Several features above (Continue, chests, pets) depend on it. The inventory already has `toJSON()` / `load()`.
+- [ ] **Save / load (suggested, high priority, needed by 13, 18 and 19):** persist the current planet, level, XP, bag, gear, pets, settings and opened chests (and, later, journal progress, buildings and each planet's state) in `localStorage`. Several features above (Continue, chests, pets) depend on it. The inventory already has `toJSON()` / `load()`.
 - [ ] **Balance pass on the new bosses (suggested, high priority):** playtest Pyrrhax and Malgrath with each hero. In particular, check how often the Doom Blade is used, the damage of the Demon Lord's flying phase, and the 50% transition timing.
 - [x] **Minimap or compass (suggested):** the compass strip and off-screen arrows landed with TODO 1 (a minimap could follow once planets get bigger, see 11).
 - [ ] **Tutorial / onboarding (suggested):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
