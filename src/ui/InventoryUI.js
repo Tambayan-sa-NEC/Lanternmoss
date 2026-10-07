@@ -26,7 +26,7 @@ import { icon } from './icons.js';
 import { describeItem, itemIconHtml, rarityColor } from './itemTooltip.js';
 import { heroPortrait } from './monsterPortraits.js';
 
-const PROBLEM = { materials: 'Not enough materials.', coins: 'Not enough coins.', space: 'No room in the bag.', station: 'Stand at its station to make it.' };
+const PROBLEM = { materials: 'Not enough materials.', fuel: 'Not enough fuel: wood, charcoal or ember shards.', coins: 'Not enough coins.', space: 'No room in the bag.', station: 'Stand at its station to make it.' };
 /** The Craft tab's filters: everything, by hand, then each station. */
 const FILTERS = [['all', 'All'], ['hand', 'By hand'], ...Object.entries(STATIONS).map(([id, s]) => [id, s.short])];
 const hex = n => '#' + n.toString(16).padStart(6, '0');
@@ -214,6 +214,7 @@ export const InventoryUI = {
       const out = reg.get(r.result), req = requirements(r, inv, P.coins), problem = craftProblem(r, inv, P.coins, at);
       const col = rarityColor(out, r.rarity ? { rarity: r.rarity } : null);
       const needs = req.items.map(n => `<span class="need${n.have >= n.need ? ' ok' : ''}">${itemIconHtml(reg.get(n.item))}${Math.min(n.have, 99)}/${n.need}</span>`).join('') +
+        (req.fuel.need ? `<span class="need fuel${req.fuel.have >= req.fuel.need ? ' ok' : ''}" title="Fuel: wood burns for 1, ember shards 2, charcoal 3">🔥 ${Math.min(req.fuel.have, 99)}/${req.fuel.need}</span>` : '') +
         (req.coins.need ? `<span class="need coin${req.coins.have >= req.coins.need ? ' ok' : ''}">✦ ${req.coins.need}</span>` : '');
       const head = r.group && r.group !== group ? `<div class="rc-group">${(group = r.group)}</div>` : '';
       const kind = out.equip ? GEAR_KINDS[out.equip.slot].label : out.tool ? 'Tool' : '';

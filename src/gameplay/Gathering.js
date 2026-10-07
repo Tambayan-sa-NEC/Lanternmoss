@@ -139,7 +139,8 @@ export const Gathering = {
     if (tool) { Hotbar.selected = tool.slot; Hotbar.changedAt = ctx.time; holdTool(P, tool.def); }
     const at = job.node?.up ?? job.spot?.dir ?? job.at;
     P.vel.set(0, 0, 0);                                                // plant your feet
-    this.job = { ...job, need, tool, at: at.clone(), from: P.up.clone(), t: 0, hits: 0, total: need.tool ? need.hits ?? 1 : 1,
+    const extra = tool ? tool.def.tool.tier - (need.tier ?? 1) : 0;   // a better tool than it needs: fewer swings
+    this.job = { ...job, need, tool, at: at.clone(), from: P.up.clone(), t: 0, hits: 0, total: need.tool ? Math.max(1, (need.hits ?? 1) - extra) : 1,
       swing: need.tool ? GATHER.swing : GATHER.pick };
   },
   stop() { if (this.job) { this.job = null; releaseTool(ctx.player); } },

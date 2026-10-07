@@ -12,7 +12,7 @@ import { Hotbar } from './hotbar.js';
 import { Stations } from './Stations.js';
 import { spendCoins } from './wallet.js';
 
-const PROBLEM = { materials: 'You need more materials for that.', coins: 'Not enough coins for that.', space: 'No room in the bag for it.',
+const PROBLEM = { materials: 'You need more materials for that.', fuel: 'The forge needs more fuel for that: wood, charcoal or ember shards.', coins: 'Not enough coins for that.', space: 'No room in the bag for it.',
   station: r => `That's made at the ${STATIONS[r.station].name}: stand at one (the village's crafting corner) and try again.` };
 
 export function bagCommands(bag) {

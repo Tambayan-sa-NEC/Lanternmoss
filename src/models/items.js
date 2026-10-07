@@ -101,6 +101,8 @@ const ART = {
   strawHat: (g, c) => { addTo(g, part(G.cyl(0.24, 0.24, 0.03, 12), c), [0, -0.05, 0]); addTo(g, part(G.cyl(0.11, 0.13, 0.12, 10), c), [0, 0.02, 0]); addTo(g, part(G.cyl(0.135, 0.135, 0.035, 10), 0xe0605a), [0, -0.01, 0]); },
   flowerCrown: (g, c) => { addTo(g, part(torus(0.17, 0.025), 0x5fae5a), [0, 0, 0], [Math.PI / 2, 0, 0]); for (let i = 0; i < 6; i++) addTo(g, part(G.ico(0.045, 0), i % 2 ? c : 0xffffff), [Math.cos(i * 1.05) * 0.17, 0.03, Math.sin(i * 1.05) * 0.17]); },
   frogHat: (g, c) => { addTo(g, part(G.hemi(0.19, 9, 3), c), [0, -0.06, 0]); for (const sx of [-1, 1]) { addTo(g, part(G.ico(0.06, 1), c), [sx * 0.09, 0.11, 0.04]); addTo(g, part(G.ico(0.035, 0), 0xffffff), [sx * 0.09, 0.12, 0.08]); } },
+  ingot: (g, c) => { for (const [y, z] of [[-0.06, -0.08], [-0.06, 0.08], [0.07, 0]]) addTo(g, part(G.box(0.32, 0.12, 0.14), c), [0, y, z], [0, 0, 0], [1, 1, 1]); },
+  coal: (g, c) => { for (const [x, y, z] of [[-0.08, -0.04, 0], [0.09, -0.05, 0.05], [0.01, 0.07, -0.03]]) addTo(g, part(G.dodec(0.1), c), [x, y, z]); addTo(g, part(G.ico(0.035), 0xff8a3a, { glow: true, intensity: 2.2 }), [0.06, 0.02, 0.1]); },
   cape: (g, c) => { addTo(g, part(G.box(0.3, 0.4, 0.03), c), [0, -0.02, 0], [0.15, 0, 0]); addTo(g, part(G.cyl(0.02, 0.02, 0.3, 5), GOLD), [0, 0.18, 0.03], [0, 0, Math.PI / 2]); },
 };
 

@@ -60,10 +60,10 @@ test('nodes: real drops, sane timings, tools that exist; every planet has wood, 
   assert.ok(PLANETS.slice(1).every(p => p.resources.nodes.some(([k]) => NODE_KINDS[k].tier >= 2)));
 });
 
-test('tools: one of each kind, craftable from what you find by hand, the pick in two tiers', () => {
+test('tools: one of each kind, craftable from what you find by hand, the pick in three tiers', () => {
   const tools = ITEM_DEFINITIONS.filter(d => d.category === 'tool');
   for (const kind of Object.keys(TOOL_KINDS)) assert.ok(tools.some(d => d.tool.kind === kind), `a ${kind}`);
-  assert.deepEqual([...new Set(tools.filter(d => d.tool.kind === 'pick').map(d => d.tool.tier))].sort(), [1, 2]);
+  assert.deepEqual([...new Set(tools.filter(d => d.tool.kind === 'pick').map(d => d.tool.tier))].sort(), [1, 2, 3]);
   for (const id of ['woodAxe', 'stonePick', 'hoe']) {
     const r = RECIPES.find(x => x.result === id); assert.ok(r, `${id}: a recipe`);
     assert.ok(r.needs.every(([i]) => ['wood', 'stone', 'sweetleaf'].includes(i)) && !r.coins, `${id}: made from hand-gathered things`);

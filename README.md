@@ -164,6 +164,11 @@ Walk up to one and press `E`: the Craft tab opens on what it makes. Those recipe
 Your first tools, a few snacks and the vanity pieces are made by hand, anywhere. Chips along the Craft tab filter by
 station, and a star marks the one you're at.
 
+**Smelting.** At the forge, ore and fuel become ingots: copper ore makes copper ingots, and iron ore makes iron ingots.
+Fuel is wood, charcoal or ember shards; charcoal is wood burned down at the forge, and lasts three times as long. Ingots
+make the metal tools, weapons, armour and trinket settings. That includes the Iron Axe and Iron Pickaxe: a tool better
+than a tree or vein needs takes fewer swings.
+
 <p>
   <img src="docs/screenshots/pet-field.jpg" width="49%" alt="Out with the dragon whelp">
 </p>
@@ -197,6 +202,8 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Smelting:** ore and fuel (wood, charcoal, ember shards) become copper and iron ingots at the forge, and ingots make
+  the metal gear. New Iron Axe and Iron Pickaxe; better tools take fewer swings.
 - **Crafting stations:** a crafting corner in every village (workbench, forge and anvil, cooking pot, brewing stand).
   Meals, potions and metal or fine gear are made at their station; first tools and basics by hand. The Craft tab
   filters by station.
@@ -545,6 +552,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Fishing: bite timing, the meter, catches per planet | `src/config/resources.js` → `FISHING` |
 | Crops, growing time, the farm plot | `src/config/resources.js` → `CROPS`, `FARM` |
 | Crafting stations, the corner's layout; which recipe needs which station | `src/config/stations.js`; `src/config/crafting.js` → `station` |
+| Smelting: ore and fuel per ingot, what burns and for how long | `src/config/crafting.js` → `fuel`, `FUEL` (the Smelting group) |
 | Buff strengths (Mighty, Stoneskin, Quickstep, Mending) | `src/config/game.js` → `BUFFS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | What wakes each boss, its arena wall | `src/config/planets.js` → `boss.summon`, `boss.arena` |

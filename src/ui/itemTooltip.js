@@ -3,6 +3,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { GEAR_KINDS, ITEM_CATEGORIES, ITEM_EFFECTS, RARITIES, TOOL_KINDS } from '../config/items.js';
 import { CROPS } from '../config/resources.js';
+import { FUEL } from '../config/crafting.js';
 import { BUFF_NAMES } from '../gameplay/buffs.js';
 import { formatStat, gearStats, itemRarity } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
@@ -48,6 +49,7 @@ export function describeItem(def, stack, o = {}) {
     (def.equip?.vanity ? '<div class="inv-d-note worn">Vanity: changes how you look, not your stats.</div>' : '') +
     (def.tool && !o.worn ? '<div class="inv-d-note worn">Keep it on the hotbar: press E (or right click) by what it works on.</div>' : '') +
     (crop && !o.worn ? '<div class="inv-d-note worn">Press E at a tilled plot in the village farm to plant.</div>' : '') +
+    (FUEL[def.id] && !o.worn ? `<div class="inv-d-note worn">Fuel for smelting at the forge: burns for ${FUEL[def.id]}.</div>` : '') +
     (o.worn ? '<div class="inv-d-note worn">Worn. Click it to take it off.</div>' : '') +
     (wrongHero ? `<div class="inv-d-note">Only the ${CHARACTERS[def.equip.hero].title} can use this.</div>` : '') +
     (o.worn ? '' : `<div class="inv-d-stats"><span>Quantity: ${qty}</span>${def.value ? `<span>Value: ${def.value}</span>` : ''}</div>`) +

@@ -101,6 +101,10 @@ const ART = {
     [[4, 19, c], [9, 14, '#fff'], [16, 13, '#ffd36b'], [23, 14, c], [28, 19, '#fff'], [10, 24, '#ffd36b'], [22, 24, c]].map(([x, y, col]) => `<circle ${S} stroke-width="1.6" fill="${col}" cx="${x}" cy="${y}" r="2.8"/>`).join(''),
   frogHat: (c, l) => `<path ${S} fill="${c}" d="M4 25c0-9 5-14 12-14s12 5 12 14z"/><circle ${S} fill="${c}" cx="10" cy="11" r="4.2"/><circle ${S} fill="${c}" cx="22" cy="11" r="4.2"/>
     <circle fill="#fff" cx="10" cy="11" r="2.4"/><circle fill="#fff" cx="22" cy="11" r="2.4"/><circle fill="${INK}" cx="10.4" cy="11.4" r="1.1"/><circle fill="${INK}" cx="22.4" cy="11.4" r="1.1"/><path fill="none" stroke="${l}" stroke-width="1.6" stroke-linecap="round" d="M9 21q7 3 14 0"/>`,
+  ingot: (c, l, d) => `<path ${S} fill="${c}" d="M4 22l5-8h14l5 8z"/><path ${S} fill="${l}" d="M9 14l2-4h10l2 4z"/><path fill="${d}" d="M23 14l5 8H4" opacity=".35"/>
+    <path fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".8" d="M12 12h6"/>`,
+  coal: (c, l) => `<path ${S} fill="${c}" d="M5 20l3-7 6-3 5 2 2-3 6 4 1 7-5 5H10z"/><path fill="${l}" d="M8 15l5-3 3 2-6 3z" opacity=".7"/>
+    <circle fill="#ff8a3a" cx="20" cy="20" r="1.6"/><circle fill="#ffc04a" cx="14" cy="22" r="1.1"/>`,
   cape: (c, l, d) => `<path ${S} fill="${c}" d="M9 5h14l5 22-6-2-6 3-6-3-6 2z"/><path ${S} fill="${d}" d="M9 5q7 5 14 0l-1 3q-6 3-12 0z"/>
     <path fill="${l}" d="M13 14l1 1-1 1-1-1zM19 18l1 1-1 1-1-1zM15 22l1 1-1 1-1-1z"/>`,
 };

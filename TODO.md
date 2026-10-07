@@ -517,7 +517,18 @@ Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js`
   - The coals glow and spark, the pot steams, the flasks bubble, and making something bursts in the station's colour.
     The compass shows the corner (and the farm) near the village.
   - Not done: a forge only in Cinder's smithy. Every village gets the same corner, so the forge isn't tied to Cinder.
-- [ ] **Smelting:** ore to ingots (with fuel), which are used in tools, weapons and armour.
+- [x] **Smelting:** ore to ingots (with fuel), which are used in tools, weapons and armour.
+  - Done (`config/crafting.js` `fuel`, `FUEL`; `items/crafting.js` `fuelIn`, `fuelToBurn`): the forge's Smelting group.
+    - 2 copper ore + 1 fuel makes a copper ingot; 2 iron ore + 2 fuel makes an iron ingot.
+    - Fuel is whatever burns in the bag: wood (1), ember shards (2), charcoal (3). Plain wood goes first. Charcoal is
+      3 wood burned down into 2 charcoal at the forge.
+    - The Craft tab shows a 🔥 have / need chip; without enough fuel it won't smelt and says so. Item details name a
+      fuel's burn.
+  - Ingots replace raw ore in the metal recipes:
+    - Copper: watering can, copper pickaxe, the Starfall Staff, Frost Circlet, Lantern Pendant, Amethyst Band.
+    - Iron: Ember Greataxe, Frostwind Bow, the Ember helm, mail and greaves, Snowstep Boots, opal and diamond settings.
+  - New tools from ingots: an Iron Axe (axe tier 2) and an Iron Pickaxe (pick tier 3). A tool better than a node needs
+    takes fewer swings (an iron pick breaks a copper vein in one).
 - [ ] **Brewing:** herbs and water become potions and tonics, with stronger versions from rarer ingredients.
 - [ ] **Magic:**
   - Enchanting gear with runes or essences (extra stats, elemental effects).

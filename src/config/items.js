@@ -97,7 +97,7 @@ export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', '
 export const ITEM_ART_KINDS = ['bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
   'staff', 'axe', 'bow', 'cloak', 'mail', 'mantle', 'pendant', 'ring', 'locket', 'key', 'crown',
   'log', 'stone', 'ore', 'gemstone', 'herb', 'pepper', 'plum', 'carrot', 'wheat', 'pumpkin', 'seeds', 'fish', 'bread', 'skewer',
-  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape'];
+  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal'];
 
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width
@@ -180,6 +180,13 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xd8844a, art: 'ore' }, maxStack: 30, value: 4 },
   { id: 'ironOre', name: 'Iron Ore', description: 'Heavy, dark iron from deep veins (a copper pickaxe gets it out). Helmets and boots.', category: 'material',
     icon: { shape: 'gem', color: 0x8a8fa8, art: 'ore' }, maxStack: 30, rarity: 'uncommon', value: 7 },
+  // ---- smelted at the forge (config/crafting.js: ore + fuel -> ingots); fuel burns in the forge (FUEL)
+  { id: 'copperIngot', name: 'Copper Ingot', description: 'Copper ore, smelted bright at the forge. Watering cans, copper picks, rings and staves.', category: 'material',
+    icon: { shape: 'gem', color: 0xe08a4a, art: 'ingot' }, maxStack: 20, value: 10 },
+  { id: 'ironIngot', name: 'Iron Ingot', description: 'Iron ore, smelted at the forge. Strong enough for helms, mail, boots and axes.', category: 'material',
+    icon: { shape: 'gem', color: 0xa8b0c8, art: 'ingot' }, maxStack: 20, rarity: 'uncommon', value: 16 },
+  { id: 'charcoal', name: 'Charcoal', description: 'Wood burned down slow at the forge. Light, and burns three times as long as wood.', category: 'material',
+    icon: { shape: 'gem', color: 0x4a4048, art: 'coal' }, maxStack: 30, value: 2 },
   { id: 'amethyst', name: 'Amethyst', description: 'A violet gem from a vein near the Hydra\'s lake. Sets into a fine ring.', category: 'material',
     icon: { shape: 'gem', color: 0xb070ff, art: 'gemstone' }, maxStack: 10, rarity: 'rare', value: 20 },
   { id: 'fireOpal', name: 'Fire Opal', description: 'A gem with a flame inside, from the Basilisk\'s hunting grounds.', category: 'material',
@@ -206,6 +213,10 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xb6aec8, art: 'pickaxe' }, value: 10, tool: { kind: 'pick', tier: 1 } },
   { id: 'copperPick', name: 'Copper Pickaxe', description: 'A harder pick: iron veins and gem veins too.', category: 'tool',
     icon: { shape: 'gem', color: 0xd8844a, art: 'pickaxe' }, rarity: 'uncommon', value: 30, tool: { kind: 'pick', tier: 2 } },
+  { id: 'ironAxe', name: 'Iron Axe', description: 'A heavy iron head on an ash handle. Fells a tree in fewer swings.', category: 'tool',
+    icon: { shape: 'gem', color: 0xa8b0c8, art: 'axe' }, rarity: 'uncommon', value: 40, tool: { kind: 'axe', tier: 2 } },
+  { id: 'ironPick', name: 'Iron Pickaxe', description: 'The best pick in three worlds: every vein, and fewer swings for each.', category: 'tool',
+    icon: { shape: 'gem', color: 0xa8b0c8, art: 'pickaxe' }, rarity: 'rare', value: 60, tool: { kind: 'pick', tier: 3 } },
   { id: 'fishingRod', name: 'Fishing Rod', description: 'Cast at a pond or lake, wait for the bite, then reel in at the right moment.', category: 'tool',
     icon: { shape: 'gem', color: 0xb0703a, art: 'rod' }, value: 12, tool: { kind: 'rod', tier: 1 } },
   { id: 'hoe', name: 'Garden Hoe', description: 'Tills a farm plot so seeds can go in.', category: 'tool',
