@@ -8,9 +8,12 @@
             Selection works like a simple drag-and-drop: click an item, then click where it should go (empty slot =
             move, same item = merge, different item = swap, a worn slot it fits = wear it there). Click a worn piece
             to take it off. Double-click or the first button uses / equips it.
-    Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have. */
+    Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have. Chips along the top
+           filter by where it's made: by hand (anywhere) or at a station (config/stations.js); recipes for a station
+           can only be crafted standing at it. Opening a station (E) shows its recipes. */
 import { CHARACTERS } from '../config/characters.js';
 import { RECIPES } from '../config/crafting.js';
+import { STATIONS } from '../config/stations.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
 import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { ctx } from '../core/context.js';
@@ -23,17 +26,21 @@ import { icon } from './icons.js';
 import { describeItem, itemIconHtml, rarityColor } from './itemTooltip.js';
 import { heroPortrait } from './monsterPortraits.js';
 
-const PROBLEM = { materials: 'Not enough materials.', coins: 'Not enough coins.', space: 'No room in the bag.' };
+const PROBLEM = { materials: 'Not enough materials.', coins: 'Not enough coins.', space: 'No room in the bag.', station: 'Stand at its station to make it.' };
+/** The Craft tab's filters: everything, by hand, then each station. */
+const FILTERS = [['all', 'All'], ['hand', 'By hand'], ...Object.entries(STATIONS).map(([id, s]) => [id, s.short])];
+const hex = n => '#' + n.toString(16).padStart(6, '0');
 const titleCase = w => w.charAt(0) + w.slice(1).toLowerCase();
 /** The equipment side's layout: worn slots left of the hero, right of the hero, and the vanity row under them. */
 const SIDE = { left: ['head', 'armor', 'feet'], right: ['weapon', 'charm', 'charm2'], vanity: ['hat', 'back'] };
 
 export const InventoryUI = {
-  isOpen: false, tab: 'bag', selected: -1, hovered: -1, hoveredGear: null, message: '', inventory: null, commands: null,
+  isOpen: false, tab: 'bag', craftFilter: 'all', selected: -1, hovered: -1, hoveredGear: null, message: '', inventory: null, commands: null,
   slotEls: [], gearEls: {}, quickBtns: [],
 
   /** commands (supplied by the game): use(slot) / equip(slot, where) / unequip(where) / craft(recipe) -> { ok, message },
-      drop(slot) -> boolean, held() -> the held hotbar slot, worn() -> P.equipment. */
+      drop(slot) -> boolean, held() -> the held hotbar slot, worn() -> P.equipment, station() -> the station the hero
+      stands at (or null). */
   init(inventory, commands) {
     this.inventory = inventory; this.commands = commands;
     const root = dom.inventory;
@@ -77,7 +84,10 @@ export const InventoryUI = {
     root.querySelector('.inv-body').appendChild(side);
     // crafting
     this.craftEl = document.createElement('div'); this.craftEl.className = 'inv-craft';
-    this.craftEl.addEventListener('click', e => { const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe); });
+    this.craftEl.addEventListener('click', e => {
+      const f = e.target.closest('[data-filter]'); if (f) { this.craftFilter = f.dataset.filter; this.message = ''; this.render(); return; }
+      const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe);
+    });
     root.querySelector('.inv-actions').after(this.craftEl);
     this.hintEl = root.querySelector('.inv-hint');
     dom.invUse.addEventListener('click', () => this.use(this.selected));
@@ -87,7 +97,11 @@ export const InventoryUI = {
   },
 
   toggle() { if (this.isOpen) this.close(); else this.open(); },
-  open(tab = 'bag') { this.isOpen = ctx.inventoryOpen = true; this.message = ''; this.tab = tab; dom.inventory.classList.add('show'); this.render(); },
+  /** filter: which recipes the Craft tab shows ('all', 'hand' or a station id); a station opens on its own. */
+  open(tab = 'bag', { filter = 'all' } = {}) {
+    this.isOpen = ctx.inventoryOpen = true; this.message = ''; this.tab = tab; this.craftFilter = filter;
+    dom.inventory.classList.add('show'); this.render();
+  },
   close() { this.isOpen = ctx.inventoryOpen = false; this.selected = this.hovered = -1; this.hoveredGear = null; dom.inventory.classList.remove('show'); },
   setTab(t) { this.tab = t; this.selected = -1; this.message = ''; this.render(); },
 
@@ -189,19 +203,26 @@ export const InventoryUI = {
   },
 
   renderCraft() {
-    const inv = this.inventory, P = ctx.player, reg = inv.registry;
+    const inv = this.inventory, P = ctx.player, reg = inv.registry, at = this.commands.station?.() ?? null, f = this.craftFilter;
     let group = '';
-    const rows = recipesFor(P.charId, reg).map(r => {
-      const out = reg.get(r.result), req = requirements(r, inv, P.coins), problem = craftProblem(r, inv, P.coins);
+    const shown = recipesFor(P.charId, reg).filter(r => f === 'all' || (f === 'hand' ? !r.station : r.station === f));
+    const chips = FILTERS.map(([id, label]) => `<button type="button" data-filter="${id}" class="${id === f ? 'on' : ''}${id === at ? ' here' : ''}"` +
+      `${STATIONS[id] ? ` style="--sc:${hex(STATIONS[id].color)}"` : ''}>${label}${id === at ? ' ★' : ''}</button>`).join('');
+    const where = at ? `You're at the <b>${STATIONS[at].name}</b>: you can make its recipes and anything by hand.`
+      : 'Not at a station: you can make things by hand. Recipes with a station tag need you to stand at it (the crafting corner in the village).';
+    const rows = shown.map(r => {
+      const out = reg.get(r.result), req = requirements(r, inv, P.coins), problem = craftProblem(r, inv, P.coins, at);
       const col = rarityColor(out, r.rarity ? { rarity: r.rarity } : null);
       const needs = req.items.map(n => `<span class="need${n.have >= n.need ? ' ok' : ''}">${itemIconHtml(reg.get(n.item))}${Math.min(n.have, 99)}/${n.need}</span>`).join('') +
         (req.coins.need ? `<span class="need coin${req.coins.have >= req.coins.need ? ' ok' : ''}">✦ ${req.coins.need}</span>` : '');
       const head = r.group && r.group !== group ? `<div class="rc-group">${(group = r.group)}</div>` : '';
       const kind = out.equip ? GEAR_KINDS[out.equip.slot].label : out.tool ? 'Tool' : '';
       return `${head}<div class="recipe${problem ? '' : ' can'}" title="${out.description.replace(/"/g, '&quot;')}">${itemIconHtml(out)}` +
-        `<div class="rc-name" style="color:${col}">${r.qty > 1 ? `${r.qty}x ` : ''}${out.name}<small>${kind}${r.rarity ? ` · ${RARITIES[r.rarity].label}` : ''}</small></div>` +
+        `<div class="rc-name" style="color:${col}">${r.qty > 1 ? `${r.qty}x ` : ''}${out.name}<small>${kind}${r.rarity ? `${kind ? ' · ' : ''}${RARITIES[r.rarity].label}` : ''}</small>` +
+        `${r.station ? `<span class="rc-st${r.station === at ? ' here' : ''}" style="--sc:${hex(STATIONS[r.station].color)}">${STATIONS[r.station].short}</span>` : ''}</div>` +
         `<div class="rc-needs">${needs}</div><button type="button" data-recipe="${r.id}" ${problem ? `disabled title="${PROBLEM[problem]}"` : ''}>Craft</button></div>`;
     });
-    this.craftEl.innerHTML = `<div class="rc-list">${rows.join('')}</div><div class="inv-msg rc-msg">${this.message}</div>`;
+    this.craftEl.innerHTML = `<div class="rc-filters">${chips}</div><div class="rc-where">${where}</div>` +
+      `<div class="rc-list">${rows.join('') || '<p class="rc-empty">Nothing to make here for your hero.</p>'}</div><div class="inv-msg rc-msg">${this.message}</div>`;
   },
 };

@@ -32,6 +32,7 @@ import { clearWorldItems, spawnForage } from './pickups.js';
 import { Farm } from './Farm.js';
 import { Fishing } from './Fishing.js';
 import { Gathering } from './Gathering.js';
+import { Stations } from './Stations.js';
 
 export class PlanetProgression {
   constructor(world) {
@@ -57,10 +58,10 @@ export class PlanetProgression {
     this.spawnResources();
   }
 
-  /** The village farm, then the planet's resource nodes (they keep clear of the farm). */
+  /** The village farm and crafting corner, then the planet's resource nodes (they keep clear of both). */
   spawnResources() {
-    const farm = Farm.setup(this.world, ctx.planet);
-    Gathering.spawnFor(this.world, ctx.planet, farm ? [farm] : []);
+    const farm = Farm.setup(this.world, ctx.planet), corner = Stations.setup(this.world, ctx.planet, farm ? [farm] : []);
+    Gathering.spawnFor(this.world, ctx.planet, [farm, corner].filter(Boolean));
   }
 
   /** First adventure only: once play starts, point the hero at the boss after a moment. */
@@ -121,7 +122,7 @@ export class PlanetProgression {
     Dialog.close(); Challenges.cancel(); Houses.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
-    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear();
+    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear(); Stations.clear();
     world.dispose(); world.generate(this.planet);
     Object.assign(P, { dead: false, deadT: 0, vy: 0 }); P.clearTimers();
     const fwd = P.placeAt(world.spawnDir); P.root.visible = true; P.shadow.visible = true;

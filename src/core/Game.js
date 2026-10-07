@@ -35,6 +35,7 @@ import { Farm } from '../gameplay/Farm.js';
 import { Fishing } from '../gameplay/Fishing.js';
 import { Gathering } from '../gameplay/Gathering.js';
 import { Needs } from '../gameplay/Needs.js';
+import { Stations } from '../gameplay/Stations.js';
 import { Houses } from '../gameplay/Houses.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
@@ -143,7 +144,7 @@ export class Game {
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
     BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
     Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt); Journal.update(dt);
-    Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
+    Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Stations.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -194,7 +195,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Gathering, Fishing, Farm, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

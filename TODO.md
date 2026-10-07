@@ -502,8 +502,21 @@ Code: `src/config/items.js`, new gathering systems in `src/gameplay/`, `src/worl
 **Goal:** turn raw resources into better things through several crafting stations.
 Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js` (Craft tab), new station props.
 
-- [ ] **Stations:** a workbench, a furnace or forge (Cinder's anvil), a cooking pot, and a brewing stand. Some recipes
+- [x] **Stations:** a workbench, a furnace or forge (Cinder's anvil), a cooking pot, and a brewing stand. Some recipes
       need you to stand at the right station.
+  - Done (`config/stations.js`, `gameplay/Stations.js`, `models/stations.js`): every village has a crafting corner, a
+    row of all four stations a short walk from the square (clear of the farm and the resource nodes).
+    - Workbench: the wooden weapons and light armour (hood, cloak, boots).
+    - Forge and Anvil: metal tools (copper pickaxe, watering can), Emberfall and Frostveil weapons and armour, and
+      every trinket with metal or a gem.
+    - Cooking Pot: all the hot meals. Brewing Stand: the potions and tonics.
+    - By hand, anywhere: the first tools (axe, stone pickaxe, hoe, fishing rod), the glowcap tonic and moonberry tart,
+      the vanity pieces and the lantern key.
+  - `E` at a station opens the Craft tab on its recipes. Chips filter the tab (All, By hand, each station), a star marks
+    the one you're at, and recipes show a station tag. Away from it they won't craft, and the message says where to go.
+  - The coals glow and spark, the pot steams, the flasks bubble, and making something bursts in the station's colour.
+    The compass shows the corner (and the farm) near the village.
+  - Not done: a forge only in Cinder's smithy. Every village gets the same corner, so the forge isn't tied to Cinder.
 - [ ] **Smelting:** ore to ingots (with fuel), which are used in tools, weapons and armour.
 - [ ] **Brewing:** herbs and water become potions and tonics, with stronger versions from rarer ingredients.
 - [ ] **Magic:**

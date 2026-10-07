@@ -28,6 +28,7 @@ import { Chests } from './Chests.js';
 import { Farm } from './Farm.js';
 import { Fishing } from './Fishing.js';
 import { Gathering } from './Gathering.js';
+import { Stations } from './Stations.js';
 import { Pets } from './Pets.js';
 import { rareTarget } from '../entities/wildlife/wildlife.js';
 import { dayClock } from './dayClock.js';
@@ -252,7 +253,7 @@ export function currentInteraction() {
   if (Fishing.active) return Fishing.target();                      // fishing: E reels in
   let h = Houses.target();
   if (Houses.inside) return h;
-  for (const c of [Chests.target(), Pets.target(), rareTarget(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
+  for (const c of [Chests.target(), Pets.target(), rareTarget(), Stations.target(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
   const P = ctx.player, n = nearestNPC(P, ctx.npcs);
   if (n && (!h || n.pos.distanceTo(P.pos) <= h.dist)) {
     return { label: `Talk to ${n.name}${Challenges.tagFor(n)}`, at: _w.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).clone(), run: () => Dialog.start(n) };

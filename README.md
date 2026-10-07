@@ -150,7 +150,21 @@ right under the bag. Monsters drop food, materials and gear. Food, tonics, gear 
 hold one, then use it (eat, drink, equip, or work with it).
 
 <p>
-  <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab">
+  <img src="docs/screenshots/stations.jpg" width="49%" alt="The village's crafting corner">
+  <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab at the forge">
+</p>
+
+**Crafting stations.** Every village has a crafting corner with four stations:
+- **Workbench:** wooden weapons and light armour.
+- **Forge and Anvil:** metal tools, weapons, armour and gem trinkets.
+- **Cooking Pot:** hot meals.
+- **Brewing Stand:** potions and tonics.
+
+Walk up to one and press `E`: the Craft tab opens on what it makes. Those recipes only work standing at that station.
+Your first tools, a few snacks and the vanity pieces are made by hand, anywhere. Chips along the Craft tab filter by
+station, and a star marks the one you're at.
+
+<p>
   <img src="docs/screenshots/pet-field.jpg" width="49%" alt="Out with the dragon whelp">
 </p>
 
@@ -183,6 +197,9 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Crafting stations:** a crafting corner in every village (workbench, forge and anvil, cooking pot, brewing stand).
+  Meals, potions and metal or fine gear are made at their station; first tools and basics by hand. The Craft tab
+  filters by station.
 - **Resources and survival:** an energy meter that food fills. Gathering by hand and with tools (axe, pickaxes,
   fishing rod, hoe, watering can) from regrowing nodes, trees and rocks, with rare gem veins guarded by mini bosses.
   Fishing has a timing meter, and each village has a farm plot. Meals and potions give buffs. The bag gets a
@@ -292,7 +309,9 @@ src/
 │   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
 │   │                      stats, the hotbar, effects, bag size and pickup settings
-│   ├── crafting.js        crafting recipes in groups (tools, food, potions, weapons, armour, trinkets, vanity)
+│   ├── crafting.js        crafting recipes in groups (tools, food, potions, weapons, armour, trinkets, vanity), and
+│   │                      the station each needs (if any)
+│   ├── stations.js        the crafting stations (workbench, forge, cooking pot, brewing stand) and the corner's layout
 │   ├── resources.js       gathering: node kinds (drops, tools, regrow), trees and rocks, fishing, crops, the farm
 │   ├── survival.js        the energy meter: drain, hungry / starving effects, after fainting
 │   ├── characters.js      the three playable heroes (stats, abilities, texts, ability tooltips, selection profile)
@@ -345,6 +364,7 @@ src/
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── resources.js       resource nodes (bushes, herbs, branches, veins), the farm (fence, plots, scarecrow), crops, the float
+│   ├── stations.js        the four crafting stations (glowing coals, a bubbling pot, flasks on a stand)
 │   ├── vanity.js          hats and capes drawn on the hero
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
@@ -398,6 +418,7 @@ src/
 │   ├── Gathering.js       resource nodes, chopping trees and mining rocks, tool jobs (swing, drops, regrow), tips
 │   ├── Fishing.js         casting, the bite, the reeling meter, catches
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
+│   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)
 │   ├── heldTool.js        the tool in the hero's hand while working
 │   ├── dayClock.js        the village clock (phase, day, light)
@@ -523,6 +544,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Each planet's nodes and rare veins | `src/config/planets.js` → `resources` |
 | Fishing: bite timing, the meter, catches per planet | `src/config/resources.js` → `FISHING` |
 | Crops, growing time, the farm plot | `src/config/resources.js` → `CROPS`, `FARM` |
+| Crafting stations, the corner's layout; which recipe needs which station | `src/config/stations.js`; `src/config/crafting.js` → `station` |
 | Buff strengths (Mighty, Stoneskin, Quickstep, Mending) | `src/config/game.js` → `BUFFS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
 | What wakes each boss, its arena wall | `src/config/planets.js` → `boss.summon`, `boss.arena` |

@@ -8,6 +8,7 @@
      quest    the villager your tracked quest needs next (compass + edge arrow)
      chest    a beaten boss's treasure chest until it's opened (compass + edge arrow)
      spotted  monsters a pet's Scout found (compass), scent = the chest a pet's Fetch sniffed out (compass + edge arrow)
+     craft, farm  the village's crafting corner and farm, when you're near the village (compass)
    Edge arrows only appear while their target is off-screen or hidden behind the planet. */
 import * as THREE from 'three';
 import { ctx } from '../core/context.js';
@@ -15,6 +16,8 @@ import { settings } from '../core/settings.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { BossGate } from '../gameplay/BossGate.js';
 import { Chests } from '../gameplay/Chests.js';
+import { Farm } from '../gameplay/Farm.js';
+import { Stations } from '../gameplay/Stations.js';
 import { petEffects } from '../gameplay/petAbilities.js';
 import { Quests } from '../gameplay/quests/Quests.js';
 import { cam } from '../systems/CameraSystem.js';
@@ -36,6 +39,8 @@ function bearing(dir) { const t = tangentToward(ctx.player.up, dir); return Math
 
 function pointsOfInterest() {
   const list = [{ key: 'village', dir: SPAWN_DIR, icon: 'home', label: 'Village', far: true }];
+  for (const [key, dir, ic, label] of [['craft', Stations.center, 'craft', 'Crafting'], ['farm', Farm.center, 'sprout', 'Farm']])   // the village's corners
+    if (dir && arcDist(dir, ctx.player.up) < 60 && arcDist(dir, ctx.player.up) > 5) list.push({ key, dir, icon: ic, label });
   const B = ctx.boss;
   list.push(...BossGate.waypoints());                                   // the sealed lair, and elites carrying sigils
   for (const e of ctx.enemies) if (e.def.miniBoss && e.alive && arcDist(e.up, ctx.player.up) < 75)   // a mini boss nearby

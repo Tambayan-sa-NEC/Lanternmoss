@@ -114,7 +114,6 @@ try {
     L.InventoryUI.selected = inv.find('emberRing'); L.InventoryUI.message = ''; L.InventoryUI.render();
   });
   await wait(2500); await shot('bag');
-  await page.click('[data-tab="craft"]'); await wait(1500); await shot('crafting');
   await run(() => { const L = window.LANTERNMOSS; L.InventoryUI.setTab('bag'); L.InventoryUI.commands.unequip('hat'); L.InventoryUI.commands.unequip('back'); });
   await run(() => { const Pt = window.LANTERNMOSS.Pets; for (const id of ['fox', 'wisp', 'whelp']) Pt.unlocked.add(id); });
   // the pet menu (B): the world pauses, the camera holds on the pet
@@ -206,6 +205,19 @@ try {
   await wait(2500); await shot('gathering');
   await run(async () => { (await import('/src/core/context.js')).ctx.paused = false; });
   await run(() => { const L = window.LANTERNMOSS; L.Gathering.stop(); L.InventoryUI.commands.unequip('hat'); L.InventoryUI.commands.unequip('back'); });
+
+  // TODO 17: the village's crafting corner (workbench, forge, cooking pot, brewing stand), then the Craft tab at the forge
+  await run(async () => { const L = window.LANTERNMOSS, S = L.Stations, pot = S.list.find(s => s.id === 'pot'), U = await import('/src/utils/sphere.js');
+    window.__front = (s, m) => { const P = L.player; P.placeAt(U.dirAlong(s.dir, s.fwd, m)); P.fwd.copy(U.tangentToward(P.up, s.dir)); P.vel.set(0, 0, 0); };
+    window.__front(pot, 1.5);
+    for (const c of L.critters) if (c.up.distanceTo(S.center) < 0.12) c.root.visible = false;
+    window.__frame(S.center, { turn: 0.55, pitch: 0.36, dist: 9.5 }); });
+  await ff(1.5); await wait(3000); await shot('stations');
+  await run(() => { const L = window.LANTERNMOSS, f = L.Stations.list.find(s => s.id === 'forge'), inv = L.inventory;
+    for (const [id, n] of [['ironOre', 6], ['emberShard', 6], ['fireOpal', 1], ['copperOre', 6]]) inv.add(id, n);
+    window.__front(f, 1.3); L.Stations.open('forge'); });
+  await ff(0.3); await wait(1500); await shot('crafting');
+  await run(() => window.LANTERNMOSS.InventoryUI.close()); await wait(400);
 
   // Gloomcap's sealed lair (the seals and the status chip), its waking (the name card), and the arena ring
   await run(async () => { const S = await import('/src/utils/sphere.js'), L = window.LANTERNMOSS, G = L.BossGate;
