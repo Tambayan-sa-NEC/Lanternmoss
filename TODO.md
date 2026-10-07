@@ -551,6 +551,8 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 - [ ] **Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
       village houses.
 - [ ] Placed things block movement and the camera, and are saved per planet.
+- [ ] **A home to start with (suggested):** before full building, claim an empty cottage in the village, decorate it with
+      furniture you craft, and sleep in your own bed. This gives a smaller first step toward the pieces above.
 
 ## 19. Portals between worlds **(core)**
 
@@ -577,6 +579,8 @@ Code: new `src/core/save.js` (format, versions, cleaning on load), `src/core/Gam
 `src/ui/MainMenu.js` (Continue), `src/ui/PauseMenu.js`; every system with state gets a `toJSON()` / `load()` pair
 (the inventory already has one).
 Needed by 13 (journal), 18 (building) and 19 (per-planet state); unlocks **Continue** on the title screen (3).
+**Priority (suggested):** do this before much more content. Every feature since 13 adds state that a refresh throws
+away (farm plots, equipment, gathered nodes, quests), and each one makes save / load bigger to build.
 
 - [ ] **What's saved:**
   - The adventure: current planet, hero, level, XP, coins, health and mana.
@@ -645,17 +649,153 @@ separate service), `src/ui/` (lobby, player list, chat).
       session cleanly), and keeping cheating out of scope for a friendly co-op game.
 - [ ] Needs Save / load (20) for persistent shared worlds; Portals (19) decide how a group moves between planets.
 
+## 23. Tutorial and first-time help **(suggested)**
+
+**Goal:** new players learn the game's many systems without reading toasts that vanish in two seconds.
+Code: new `src/gameplay/Tutorial.js`, `src/ui/` (a hint panel), `src/config/` (tutorial steps); builds on the
+first-time tips in `src/gameplay/Gathering.js`.
+Promoted from the suggested additions (tutorial, death screen).
+
+- [ ] **A guided start:** a short first walk out of the village that teaches moving, the camera, talking (`E`),
+      the bag and hotbar, a first fight (dodging, abilities, the ultimate's aim) and the sealed boss lair's conditions.
+      It can be skipped, and offered again from the pause menu.
+- [ ] **Hints that stay:** a small hint panel (or a "help" page in the journal) that keeps the first-time tips:
+      energy, tools, stations, smelting, fishing, farming, pets.
+- [ ] **A death screen:** "You fainted", with a short recap (what hit you, how long you lasted), a respawn countdown
+      and a tip.
+
+## 24. Villager friendship **(suggested)**
+
+**Goal:** the villagers become friends you care about, not only quest givers and a shop.
+Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts, reward tiers), `src/ui/Dialog.js`
+(a gift option), the journal (a friends page).
+
+- [ ] **Friendship hearts** per villager, raised by talking each day, gifts and finishing their quests.
+- [ ] **Gifts:** each villager has favourite, liked and disliked things (food you cook, fish, gems, flowers), with a
+      reaction line and an emote for each.
+- [ ] **Rewards by heart level:** recipes (ties into recipe discovery, 17), shop discounts, a unique trinket or vanity
+      piece, new dialogue and a small personal quest.
+- [ ] Friends greet you by name, wave from across the square and sometimes leave a gift at your door.
+
+## 25. Festivals **(suggested)**
+
+**Goal:** the calendar has highlights to look forward to.
+Code: `src/config/day.js` (a calendar), new `src/gameplay/Festivals.js`, `src/world/village.js` (decorations),
+`src/config/shop.js` (festival stock).
+
+- [ ] **A lantern festival** every few days: paper lanterns over the square, villagers gathered at night, a special
+      shop, and small mini-games (lantern lighting, a race).
+- [ ] **A harvest fair:** enter your best crop or fish, and the villagers judge it for a ribbon and a prize.
+- [ ] Each planet gets its own version (an ember festival, a frost festival), and the journal remembers the ones
+      you've been to.
+
+## 26. Pet care **(suggested)**
+
+**Goal:** pets feel looked after, and the food you grow matters to them too.
+Code: `src/gameplay/Pets.js`, `src/ui/PetMenu.js`, `src/config/pets.js`, `src/models/vanity.js`.
+
+- [ ] **Feeding:** pets have favourite foods from the farm, the ponds and the wilds; feeding them gives a short buff
+      or a little XP, and a happy emote.
+- [ ] **Pet outfits:** small hats, bows and scarves for pets, using the same vanity idea as the hero's hat and cape.
+- [ ] **Pet finds:** a well-fed pet sometimes brings back something it found (a forage item, a seed, now and then a
+      coin).
+- [ ] A pet bed in your home (18) where resting pets heal.
+
+## 27. Museum **(suggested)**
+
+**Goal:** collecting has a place to show off, and fishing, mining and foraging lead somewhere.
+Code: new `src/gameplay/Museum.js`, `src/world/interiors.js` (a museum room), the journal's Collection tab.
+
+- [ ] **Donate** fish, gems, rare forage and monster trophies to Old Bramble's museum. Each donation fills a display
+      in a museum room you can walk through.
+- [ ] **Rewards** for completing a shelf (all the fish, all the gems): coins, a vanity piece, a unique trinket.
+- [ ] The journal's Collection tab marks what's been donated.
+
+## 28. Dungeons and caves **(suggested)**
+
+**Goal:** something to explore beyond the open planet surface, where mining and fighting meet.
+Code: new `src/world/caves.js` (interiors like the houses', away from the planet), `src/gameplay/Dungeons.js`,
+`src/config/dungeons.js`.
+
+- [ ] **A cave or dungeon per planet,** entered from the surface: a few rooms with monsters, chests and ore veins
+      that are found nowhere else.
+- [ ] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
+- [ ] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
+- [ ] Caves are dark: lanterns and glowcaps light the way.
+
+## 29. Bounty board **(suggested)**
+
+**Goal:** there's always something small to do, every day.
+Code: new `src/gameplay/Bounties.js`, `src/config/bounties.js`, a board prop in each village, `src/ui/` (the board).
+
+- [ ] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
+      ("3 ramhorns"), catch a fish ("a Golden Koi"), harvest a crop.
+- [ ] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
+- [ ] The journal counts bounties finished, with an achievement or two.
+
+## 30. Gear sets and hero depth **(suggested)**
+
+**Goal:** choosing gear and growing a hero have more to them than bigger numbers.
+Code: `src/config/items.js` (sets), `src/items/gear.js`, `src/config/characters.js` (talents), `src/ui/` (a talent
+page).
+
+- [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
+      chilling hits; the Moss set: more healing), shown in the bag's equipment side.
+- [ ] **A small talent tree per hero:** a point every level or two, spent on upgrades to their abilities or an
+      alternative version of a skill (a wider Cleave, a homing Fireball).
+- [ ] A free reset at the village (a wizard's service), so trying builds is cozy, not punishing.
+
+## 31. After the last boss **(suggested)**
+
+**Goal:** the adventure doesn't simply stop after Malgrath.
+Code: `src/gameplay/PlanetProgression.js`, `src/config/planets.js`, `src/config/combat.js`.
+
+- [ ] **Rematches:** harder versions of the planet bosses and mini bosses, with new attacks and better loot.
+- [ ] **A secret fourth planet,** unlocked after the last boss, with its own boss and materials.
+- [ ] **New Game+:** start again with your journal, pets and vanity kept, against tougher rosters with better loot.
+
+## 32. A living village **(suggested)**
+
+**Goal:** the villagers use the same world you do, so the village feels busy.
+Code: `src/entities/npc/NPC.js`, `src/entities/npc/npcDefs.js` (schedules), `src/gameplay/Stations.js`,
+`src/gameplay/Farm.js`.
+
+- [ ] Villagers' schedules include the new places: Cinder at the forge, Pim at the cooking pot, someone fishing at
+      the pond in the evening, someone tending a farm plot.
+- [ ] They react to what you do there ("Nice catch!", "That pumpkin's enormous!").
+- [ ] Their activities show with small animations and the stations' own effects (sparks, steam).
+
+## 33. Photo mode **(suggested)**
+
+**Goal:** a cozy, pretty game is one people want to take pictures of.
+Code: `src/systems/CameraSystem.js` (the showcase camera already exists), new `src/ui/PhotoMode.js`.
+
+- [ ] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
+- [ ] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
+- [ ] Save the picture as an image file.
+
 ---
 
 ## Suggested additions
 
 - [~] **Save / load (suggested):** promoted to item 20.
+- [ ] **Balance and pacing pass (suggested, high priority):** play through with each hero and tune the numbers that
+      were set by hand and never tested together: energy drain, node regrow times, crop growth, fuel costs, mini boss
+      health, coin prices and shop costs.
 - [ ] **Balance pass on the new bosses (suggested, high priority):** playtest Pyrrhax and Malgrath with each hero. In particular, check how often the Doom Blade is used, the damage of the Demon Lord's flying phase, and the 50% transition timing.
 - [x] **Minimap or compass (suggested):** the compass strip and off-screen arrows landed with TODO 1 (a minimap could follow once planets get bigger, see 11).
-- [ ] **Tutorial / onboarding (suggested):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
-- [ ] **Death / respawn screen (suggested):** "You fainted" with a short recap and a respawn countdown, instead of only a toast.
+- [~] **Tutorial / onboarding (suggested, promoted to item 23):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
+- [~] **Death / respawn screen (suggested, promoted to item 23):** "You fainted" with a short recap and a respawn countdown, instead of only a toast.
 - [ ] **Gamepad support (suggested):** movement, camera and abilities on a controller, with aiming for ground-targeted ultimates.
 - [ ] **Accessibility (suggested):** colour-blind-friendly telegraph colours, reduced motion (less shake and flashing), adjustable text size.
 - [ ] **Real audio (suggested):** replace the procedural placeholder sounds and music with real samples (`src/systems/AudioSystem.js`).
+      Music per planet and per situation: calm village themes, exploring, night, and a stronger boss theme.
 - [~] **Achievements / bestiary (suggested):** promoted to item 13.
+- [ ] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
+      chests, and favourite recipes pinned at the top of the Craft tab.
+- [ ] **Gameplay checks in the repo (suggested):** the headless game simulations (the "sims": environment, fights,
+      bosses, items, survival, stations and others) only live outside the repo today. Move them into `tests/sim/` with
+      an `npm run sim` command, and make the dragon's random "uses every move" check reliable.
+- [ ] **Performance budget (suggested):** a frame-rate overlay, and density settings per feature (scenery, nodes,
+      particles, weather). The planets keep growing, and Mobile support (21) will need them anyway.
 - [ ] **Small fixes (suggested):** add a `favicon.ico` (the server currently returns 404 for it); add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`).
