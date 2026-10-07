@@ -616,6 +616,35 @@ Code: `src/systems/InputSystem.js`, `src/core/controls.js`, new `src/ui/touchCon
       check.
 - [ ] Facing-based aiming (14) suits the joystick: attacks go where the hero faces.
 
+## 22. Multiplayer support **(core)**
+
+**Goal:** friends explore the planets together: co-op adventures with each player as their own hero and pet.
+Code: new `src/net/` (connection, messages, state sync), `src/core/Game.js` (local vs. remote players), `src/core/context.js`
+(more than one player), `src/entities/player/` (a remote hero driven by network state), a small server (`scripts/` or a
+separate service), `src/ui/` (lobby, player list, chat).
+
+- [ ] **Decide the model:** peer-to-peer with one host (WebRTC) or a small authoritative server (WebSocket). The host
+      or server runs the world (monsters, bosses, loot, chests, the day clock, weather); clients send their input and
+      draw what they're told. Pick one before building the rest.
+- [ ] **Lobby:** host a game and get a short room code or link; join with the code. Each player picks their own hero
+      and pet; a player list shows who's in, with a ready check before the adventure starts. Drop-in / drop-out mid
+      adventure if possible.
+- [ ] **Shared world, separate heroes:**
+  - Every player's hero, pet, animations and abilities are seen by the others, with smoothing for network lag.
+  - Monsters choose among nearby players; boss fights scale their health with the number of players.
+  - Each player keeps their own level, XP, bag, gear, energy and journal.
+- [ ] **Sharing rules:**
+  - Loot from chests and drops: per-player rolls (everyone gets their own), so nobody steals anything.
+  - Resource nodes, the farm and crafting stations are shared; decide whether gathered nodes regrow per player.
+  - Quests and boss gates: whose progress counts (the host's, or each player's own), and what happens to a player
+    who joins late.
+  - Planet travel: everyone travels together when a boss falls, or a vote to leave.
+- [ ] **Talking to each other:** quick emotes (the existing emote bubbles), a short text chat, name tags over heroes,
+      and the compass showing where the other players are.
+- [ ] **Robustness:** reconnecting after a drop, the host leaving (hand the world to another player, or end the
+      session cleanly), and keeping cheating out of scope for a friendly co-op game.
+- [ ] Needs Save / load (20) for persistent shared worlds; Portals (19) decide how a group moves between planets.
+
 ---
 
 ## Suggested additions
