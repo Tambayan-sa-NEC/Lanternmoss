@@ -6,7 +6,7 @@
      tools                  used on what's in front: chop, mine, fish, till, water (./Gathering.js, Fishing.js, Farm.js)
      seeds                  planted in the farm plot you stand at (./Farm.js)
      materials, keys, trophies   nothing to do in your hands: a hint says where they're used
-   Placeable things (TODO 17) will be put down from here. */
+   Placeable things (TODO 25) will be put down from here. */
 import { HOTBAR } from '../config/items.js';
 import { ctx } from '../core/context.js';
 import { itemRegistry } from '../items/ItemRegistry.js';

@@ -1,10 +1,13 @@
 # Lanternmoss TODO
 
-Planned features, in rough priority order. Each entry says **what** it is, **why** it matters, and the main
-**tasks**, with pointers to the code it touches. Check items off as they land.
+Planned features, in the order to build them. Each entry says **what** it is, **why** it matters, and the main
+**tasks**, with pointers to the code it touches. Check items off as they land. Items 1–17 are done and keep their
+numbers; **Round 3** (after 17) explains the order of everything still open, the risks, and what changed on 2026-10-08.
 
 Legend: `[ ]` to do · `[~]` in progress · `[x]` done. Tags: **(core)** must-have, **(nice)** polish,
-**(suggested)** an idea added on top of the original list.
+**(suggested)** an idea added on top of the original list. From Round 3 on, each item also has a **Size** (S / M / L / XL,
+explained in Round 3), **Needs** (items that must land first), and where it applies, a **Risk** and a
+**Recommendation**.
 
 ---
 
@@ -49,7 +52,8 @@ Schema: `src/config/settings.js` (one table drives the screen, defaults and vali
 - [x] Graphics: quality preset (render resolution), bloom on/off, outline width (0 hides outlines).
 - [x] Gameplay: screen shake strength, damage numbers on/off, impact slow-motion on/off.
 - [x] Interface: HUD size, compass & target arrows on/off, pause when the window loses focus.
-- [ ] Remappable keys (stretch goal; needs bindings to move out of `CHARACTERS` key lists into one keymap table).
+- [x] Remappable keys (stretch goal; needs bindings to move out of `CHARACTERS` key lists into one keymap table).
+  - Done in 10.4: Settings → Keys (`src/core/keybinds.js`).
 - [x] Remembered in `localStorage` (`lanternmoss.settings`); saved values are validated on load, Reset restores defaults.
 
 ## 3. Main menu / landing page **(core)** ✓
@@ -61,7 +65,7 @@ Code: `src/ui/MainMenu.js`, `index.html` (`#title`, `#start`), `src/ui/Character
       the first click or key press (browsers block audio until then).
 - [x] Buttons: **Play**, **Settings**, **Controls**, **Credits** (credits text in `src/config/credits.js`); mouse or
       ↑ ↓ + Enter. Settings / Controls / Credits open as panels of the pause menu (`PauseMenu.openPanel`).
-- [ ] **Continue**: needs the save system (see 20); add the button then.
+- [ ] **Continue**: needs the save system (see 19); add the button then.
 - [x] Animated transitions: the title lifts away as the hero cards slide in (and the camera moves in close); character
       select has Back / Esc; starting fades the overlay while the camera swoops into play, with the planet banner.
 - [x] Campaign strip: Lanternmoss → Emberfall → Frostveil with each planet's colour and boss (from `config/planets.js`).
@@ -171,8 +175,8 @@ Code: `src/config/pets.js`, `src/gameplay/Pets.js`, `src/gameplay/petAbilities.j
 
 Second batch of features (requested after TODO 1–9 landed). Several of them change the controls or the world itself,
 so the order matters: **10** reworks the key layout that later items build on, **11** changes the planets that
-**14**, **15**, **16**, **18** and **19** place things on, and **Save / load** (**20**) becomes a must-have
-once players can build (**18**) and travel back and forth (**19**).
+**14**, **15**, **16**, Building (now **25**) and Portals (now **24**) place things on, and **Save / load** (now
+**19**) becomes a must-have once players can build and travel back and forth. (Round 3 renumbered the open items.)
 
 ## 10. A much better HUD **(core)** ✓
 
@@ -202,7 +206,7 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
     placeables are put down (needed by 18).
   - Done: the hotbar is the first 9 slots of the hero's inventory. Food and gear land there first; materials go
     in the bag. Press the held slot's number again, or right click, to use it: food and tonics are eaten, gear is
-    equipped. Materials and keys show a hint about where they're used. Placeables wait for 18, and tools for 16. The held
+    equipped. Materials and keys show a hint about where they're used. Placeables wait for 25, and tools for 16. The held
     item's name shows above the vitals.
 - [x] **10.3 Vitals above the hotbar:** health, mana / stamina / focus, level and XP sit just above the hotbar, centred.
 - [x] **10.4 Skills HUD on the lower right:** skill icons with their names, cooldowns and keys.
@@ -318,9 +322,11 @@ Code: new `src/config/achievements.js`, `src/gameplay/Journal.js`, `src/ui/` (jo
     - Bestiary: the pages above.
     - Collection: every item, with the ones found in colour and a gem on gear found at Legendary rarity.
     - "Start the journal over" erases it (it asks twice).
-- [ ] Saved with the rest of the game (needs Save / load, 20).
+- [x] Saved with the rest of the game (needs Save / load, 19).
   - For now: the journal saves itself to localStorage (`lanternmoss.journal`, cleaned on load) and is kept across
     adventures, so it doesn't wait on Save / load. Fold it into the save system when that arrives.
+  - Decided (Round 3): the journal is per device, not per adventure, so it keeps saving itself and stays out of the
+    adventure save (19).
 
 ## 14. Better fights **(core)** ✓
 
@@ -373,7 +379,7 @@ Code: `src/combat/targeting.js` (`aimDirection`, soft lock-on), `src/combat/aimi
     - Villagers hint before the fight and cheer after.
     - Bestiary boss pages have lore and "To wake it".
 - [ ] Optional harder versions (rematches through portals, at a higher difficulty) with better loot.
-  - Waits on portals (19): today a beaten planet is left behind, so there's nowhere to rematch from yet.
+  - Waits on portals (24): today a beaten planet is left behind, so there's nowhere to rematch from yet. Planned in 31.
 
 ## 15. Better environments **(core)** ✓
 
@@ -497,10 +503,11 @@ Code: `src/config/items.js`, new gathering systems in `src/gameplay/`, `src/worl
 - [x] **Move the item description window** that shows now so it sits right under the whole inventory window.
   - Done: it's its own little window under the bag.
 
-## 17. More crafting **(core)**
+## 17. More crafting, part 1: stations and smelting **(core)** ✓
 
 **Goal:** turn raw resources into better things through several crafting stations.
 Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js` (Craft tab), new station props.
+The open half of this item (brewing, magic, cooking, recipe discovery) moved to **22. More crafting, part 2**.
 
 - [x] **Stations:** a workbench, a furnace or forge (Cinder's anvil), a cooking pot, and a brewing stand. Some recipes
       need you to stand at the right station.
@@ -529,79 +536,664 @@ Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js`
     - Iron: Ember Greataxe, Frostwind Bow, the Ember helm, mail and greaves, Snowstep Boots, opal and diamond settings.
   - New tools from ingots: an Iron Axe (axe tier 2) and an Iron Pickaxe (pick tier 3). A tool better than a node needs
     takes fewer swings (an iron pick breaks a copper vein in one).
-- [ ] **Brewing:** herbs and water become potions and tonics, with stronger versions from rarer ingredients.
-- [ ] **Magic:**
-  - Enchanting gear with runes or essences (extra stats, elemental effects).
-  - Infusing charms; maybe upgrading a piece's rarity.
-- [ ] **Cooking:** meals for the needs and buffs from 16.
-- [ ] Recipe discovery: recipes are learned from villagers, books, the bestiary, or found as scrolls.
 
-## 18. Building **(core)**
+---
 
-**Goal:** players shape their own spot on the planet.
-Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (placement on terrain), hotbar
-(10.2); needs Save / load (20).
+# Round 3: the plan from here
 
-- [ ] **Placeables:** furniture, lights, fences, paths, walls, floors and roofs, chests for storage, crafting stations
-      (17) and farm plots (16).
-- [ ] **Acquire them** by crafting, buying from villagers, or finding them.
-- [ ] **Place:** hold a placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
-      spots (not in the village square, not on paths or in lairs).
-- [ ] **Break / pick up:** taking a piece down gives it back (or its materials).
-- [ ] **Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
-      village houses.
-- [ ] Placed things block movement and the camera, and are saved per planet.
-- [ ] **A home to start with (suggested):** before full building, claim an empty cottage in the village, decorate it with
-      furniture you craft, and sleep in your own bed. This gives a smaller first step toward the pieces above.
+Written on 2026-10-08 after a review of the whole list. Items 1–17 are done and keep their places and numbers.
+Everything still open is renumbered **18–41** in the order I suggest building it, in six phases. The plan adds three
+new worlds (**27**, **30**, **32**) and the groundwork they need (**26**).
 
-## 19. Portals between worlds **(core)**
+**Sizes**, measured against items already built: **S** is smaller than smelting; **M** is about pet selection (12);
+**L** is about resources and survival (16); **XL** is bigger than anything built so far. Coding has been fast, but
+playtesting and balancing don't speed up the same way, so read L and XL as optimistic.
 
-**Goal:** travel is your choice, not a one-way trip.
-Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/world/` (a portal landmark),
-`src/ui/` (destination picker).
+| Phase | Items | Why here |
+|---|---|---|
+| **A. Foundations** | 18 Gameplay checks · 19 Save / load · 20 Performance budget | Stop the debt growing before more content lands. |
+| **B. A good first hour** | 21 Tutorial · 22 Crafting, part 2 · 23 Balance pass | Make the three worlds you have play well first. |
+| **C. Travel and a home** | 24 Portals · 25 Building | Per-planet state, and the way into the new worlds. |
+| **D. New worlds** | 26 Groundwork · 27 Tidewhisper · 28 Hero depth · 29 Caves · 30 Duskhollow · 31 After the last boss · 32 The Lantern Moon | The expansion, one world at a time. |
+| **E. Cozy depth** | 33 Friendship · 34 Bounties · 35 Pet care · 36 Living village · 37 Museum · 38 Festivals · 39 Photo mode | Independent: pull any forward as a break between worlds. |
+| **F. Reach** | 40 Mobile · 41 Multiplayer | Biggest rewrites; they need a stable game under them. |
 
-- [ ] **A portal on each planet** (e.g. in the village) that takes you back and forth between the worlds you've
-      unlocked by defeating their boss.
-- [ ] **Going ahead early:** under a special condition (a rare key, a challenge, an item), you can travel to a planet
-      whose boss you haven't beaten yet.
-  - The consequence: you can't travel freely back and forth (for example, a one-way trip until that planet's boss
-    falls, or until you find its portal key).
-  - Decide the exact rule.
-- [ ] Each planet keeps its state between visits: chests opened, monsters defeated, things built, villagers' progress.
-      Today a planet is rebuilt when you arrive, so this needs per-planet saved state.
-- [ ] Bosses you've beaten stay beaten (or offer a harder rematch, see 14). Travelling through a portal has its own
-      fade and sound.
+**Why the big moves** (so you can disagree with them):
+- **Save / load jumps from 20 to 19,** behind only the sims (18). Every item since 13 added state that a refresh throws
+  away, and every item after this adds more, so it will never be cheaper than now. The sims go first because save / load
+  touches every system and needs a safety net. The performance budget (20) comes before any new content because the
+  worlds and mobile will both be judged against it.
+- **Balance (23) is promoted from Suggested additions and placed before the new worlds,** because the worlds extend
+  the level and difficulty curve from wherever 23 leaves it. Tuning six worlds at once is much harder than tuning three
+  and then extending.
+- **Portals (24) now come before Building (25).** Portals bring per-planet state, which Building also needs, and
+  portals are how the new worlds are reached. Building is split so a small "home of your own" ships first.
+- **The new worlds start with a groundwork item (26), and the first world (27) is a test run** with a go / no-go check
+  before the next. Hero depth (28, was 30) and caves (29, was 28) sit between the worlds because they're prerequisites:
+  talents give the new levels (11–16) something to spend points on, and the caves build the darkness tech that Duskhollow needs.
+- **Cozy depth (33–39) comes after the worlds but blocks nothing.** These are the old suggested items 24–27, 29, 32 and 33. The only
+  hard order is Pet care (35) after Cooking (22). Bounties (34) and Friendship (33) are the cheapest wins if you want a
+  break.
+- **Mobile and Multiplayer stay last** (40, 41; were 21, 22). Both cost more with every screen and system added,
+  but both are also the riskiest to start halfway through. Mobile gets a cheap rule to follow from today (see
+  *Rules from here on*). Multiplayer gets a decision gate at the end of phase A (risk 1 below).
 
-## 20. Save / load **(core)**
+**Old number → new:** 17 (open half) → 22 · 18 → 25 · 19 → 24 · 20 → 19 · 21 → 40 · 22 → 41 · 23 → 21 · 24 → 33 ·
+25 → 38 · 26 → 35 · 27 → 37 · 28 → 29 · 29 → 34 · 30 → 28 · 31 → 31 · 32 → 36 · 33 → 39. From Suggested additions:
+gameplay checks → 18, performance budget → 20, both balance passes → 23. New: 26, 27, 30, 32.
+
+**Assumptions** (one line each; overrule any of them):
+- 17 is split: stations and smelting stay as 17 (done); brewing, magic, cooking and recipe discovery become 22.
+- 2a's "Remappable keys" was finished by 10.4, so it's checked.
+- Malgrath stays the end of the first act. The new worlds are a second act, reached through the portals once he falls.
+- The new worlds are **(core)**: they were asked for, not suggested.
+- The audio stays procedural: "no asset files" is part of Lanternmoss's identity (README). Each world gets a theme made in code.
+- Settings, keys, the journal and remembered pets stay per device, outside the adventure save.
+- Monsters respawn when you come back to a planet. Chests, beaten bosses and anything built stay as you left them.
+- Multiplayer stays **(core)** but last, behind a decision gate.
+
+## Plan-wide risks and recommendations
+
+Ranked by how likely each is to cause trouble. The items they affect also have inline notes.
+
+1. **Multiplayer (41) is the item most likely to cause trouble.** The game is built for one hero: `ctx.player`
+   appears 265 times in `src/`, monsters target that one hero, the pet menu and the journal pause the whole world, and
+   108 `Math.random()` calls across 36 files mean two machines will never agree on what happened. Every item before 41
+   adds more of this.
+   **Recommendation:** decide by the end of phase A. If it stays core, spend at most three days on a spike right
+   after 19: two heroes and one goblin over a host-authoritative WebRTC link, reusing the save's `toJSON()` / `load()`
+   pairs as the snapshot format. If the spike can't produce a fair goblin fight in that time, mark 41 **(stretch)** and stop
+   paying for it. Either way, don't leave it last *and* core.
+2. **Save / load (19) gets bigger with every feature.** Farm plots, equipment, gathered nodes, quests, stations, pets,
+   the day clock, and soon tides, lamps and placed things.
+   **Recommendation:** do it next, with a registry (each stateful system registers `{ key, toJSON, load }`), a
+   round-trip test per system, and a test that fails when a new system keeps state without registering. Keep a fixture
+   save in `tests/fixtures/` so old saves are proven to load after every format change.
+3. **The code assumes three planets in a fixed order.** `entities/npc/npcDefs.js` checks `s.planet === 1` and
+   `=== 2` (lines 65–160), `models/villagers.js:121` dresses villagers by index, `core/Game.js:84,89` starts on
+   `PLANETS[0]`, `config/achievements.js` has `allBosses` at 3 and `BOSS_CHALLENGES.lowLevel = [3, 5, 7]`, and
+   Frostveil's tagline calls it "the last". Portals break "index = progress", and new worlds break "three".
+   **Recommendation:** in 19, give planets ids (`'lanternmoss'`, `'emberfall'`, `'frostveil'`), save the ids, replace
+   index checks with `s.planetId === 'emberfall'`, and move per-planet lists (outfits, low-level targets) into the planet
+   config. Add a test that fails on `planet === <number>` in `src/`.
+4. **The new worlds (26–32) need a lot of content.** By the standard items 11–16 set, a world is much more than a new palette. Each one needs:
+   terrain, 3–4 new monsters (each a new AI behaviour and a new body builder), a boss AI (the existing ones are 160–380
+   lines each), a mini boss, 2–3 tree kinds, critters, a rare creature, birds and fish, weather, nodes, a material,
+   food, gear, a local villager with a quest, bestiary pages, achievements, music, first-arrival lines for every
+   travelling villager, and a mechanic. The cross-cutting systems (bounties, museum, festivals, gifts) then want data
+   for each world too.
+   **Recommendation:** three worlds, not more (a fourth is parked in Suggested additions). A test enforces the content
+   checklist (26), so no world ships half-filled or as a reskin. The first world is a test run with a go / no-go check.
+   The cross-cutting systems generate their data from the planet config (bounties from the roster and nodes, museum shelves from fish
+   and veins) instead of hand-writing it for each world.
+5. **Balance and difficulty scaling.** The level cap (10) and XP curve (2308 XP to the cap) were set for three planets.
+   Enemy stats multiply per planet (hp 1 → 1.6 → 2.4, damage 1 → 1.35 → 1.75), and none of it has been played through
+   together. Carrying on with those multipliers turns monsters into damage sponges by world 5.
+   **Recommendation:** 23 sets measurable targets that the sims (18) report per hero: a regular monster falls in 2–6 s at
+   the planet's expected level, a mini boss takes 1.5–3 min, a boss 3–5 min, and you arrive at each boss near its summon
+   level without grinding. New worlds grow at about +20% per world. Their difficulty comes from mechanics and monster
+   behaviour, not bigger numbers (26 has starting values).
+6. **Performance isn't measured.** The planets are already 3x bigger with 3.2x the scenery, the weather spawns up to 2200
+   particles, and nothing measures frame time. New worlds add unique meshes, Duskhollow wants many lights, and mobile
+   wants less of everything.
+   **Recommendation:** 20 records a budget before any new content, and every world must stay inside it (it's on the
+   checklist in 26). Duskhollow's lights are faked in shaders (29): in three.js each real point light costs every lit
+   pixel, and changing the number of lights recompiles every material.
+7. **Scope creep in Building (25) and Magic (22).** Walls, floors and roofs on a round, hilly planet, with collisions,
+   the camera and saving, is a game of its own. Rarity upgrades break the rarity-scaled loot from 8 (any Common could
+   become Legendary, so drops stop being exciting).
+   **Recommendation:** Building ships in stages, and the structures stage has its own go / no-go check. Magic drops
+   rarity upgrades and keeps to one enchantment slot per piece.
+8. **Per-planet state (24).** Today a planet is rebuilt from its seed every time you arrive. Saving whole planets would be big and
+   fragile.
+   **Recommendation:** store only what changed from the seed: opened chest ids, gathered node ids with the time they regrow,
+   farm plots, lit lamps, placed things. Ids come from the seed and placement order. Add a test that builds a planet twice from the same seed and checks that
+   every id matches.
+9. **Schedule.** There are 24 open items: seven L and three XL (one of them XL+). Content and playtesting are the bottleneck, not code. The
+   README rule (refresh the tour and retake the screenshots after every major update) adds time to every item, and that grows with
+   every world.
+   **Recommendation:** add a playtest checkpoint at the end of each phase: play the whole game once with one hero, list
+   what's broken, and fix it before the next phase. Let `scripts/screenshots.mjs` take a list of shots, so only the
+   affected ones are retaken.
+10. **The tests check the data, not the game.** The 113 unit tests cover configs and rules. Fights, bosses and AI are only
+    checked by sims that live outside the repo, and one of those checks is random (the dragon's "uses every move").
+    Save / load, portals and the new monster AIs will all touch that code.
+    **Recommendation:** 18, first.
+
+## Rules from here on
+
+Cheap habits that keep the expensive items (19, 26, 40, 41) from getting more expensive:
+- **No hover-only UI.** Details open on click or tap; hover may add to that, never replace it (for 40).
+- **New state registers with the save** (19) the day it's added, with a round-trip test.
+- **Planets by id, never by index** (risk 3).
+- **Weather stays mood only.** Anything that changes the rules (tides, darkness, gravity) is a planet mechanic (26),
+  which may read the weather.
+- **Randomness goes through one seeded `rng()`** (18), not `Math.random()`, in new code.
+- **New planet content passes the checklist** in 26.
+
+---
+
+# Phase A: Foundations
+
+## 18. Gameplay checks in the repo **(core)**
+
+**Goal:** the headless game simulations (the "sims") that check fights, bosses, items, survival and stations live in the repo and run with
+one command, so the big changes ahead (save / load, portals, new monster AIs) can't quietly break the game.
+Code: new `tests/sim/`, `package.json` (`npm run sim`), new `src/utils/rng.js`.
+Promoted from the suggested additions. **Size:** S. **Needs:** nothing.
+
+- [ ] Move the sims (environment, fights, bosses, items, survival, stations and others) into `tests/sim/` with a shared
+      headless setup, and add `npm run sim`.
+- [ ] **A seeded `rng()`** in `src/utils/rng.js`, used by the AI, loot and spawning code the sims touch. Make the
+      dragon's random "uses every move" check reliable with a fixed seed.
+- [ ] **Numbers, not only pass / fail:** the sims print time to kill per monster and hero, boss fight length and damage
+      taken. The balance pass (23) uses them as its targets.
+- [ ] While here, from Small fixes: add a `favicon.ico` (the server returns 404 for it).
+
+## 19. Save / load **(core)**
 
 **Goal:** an adventure survives closing the browser: come back and carry on where you left off.
 Code: new `src/core/save.js` (format, versions, cleaning on load), `src/core/Game.js` (gathering and restoring state),
 `src/ui/MainMenu.js` (Continue), `src/ui/PauseMenu.js`; every system with state gets a `toJSON()` / `load()` pair
 (the inventory already has one).
-Needed by 13 (journal), 18 (building) and 19 (per-planet state); unlocks **Continue** on the title screen (3).
-**Priority (suggested):** do this before much more content. Every feature since 13 adds state that a refresh throws
-away (farm plots, equipment, gathered nodes, quests), and each one makes save / load bigger to build.
+Unlocks **Continue** on the title screen (3); needed by 24 (per-planet state), 25 (building) and 41 (multiplayer
+snapshots). **Size:** L. **Needs:** 18.
+**Risk:** it grows with every feature (risk 2), and indices saved today break with portals and new worlds (risk 3).
+**Recommendation:** ids first, a registry and round-trip tests, and a fixture save checked into the repo.
 
+- [ ] **Planet ids first:** `'lanternmoss'`, `'emberfall'`, `'frostveil'`; `ctx.planetId` next to `ctx.planet`. Replace
+      the index checks in `npcDefs.js`, `models/villagers.js`, `Game.js` and `achievements.js` (risk 3), and add a test
+      that fails on `planet === <number>`.
 - [ ] **What's saved:**
   - The adventure: current planet, hero, level, XP, coins, health and mana.
   - The bag, the hotbar and the gear worn.
   - Pets: unlocked, names, the one out, the command, health.
   - Progress: quests and challenges, story state (what villagers know), opened chests, bosses beaten, the day clock.
-  - Later: each planet's own state (19) and what's been built (18).
+  - The survival state: energy, farm plots, gathered nodes and their regrow times, active buffs.
+  - A per-planet section in the format from day one, keyed by planet id, even before 24 fills it.
+  - Later: each planet's own state (24) and what's been built (25).
+- [ ] **A save registry:** each system registers `{ key, toJSON, load }`; a test fails if a system with state isn't in
+      it, and each one has a round-trip test (`load(toJSON(x))` gives `x` back).
 - [ ] **When:** autosave on arriving at a planet, after a boss, on quitting to the menu, and every few minutes; a
       "Save" button on the pause menu too. A small "Saved" note when it happens.
 - [ ] **Continue** on the title screen loads the save (and starts a new adventure only after asking, if one exists).
 - [ ] **A safe format:** versioned, and cleaned on load like the settings (unknown items, pets or planets dropped,
-      numbers clamped), so an old or broken save never crashes the game. Unit-tested.
-- [ ] Settings, keys, the journal and remembered pets already save themselves; decide whether they join the save
+      numbers clamped), so an old or broken save never crashes the game. Unit-tested, with a fixture save in
+      `tests/fixtures/` that must keep loading after every format change.
+- [x] Settings, keys, the journal and remembered pets already save themselves; decide whether they join the save
       or stay separate (they're per device, not per adventure).
-- [ ] Maybe: more than one save slot, and export / import a save as a file.
+  - Decided (Round 3): they stay separate, per device. The adventure save holds only the adventure.
+- [ ] More than one save slot, and export / import a save as a file.
+  - Start with one slot, but make the slot a field in the format. Export / import is cheap and helps with bug reports,
+    so do it in this item; extra slots can wait.
 
-## 21. Mobile support **(core)**
+## 20. Performance budget **(core)**
+
+**Goal:** know how fast the game runs, and keep it that way as the worlds grow.
+Code: new `src/ui/perfOverlay.js`, `src/config/settings.js` (density settings), `src/config/render.js`,
+`src/config/weather.js` (`counts`), `src/world/scatter.js`.
+Promoted from the suggested additions. **Size:** M. **Needs:** 18.
+**Why now:** the planets keep growing (11 noted "watch the performance budget"), and both the new worlds (26) and Mobile
+support (40) need numbers to stay under.
+
+- [ ] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
+- [ ] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
+      record it as the ceiling. The target is a steady 60 fps at 1080p on integrated graphics (Iris Xe class) at the
+      default quality. Write the numbers down in `docs/performance.md`.
+- [ ] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
+      quality preset from 2a, so lower presets draw less, not only at a lower resolution.
+- [ ] Batching, culling and level of detail where the overlay shows the need (scenery first).
+- [ ] The sims (18) or the screenshot script record draw calls per planet, so regressions show up in a diff.
+
+---
+
+# Phase B: A good first hour
+
+## 21. Tutorial and first-time help **(suggested)**
+
+**Goal:** new players learn the game's many systems without reading toasts that vanish in two seconds.
+Code: new `src/gameplay/Tutorial.js`, `src/ui/` (a hint panel), `src/config/` (tutorial steps); builds on the
+first-time tips in `src/gameplay/Gathering.js`.
+Promoted from the suggested additions (tutorial, death screen). **Size:** M. **Needs:** 19 (so "seen" survives a refresh).
+**Risk:** it teaches systems that 22 and 24 will still change. **Recommendation:** keep the steps as data in
+`src/config/`, so a changed system means changing one line, not rewriting the tutorial.
+
+- [ ] **A guided start:** a short first walk out of the village that teaches moving, the camera, talking (`E`),
+      the bag and hotbar, a first fight (dodging, abilities, the ultimate's aim) and the sealed boss lair's conditions.
+      It can be skipped, and offered again from the pause menu.
+- [ ] **Hints that stay:** a small hint panel (or a "help" page in the journal) that keeps the first-time tips:
+      energy, tools, stations, smelting, fishing, farming, pets.
+- [ ] **A death screen:** "You fainted", with a short recap (what hit you, how long you lasted), a respawn countdown
+      and a tip.
+
+## 22. More crafting, part 2 **(core)**
+
+**Goal:** the farm, the ponds and the wilds feed into crafting that's worth doing: better meals and potions, magic for
+your gear, and recipes worth discovering.
+Code: `src/config/crafting.js`, `src/items/crafting.js`, `src/ui/InventoryUI.js` (Craft tab), `src/gameplay/buffs.js`.
+The open half of the old 17, in the order to build it. **Size:** M–L. **Needs:** 19.
+**Risk:** Magic is where this item can sprawl (risk 7). **Recommendation:** build it last, with no rarity upgrades and
+one enchantment slot per piece; recipe discovery never hides a recipe that a quest, the tutorial or a first tool needs.
+
+- [ ] **Cooking:** meals for the needs and buffs from 16.
+  - Assumption: the pot already cooks the meals from 16, so what's open is depth: meals from the farm's crops and each
+    planet's fish, stronger versions from rarer ingredients (a Golden Koi feast), and one meal buff at a time so buffs
+    don't stack into silliness.
+- [ ] **Brewing:** herbs and water become potions and tonics, with stronger versions from rarer ingredients.
+- [ ] Recipe discovery: recipes are learned from villagers, books, the bestiary, or found as scrolls.
+  - Start with books (the bookshelves in the houses), scrolls in chests and bestiary pages; villagers teach recipes once
+    Friendship (33) lands.
+- [ ] **Magic:**
+  - Enchanting gear with runes or essences (extra stats, elemental effects).
+  - Infusing charms; maybe upgrading a piece's rarity.
+  - Trimmed (Round 3): one enchantment slot per piece and three or four rune kinds (one per world's material), no
+    rarity upgrades.
+- [ ] From Quality of life: a "Craft x5" / "Smelt all" button, and favourite recipes pinned at the top of the Craft tab.
+
+## 23. Balance and pacing pass **(core)**
+
+**Goal:** the numbers set by hand play well together, with every hero, and there are written targets the new worlds can
+be tuned to.
+Code: `src/config/` (combat, planets, leveling, survival, resources, shop, crafting), the sims in `tests/sim/` (18).
+Merges the two high-priority balance items from the suggested additions. **Size:** M. **Needs:** 18, 22.
+
+- [ ] **Targets first** (risk 5), reported by the sims per hero: a regular monster falls in 2–6 s at the planet's
+      expected level; a mini boss takes 1.5–3 min, a boss 3–5 min; a natural play-through reaches each boss's summon
+      level (2, 4, 6) without grinding. Write them in `docs/balance.md`.
+- [ ] Balance and pacing (was a suggested addition): play through with each hero and tune the numbers that were set by
+      hand and never tested together: energy drain, node regrow times, crop growth, fuel costs, mini boss health, coin
+      prices and shop costs.
+- [ ] Balance pass on the new bosses (was a suggested addition): playtest Pyrrhax and Malgrath with each hero. In
+      particular, check how often the Doom Blade is used, the damage of the Demon Lord's flying phase, and the 50%
+      transition timing.
+- [ ] **The economy:** coins in (monsters, chests, quests, selling) against coins out (shop, seeds); a planet's chests and
+      quests should pay for its next gear tier, not more.
+
+---
+
+# Phase C: Travel and a home
+
+## 24. Portals between worlds **(core)**
+
+**Goal:** travel is your choice, not a one-way trip.
+Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/world/` (a portal landmark),
+`src/ui/` (destination picker), `src/core/save.js` (per-planet state).
+**Size:** L. **Needs:** 19. The new worlds (26 on) are reached through it, and rematches (31) start from it.
+**Risk:** storing whole planets is big and fragile (risk 8); one-off villager lines replay on revisits.
+**Recommendation:** store only what changed from the seed, with stable ids; one-off lines are keyed by planet id (19).
+
+- [ ] **A portal on each planet** (e.g. in the village) that takes you back and forth between the worlds you've
+      unlocked by defeating their boss.
+  - A lantern gate at the edge of the village square, lit in the colour of each world it can reach.
+- [ ] **Going ahead early:** under a special condition (a rare key, a challenge, an item), you can travel to a planet
+      whose boss you haven't beaten yet.
+  - The consequence: you can't travel freely back and forth (for example, a one-way trip until that planet's boss
+    falls, or until you find its portal key).
+  - Decided (Round 3): a **Wayfarer's Key** (rare: Lantern chests, or a no-hit boss challenge) opens the next locked
+    planet one way. The gate home stays dark until that planet's boss falls, or until you use another key.
+- [ ] Each planet keeps its state between visits: chests opened, monsters defeated, things built, villagers' progress.
+      Today a planet is rebuilt when you arrive, so this needs per-planet saved state.
+  - Only what changed from the seed is stored (risk 8). Monsters respawn on a revisit (assumption); nodes regrow by
+    the play time that passed.
+- [ ] Bosses you've beaten stay beaten (or offer a harder rematch, see 31). Travelling through a portal has its own
+      fade and sound.
+- [ ] The travelling villagers come with you wherever you go (as now); the locals (Cinder, Tuva) stay home.
+
+## 25. Building **(core)**
+
+**Goal:** players shape their own spot on the planet.
+Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (placement on terrain), hotbar
+(10.2). **Size:** L, in three stages. **Needs:** 19 and 24 (saved per planet).
+**Risk:** the structures stage (walls, floors, roofs on a round, hilly planet) is a game of its own (risk 7).
+**Recommendation:** ship 25a and 25b, play with them, then decide on 25c.
+
+- [ ] **25a. A home to start with (suggested):** before full building, claim an empty cottage in the village, decorate it with
+      furniture you craft, and sleep in your own bed. This gives a smaller first step toward the pieces below.
+- [ ] **25b. Placeables:** furniture, lights, fences, paths, walls, floors and roofs, chests for storage, crafting stations
+      (17) and farm plots (16).
+  - In 25b: furniture, lights, fences, paths, storage chests, stations and farm plots. Walls, floors and roofs go to 25c.
+  - From Quality of life: quick-stacking into storage chests, and sorting the bag.
+- [ ] **Acquire them** by crafting, buying from villagers, or finding them.
+- [ ] **Place:** hold a placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
+      spots (not in the village square, not on paths or in lairs).
+- [ ] **Break / pick up:** taking a piece down gives it back (or its materials).
+- [ ] Placed things block movement and the camera, and are saved per planet.
+- [ ] **25c. Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
+      village houses.
+  - Go / no-go after 25b: only if placement on slopes, collisions and the camera already feel solid.
+
+---
+
+# Phase D: New worlds
+
+Three new worlds, each built around one mechanic the first three don't have, in Lanternmoss's look: storybook
+low-poly, made in code, ink outlines, warm glowing lights, cozy rather than grim.
+- **Tidewhisper** (27): islands, tide pools and lighthouses. Mechanic: **tides**.
+- **Duskhollow** (30): a twilight world under giant glowing mushrooms. Mechanic: **light and dark** (your lantern).
+- **The Lantern Moon** (32, secret): where every lantern's light drifts up to. Mechanic: **low gravity**.
+
+Why three: each existing world was built up over items 11–16, and a new one has to match that standard (risk 4). Three
+worlds give a full second act plus a secret ending without doubling the game. A fourth idea (Windward) is parked in
+Suggested additions.
+
+## 26. New worlds: the groundwork **(core)**
+
+**Goal:** adding a world means filling in a checklist, not surgery, and no world ships as a reskin.
+Code: `src/config/planets.js` → `src/config/planets/` (one file per world), new `src/world/mechanics/`,
+`src/physics/Walker.js`, `src/config/leveling.js`, `src/config/achievements.js`, `src/ui/MainMenu.js` (campaign strip),
+`tests/planets.test.mjs`. New in Round 3. **Size:** L. **Needs:** 19, 23, 24.
+**Risk:** players never see this item, so it's tempting to skip. **Recommendation:** don't. Without it, world 4 turns into
+copy-paste in `planets.js`, and the three-planet assumptions break one at a time during 27.
+
+- [ ] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
+      its `act`.
+- [ ] **Planet mechanics:** `mechanic: 'tides'` loads `src/world/mechanics/tides.js` with `enter`, `update(dt)`, `exit`
+      and save hooks (19). Weather stays mood only; a mechanic may read the weather.
+- [ ] **Per-planet physics:** gravity (Moon-Hop already scales it: `moonGravity` in `config/game.js`) and a sea level
+      that can move (today ponds and lakes are fixed). The Walker, swimming, spawning and node placement read both.
+- [ ] **New enemy behaviours as building blocks** in `src/entities/enemies/behaviors/` (like `charger`, `burrower`),
+      not buried inside one monster: `armoured`, `drifter`, `amphibian` (27); `lightbound`, `weaver`, `mimic`, `thief`
+      (30); `swarm`, `puller`, `launcher` (32). Ten behaviours, three boss AIs and two mini boss AIs in total, which is
+      where most of the time goes.
+- [ ] **Levels:** cap 10 → 16, with the XP curve extended. Expected levels: Tidewhisper 7–10, Duskhollow 10–13, the
+      Lantern Moon 13–16. Starting scale values (tune them to 23's targets): hp 2.9 / 3.4 / 4.0, damage 2.0 / 2.25 /
+      2.5. The low-level challenge targets move into each planet's file.
+- [ ] **A second act:** the title's campaign strip shows Act II (the secret world as "?"), Frostveil's tagline no
+      longer says "the last", and there are achievements for the new bosses plus "Lantern of Five Worlds" (the first three keep
+      "Lantern of Three Worlds").
+- [ ] **The content checklist, as a test,** for every world: at least 3 monster types found on no other planet (at most 2
+      returning types); its own boss AI module and a mini boss; at least 2 tree kinds, 2 critters and a rare creature of
+      its own; at least 1 weather kind of its own; a material and a rare vein; a local villager with a quest; a bestiary
+      page for every monster; a music theme; first-arrival lines for every travelling villager; and the performance
+      budget (20).
+
+## 27. World 4: Tidewhisper **(core)**
+
+**Goal:** a planet of islands, tide pools and lighthouses, and the test run for the groundwork (26).
+Code: `src/config/planets/tidewhisper.js`, `src/world/mechanics/tides.js`, new behaviours and models, a boss in
+`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL. **Needs:** 26.
+Reuses on purpose: swimming (11), fishing (16), fuel (17), facing-based aiming (14).
+**Risk:** the moving sea touches physics, spawning, monster AI (monsters that end up in water), nodes and the farm.
+**Recommendation:** keep the tide range small (about 1.5 m), mark the tidal band in the height field, and only place
+things meant for it there (tide pools, clams, driftwood). The farm sits above the high-tide line.
+
+- [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
+      sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
+      on stilts on the largest island, with a pier for fishing.
+- [ ] **Tides:** the sea rises and falls once a day (low in the afternoon, high at night). Low tide opens sandbars,
+      tide pools (crabs, clams, pearls) and the causeway to the boss lagoon; high tide floods them (swim across;
+      swimming drains energy faster, 16). Driftwood and shells wash up on the flats at each high tide, a reason to come
+      back. A tide chip sits next to the clock.
+- [ ] **Monsters (new):**
+  - **Shellbacks:** crabs that scuttle sideways. The shell blocks hits from the front, so circle round them (facing, 14).
+  - **Jellybells:** jellyfish that drift with the tide over the water and the flooded flats, pulsing a stinging ring;
+    popped, they burst into light.
+  - **Surf skippers:** mudskipper raiders that ambush from the surf and slip back into deep water where you can't
+    follow on foot.
+  - Returning: a few wisps, sea-green.
+- [ ] **Mini boss: Old Ironclaw,** a giant hermit crab wearing a sunken bronze bell. The bell takes no damage and rings
+      a stunning shockwave when hit; Ironclaw is open when it pulls out to swap shells (at 66% and 33%) or when a charge
+      wedges it in the sand at low tide. It guards the black pearl beds on the far beach.
+- [ ] **Boss: Mirelure, the Lantern Angler,** a huge anglerfish whose lure is a lantern that once drew ships onto the rocks.
+  - Wakes when: level 8, Marlo's quest is done (the lighthouse relit) and the tide is low enough to cross the causeway.
+  - Phase 1, lagoon flooded: only her lure shows, and she lights false lures around the lagoon. Strike the real one (it
+    flickers in time with her breathing) and she surfaces; strike a false one and it bursts.
+  - Phase 2, at 50%: she smashes the sluice and the lagoon drains. Beached, she thrashes, rolls and bites, open to
+    everything, while the water creeps back on a timer.
+  - Arena ring: crashing surf. Trophy: the Tide Crown.
+- [ ] **Flora:** lantern palms (glowing coconuts hang like lanterns), kelp trees swaying at the shore, coral fans (no
+      wood, like crystal spires), dune grass, sea thrift and sea lavender.
+- [ ] **Wildlife:** hermit crabs that hide in their shells, sea turtles on the beaches, seals that loaf on rocks and bark,
+      gulls and terns, shoals in the shallows, and lanternfish that glow at night. Rare: the **Pearl Turtle** (gift: the
+      Pearl of the Deep charm). New body builders: crab, turtle, seal.
+- [ ] **Weather:** clear and breezy, plus two new kinds: **sea mist** (rolls in at dawn) and **squall** (driving rain,
+      wind and whitecaps).
+- [ ] **Resources and items:** driftwood and shells by hand, clam beds at low tide (pearls), coral (pickaxe), salt pans
+      (sea salt for cooking), seaweed, and iron in the old shipwrecks. Material: **seaglass**. Rare vein: black pearl
+      beds. Food: salted fish, seaweed rolls, chowder. Gear: the Tide set (28).
+- [ ] **People:** Marlo the lighthouse keeper (lines, tips for Mirelure, and the quest "The Dark Lighthouse": seaglass for a
+      new lens and fuel to light it); stilt houses with two interiors; beach outfits for the travelling villagers.
+- [ ] **Music:** a slow waltz over a sea-swell pad, made in code.
+- [ ] Optional, only if the world comes in under budget: an otter pet that dives for pearls.
+- [ ] **Go / no-go check** once it plays end to end: how long it took, what the groundwork (26) got wrong, and whether
+      the checklist was too much. Fix 26 before starting 30, or cut Duskhollow down to fit.
+
+## 28. Gear sets and hero depth **(suggested)**
+
+**Goal:** choosing gear and growing a hero have more to them than bigger numbers.
+Code: `src/config/items.js` (sets), `src/items/gear.js`, `src/config/characters.js` (talents), `src/ui/` (a talent
+page). **Size:** M. **Needs:** 26 (the level cap rises to 16).
+**Why here:** after 26, levels 11–16 add only small stat bumps; talents give them something to spend points on.
+
+- [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
+      chilling hits; the Moss set: more healing), shown in the bag's equipment side.
+  - One set per world: the Tide set (27), the Dusk set (30) and the Star set (32) join them.
+- [ ] **A small talent tree per hero:** a point every level or two, spent on upgrades to their abilities or an
+      alternative version of a skill (a wider Cleave, a homing Fireball).
+- [ ] A free reset at the village (a wizard's service), so trying builds is cozy, not punishing.
+
+## 29. Dungeons and caves **(suggested)**
+
+**Goal:** something to explore beyond the open planet surface, where mining and fighting meet.
+Code: new `src/world/caves.js` (interiors like the houses', away from the planet), `src/gameplay/Dungeons.js`,
+`src/config/dungeons.js`, new `src/render/lighting.js`. **Size:** L. **Needs:** 19, 20.
+**Why here:** it builds the darkness and light that Duskhollow (30) needs, in a small space first.
+**Risk:** one hand-made cave per planet means six caves. **Recommendation:** build caves from a kit of room pieces put
+together from a seed, so each planet's cave is config (palette, monsters, veins), not hand-built.
+
+- [ ] **A cave or dungeon per planet,** entered from the surface: a few rooms with monsters, chests and ore veins
+      that are found nowhere else.
+- [ ] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
+- [ ] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
+- [ ] Caves are dark: lanterns and glowcaps light the way.
+  - **The light tech:** a light radius around the hero and around lanterns, done in the shaders (a few light positions
+    passed to the materials) plus emissive glow and bloom. At most about four real point lights (risk 6).
+  - Keep a minimum ambient light and the ink outlines, so the dark is moody but always readable.
+
+## 30. World 5: Duskhollow **(core)**
+
+**Goal:** a twilight planet under a canopy of giant glowing mushrooms, where your lantern decides what you can see and
+fight.
+Code: `src/config/planets/duskhollow.js`, `src/world/mechanics/lantern.js`, the light tech from 29, new behaviours and
+models, a boss in `src/entities/enemies/behaviors/boss/moth.js`. New in Round 3. **Size:** XL. **Needs:** 27 (and its
+go / no-go check), 28, 29.
+**Risk:** a dark world can be hard to read, and frustrating on cheap screens. **Recommendation:** keep a minimum light
+level and the outlines, never let an empty lantern hurt you, and test it on the lowest quality preset.
+
+- [ ] **Shape and look:** deep valleys under a canopy of giant lumen caps about 25 m up, with gaps of starlight. An
+      endless dusk (the day clock still turns, as brighter and dimmer dusk). Glowmoss carpets light up in your
+      footprints as you walk, the world's signature effect.
+- [ ] **Your lantern:** it hangs from the hero's belt and has an Oil bar beside Energy, refilled with glowcaps, firefly
+      jars and lumen oil. An empty lantern shrinks to a small glow; it never hurts you. The village and its lamp posts
+      are safe light. Relight **waylamps** along the roads and they stay lit (per-planet state, 24), making safe paths.
+- [ ] **Monsters (new):**
+  - **Shadelings:** only shadows outside your light, solid and hittable inside it. A burst of light (fire spells, a
+    flare) sends them fleeing.
+  - **Gloomweavers:** round, fuzzy spiders that string sticky webs between the stalks. Webs slow you; fire or a blade
+    cuts them. (Accessibility: an option draws them as round beetles.)
+  - **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
+  - **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
+- [ ] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
+      her down, where she fights and spins new anchors. She guards the moonstone vein.
+- [ ] **Boss: Umbra, the Moth of the Last Light.**
+  - Wakes when: level 11, and the three moonwell lanterns on the Old Road are relit for Wick's quest by carrying the
+    village flame (run dry on the way and you start again from the last lit waylamp).
+  - She dives at the brightest light. Light an arena lantern and she crashes into it, stunned and open to hits.
+  - Her wingbeats snuff your lantern and the arena's, and in the dark, shadelings join the fight.
+  - At 50% she drinks light: the arena dims each time she feeds, and the scales she sheds blind you (a fog that
+    follows you).
+  - Arena ring: pale moonfire. Trophy: the Dusk Crown.
+- [ ] **Flora:** lumen caps (the canopy, and smaller ones you walk under), lantern vines hanging from them, ghost ferns,
+      glowmoss and pale moonflowers.
+- [ ] **Wildlife:** firefly swarms (catch them in a jar with `E`, for light and oil), glow snails, lantern bats hanging
+      under the caps, and crickets you hear before you see. Pale blind fish in glowing pools. Rare: the **Moonmoth**
+      (gift: the Moonmoth Wing charm, a wider light).
+- [ ] **Weather:** no rain under the canopy (the dripping caps water the farm instead), plus two new kinds: **spore
+      drift** (glowing spores) and **deep dark** (the dusk thickens; the lantern mechanic shrinks your light a little).
+- [ ] **Resources and items:** lumen ore (needs an iron pickaxe) for lumen ingots, spider silk from cut webs (cloth for
+      light armour), firefly jars, and shade mushrooms (a crop that grows only in shade). Material: **lumen dust**. Rare
+      vein: moonstone. Gear: the Dusk set (28).
+- [ ] **People:** Wick the lamplighter (lines, tips for Umbra, and the quest "Light the Old Road"); houses inside
+      mushroom stalks; the travellers' lines ("I can't see my own beard!").
+- [ ] **Music:** a music box over low strings, made in code.
+
+## 31. After the last boss **(suggested)**
+
+**Goal:** the adventure doesn't simply stop after the last boss.
+Code: `src/gameplay/PlanetProgression.js`, `src/config/planets/`, `src/config/combat.js`. **Size:** M. **Needs:** 24.
+Before 32, because the Lantern Moon's boss reuses the rematch versions of the other bosses' moves.
+
+- [ ] **Rematches:** harder versions of the planet bosses and mini bosses, with new attacks and better loot.
+  - Reached through the portals (24): a beaten boss's lair offers a rematch (this replaces 14's open "harder
+    versions").
+- [ ] **A secret fourth planet,** unlocked after the last boss, with its own boss and materials.
+  - Now the sixth world: **32. The Lantern Moon**.
+- [ ] **New Game+:** start again with your journal, pets and vanity kept, against tougher rosters with better loot.
+
+## 32. World 6 (secret): The Lantern Moon **(core)**
+
+**Goal:** a small secret world after the second act: the place where every lantern's light drifts up to.
+Code: `src/config/planets/lanternMoon.js`, `src/world/mechanics/lowGravity.js`, new behaviours and models, a boss in
+`src/entities/enemies/behaviors/boss/eclipse.js`. New in Round 3. **Size:** L (a deliberately small world).
+**Needs:** 30, 31.
+**Risk:** this is a reward for completionists, and it could easily grow as big as a main world. **Recommendation:** keep it
+small: radius 40 (the old planet size, so you can see the curve, like a moon), one building, and no farm or cave. Its boss
+reuses moves from the other five.
+
+- [ ] **Unlock** (assumption): beat Umbra and befriend every rare creature in this adventure. Their five lights then
+      open the lantern gate to the moon at night.
+- [ ] **Low gravity:** higher, floatier jumps, slower falls and longer knockbacks, for monsters too (built on
+      Moon-Hop's gravity).
+- [ ] **Shape and look:** silver-blue grass and craters (a new terrain part), a black starry sky with the worlds you've
+      visited hanging in it in their colours, and lanterns from every world drifting up over the horizon. Catch one (`E`)
+      for a small gift from the world it came from.
+- [ ] **Monsters (new):**
+  - **Moonmites:** crystal beetles that roll in swarms and bowl you over.
+  - **Gravity puffs:** balloon creatures that pull you in, then pop.
+  - **Lunar golems:** they slam the ground and launch you up, so part of the fight happens in the air.
+  - The mini boss slot on the checklist is waived here: the rematches (31) fill it.
+- [ ] **Boss: Nyxra, the Eclipse,** a lonely being who drinks lantern light.
+  - Wakes when: level 14, at the top of the observatory, at night.
+  - The fight remembers the journey: each phase borrows a signature move from an earlier boss in its rematch version
+    (thorns, dragonfire, the Doom Blade, a false lure, a moth's dive), plus her own moves. She eclipses the sun (the
+    darkness from 29) and opens gravity wells.
+  - She isn't destroyed. At 0 she's rekindled and stays on the moon as a lantern spirit, the last villager you meet.
+- [ ] **Flora:** moonglass trees (see-through, they chime in the wind), star lilies that open at night, silver tufts.
+- [ ] **Wildlife:** moon rabbits pounding mochi (a nod to the folk tale, with their own model and animation, not the
+      bunny), comet foxes with glowing tail trails, star moths, and starfins in a still star-pool. Rare: the **Jade
+      Rabbit** (gift: the Mochi Moon charm).
+- [ ] **Weather:** clear, plus a **meteor shower**: star shards fall at marked spots (collecting them is part of the low-gravity
+      mechanic). Material: **stardust**.
+- [ ] **People and items:** the Lamplighter, who tends the lanterns that drift up, keeps the observatory and sells the last
+      tier: the Star set (28) and endgame trinkets.
+- [ ] **Music:** a celesta theme, made in code.
+
+---
+
+# Phase E: Cozy depth
+
+Independent of each other and of the worlds: pull any of them forward as a break between worlds. The only hard order
+is Pet care (35) after Cooking (22). Where one of them needs data for each world, generate it from the planet config
+(risk 4).
+
+## 33. Villager friendship **(suggested)**
+
+**Goal:** the villagers become friends you care about, not only quest givers and a shop.
+Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts, reward tiers), `src/ui/Dialog.js`
+(a gift option), the journal (a friends page). **Size:** M. **Needs:** 19.
+
+- [ ] **Friendship hearts** per villager, raised by talking each day, gifts and finishing their quests.
+- [ ] **Gifts:** each villager has favourite, liked and disliked things (food you cook, fish, gems, flowers), with a
+      reaction line and an emote for each.
+- [ ] **Rewards by heart level:** recipes (ties into recipe discovery, 22), shop discounts, a unique trinket or vanity
+      piece, new dialogue and a small personal quest.
+- [ ] Friends greet you by name, wave from across the square and sometimes leave a gift at your door.
+- [ ] The new worlds' locals (Marlo, Wick, the Lamplighter) join with their own tastes.
+
+## 34. Bounty board **(suggested)**
+
+**Goal:** there's always something small to do, every day.
+Code: new `src/gameplay/Bounties.js`, `src/config/bounties.js`, a board prop in each village, `src/ui/` (the board).
+**Size:** S. **Needs:** 19.
+
+- [ ] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
+      ("3 ramhorns"), catch a fish ("a Golden Koi"), harvest a crop.
+  - Generated from the planet's config (roster, nodes, fish, crops), so every world gets bounties without extra writing.
+- [ ] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
+- [ ] The journal counts bounties finished, with an achievement or two.
+
+## 35. Pet care **(suggested)**
+
+**Goal:** pets feel looked after, and the food you grow matters to them too.
+Code: `src/gameplay/Pets.js`, `src/ui/PetMenu.js`, `src/config/pets.js`, `src/models/vanity.js`. **Size:** S–M.
+**Needs:** 22 (cooking); the pet bed needs 25a.
+
+- [ ] **Feeding:** pets have favourite foods from the farm, the ponds and the wilds; feeding them gives a short buff
+      or a little XP, and a happy emote.
+- [ ] **Pet outfits:** small hats, bows and scarves for pets, using the same vanity idea as the hero's hat and cape.
+- [ ] **Pet finds:** a well-fed pet sometimes brings back something it found (a forage item, a seed, now and then a
+      coin).
+- [ ] A pet bed in your home (25) where resting pets heal.
+
+## 36. A living village **(suggested)**
+
+**Goal:** the villagers use the same world you do, so the village feels busy.
+Code: `src/entities/npc/NPC.js`, `src/entities/npc/npcDefs.js` (schedules), `src/gameplay/Stations.js`,
+`src/gameplay/Farm.js`. **Size:** M.
+
+- [ ] Villagers' schedules include the new places: Cinder at the forge, Pim at the cooking pot, someone fishing at
+      the pond in the evening, someone tending a farm plot.
+  - And on the new worlds: Marlo fishes from the pier, and Wick relights the lamps at dusk.
+- [ ] They react to what you do there ("Nice catch!", "That pumpkin's enormous!").
+- [ ] Their activities show with small animations and the stations' own effects (sparks, steam).
+
+## 37. Museum **(suggested)**
+
+**Goal:** collecting has a place to show off, and fishing, mining and foraging lead somewhere.
+Code: new `src/gameplay/Museum.js`, `src/world/interiors.js` (a museum room), the journal's Collection tab.
+**Size:** M. **Needs:** 19.
+
+- [ ] **Donate** fish, gems, rare forage and monster trophies to Old Bramble's museum. Each donation fills a display
+      in a museum room you can walk through.
+  - The shelves are generated from the item and planet config, so they grow with each world on their own.
+- [ ] **Rewards** for completing a shelf (all the fish, all the gems): coins, a vanity piece, a unique trinket.
+- [ ] The journal's Collection tab marks what's been donated.
+
+## 38. Festivals **(suggested)**
+
+**Goal:** the calendar has highlights to look forward to.
+Code: `src/config/day.js` (a calendar), new `src/gameplay/Festivals.js`, `src/world/village.js` (decorations),
+`src/config/shop.js` (festival stock). **Size:** M.
+**Risk:** a hand-made festival per planet means six festivals. **Recommendation:** one festival system whose decorations
+take the planet's colours; give the first three worlds their own versions only if time allows.
+
+- [ ] **A lantern festival** every few days: paper lanterns over the square, villagers gathered at night, a special
+      shop, and small mini-games (lantern lighting, a race).
+- [ ] **A harvest fair:** enter your best crop or fish, and the villagers judge it for a ribbon and a prize.
+- [ ] Each planet gets its own version (an ember festival, a frost festival), and the journal remembers the ones
+      you've been to.
+
+## 39. Photo mode **(suggested)**
+
+**Goal:** a cozy, pretty game is one people want to take pictures of.
+Code: `src/systems/CameraSystem.js` (the showcase camera already exists), new `src/ui/PhotoMode.js`. **Size:** S.
+
+- [ ] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
+- [ ] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
+- [ ] Save the picture as an image file.
+
+---
+
+# Phase F: Reach
+
+## 40. Mobile support **(core)**
 
 **Goal:** the game is playable in a phone or tablet browser, with touch controls.
 Code: `src/systems/InputSystem.js`, `src/core/controls.js`, new `src/ui/touchControls.js`, `styles/main.css`,
-`index.html` (viewport), `src/config/settings.js` (defaults for mobile).
+`index.html` (viewport), `src/config/settings.js` (defaults for mobile). **Size:** L. **Needs:** 20.
+**Risk:** every screen built until then becomes a screen to convert, and there are about twenty actions on keys today.
+**Recommendation:** follow the no-hover rule from today (*Rules from here on*). Build touch and gamepad on one input
+layer (actions, not keys) so Gamepad support comes almost for free.
 
 - [ ] **Detect a touch device** (`pointer: coarse`, touch events) and switch the touch layout on; keep a setting to
       turn it on or off by hand.
@@ -618,18 +1210,23 @@ Code: `src/systems/InputSystem.js`, `src/core/controls.js`, new `src/ui/touchCon
       portrait), no page scrolling or pinch-zooming of the page, full screen when possible.
 - [ ] **Performance:** lower default quality on mobile (pixel ratio, bloom, shadows, scenery density) and a frame-rate
       check.
+  - Using the density settings and the budget from 20; Duskhollow (30) is the world to test on.
 - [ ] Facing-based aiming (14) suits the joystick: attacks go where the hero faces.
 
-## 22. Multiplayer support **(core)**
+## 41. Multiplayer support **(core)**
 
 **Goal:** friends explore the planets together: co-op adventures with each player as their own hero and pet.
 Code: new `src/net/` (connection, messages, state sync), `src/core/Game.js` (local vs. remote players), `src/core/context.js`
 (more than one player), `src/entities/player/` (a remote hero driven by network state), a small server (`scripts/` or a
-separate service), `src/ui/` (lobby, player list, chat).
+separate service), `src/ui/` (lobby, player list, chat). **Size:** XL+. **Needs:** 19, 24.
+**Risk:** this is the item most likely to cause trouble (risk 1). **Recommendation:** a decision gate at the end of phase A, and a
+three-day spike right after 19. If it stays, it stays last.
 
 - [ ] **Decide the model:** peer-to-peer with one host (WebRTC) or a small authoritative server (WebSocket). The host
       or server runs the world (monsters, bosses, loot, chests, the day clock, weather); clients send their input and
       draw what they're told. Pick one before building the rest.
+  - Recommendation: one host over WebRTC. The game is a static site served by `scripts/serve.mjs`, so there's no server
+    to run beyond a tiny signalling step, and the save's `toJSON()` / `load()` pairs (19) are the snapshot format.
 - [ ] **Lobby:** host a game and get a short room code or link; join with the code. Each player picks their own hero
       and pet; a player list shows who's in, with a ready check before the adventure starts. Drop-in / drop-out mid
       adventure if possible.
@@ -637,6 +1234,7 @@ separate service), `src/ui/` (lobby, player list, chat).
   - Every player's hero, pet, animations and abilities are seen by the others, with smoothing for network lag.
   - Monsters choose among nearby players; boss fights scale their health with the number of players.
   - Each player keeps their own level, XP, bag, gear, energy and journal.
+  - Menus that pause the world today (the pet menu, the journal) can't pause it in co-op: decide what they do.
 - [ ] **Sharing rules:**
   - Loot from chests and drops: per-player rolls (everyone gets their own), so nobody steals anything.
   - Resource nodes, the farm and crafting stations are shared; decide whether gathered nodes regrow per player.
@@ -647,155 +1245,36 @@ separate service), `src/ui/` (lobby, player list, chat).
       and the compass showing where the other players are.
 - [ ] **Robustness:** reconnecting after a drop, the host leaving (hand the world to another player, or end the
       session cleanly), and keeping cheating out of scope for a friendly co-op game.
-- [ ] Needs Save / load (20) for persistent shared worlds; Portals (19) decide how a group moves between planets.
-
-## 23. Tutorial and first-time help **(suggested)**
-
-**Goal:** new players learn the game's many systems without reading toasts that vanish in two seconds.
-Code: new `src/gameplay/Tutorial.js`, `src/ui/` (a hint panel), `src/config/` (tutorial steps); builds on the
-first-time tips in `src/gameplay/Gathering.js`.
-Promoted from the suggested additions (tutorial, death screen).
-
-- [ ] **A guided start:** a short first walk out of the village that teaches moving, the camera, talking (`E`),
-      the bag and hotbar, a first fight (dodging, abilities, the ultimate's aim) and the sealed boss lair's conditions.
-      It can be skipped, and offered again from the pause menu.
-- [ ] **Hints that stay:** a small hint panel (or a "help" page in the journal) that keeps the first-time tips:
-      energy, tools, stations, smelting, fishing, farming, pets.
-- [ ] **A death screen:** "You fainted", with a short recap (what hit you, how long you lasted), a respawn countdown
-      and a tip.
-
-## 24. Villager friendship **(suggested)**
-
-**Goal:** the villagers become friends you care about, not only quest givers and a shop.
-Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts, reward tiers), `src/ui/Dialog.js`
-(a gift option), the journal (a friends page).
-
-- [ ] **Friendship hearts** per villager, raised by talking each day, gifts and finishing their quests.
-- [ ] **Gifts:** each villager has favourite, liked and disliked things (food you cook, fish, gems, flowers), with a
-      reaction line and an emote for each.
-- [ ] **Rewards by heart level:** recipes (ties into recipe discovery, 17), shop discounts, a unique trinket or vanity
-      piece, new dialogue and a small personal quest.
-- [ ] Friends greet you by name, wave from across the square and sometimes leave a gift at your door.
-
-## 25. Festivals **(suggested)**
-
-**Goal:** the calendar has highlights to look forward to.
-Code: `src/config/day.js` (a calendar), new `src/gameplay/Festivals.js`, `src/world/village.js` (decorations),
-`src/config/shop.js` (festival stock).
-
-- [ ] **A lantern festival** every few days: paper lanterns over the square, villagers gathered at night, a special
-      shop, and small mini-games (lantern lighting, a race).
-- [ ] **A harvest fair:** enter your best crop or fish, and the villagers judge it for a ribbon and a prize.
-- [ ] Each planet gets its own version (an ember festival, a frost festival), and the journal remembers the ones
-      you've been to.
-
-## 26. Pet care **(suggested)**
-
-**Goal:** pets feel looked after, and the food you grow matters to them too.
-Code: `src/gameplay/Pets.js`, `src/ui/PetMenu.js`, `src/config/pets.js`, `src/models/vanity.js`.
-
-- [ ] **Feeding:** pets have favourite foods from the farm, the ponds and the wilds; feeding them gives a short buff
-      or a little XP, and a happy emote.
-- [ ] **Pet outfits:** small hats, bows and scarves for pets, using the same vanity idea as the hero's hat and cape.
-- [ ] **Pet finds:** a well-fed pet sometimes brings back something it found (a forage item, a seed, now and then a
-      coin).
-- [ ] A pet bed in your home (18) where resting pets heal.
-
-## 27. Museum **(suggested)**
-
-**Goal:** collecting has a place to show off, and fishing, mining and foraging lead somewhere.
-Code: new `src/gameplay/Museum.js`, `src/world/interiors.js` (a museum room), the journal's Collection tab.
-
-- [ ] **Donate** fish, gems, rare forage and monster trophies to Old Bramble's museum. Each donation fills a display
-      in a museum room you can walk through.
-- [ ] **Rewards** for completing a shelf (all the fish, all the gems): coins, a vanity piece, a unique trinket.
-- [ ] The journal's Collection tab marks what's been donated.
-
-## 28. Dungeons and caves **(suggested)**
-
-**Goal:** something to explore beyond the open planet surface, where mining and fighting meet.
-Code: new `src/world/caves.js` (interiors like the houses', away from the planet), `src/gameplay/Dungeons.js`,
-`src/config/dungeons.js`.
-
-- [ ] **A cave or dungeon per planet,** entered from the surface: a few rooms with monsters, chests and ore veins
-      that are found nowhere else.
-- [ ] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
-- [ ] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
-- [ ] Caves are dark: lanterns and glowcaps light the way.
-
-## 29. Bounty board **(suggested)**
-
-**Goal:** there's always something small to do, every day.
-Code: new `src/gameplay/Bounties.js`, `src/config/bounties.js`, a board prop in each village, `src/ui/` (the board).
-
-- [ ] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
-      ("3 ramhorns"), catch a fish ("a Golden Koi"), harvest a crop.
-- [ ] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
-- [ ] The journal counts bounties finished, with an achievement or two.
-
-## 30. Gear sets and hero depth **(suggested)**
-
-**Goal:** choosing gear and growing a hero have more to them than bigger numbers.
-Code: `src/config/items.js` (sets), `src/items/gear.js`, `src/config/characters.js` (talents), `src/ui/` (a talent
-page).
-
-- [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
-      chilling hits; the Moss set: more healing), shown in the bag's equipment side.
-- [ ] **A small talent tree per hero:** a point every level or two, spent on upgrades to their abilities or an
-      alternative version of a skill (a wider Cleave, a homing Fireball).
-- [ ] A free reset at the village (a wizard's service), so trying builds is cozy, not punishing.
-
-## 31. After the last boss **(suggested)**
-
-**Goal:** the adventure doesn't simply stop after Malgrath.
-Code: `src/gameplay/PlanetProgression.js`, `src/config/planets.js`, `src/config/combat.js`.
-
-- [ ] **Rematches:** harder versions of the planet bosses and mini bosses, with new attacks and better loot.
-- [ ] **A secret fourth planet,** unlocked after the last boss, with its own boss and materials.
-- [ ] **New Game+:** start again with your journal, pets and vanity kept, against tougher rosters with better loot.
-
-## 32. A living village **(suggested)**
-
-**Goal:** the villagers use the same world you do, so the village feels busy.
-Code: `src/entities/npc/NPC.js`, `src/entities/npc/npcDefs.js` (schedules), `src/gameplay/Stations.js`,
-`src/gameplay/Farm.js`.
-
-- [ ] Villagers' schedules include the new places: Cinder at the forge, Pim at the cooking pot, someone fishing at
-      the pond in the evening, someone tending a farm plot.
-- [ ] They react to what you do there ("Nice catch!", "That pumpkin's enormous!").
-- [ ] Their activities show with small animations and the stations' own effects (sparks, steam).
-
-## 33. Photo mode **(suggested)**
-
-**Goal:** a cozy, pretty game is one people want to take pictures of.
-Code: `src/systems/CameraSystem.js` (the showcase camera already exists), new `src/ui/PhotoMode.js`.
-
-- [ ] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
-- [ ] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
-- [ ] Save the picture as an image file.
+- [ ] Needs Save / load (19) for persistent shared worlds; Portals (24) decide how a group moves between planets.
 
 ---
 
 ## Suggested additions
 
-- [~] **Save / load (suggested):** promoted to item 20.
-- [ ] **Balance and pacing pass (suggested, high priority):** play through with each hero and tune the numbers that
-      were set by hand and never tested together: energy drain, node regrow times, crop growth, fuel costs, mini boss
-      health, coin prices and shop costs.
-- [ ] **Balance pass on the new bosses (suggested, high priority):** playtest Pyrrhax and Malgrath with each hero. In particular, check how often the Doom Blade is used, the damage of the Demon Lord's flying phase, and the 50% transition timing.
+Smaller ideas, and where the promoted ones went.
+
+- [~] **Save / load (suggested):** promoted to item 19.
+- [~] **Balance and pacing pass (suggested, high priority):** promoted to item 23.
+- [~] **Balance pass on the new bosses (suggested, high priority):** promoted to item 23.
 - [x] **Minimap or compass (suggested):** the compass strip and off-screen arrows landed with TODO 1 (a minimap could follow once planets get bigger, see 11).
-- [~] **Tutorial / onboarding (suggested, promoted to item 23):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
-- [~] **Death / respawn screen (suggested, promoted to item 23):** "You fainted" with a short recap and a respawn countdown, instead of only a toast.
+- [~] **Tutorial / onboarding (suggested, promoted to item 21):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
+- [~] **Death / respawn screen (suggested, promoted to item 21):** "You fainted" with a short recap and a respawn countdown, instead of only a toast.
 - [ ] **Gamepad support (suggested):** movement, camera and abilities on a controller, with aiming for ground-targeted ultimates.
+      Build it on the input layer from 40 (actions, not keys).
 - [ ] **Accessibility (suggested):** colour-blind-friendly telegraph colours, reduced motion (less shake and flashing), adjustable text size.
+      Cheap: do it alongside 21. The screen shake slider and UI scale (2a) are a start; add the beetle option for the
+      spiders (30).
 - [ ] **Real audio (suggested):** replace the procedural placeholder sounds and music with real samples (`src/systems/AudioSystem.js`).
       Music per planet and per situation: calm village themes, exploring, night, and a stronger boss theme.
+      Assumption (Round 3): the audio stays procedural to keep "no asset files"; the themes per world and situation
+      are made in code, as part of each world item. Revisit only if that becomes the limit.
 - [~] **Achievements / bestiary (suggested):** promoted to item 13.
-- [ ] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
-      chests, and favourite recipes pinned at the top of the Craft tab.
-- [ ] **Gameplay checks in the repo (suggested):** the headless game simulations (the "sims": environment, fights,
-      bosses, items, survival, stations and others) only live outside the repo today. Move them into `tests/sim/` with
-      an `npm run sim` command, and make the dragon's random "uses every move" check reliable.
-- [ ] **Performance budget (suggested):** a frame-rate overlay, and density settings per feature (scenery, nodes,
-      particles, weather). The planets keep growing, and Mobile support (21) will need them anyway.
-- [ ] **Small fixes (suggested):** add a `favicon.ico` (the server currently returns 404 for it); add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`).
+- [~] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
+      chests, and favourite recipes pinned at the top of the Craft tab. Split: crafting ones into 22, bag sorting and
+      storage into 25b.
+- [~] **Gameplay checks in the repo (suggested):** promoted to item 18.
+- [~] **Performance budget (suggested):** promoted to item 20.
+- [ ] **Small fixes (suggested):** add a `favicon.ico` (the server currently returns 404 for it; now part of 18); add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`).
+- [ ] **A fourth new world, Windward (suggested, parked):** tall mesas above a sea of clouds, with updrafts and a leaf
+      glider. Parked because gliding needs new movement, a new camera and falling rules, and the clouds below need a
+      soft respawn. Only consider it after 32, if the three new worlds went smoothly.
