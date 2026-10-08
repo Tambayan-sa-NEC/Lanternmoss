@@ -1,5 +1,7 @@
 # Lanternmoss
 
+<img src="docs/logo/witch-A1.png" width="140" align="right" alt="Lanternmoss character mark: the Girl Witch in her violet hat">
+
 A tiny cozy planet of lanterns, moss and friendly critters: a third-person browser game built with
 [Three.js](https://threejs.org/) (r160) and plain ES modules, with no asset files (every model, icon and sound is made in
 code). Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore hilly little planets, help the villagers, open
