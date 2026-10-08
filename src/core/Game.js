@@ -73,6 +73,7 @@ import { BossGate } from '../gameplay/BossGate.js';
 import { showBanner } from '../ui/banner.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
+import { rng } from '../utils/random.js';
 
 export class Game {
   /** ORDER MATTERS: world generation and the initial enemy spawn share one seeded random stream, and moving bodies
@@ -199,11 +200,11 @@ export class Game {
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,
-      spawnItem: (id, qty = 1, arc = 2) => spawnWorldItem(id, qty, offsetDir(ctx.player.up, Math.random() * 6.28, arc)),
+      spawnItem: (id, qty = 1, arc = 2) => spawnWorldItem(id, qty, offsetDir(ctx.player.up, rng() * 6.28, arc)),
       get planet() { return ctx.planet; }, get boss() { return ctx.boss; }, planets: game.planets, PLANETS,
       goToPlanet: i => { game.planets.load(i); game.planets.announceArrival(); },
       setWeather: kind => game.world.weather.set(kind, true), get weather() { return game.world.weather; },
       begin: () => game.beginGame(), update: dt => game.update(dt),
-      spawnEnemy: (type, arc = 7) => addEnemy(type, offsetDir(ctx.player.up, Math.random() * 6.28, arc)) };
+      spawnEnemy: (type, arc = 7) => addEnemy(type, offsetDir(ctx.player.up, rng() * 6.28, arc)) };
   }
 }

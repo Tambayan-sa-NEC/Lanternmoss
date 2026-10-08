@@ -12,7 +12,7 @@ import { sparkles } from '../../../../fx/sparkles.js';
 import { audio } from '../../../../systems/AudioSystem.js';
 import { shakeCamera } from '../../../../systems/CameraSystem.js';
 import { damp } from '../../../../utils/math.js';
-import { mpick } from '../../../../utils/random.js';
+import { mpick, rng } from '../../../../utils/random.js';
 import { turnToward } from '../../../../utils/sphere.js';
 import { Projectile } from '../../../Projectile.js';
 import { bossDecal, defineBoss, facing, glowOf, inWedge, phaseOf, roar } from './core.js';
@@ -27,7 +27,7 @@ const moves = {
   bite: {
     ready: (e, dist) => dist <= A(e, 'bite').range + 0.4 && facing(e) > 0.3,
     weight: () => 3,
-    begin(e) { e.biter = Math.floor(Math.random() * heads(e)); audio.growl(); },
+    begin(e) { e.biter = Math.floor(rng() * heads(e)); audio.growl(); },
     windup(e, dt, k) { if (k < 0.6) turnToward(e.fwd, e.toP, e.up, damp(4, dt)); e.biteMark.place(e.up, e.fwd, A(e, 'bite').range).opacity = 0.2 + 0.5 * k; },
     fire(e) {
       const a = A(e, 'bite'), P = ctx.player; e.snapT = 0.3;
@@ -54,7 +54,7 @@ const moves = {
   sweep: {
     ready: (e, dist) => dist <= A(e, 'sweep').radius,
     weight: e => (facing(e) > 0.2 ? 2 : 0.5),
-    begin(e) { audio.growl(); e.sweepSide = Math.random() < 0.5 ? 1 : -1; },
+    begin(e) { audio.growl(); e.sweepSide = rng() < 0.5 ? 1 : -1; },
     windup(e, dt, k) { e.sweepMark.place(e.up, e.fwd, A(e, 'sweep').radius).opacity = 0.15 + 0.45 * k; },
     fire(e) {
       const a = A(e, 'sweep'), P = ctx.player; e.sweepT = 0.5;
@@ -103,6 +103,6 @@ export const hydra = defineBoss({
     });
     e.body.scale.setScalar(1 + e.hitPop * 0.05);
     e.tail.rotation.y = Math.sin(t * 1.1) * 0.3;
-    if (Math.random() < dt * 2) sparkles.emit(_tv.copy(e.pos).addScaledVector(e.up, 0.2), { count: 1, color: mpick([0x9ff3ff, 0xd8ffa0]), speed: 0.6, up: e.up, upBias: 1, life: 0.8, size: 0.3 });
+    if (rng() < dt * 2) sparkles.emit(_tv.copy(e.pos).addScaledVector(e.up, 0.2), { count: 1, color: mpick([0x9ff3ff, 0xd8ffa0]), speed: 0.6, up: e.up, upBias: 1, life: 0.8, size: 0.3 });
   },
 });

@@ -22,6 +22,7 @@ import { arcDist, dirAlong, projectTangent, turnToward } from '../../../../utils
 import { groundHeight } from '../../../../world/terrain.js';
 import { hideDots, layLane, layRing, makeDots, showDisc } from '../telegraphs.js';
 import { defineBoss, finish, glowOf } from './core.js';
+import { rng } from '../../../../utils/random.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _probe = new V3(), _aim = new V3();
@@ -75,7 +76,7 @@ const moves = {
       const a = e.def.attacks.charge, P = ctx.player;
       projectTangent(e.chargeDir, e.up).normalize(); e.fwd.copy(e.chargeDir); e.move.copy(e.chargeDir);
       if (!e.hitPlayer && !P.dead && dist < e.radius + P.radius + a.width * 0.5) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); shakeCamera(0.3); }
-      if (Math.random() < dt * 30) sparkles.emit(groundPoint(e.pos, 0.2), { count: 1, color: 0xe8d6c0, speed: 1.6, up: e.up, upBias: 0.6, life: 0.5, size: 0.4 });
+      if (rng() < dt * 30) sparkles.emit(groundPoint(e.pos, 0.2), { count: 1, color: 0xe8d6c0, speed: 1.6, up: e.up, upBias: 0.6, life: 0.5, size: 0.4 });
       if ((e.chargeT -= dt) <= 0 || arcDist(e.up, e.home) > e.def.leash - 4) endCharge(e, false);   // pulls up short of the arena's edge
       return a.speed;
     },
@@ -106,7 +107,7 @@ const moves = {
   summon: {
     ready: e => minionCount(e) < e.def.attacks.summon.max,
     begin() { audio.charge(); },
-    windup(e, dt) { if (Math.random() < dt * 14) sparkles.emit(_tv.copy(e.pos).addScaledVector(e.up, 0.3), { count: 2, color: glowOf(e), speed: 1, up: e.up, upBias: 2.5, life: 0.9, size: 0.34 }); },
+    windup(e, dt) { if (rng() < dt * 14) sparkles.emit(_tv.copy(e.pos).addScaledVector(e.up, 0.3), { count: 2, color: glowOf(e), speed: 1, up: e.up, upBias: 2.5, life: 0.9, size: 0.34 }); },
     fire(e) {
       const a = e.def.attacks.summon, want = Math.min(a.types.length, a.max - minionCount(e));
       for (let i = 0; i < want; i++) {

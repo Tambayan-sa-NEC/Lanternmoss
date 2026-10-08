@@ -1,7 +1,7 @@
 /* AUDIO (procedural, WebAudio): soft pad, wind-chimes and every sound effect. All sounds are synthesized
    PLACEHOLDERS: to use real samples, swap the body of the matching method. Nothing plays until init() runs
    from a user gesture (browsers block audio before that); every method is a no-op until then. */
-import { mpick } from '../utils/random.js';
+import { mpick, rng } from '../utils/random.js';
 
 export const audio = {
   ctx: null, master: null, fx: null, music: null, muted: false, ducked: false, pad: null, battleOn: false, battleTimer: null,
@@ -16,10 +16,10 @@ export const audio = {
     const pad = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850;
     pad.gain.setValueAtTime(0, ctx.currentTime); pad.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 5); lp.connect(pad); pad.connect(this.music); this.pad = pad;
     [130.81, 196.0, 261.63, 329.63, 392.0].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-      o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (Math.random() - 0.5) * 10; g.gain.value = 0.22;
+      o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (rng() - 0.5) * 10; g.gain.value = 0.22;
       lfo.frequency.value = 0.05 + i * 0.031; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(g.gain); o.connect(g); g.connect(lp); o.start(); lfo.start(); });
     const chime = () => { setTimeout(() => { if (this.battleOn) { chime(); return; } const s = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; const f = mpick(s);
-      this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (Math.random() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, 2500 + Math.random() * 5000); };
+      this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (rng() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, 2500 + rng() * 5000); };
     chime();
   },
   tone(freq, dur = 0.5, type = 'sine', vol = 0.08, when = 0, slide = 0, out = this.fx) {
@@ -30,16 +30,16 @@ export const audio = {
   },
   jump() { this.tone(330, 0.18, 'sine', 0.05, 0, 1.9); },
   land() { this.tone(160, 0.12, 'sine', 0.05, 0, 0.6); },
-  blip() { this.tone(640 + Math.random() * 160, 0.05, 'triangle', 0.018); },
+  blip() { this.tone(640 + rng() * 160, 0.05, 'triangle', 0.018); },
   sparkle() { [1046, 1318, 1568, 2093].forEach((f, i) => this.tone(f, 0.6, 'sine', 0.04, i * 0.07)); },
-  chirp() { this.tone(2200 + Math.random() * 600, 0.08, 'sine', 0.02, 0, 1.4); this.tone(2600, 0.07, 'sine', 0.015, 0.1, 1.3); },
+  chirp() { this.tone(2200 + rng() * 600, 0.08, 'sine', 0.02, 0, 1.4); this.tone(2600, 0.07, 'sine', 0.015, 0.1, 1.3); },
   bark() { this.tone(420, 0.1, 'square', 0.025, 0, 0.7); },
   meow() { this.tone(700, 0.35, 'triangle', 0.03, 0, 1.25); },
   plip() { this.tone(900, 0.15, 'sine', 0.04, 0, 0.5); },
   // --- combat sfx (procedural placeholders: swap for samples later) ---
   noise(dur = 0.3, vol = 0.08, freq = 1000, when = 0) {
     if (!this.ctx) return; const t = this.ctx.currentTime + when;
-    if (!this._nb) { this._nb = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate); const d = this._nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    if (!this._nb) { this._nb = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate); const d = this._nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = rng() * 2 - 1; }
     const src = this.ctx.createBufferSource(), f = this.ctx.createBiquadFilter(), g = this.ctx.createGain(); src.buffer = this._nb;
     f.type = 'lowpass'; f.frequency.setValueAtTime(freq, t); f.frequency.exponentialRampToValueAtTime(Math.max(60, freq * 0.25), t + dur);
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -50,7 +50,7 @@ export const audio = {
   explode() { this.noise(0.7, 0.16, 900); this.tone(110, 0.5, 'sine', 0.1, 0, 0.4); },
   nova() { [1568, 1319, 1047, 784].forEach((f, i) => this.tone(f, 0.6, 'sine', 0.04, i * 0.04)); this.noise(0.5, 0.05, 4000); },
   blink() { this.tone(500, 0.25, 'sine', 0.06, 0, 3); this.tone(1500, 0.2, 'triangle', 0.02, 0.08, 0.5); },
-  hitEnemy() { this.tone(260 + Math.random() * 60, 0.09, 'square', 0.02, 0, 0.6); },
+  hitEnemy() { this.tone(260 + rng() * 60, 0.09, 'square', 0.02, 0, 0.6); },
   enemyDie() { this.tone(520, 0.35, 'triangle', 0.045, 0, 0.35); this.noise(0.3, 0.05, 2500); },
   hurt() { this.tone(240, 0.28, 'triangle', 0.08, 0, 0.5); },
   faint() { [523, 440, 349, 262].forEach((f, i) => this.tone(f, 0.5, 'triangle', 0.06, i * 0.18)); },
@@ -124,7 +124,7 @@ export const audio = {
     if (!this.ctx) return;
     if (!this.amb) {
       const c = this.ctx, buf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate), d = buf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      for (let i = 0; i < d.length; i++) d[i] = rng() * 2 - 1;
       const loop = (type, freq, q) => { const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
         s.buffer = buf; s.loop = true; f.type = type; f.frequency.value = freq; f.Q.value = q; g.gain.value = 0; s.connect(f); f.connect(g); g.connect(this.fx); s.start(); return { g, f }; };
       this.amb = { rain: loop('highpass', 1800, 0.3), wind: loop('lowpass', 420, 1.2), r: 0, w: 0 };

@@ -22,7 +22,7 @@ import { audio } from '../../systems/AudioSystem.js';
 import { shakeCamera } from '../../systems/CameraSystem.js';
 import { dom } from '../../ui/dom.js';
 import { damp } from '../../utils/math.js';
-import { mr } from '../../utils/random.js';
+import { mr, rng } from '../../utils/random.js';
 import { arcDist, dirAlong, frameQuat, projectTangent, tangentFrame, tangentTo, tangentToward, turnToward } from '../../utils/sphere.js';
 import { SPAWN_DIR } from '../../world/World.js';
 import { groundHeight } from '../../world/terrain.js';
@@ -49,7 +49,7 @@ export class Enemy extends Walker {
     this.type = type; this.def = def; this.hover = def.hover || 0; this.height = def.height; this.hitR = def.radius + 0.3;
     Object.assign(this, ENEMY_BUILDERS[type](def)); this.baseScale = this.root.scale.x; scene.add(this.root);
     this.shadow = makeShadow(def.radius * 1.5); this.selfCollider = addDyn(this.up, def.radius);
-    this.home = dir.clone(); this.knock = new V3(); this.move = new V3(); this.toP = new V3(); this._c = new V3(); this.seed = Math.random() * 10;
+    this.home = dir.clone(); this.knock = new V3(); this.move = new V3(); this.toP = new V3(); this._c = new V3(); this.seed = rng() * 10;
     if (def.slamRadius || def.telegraph) { this.tele = new THREE.Mesh(discGeo, fxMaterial(0xff4d6d, 1.2)); this.tele.renderOrder = 3; this.tele.visible = false; scene.add(this.tele); }
     this.fxMeshes = [];                               // extra warning meshes a behaviour owns: hidden by hideTele, removed by dispose
     this.behavior = BEHAVIORS[def.behavior ?? def.ai] || null; this.behavior?.init?.(this);   // def.behavior: a boss's own AI
@@ -58,7 +58,7 @@ export class Enemy extends Walker {
   }
   spawn(dir) {
     this.up.copy(dir); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r); this.vy = 0; this.grounded = true;
-    this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, Math.random() * 6.28);
+    this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, rng() * 6.28);
     Object.assign(this, { hp: this.def.hp, alive: true, state: 'idle', timer: mr(0.5, 2.5), cool: 0, speed: 0, phase: 0, deadT: 0, turn: 0,
       slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false,
       hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0 });   // hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
@@ -160,10 +160,10 @@ export class Enemy extends Walker {
     this.behavior?.update?.(this, dt, n);
     if (d.contact && ENGAGED.has(this.state) && !safe && this.cool <= 0 && dist < this.radius + ctx.player.radius + 0.3 && ctx.player.r - groundHeight(ctx.player.up) < 1) {
       hurtPlayer(d.damage, this.pos, d.knockback); this.cool = d.contactCooldown; }
-    if (this.stunT > 0.1 && Math.random() < dt * 12) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.55), { count: 1, color: 0xffe066, speed: 1.4, up: this.up, upBias: 0.3, life: 0.5, size: 0.32 });   // dazed stars
-    if (this.slowT > 0 && Math.random() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
-    if (this.shieldT > 0 && Math.random() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
-    if (this.markT > 0 && Math.random() < dt * 6) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.6), { count: 1, color: 0xc7a8ff, speed: 0.4, up: this.up, upBias: 1.5, life: 0.6, size: 0.3 });
+    if (this.stunT > 0.1 && rng() < dt * 12) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.55), { count: 1, color: 0xffe066, speed: 1.4, up: this.up, upBias: 0.3, life: 0.5, size: 0.32 });   // dazed stars
+    if (this.slowT > 0 && rng() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
+    if (this.shieldT > 0 && rng() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
+    if (this.markT > 0 && rng() < dt * 6) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.6), { count: 1, color: 0xc7a8ff, speed: 0.4, up: this.up, upBias: 1.5, life: 0.6, size: 0.3 });
     this.animate(dt);
     this.place(this.root);
     if (this.hover) this.root.position.addScaledVector(this.up, Math.sin(ctx.time * 2 + this.seed) * 0.15);

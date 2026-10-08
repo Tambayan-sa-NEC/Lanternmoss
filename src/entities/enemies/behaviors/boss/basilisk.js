@@ -21,6 +21,7 @@ import { arcDist, projectTangent, tangentToward, turnToward } from '../../../../
 import { Projectile } from '../../../Projectile.js';
 import { hideDots, layLane, makeDots } from '../telegraphs.js';
 import { bossDecal, defineBoss, facing, finish } from './core.js';
+import { rng } from '../../../../utils/random.js';
 
 const WARN = 0xff4d6d, VENOM = 0xb8ff6a, GAZE = 0xfff066;
 const A = (e, id) => e.def.attacks[id];
@@ -130,6 +131,6 @@ export const basilisk = defineBoss({
     const open = e.state === 'windup' && (e.attack === 'lunge' || e.attack === 'spit') ? 0.5 : e.state === 'active' && e.attack === 'lunge' ? 0.6 : 0.05;
     e.jaw.rotation.x += (open - e.jaw.rotation.x) * damp(12, dt);
     e.body.scale.setScalar(1 + e.hitPop * 0.05);
-    if (e.gazeK > 0.3 && Math.random() < dt * 20) { e.eyes[0].getWorldPosition(_tv); sparkles.emit(_tv, { count: 1, color: GAZE, speed: 0.8, life: 0.4, size: 0.3 }); }
+    if (e.gazeK > 0.3 && rng() < dt * 20) { e.eyes[0].getWorldPosition(_tv); sparkles.emit(_tv, { count: 1, color: GAZE, speed: 0.8, life: 0.4, size: 0.3 }); }
   },
 });

@@ -15,7 +15,7 @@ import { scene } from '../render/scene.js';
 import { audio } from '../systems/AudioSystem.js';
 import { shakeCamera } from '../systems/CameraSystem.js';
 import { clamp } from '../utils/math.js';
-import { mr } from '../utils/random.js';
+import { mr, rng } from '../utils/random.js';
 import { dirAlong, frameQuat, projectTangent, tangentFrame } from '../utils/sphere.js';
 import { groundHeight } from '../world/terrain.js';
 import { edgeFraction, enemiesInArea, playerInArea } from './area.js';
@@ -35,8 +35,8 @@ export function hazardsOf(owner) { return list.filter(h => h.owner === owner); }
 
 /** A random surface direction inside the circle (uniform over its area). */
 export function scatterIn(center, radius) {
-  const [t1, t2] = tangentFrame(center), a = Math.random() * Math.PI * 2;
-  return dirAlong(center, t1.multiplyScalar(Math.cos(a)).addScaledVector(t2, Math.sin(a)), radius * Math.sqrt(Math.random()));
+  const [t1, t2] = tangentFrame(center), a = rng() * Math.PI * 2;
+  return dirAlong(center, t1.multiplyScalar(Math.cos(a)).addScaledVector(t2, Math.sin(a)), radius * Math.sqrt(rng()));
 }
 
 /** Shake scaled by how close the hero is to the effect. */
@@ -85,7 +85,7 @@ export class Blast {
         _up.copy(this.missile.position).normalize(); this.missile.position.addScaledVector(_up, Math.sin(Math.PI * k) * 5);
       } else this.missile.position.lerpVectors(this.start, this.point, k * k);   // accelerates as it falls
       this.missile.rotation.x += dt * 3; this.missile.rotation.y += dt * 2;
-      if (Math.random() < dt * 40) sparkles.emit(this.missile.position, { count: 2, color: this.color, speed: 0.8, life: 0.5, size: this.size * 0.9 });
+      if (rng() < dt * 40) sparkles.emit(this.missile.position, { count: 2, color: this.color, speed: 0.8, life: 0.5, size: this.size * 0.9 });
     }
     if (k >= 1) { this.detonate(); return false; }
     return true;
@@ -129,9 +129,9 @@ export class Zone {
     this.t += dt; const fade = Math.min(1, this.t / 0.2, Math.max(0, this.duration - this.t) / 0.3);
     this.fill.opacity = 0.16 * fade; this.edge.opacity = (0.45 + 0.25 * Math.sin(this.t * 8)) * fade;
     if (this.rain === 'arrows') this.updateArrows(dt);
-    else if (this.live && Math.random() < dt * this.radius * 7) {
+    else if (this.live && rng() < dt * this.radius * 7) {
       const d = scatterIn(this.center, this.radius);
-      sparkles.emit(groundPoint(d, 0.2), { count: 1, color: Math.random() < 0.5 ? this.color : 0xffd36b, speed: 0.8, up: d, upBias: 2.2, life: 0.7, size: 0.4 });
+      sparkles.emit(groundPoint(d, 0.2), { count: 1, color: rng() < 0.5 ? this.color : 0xffd36b, speed: 0.8, up: d, upBias: 2.2, life: 0.7, size: 0.4 });
     }
     if (this.live && (this.next -= dt) <= 0) { this.next += this.tick; this.pulse(); }
     return this.live || this.arrows.length > 0;
@@ -153,7 +153,7 @@ export class Zone {
     for (let i = this.arrows.length - 1; i >= 0; i--) {
       const a = this.arrows[i]; a.t += dt;
       if (a.t < ARROW_FALL) a.mesh.position.lerpVectors(a.start, a.end, a.t / ARROW_FALL);
-      else if (!a.landed) { a.landed = true; a.mesh.position.copy(a.end); if (Math.random() < 0.5) sparkles.emit(a.end, { count: 2, color: 0xe8d6c0, speed: 1, up: a.land, upBias: 0.6, life: 0.35, size: 0.26 }); }
+      else if (!a.landed) { a.landed = true; a.mesh.position.copy(a.end); if (rng() < 0.5) sparkles.emit(a.end, { count: 2, color: 0xe8d6c0, speed: 1, up: a.land, upBias: 0.6, life: 0.35, size: 0.26 }); }
       if (a.t > ARROW_FALL + ARROW_STUCK) { returnArrow(this.color, a.mesh); this.arrows.splice(i, 1); }
     }
   }

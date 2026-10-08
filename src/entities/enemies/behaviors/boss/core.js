@@ -29,7 +29,7 @@ import { audio } from '../../../../systems/AudioSystem.js';
 import { shakeCamera } from '../../../../systems/CameraSystem.js';
 import { toast } from '../../../../ui/toast.js';
 import { clamp, damp } from '../../../../utils/math.js';
-import { mpick } from '../../../../utils/random.js';
+import { mpick, rng } from '../../../../utils/random.js';
 import { frameQuat, tangentFrame, tangentTo, turnToward } from '../../../../utils/sphere.js';
 import { groundHeight } from '../../../../world/terrain.js';
 import { ENGAGED } from '../../states.js';
@@ -79,7 +79,7 @@ function pickMove(e, kit, dist) {
   if (!opts.length) return kit.fallback?.(e, dist) ?? null;
   const w = opts.map(id => Math.max(0, kit.moves[id].weight?.(e, dist) ?? 1)), total = w.reduce((s, x) => s + x, 0);
   if (total <= 0) return mpick(opts);
-  let r = Math.random() * total;
+  let r = rng() * total;
   for (let i = 0; i < opts.length; i++) if ((r -= w[i]) <= 0) return opts[i];
   return opts[opts.length - 1];
 }

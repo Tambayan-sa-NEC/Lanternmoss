@@ -20,6 +20,7 @@ import { projectTangent, tangentFrame, turnToward } from '../../utils/sphere.js'
 import { damp } from '../../utils/math.js';
 import { groundHeight } from '../../world/terrain.js';
 import { animateHero, HERO_POSES } from './poses.js';
+import { rng } from '../../utils/random.js';
 
 const V3 = THREE.Vector3;
 const _cf = new V3(), _cr = new V3(), _wish = new V3(), _tv = new V3(), _tv2 = new V3();
@@ -72,7 +73,7 @@ export class Player extends Walker {
     const burst = (count, speed) => { _tv.copy(this.up).multiplyScalar(surf);
       sparkles.emit(_tv, { count, color: 0xe8fbff, speed, up: this.up, upBias: 0.9, life: 0.55, size: 0.3 }); };
     if (!this.wet) { this.wet = true; this.rippleT = 0.2; burst(26, 3); audio.splash(); return; }
-    if (moving && (this.rippleT -= dt) < 0) { this.rippleT = this.swimming ? 0.32 : 0.24; burst(5, 1.2); if (Math.random() < 0.35) audio.splash(false); }
+    if (moving && (this.rippleT -= dt) < 0) { this.rippleT = this.swimming ? 0.32 : 0.24; burst(5, 1.2); if (rng() < 0.35) audio.splash(false); }
   }
   /** Movement for one frame. input: { keys, viewFwd (camera heading), enabled (false while menus own the keys) }.
       While a scripted move runs (this.motion(player, dt) -> false when finished, e.g. Leap Slam) it replaces steering and physics. */

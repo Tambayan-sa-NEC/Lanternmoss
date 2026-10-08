@@ -17,7 +17,7 @@ import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { clamp, damp } from '../../utils/math.js';
-import { mpick, mr } from '../../utils/random.js';
+import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist, projectTangent, tangentTo, tangentToward, turnToward } from '../../utils/sphere.js';
 import { spawnSpot } from '../../world/placement.js';
 import { toast } from '../../ui/toast.js';
@@ -33,27 +33,27 @@ export class Critter extends Walker {
   constructor(defKey, dir) {
     const def = CRITTER_DEFS[defKey]; super(dir, def.radius ?? (def.kind === 'dog' ? 0.38 : 0.32));
     this.def = def; this.defKey = defKey; this.kind = def.kind; Object.assign(this, (def.build === 'toad' ? buildToad : buildQuad)(def)); scene.add(this.root);
-    this.shadow = makeShadow(def.kind === 'deer' ? 0.7 : 0.45); this.height = { deer: 1.5, frog: 0.45, lizard: 0.5 }[def.kind] ?? 0.85; this.fwd.applyAxisAngle(this.up, Math.random() * 6.28);
+    this.shadow = makeShadow(def.kind === 'deer' ? 0.7 : 0.45); this.height = { deer: 1.5, frog: 0.45, lizard: 0.5 }[def.kind] ?? 0.85; this.fwd.applyAxisAngle(this.up, rng() * 6.28);
     this.home = this.up.clone(); this.hopT = 0; this.rare = def.rare ?? null; this.away = 0;
-    this.state = 'idle'; this.timer = mr(1, 3); this.speed = 0; this.phase = Math.random() * 10; this.cool = 0; this.turnRate = 0; this.sit = 0; this.trailT = 0;
+    this.state = 'idle'; this.timer = mr(1, 3); this.speed = 0; this.phase = rng() * 10; this.cool = 0; this.turnRate = 0; this.sit = 0; this.trailT = 0;
     this.baseSpeed = def.speed ?? { cat: 1.4, dog: 1.9, fox: 2.3 }[this.kind] ?? 1.5;
     this.selfCollider = addDyn(this.up, this.radius * 0.8);
     this.toP = new V3();      // tangent direction toward the player, refreshed every update (also read by animate)
   }
   dispose() { scene.remove(this.root, this.shadow); disposeTree(this.root); removeDyn(this.selfCollider); }
   react() {
-    this.cool = 9 + Math.random() * 4;
+    this.cool = 9 + rng() * 4;
     if (this.kind === 'frog') { emote(this, '♪', '#6fc46a'); this.state = 'flee'; this.timer = 0.9; audio.plip(); return; }
     if (this.kind === 'bunny' || this.kind === 'deer' || this.kind === 'lizard') {
-      if (this.kind === 'deer' || Math.random() < 0.6) emote(this, '!', '#ff8a3d');
-      this.state = 'flee'; this.timer = { deer: 3.5, bunny: 2.2, lizard: 1.6 }[this.kind]; this.cool = 4 + Math.random() * 3; return;
+      if (this.kind === 'deer' || rng() < 0.6) emote(this, '!', '#ff8a3d');
+      this.state = 'flee'; this.timer = { deer: 3.5, bunny: 2.2, lizard: 1.6 }[this.kind]; this.cool = 4 + rng() * 3; return;
     }
     if (this.kind === 'cat') {
-      if (this.state === 'nap' || Math.random() < 0.45) { emote(this, '!', '#ff8a3d'); this.vy = 4.2; this.grounded = false; this.state = 'flee'; this.timer = 1.8; }
+      if (this.state === 'nap' || rng() < 0.45) { emote(this, '!', '#ff8a3d'); this.vy = 4.2; this.grounded = false; this.state = 'flee'; this.timer = 1.8; }
       else { emote(this, 'heart'); this.state = 'sit'; this.timer = 4; this.vy = 2.5; this.grounded = false; }
       audio.meow();
     } else if (this.kind === 'dog') {
-      emote(this, Math.random() < 0.6 ? 'heart' : '!', Math.random() < 0.5 ? '#ff6b9a' : '#ff8a3d');
+      emote(this, rng() < 0.6 ? 'heart' : '!', rng() < 0.5 ? '#ff6b9a' : '#ff8a3d');
       this.state = 'follow'; this.timer = 7; this.vy = 3.6; this.grounded = false; audio.bark();
     } else {
       emote(this, 'star', '#b58cff'); this.state = 'spin'; this.timer = 0.9;
@@ -91,7 +91,7 @@ export class Critter extends Walker {
     switch (this.state) {
       case 'idle':
         if (this.timer < 0) {
-          if (this.kind === 'cat' && Math.random() < 0.3) { this.state = 'nap'; this.timer = mr(6, 10); }
+          if (this.kind === 'cat' && rng() < 0.3) { this.state = 'nap'; this.timer = mr(6, 10); }
           else { this.state = 'wander'; this.timer = mr(2, 5); this.turnRate = mr(-1.2, 1.2); }
         }
         break;
@@ -99,11 +99,11 @@ export class Critter extends Walker {
         target = this.kind === 'lizard' ? (this.timer % 1.2 < 0.45 ? this.baseSpeed * 2 : 0) : this.baseSpeed;   // lizards scurry in bursts
         this.fwd.applyAxisAngle(this.up, this.turnRate * dt);
         if (this.kind === 'frog' && arcDist(this.up, this.home) > 4) turnToward(this.fwd, tangentToward(this.up, this.home), this.up, damp(3, dt));   // frogs stay by their pond
-        if (this.kind === 'frog' && Math.random() < dt * 0.05) { emote(this, '♪', '#6fc46a'); audio.plip(); }
+        if (this.kind === 'frog' && rng() < dt * 0.05) { emote(this, '♪', '#6fc46a'); audio.plip(); }
         if (this.timer < 0) { this.state = 'idle'; this.timer = mr(1.2, 4); }
         break;
       case 'nap':
-        if (Math.random() < dt * 0.4) emote(this, 'z', '#7a6cff');
+        if (rng() < dt * 0.4) emote(this, 'z', '#7a6cff');
         if (this.timer < 0) { this.state = 'idle'; this.timer = 1; }
         break;
       case 'sit':
@@ -111,7 +111,7 @@ export class Critter extends Walker {
         break;
       case 'follow':
         turnToward(this.fwd, toP, this.up, damp(6, dt)); target = dist > 2.2 ? Math.min(6, dist * 1.8) : 0;
-        if (dist < 2.6 && this.grounded && Math.random() < dt * 1.4) { this.vy = 3.4; this.grounded = false; }
+        if (dist < 2.6 && this.grounded && rng() < dt * 1.4) { this.vy = 3.4; this.grounded = false; }
         if (this.timer < 0) { this.state = 'idle'; this.timer = 2; }
         break;
       case 'flee':
@@ -129,7 +129,7 @@ export class Critter extends Walker {
     _tv2.copy(this.fwd).multiplyScalar(this.speed);
     const n = this.step(_tv2, dt, 24);
     if (n && this.speed > 0.3) { this.fwd.addScaledVector(n, 0.9); projectTangent(this.fwd, this.up).normalize(); this.turnRate = -this.turnRate; }
-    if (this.rare && Math.random() < dt * 6) sparkles.emit(_tv.copy(this.pos).addScaledVector(this.up, 0.4 + Math.random() * 0.4), { count: 1, color: this.rare.color, speed: 0.6, up: this.up, upBias: 1, life: 0.9, size: 0.3 });
+    if (this.rare && rng() < dt * 6) sparkles.emit(_tv.copy(this.pos).addScaledVector(this.up, 0.4 + rng() * 0.4), { count: 1, color: this.rare.color, speed: 0.6, up: this.up, upBias: 1, life: 0.9, size: 0.3 });
     // spirit fox: sparkle trail from its glowing tail
     if (this.tip && this.speed > 1) {
       this.trailT -= dt;

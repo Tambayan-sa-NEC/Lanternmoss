@@ -37,6 +37,7 @@ import { dayClock } from './dayClock.js';
 import { Quests } from './quests/Quests.js';
 import { spawnWorldItem } from './pickups.js';
 import { fillStory } from './storyState.js';
+import { rng } from '../utils/random.js';
 
 const shortName = def => def.name.split(',')[0];
 const epithet = def => def.name.split(', ')[1] ?? '';
@@ -142,7 +143,7 @@ export const BossGate = {
     }
     if (b.dormant === 'show') {
       const k = clamp((t - r0) / (r1 - r0), 0, 1); b.root.scale.setScalar(b.baseScale * Math.max(0.001, easeOutBack(k)));
-      if (k < 1 && Math.random() < dt * 30) sparkles.emit(b.pos, { count: 3, color: this.glow, speed: 2.5, up: b.up, upBias: 1, life: 0.8, size: 0.4 });
+      if (k < 1 && rng() < dt * 30) sparkles.emit(b.pos, { count: 3, color: this.glow, speed: 2.5, up: b.up, upBias: 1, life: 0.8, size: 0.4 });
     }
     if (t >= c0 && !this.cardShown) { this.cardShown = true; this.showCard(); }
     if (t >= c1) this.hideCard();

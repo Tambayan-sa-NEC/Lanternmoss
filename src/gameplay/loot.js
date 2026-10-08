@@ -3,6 +3,7 @@
 import { GEAR_RARITY, LOOT, LOOT_TABLES } from '../config/chests.js';
 import { GEAR_KINDS, ITEM_DEFINITIONS, RARITIES } from '../config/items.js';
 import { PLANETS } from '../config/planets.js';
+import { rng as playRng } from '../utils/random.js';
 
 /** '@material' / '@trophy' -> the planet's own item id (null if the planet has none). */
 export function resolveLootItem(item, planet) {
@@ -30,7 +31,7 @@ function weighted(pairs, rng) {
 
 /** A piece of gear for `hero` on `planet`: this planet's tier is likelier, earlier tiers still turn up; rarity from
     GEAR_RARITY[source]. Returns { item, qty: 1, props: { rarity } } or null. */
-export function rollGear(planet, hero, source = 'chest', rng = Math.random) {
+export function rollGear(planet, hero, source = 'chest', rng = playRng) {
   const tier = planet + 1, fits = GEAR.filter(d => d.equip.tier <= tier && (!d.equip.hero || d.equip.hero === hero));
   if (!fits.length) return null;
   const def = weighted(fits.map(d => [d, d.equip.tier === tier ? 3 : 1]), rng);
@@ -42,7 +43,7 @@ const qtyOf = (q, rng) => (Array.isArray(q) ? q[0] + Math.floor(rng() * (q[1] - 
 
 /** { coins, items: [{ item, qty, props? }] } for loot table `tableId` on planet index `planet`, for `hero`.
     rng() in [0, 1). Gear comes as its own stacks (each piece has its own rarity); everything else is merged. */
-export function rollLoot(tableId, planet, rng = Math.random, hero = null) {
+export function rollLoot(tableId, planet, rng = playRng, hero = null) {
   const t = LOOT_TABLES[tableId]; if (!t) return { coins: 0, items: [] };
   const coins = t.coins ? Math.round(qtyOf(t.coins, rng) * (1 + LOOT.coinsPerPlanet * planet)) : 0;
   const got = new Map(), gear = [];

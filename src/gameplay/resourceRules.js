@@ -2,11 +2,12 @@
    The runtimes are ./Gathering.js, ./Fishing.js and ./Farm.js. */
 import { CROPS, FISHING, NODE_KINDS, SCENERY } from '../config/resources.js';
 import { PLANETS } from '../config/planets.js';
+import { rng as playRng } from '../utils/random.js';
 
 const qtyOf = (q, rng) => (Array.isArray(q) ? q[0] + Math.floor(rng() * (q[1] - q[0] + 1)) : q);
 
 /** What one gather of `drops` (+ `extra` bonus chances) gives: [[item, n]] (zero counts left out). */
-export function rollDrops(drops, extra = [], rng = Math.random) {
+export function rollDrops(drops, extra = [], rng = playRng) {
   const out = new Map();
   for (const [item, q] of drops) { const n = qtyOf(q, rng); if (n > 0) out.set(item, (out.get(item) ?? 0) + n); }
   for (const [item, chance] of extra) if (rng() < chance) out.set(item, (out.get(item) ?? 0) + 1);
@@ -26,7 +27,7 @@ export function bestTool(kind, candidates) {
 }
 
 /** A fish for this planet: weighted from FISHING.catches (a lake makes the golden koi likelier). */
-export function rollCatch(planet, lake = false, rng = Math.random) {
+export function rollCatch(planet, lake = false, rng = playRng) {
   const table = (FISHING.catches[planet] ?? FISHING.catches[0]).map(([item, w]) => [item, item === 'goldenKoi' && lake ? w * FISHING.lakeBonus : w]);
   let x = rng() * table.reduce((s, [, w]) => s + w, 0);
   for (const [item, w] of table) if ((x -= w) < 0) return item;

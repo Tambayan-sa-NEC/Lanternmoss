@@ -23,6 +23,7 @@ import { holdTool, releaseTool } from './heldTool.js';
 import { Hotbar } from './hotbar.js';
 import { grantItem } from './pickups.js';
 import { catchFeel, inZone, needleAt, rollCatch } from './resourceRules.js';
+import { rng } from '../utils/random.js';
 
 const _a = new THREE.Vector3(), _b = new THREE.Vector3();
 
@@ -61,14 +62,14 @@ export const Fishing = {
     const float = buildFloat(); scene.add(float);
     const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0x3a2340 }));
     line.frustumCulled = false; scene.add(line);
-    this.s = { stage: 'cast', pond, dir, float, line, t: 0, biteAt: FISHING.bite[0] + Math.random() * (FISHING.bite[1] - FISHING.bite[0]), from: P.up.clone(), surf: pond.water / dir.dot(pond.dir) };
+    this.s = { stage: 'cast', pond, dir, float, line, t: 0, biteAt: FISHING.bite[0] + rng() * (FISHING.bite[1] - FISHING.bite[0]), from: P.up.clone(), surf: pond.water / dir.dot(pond.dir) };
     P.fwd.copy(tangentToward(P.up, dir)); audio.whoosh?.();
   },
   /** E or a click while fishing. */
   press() {
     const s = this.s; if (!s) return;
     if (s.stage === 'cast' || s.stage === 'wait') { this.end('You reel in early: nothing yet. Wait for the float to dip!'); return; }
-    if (s.stage === 'bite') { s.stage = 'reel'; s.t = 0; s.fish = rollCatch(ctx.planet, s.pond.r >= FISHING.lakeRadius); s.feel = catchFeel(s.fish); s.centre = 0.25 + Math.random() * 0.5; this.showMeter(true); audio.blip(); return; }
+    if (s.stage === 'bite') { s.stage = 'reel'; s.t = 0; s.fish = rollCatch(ctx.planet, s.pond.r >= FISHING.lakeRadius); s.feel = catchFeel(s.fish); s.centre = 0.25 + rng() * 0.5; this.showMeter(true); audio.blip(); return; }
     if (s.stage === 'reel') {
       if (inZone(needleAt(s.t, s.feel.sweeps), s.centre, s.feel.zone)) this.caught();
       else this.end('Splash! It wriggled free. Press when the needle is in the green.');

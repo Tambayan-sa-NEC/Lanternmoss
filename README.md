@@ -251,7 +251,17 @@ UI font come from CDNs, declared in the import map in `index.html`.
 
 ```sh
 npm test             # unit tests (Node's built-in test runner, no dependencies)
+npm install          # once, for the sims: installs three (the same version as the import map) as a dev dependency
+npm run sim          # gameplay sims: the real game, headless, played by scripts (about 2 minutes)
+npm run sim -- bosses combat     # only some sims
+npm run sim -- balance           # the balance report: time to kill and damage taken, per hero and planet (~7 min)
 ```
+
+The **gameplay sims** in `tests/sim/` boot the real game in Node with a fake browser (`tests/sim/lib/`: no WebGL, the
+renderer is a stub) and play it by script: fights and bosses, boss gates, menus, the HUD, pets, villagers, houses,
+chests, items, terrain, survival and stations. Each prints `PASS` / `FAIL` lines; `npm run sim` runs them a few at a
+time and sums up. Randomness is seeded (`SIM_SEED`, default 1), so a run plays out the same every time: game code
+draws from the play stream in `src/utils/random.js`, never `Math.random` (a unit test checks).
 
 ### Refreshing the screenshots
 
@@ -304,7 +314,10 @@ scripts/screenshots.mjs    retakes the README screenshots (headless Chrome)
 docs/screenshots/          the README screenshots
 docs/typography.md         the type brief, the pairings compared (type-specimen.html) and the choice
 tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
-                           heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds
+                           heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,
+                           the seeded random stream
+tests/sim/                 gameplay sims (npm run sim): the real game played headless; balance.sim.mjs is the balance report
+favicon.ico                the lantern in the browser tab
 src/
 ├── main.js                entry point: builds the Game, starts the loop, exposes window.LANTERNMOSS
 ├── errorOverlay.js        classic script that shows load/runtime errors on screen

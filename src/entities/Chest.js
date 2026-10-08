@@ -14,6 +14,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { clamp } from '../utils/math.js';
 import { frameQuat } from '../utils/sphere.js';
 import { groundHeight } from '../world/terrain.js';
+import { rng } from '../utils/random.js';
 
 const OPEN_ANGLE = -1.95, OPEN_TIME = 0.5, GLOW_TIME = 3;
 const easeOutBack = t => 1 + 2.4 * (t - 1) ** 3 + 1.4 * (t - 1) ** 2;
@@ -30,7 +31,7 @@ export class Chest {
     this.radius = 0.6 * this.def.scale; this.height = 0.9 * this.def.scale;
     this.collider = addCollider(this.up, this.radius);
     this.shadow = makeShadow(0.75 * this.def.scale); updateShadow(this.shadow, this.up, this.fwd, 0);
-    this.opened = opened; this.openT = opened ? 99 : -1; this.rattleT = -1; this.seed = Math.random() * 10;
+    this.opened = opened; this.openT = opened ? 99 : -1; this.rattleT = -1; this.seed = rng() * 10;
     this.fallT = fall ? 0 : -1;
     if (opened) this.parts.lid.rotation.x = OPEN_ANGLE;
     this.place(0);
@@ -75,7 +76,7 @@ export class Chest {
     if (this.rattleT >= 0) { this.rattleT += dt; wobble = Math.sin(this.rattleT * 40) * 0.09 * (1 - this.rattleT / 0.45); if (this.rattleT > 0.45) this.rattleT = -1; }
     else if (!this.opened && this.kind !== 'common' && t % 5 < 0.5) wobble = Math.sin(t * 30) * 0.03;   // something rustles inside...
     body.rotation.z = wobble;
-    if (!this.opened && Math.random() < dt * (this.kind === 'common' ? 0.8 : 2.5)) {
+    if (!this.opened && rng() < dt * (this.kind === 'common' ? 0.8 : 2.5)) {
       sparkles.emit(this.top(-0.2), { count: 1, color: this.def.look.glow, speed: 0.5, up: this.up, upBias: 1, life: 0.9, size: 0.26 });
     }
     if (beam?.visible) { beam.material.opacity = 0.13 + Math.sin(t * 3) * 0.04; beam.rotation.y = t * 0.6; }

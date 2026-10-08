@@ -15,7 +15,7 @@ import { Chest } from '../entities/Chest.js';
 import { freeOfColliders } from '../physics/colliders.js';
 import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
-import { mr, mulberry32 } from '../utils/random.js';
+import { mr, mulberry32, rng } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir, tangentFrame, tangentToward } from '../utils/sphere.js';
 import { spawnSpot } from '../world/placement.js';
 import { ponds, slopeAt } from '../world/terrain.js';
@@ -94,7 +94,7 @@ export const Chests = {
       ctx.player.inventory.remove(KEYS.item, 1); audio.unlock(); toast('The Lantern Key turns with a click!');
     }
     c.open(); this.opened.add(c.id); emit('chestopened', { kind: c.kind, planet: ctx.planet });
-    const loot = rollLoot(c.def.loot, ctx.planet, Math.random, ctx.player.charId), names = [];
+    const loot = rollLoot(c.def.loot, ctx.planet, rng, ctx.player.charId), names = [];
     if (loot.coins) { gainCoins(loot.coins, c.top(0.6)); names.push(`${loot.coins} coins`); }
     loot.items.forEach(({ item, qty, props }, i) => {
       const heading = (i / Math.max(1, loot.items.length)) * Math.PI * 2 + mr(-0.4, 0.4);
@@ -118,7 +118,7 @@ export const Chests = {
   onEnemyDefeated(e) {
     if (e.owner || e === ctx.boss || !this.lockedWaiting() || this.hasKey()) return;
     if (ctx.worldItems.some(w => w.itemId === KEYS.item)) return;          // one's already lying around
-    if (++this.sinceKey < KEYS.pity && Math.random() >= KEYS.dropChance) return;
+    if (++this.sinceKey < KEYS.pity && rng() >= KEYS.dropChance) return;
     this.sinceKey = 0;
     spawnWorldItem(KEYS.item, 1, spawnSpot(e.up, 0.6, 1.4, 0.3), { from: e.up, popTime: 0.5, stepAway: false });
     toast(`The ${e.def.name?.split(",")[0] ?? e.type} dropped a Lantern Key!`); audio.sparkle();

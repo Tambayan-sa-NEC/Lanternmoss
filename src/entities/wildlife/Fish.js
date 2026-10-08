@@ -7,7 +7,7 @@ import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
-import { mpick, mr } from '../../utils/random.js';
+import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist, frameQuat } from '../../utils/sphere.js';
 
 const V3 = THREE.Vector3;
@@ -18,13 +18,13 @@ export class Fish {
   /** looks = colours to pick from (default SCALES); size scales the fish (the lakes' golden koi). */
   constructor(pond, looks = null, size = 1) {
     this.pond = pond; Object.assign(this, buildFish(mpick(looks ?? SCALES))); this.root.scale.setScalar(size);
-    scene.add(this.root); this.theta = Math.random() * 6.28; this.rad = mr(0.8, pond.r * 0.62); this.radTarget = this.rad;
-    this.w = mr(0.35, 0.6) * (Math.random() < 0.5 ? -1 : 1); this.boost = 0; this.jump = -1; this.pos = new V3(); this.up = pond.dir; this.height = 0.3;
+    scene.add(this.root); this.theta = rng() * 6.28; this.rad = mr(0.8, pond.r * 0.62); this.radTarget = this.rad;
+    this.w = mr(0.35, 0.6) * (rng() < 0.5 ? -1 : 1); this.boost = 0; this.jump = -1; this.pos = new V3(); this.up = pond.dir; this.height = 0.3;
   }
   update(dt) {
     const p = this.pond, near = arcDist(ctx.player.up, p.dir) < p.r + 2.6;
     if (near) this.boost = Math.min(1, this.boost + dt * 2); else this.boost = Math.max(0, this.boost - dt * 0.4);
-    if (Math.random() < dt * 0.25) this.radTarget = mr(0.8, p.r * 0.65);
+    if (rng() < dt * 0.25) this.radTarget = mr(0.8, p.r * 0.65);
     this.rad += (this.radTarget - this.rad) * damp(0.6, dt);
     this.theta += this.w * (1 + this.boost * 2.2) * dt * (2 / Math.max(1, this.rad));
     let jh = 0, pitch = 0;

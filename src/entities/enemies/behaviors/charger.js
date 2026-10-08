@@ -11,6 +11,7 @@ import { shakeCamera } from '../../../systems/CameraSystem.js';
 import { damp } from '../../../utils/math.js';
 import { projectTangent, turnToward } from '../../../utils/sphere.js';
 import { layLane, makeDots } from './telegraphs.js';
+import { rng } from '../../../utils/random.js';
 
 const V3 = THREE.Vector3;
 const _probe = new V3();
@@ -36,7 +37,7 @@ export const charger = {
       case 'charge':
         projectTangent(e.chargeDir, e.up).normalize(); e.fwd.copy(e.chargeDir); e.move.copy(e.chargeDir);
         if (!e.hitPlayer && !ctx.player.dead && dist < e.radius + ctx.player.radius + d.width * 0.5) { e.hitPlayer = true; hurtPlayer(d.damage, e.pos, d.knockback); }
-        if (Math.random() < dt * 25) sparkles.emit(e.pos, { count: 1, color: 0xe8d6c0, speed: 1.2, up: e.up, upBias: 0.6, life: 0.4, size: 0.3 });
+        if (rng() < dt * 25) sparkles.emit(e.pos, { count: 1, color: 0xe8d6c0, speed: 1.2, up: e.up, upBias: 0.6, life: 0.4, size: 0.3 });
         if (e.timer <= 0) { e.state = 'recover'; e.timer = e.cool = d.cooldown; }
         return d.chargeSpeed;
       case 'recover':

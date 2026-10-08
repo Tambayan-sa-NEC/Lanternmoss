@@ -11,10 +11,11 @@ import { setFogColor, setFogRange } from '../render/scene.js';
 import { audio } from '../systems/AudioSystem.js';
 import { frameQuat, tangentFrame } from '../utils/sphere.js';
 import { WIND } from './scatter.js';
+import { rng } from '../utils/random.js';
 
 const NUM = ['wind', 'fog', 'light', 'overcast', 'rain', 'snow', 'embers', 'petals'];
 const mix = (a, b, k) => a + (b - a) * k;
-const rnd = (a, b) => a + Math.random() * (b - a);
+const rnd = (a, b) => a + rng() * (b - a);
 
 /** The shared part of every particle shader: a seeded point in the box, falling (or rising) and drifting with the wind. */
 const FALL = `uniform float uTime, uIntensity, uFall, uHalf, uHeight; uniform vec2 uDrift; attribute vec3 aPos; attribute float aSeed;
@@ -27,7 +28,7 @@ const FALL = `uniform float uTime, uIntensity, uFall, uHalf, uHeight; uniform ve
 
 function particles(count, extra = 0) {
   const { half, height } = WEATHER.volume, pos = new Float32Array(count * 3), seed = new Float32Array(count);
-  for (let i = 0; i < count; i++) { pos.set([rnd(-half, half), rnd(0, height), rnd(-half, half)], i * 3); seed[i] = Math.random(); }
+  for (let i = 0; i < count; i++) { pos.set([rnd(-half, half), rnd(0, height), rnd(-half, half)], i * 3); seed[i] = rng(); }
   const g = new THREE.BufferGeometry();
   if (!extra) { g.setAttribute('aPos', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1)); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); return g; }
   // rain: two vertices per drop (a streak): the same seed point, aEnd 0 / 1
@@ -87,7 +88,7 @@ export class Weather {
   }
   roll() {
     const e = Object.entries(this.mixes).filter(([k]) => k !== this.to || Object.keys(this.mixes).length === 1);
-    let r = Math.random() * e.reduce((t, [, w]) => t + w, 0);
+    let r = rng() * e.reduce((t, [, w]) => t + w, 0);
     for (const [k, w] of e) if ((r -= w) <= 0) return k;
     return e[0][0];
   }

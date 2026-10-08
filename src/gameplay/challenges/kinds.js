@@ -9,7 +9,7 @@ import { glowMat } from '../../render/materials.js';
 import { disposeTree, G, part } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
-import { mr } from '../../utils/random.js';
+import { mr, rng } from '../../utils/random.js';
 import { arcDist, dirAlong, frameQuat, offsetDir, projectTangent, tangentFrame, tangentTo, tangentToward } from '../../utils/sphere.js';
 import { groundHeight, ponds } from '../../world/terrain.js';
 
@@ -18,7 +18,7 @@ const _tv = new THREE.Vector3();
 /** Random free ground spots around an anchor direction (clear of colliders, ponds and each other). */
 function spotsAround(anchor, n, minArc, maxArc, clearance) {
   const out = [];
-  for (let i = 0; out.length < n && i < n * 60; i++) { const d = offsetDir(anchor, Math.random() * Math.PI * 2, mr(minArc, maxArc));
+  for (let i = 0; out.length < n && i < n * 60; i++) { const d = offsetDir(anchor, rng() * Math.PI * 2, mr(minArc, maxArc));
     if (!freeOfColliders(d, clearance) || ponds.some(p => arcDist(d, p.dir) < p.r + 0.8) || out.some(o => arcDist(o, d) < 2)) continue;
     out.push(d); }
   return out;
@@ -42,7 +42,7 @@ export const CHALLENGE_KINDS = {
       run.items = spotsAround(run.anchor, p.count, p.minRadius ?? 2, p.radius, 0.6).map(d => {
         const m = part(G.ico(p.size ?? 0.2, 1), p.color, { glow: true, intensity: 2.6 }); scene.add(m);
         m.position.copy(d).multiplyScalar(groundHeight(d) + (p.height ?? 1));
-        return { d, m, seed: Math.random() * 6.28, got: false }; }); },
+        return { d, m, seed: rng() * 6.28, got: false }; }); },
     update(run, dt) { const p = run.def.params;
       for (const it of run.items) { if (it.got) continue;
         if (p.drift && tangentTo(ctx.player.pos, ctx.player.up, it.m.position, _tv) < 5) {                     // shy items float away from you, but stay inside the play area
@@ -50,7 +50,7 @@ export const CHALLENGE_KINDS = {
           const nd = dirAlong(it.d, arcDist(it.d, run.anchor) > p.radius + 2 ? tangentToward(it.d, run.anchor) : away, p.drift * dt);
           if (freeOfColliders(nd, 0.4) && !ponds.some(q => arcDist(nd, q.dir) < q.r + 0.5)) it.d.copy(nd); }
         it.m.position.copy(it.d).multiplyScalar(groundHeight(it.d) + (p.height ?? 1) + Math.sin(ctx.time * 2.5 + it.seed) * 0.2); it.m.rotation.y += dt * 2;
-        if (Math.random() < dt * 3) sparkles.emit(it.m.position, { count: 1, color: p.color, speed: 0.4, life: 0.6, size: 0.25 });
+        if (rng() < dt * 3) sparkles.emit(it.m.position, { count: 1, color: p.color, speed: 0.4, life: 0.6, size: 0.25 });
         if (tangentTo(ctx.player.pos, ctx.player.up, it.m.position, _tv) < 1.3) { it.got = true; run.got++; scene.remove(it.m); disposeTree(it.m);
           sparkles.emit(it.m.position, { count: 18, color: p.color, speed: 2.2, up: ctx.player.up, upBias: 0.6, life: 0.7, size: 0.32 });
           audio.tone(880 + run.got * 110, 0.3, 'sine', 0.05); } }
@@ -61,7 +61,7 @@ export const CHALLENGE_KINDS = {
   },
   /** Run through glowing rings in order, laid out in a loop around the giver. params: count, radius, color */
   race: {
-    start(run) { const p = run.def.params, base = Math.random() * Math.PI * 2; run.idx = 0;
+    start(run) { const p = run.def.params, base = rng() * Math.PI * 2; run.idx = 0;
       const pts = [];
       for (let i = 0; i < p.count; i++) for (let k = 0; k < 30; k++) {
         const d = offsetDir(run.anchor, base + i / p.count * Math.PI * 2 + mr(-0.25, 0.25), mr(p.radius * 0.7, p.radius));

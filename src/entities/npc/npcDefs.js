@@ -19,7 +19,7 @@ import { giftItem } from '../../gameplay/pickups.js';
 import { buildBaker, buildBard, buildSmith, buildSnowKeeper, buildSprite, buildWizard } from '../../models/villagers.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { cam } from '../../systems/CameraSystem.js';
-import { mpick, mr } from '../../utils/random.js';
+import { mpick, mr, rng } from '../../utils/random.js';
 import { dirAlong, offsetDir, tangentToward } from '../../utils/sphere.js';
 import { FLOWER_COLORS } from '../../world/scatter.js';
 
@@ -43,7 +43,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
       dir: stones,
       places: { home: place(houses[2].door), stones: place(stones, 2.5), square: place(square(3.9), 3) },
       schedule: { morning: 'stones', noon: 'square', evening: 'stones', night: 'home' },
-      anim: (n) => { n.orb.scale.setScalar(1 + Math.sin(ctx.time * 3) * 0.12); if (Math.random() < 0.05) { n.orb.getWorldPosition(_tv); sparkles.emit(_tv, { count: 1, color: 0x9ff3ff, speed: 0.5, life: 0.8, size: 0.25 }); } },
+      anim: (n) => { n.orb.scale.setScalar(1 + Math.sin(ctx.time * 3) * 0.12); if (rng() < 0.05) { n.orb.getWorldPosition(_tv); sparkles.emit(_tv, { count: 1, color: 0x9ff3ff, speed: 0.5, life: 0.8, size: 0.25 }); } },
       lines: [
         { t: 'Ah, a traveler! Mind the moss. It hums on full moons, and it is terribly off-key.' },
         { t: 'Watch closely now... Fizzle... POP! Hm. That was supposed to be a dove.', a: n => { n.orb.getWorldPosition(_tv); burstAt(_tv.clone(), n.up, 0x9ff3ff, 50); emote(n, 'star', '#8ff0ff'); } },
@@ -115,7 +115,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
       places: { pond: place(dirAlong(pond1.dir, tangentToward(pond1.dir, spawnDir), pond1.r + 2.3), 3), flowers: place(square(2.8, 7), 5) },
       schedule: { morning: 'pond', noon: 'flowers', evening: 'pond', night: 'pond' },
       anim: (n) => { const f = Math.sin(ctx.time * 26) * 0.5; n.wingL.rotation.y = f; n.wingR.rotation.y = -f;
-        if (Math.random() < 0.08) sparkles.emit(n.root.position.clone().addScaledVector(n.up, 0.5), { count: 1, color: mpick([0xcffaff, 0xffd6f5, 0xfff0a0]), speed: 0.4, life: 1, size: 0.22 }); },
+        if (rng() < 0.08) sparkles.emit(n.root.position.clone().addScaledVector(n.up, 0.5), { count: 1, color: mpick([0xcffaff, 0xffd6f5, 0xfff0a0]), speed: 0.4, life: 1, size: 0.22 }); },
       lines: [
         { t: "Tee-hee! You're so big up close! Do you get dizzy all the way up there?" },
         { t: 'I painted all the glowing flowers myself. One petal at a time!' },

@@ -8,11 +8,12 @@ import { spawnSpot } from '../world/placement.js';
 import { rollLoot } from './loot.js';
 import { spawnWorldItem } from './pickups.js';
 import { gainCoins } from './wallet.js';
+import { rng as playRng } from '../utils/random.js';
 
 /** Chance that enemy definition `def` drops something. */
 export function dropChance(def) { return Math.min(MONSTER_DROPS.max, MONSTER_DROPS.chance + (def.xp ?? 0) * MONSTER_DROPS.perXp); }
 
-export function dropLoot(e, rng = Math.random) {
+export function dropLoot(e, rng = playRng) {
   if (e.owner || e === ctx.boss || e.def.ai === 'boss' || e.def.object) return [];
   if (rng() >= dropChance(e.def)) return [];
   const { items } = rollLoot(MONSTER_DROPS.table, ctx.planet, rng, ctx.player.charId);
@@ -23,7 +24,7 @@ export function dropLoot(e, rng = Math.random) {
 encounterEvents.addEventListener('enemydefeated', ev => dropLoot(ev.detail.enemy));
 
 /** A mini boss always leaves treasure: a rare loot roll (coins and items) scattered around where it fell. */
-export function miniBossLoot(e, rng = Math.random) {
+export function miniBossLoot(e, rng = playRng) {
   const { coins, items } = rollLoot(MINI_BOSS_LOOT.table, ctx.planet, rng, ctx.player.charId);
   for (const [item, qty] of MINI_BOSS_LOOT.extra?.[e.type] ?? []) items.push({ item, qty });   // its own keepsake (the Hydra's toad cap)
   if (coins) gainCoins(coins, e.center());

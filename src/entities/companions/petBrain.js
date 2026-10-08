@@ -7,6 +7,7 @@ import { targeting } from '../../combat/targeting.js';
 import { Pets } from '../../gameplay/Pets.js';
 import { arcDist } from '../../utils/sphere.js';
 import { ENGAGED } from '../enemies/states.js';
+import { rng } from '../../utils/random.js';
 
 const fightable = e => e && e.alive && !e.hidden;
 
@@ -41,5 +42,5 @@ export function keepTarget(pet, e) {
 export function strike(pet, e) {
   const a = pet.def.attack;
   damageEnemy(e, Pets.damage(), { source: 'pet', mark: a.mark, stagger: a.stagger, slow: a.slow, slowTime: a.slowTime, knock: a.knock, from: pet.pos, color: pet.color });
-  if (e.alive && Math.random() < PET_CARE.retaliate) Pets.hurt((e.def.damage ?? 5) * PET_CARE.retaliateDamage);
+  if (e.alive && rng() < PET_CARE.retaliate) Pets.hurt((e.def.damage ?? 5) * PET_CARE.retaliateDamage);
 }

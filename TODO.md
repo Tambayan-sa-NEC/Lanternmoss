@@ -598,8 +598,8 @@ Ranked by how likely each is to cause trouble. The items they affect also have i
 
 1. **Multiplayer (41) is the item most likely to cause trouble.** The game is built for one hero: `ctx.player`
    appears 265 times in `src/`, monsters target that one hero, the pet menu and the journal pause the whole world, and
-   108 `Math.random()` calls across 36 files mean two machines will never agree on what happened. Every item before 41
-   adds more of this.
+   two machines would roll every random number differently. 18 routed all randomness through one seedable stream,
+   which is a start but not shared state. Every item before 41 adds more of this.
    **Recommendation:** decide by the end of phase A. If it stays core, spend at most three days on a spike right
    after 19: two heroes and one goblin over a host-authoritative WebRTC link, reusing the save's `toJSON()` / `load()`
    pairs as the snapshot format. If the spike can't produce a fair goblin fight in that time, mark 41 **(stretch)** and stop
@@ -668,27 +668,45 @@ Cheap habits that keep the expensive items (19, 26, 40, 41) from getting more ex
 - **Planets by id, never by index** (risk 3).
 - **Weather stays mood only.** Anything that changes the rules (tides, darkness, gravity) is a planet mechanic (26),
   which may read the weather.
-- **Randomness goes through one seeded `rng()`** (18), not `Math.random()`, in new code.
+- **Randomness goes through the play stream** (`rng` / `mr` / `mpick` in `src/utils/random.js`, 18), never
+  `Math.random()`; a unit test enforces it.
 - **New planet content passes the checklist** in 26.
 
 ---
 
 # Phase A: Foundations
 
-## 18. Gameplay checks in the repo **(core)**
+## 18. Gameplay checks in the repo **(core)** ✓
 
 **Goal:** the headless game simulations (the "sims") that check fights, bosses, items, survival and stations live in the repo and run with
 one command, so the big changes ahead (save / load, portals, new monster AIs) can't quietly break the game.
-Code: new `tests/sim/`, `package.json` (`npm run sim`), new `src/utils/rng.js`.
+Code: `tests/sim/`, `package.json` (`npm run sim`), `src/utils/random.js` (the play stream).
 Promoted from the suggested additions. **Size:** S. **Needs:** nothing.
 
-- [ ] Move the sims (environment, fights, bosses, items, survival, stations and others) into `tests/sim/` with a shared
+- [x] Move the sims (environment, fights, bosses, items, survival, stations and others) into `tests/sim/` with a shared
       headless setup, and add `npm run sim`.
-- [ ] **A seeded `rng()`** in `src/utils/rng.js`, used by the AI, loot and spawning code the sims touch. Make the
+  - Done: 18 sims in `tests/sim/*.sim.mjs` (bosses, bossGate, characterSelect, chests, combat, environment, houses, hud,
+    items, journal, menus, pause, petMenu, pets, stations, survival, terrain, villagers). The shared fake browser,
+    module loader and render stub are in `tests/sim/lib/`, with paths relative to the repo.
+  - `npm run sim` runs them six at a time, each in its own process, and sums up (about 2 minutes). Name some to run only
+    those, `--verbose` prints everything, and the exit code is 1 on any failure.
+  - `three` is now a dev dependency (0.160.0, the version in the import map), so `npm install` is all a fresh clone
+    needs. `node_modules/` is ignored.
+- [x] **A seeded `rng()`** in `src/utils/rng.js`, used by the AI, loot and spawning code the sims touch. Make the
       dragon's random "uses every move" check reliable with a fixed seed.
-- [ ] **Numbers, not only pass / fail:** the sims print time to kill per monster and hero, boss fight length and damage
+  - Done in the existing `src/utils/random.js` rather than a new file: its runtime stream (`rng`, `mr`, `mpick`) can now
+    be seeded with `seedPlay(seed)`. It's still `Math.random` in the browser.
+  - All 108 `Math.random()` calls in 36 files now go through it. `tests/random.test.mjs` fails if one comes back.
+  - The sims seed it (`SIM_SEED`, default 1), and seed `Math.random` separately for their own bots, so a run plays out the
+    same every time. The dragon check passes on seeds 1–10; its fight is now 160 s instead of 120, because the leap is
+    rare (1–2 per fight).
+- [x] **Numbers, not only pass / fail:** the sims print time to kill per monster and hero, boss fight length and damage
       taken. The balance pass (23) uses them as its targets.
-- [ ] While here, from Small fixes: add a `favicon.ico` (the server returns 404 for it).
+  - Done: `npm run sim -- balance` (`tests/sim/balance.sim.mjs`, about 7 minutes, not part of the default run). A bot
+    fights each planet's monsters, mini boss and boss with each hero at the boss's summon level and prints a table of
+    time to kill, damage taken, deaths and HP top-ups. The first findings are under 23.
+- [x] While here, from Small fixes: add a `favicon.ico` (the server returns 404 for it).
+  - Done: a 32 px lantern in the game's colours with an ink outline, linked from `index.html`.
 
 ## 19. Save / load **(core)**
 
@@ -797,6 +815,18 @@ be tuned to.
 Code: `src/config/` (combat, planets, leveling, survival, resources, shop, crafting), the sims in `tests/sim/` (18).
 Merges the two high-priority balance items from the suggested additions. **Size:** M. **Needs:** 18, 22.
 
+- **First balance report** (2026-10-08, `npm run sim -- balance`, seed 1; the bot never dodges, and heroes are at the
+  boss's summon level with starting gear):
+  - Monsters on Lanternmoss and Emberfall fall in 0.2–3.5 s, mostly under the 2–6 s target; the opening burst (skills
+    ready) kills most of them before they land a hit. Frostveil sits in the target (2–7.5 s) and starts to hurt.
+  - Every boss and mini boss except Malgrath falls in 12–58 s, far under the targets (bosses 3–5 min, mini bosses
+    1.5–3 min), even though the bot never dodges. Either boss health is low or the targets are wrong for a cozy game:
+    decide which.
+  - **Malgrath:** the witch and ranger bots barely scratch him (80–84% left after 5 min, about 46 HP top-ups), while
+    the knight wins in 124 s. Check whether ranged heroes can hit him while he flies (phase 2), and how often the Doom
+    Blade lands.
+  - The knight is the fastest and takes the least damage everywhere (difficulty 1 in the hero picker, so maybe
+    intended, but by this much?).
 - [ ] **Targets first** (risk 5), reported by the sims per hero: a regular monster falls in 2–6 s at the planet's
       expected level; a mini boss takes 1.5–3 min, a boss 3–5 min; a natural play-through reaches each boss's summon
       level (2, 4, 6) without grinding. Write them in `docs/balance.md`.
@@ -1272,9 +1302,9 @@ Smaller ideas, and where the promoted ones went.
 - [~] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
       chests, and favourite recipes pinned at the top of the Craft tab. Split: crafting ones into 22, bag sorting and
       storage into 25b.
-- [~] **Gameplay checks in the repo (suggested):** promoted to item 18.
+- [x] **Gameplay checks in the repo (suggested):** promoted to item 18 (done).
 - [~] **Performance budget (suggested):** promoted to item 20.
-- [ ] **Small fixes (suggested):** add a `favicon.ico` (the server currently returns 404 for it; now part of 18); add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`).
+- [ ] **Small fixes (suggested):** add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`). (The `favicon.ico` was done in 18.)
 - [ ] **A fourth new world, Windward (suggested, parked):** tall mesas above a sea of clouds, with updrafts and a leaf
       glider. Parked because gliding needs new movement, a new camera and falling rules, and the clouds below need a
       soft respawn. Only consider it after 32, if the three new worlds went smoothly.

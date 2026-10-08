@@ -21,7 +21,7 @@ import { sparkles } from '../../../../fx/sparkles.js';
 import { audio } from '../../../../systems/AudioSystem.js';
 import { shakeCamera } from '../../../../systems/CameraSystem.js';
 import { damp } from '../../../../utils/math.js';
-import { mpick } from '../../../../utils/random.js';
+import { mpick, rng } from '../../../../utils/random.js';
 import { dirAlong, projectTangent, slerpDir, turnToward } from '../../../../utils/sphere.js';
 import { groundHeight } from '../../../../world/terrain.js';
 import { bossDecal, defineBoss, facing, finish, inWedge, keepInArena, phaseOf, predictHero, roar, shortName } from './core.js';
@@ -66,7 +66,7 @@ const moves = {
     active(e, dt) {
       const a = A(e, 'tail');
       if (!e.hitPlayer && playerInArea(e.up, a.radius, true)) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); shakeCamera(0.3); }
-      if (Math.random() < dt * 40) sparkles.emit(groundPoint(dirAlong(e.up, _tv.copy(e.fwd).applyAxisAngle(e.up, Math.random() * 6.28), a.radius * 0.8), 0.2),
+      if (rng() < dt * 40) sparkles.emit(groundPoint(dirAlong(e.up, _tv.copy(e.fwd).applyAxisAngle(e.up, rng() * 6.28), a.radius * 0.8), 0.2),
         { count: 2, color: 0xe8d6c0, speed: 2, up: e.up, upBias: 0.5, life: 0.5, size: 0.4 });
       if (e.actT >= a.spinTime) { ringFX(e.pos, a.radius, 0xffd0a0, 0.4); finish(e); }
       return 0;
@@ -76,14 +76,14 @@ const moves = {
   breath: {
     ready: (e, dist) => dist >= A(e, 'breath').minRange && dist <= A(e, 'breath').maxRange,
     weight: e => (facing(e) > 0.3 ? 2.5 : 1.2),
-    begin(e) { e.sweepSign = Math.random() < 0.5 ? -1 : 1; audio.charge(); },
+    begin(e) { e.sweepSign = rng() < 0.5 ? -1 : 1; audio.charge(); },
     windup(e, dt, k) {
       const a = A(e, 'breath'), sweep = sweepOf(e);
       if (k < 0.7) turnToward(e.fwd, e.toP, e.up, damp(4, dt));
       e.breathDir.copy(e.fwd).applyAxisAngle(e.up, -e.sweepSign * sweep / 2);              // starts on one side...
       (enraged(e) ? e.sweepMarkE : e.sweepMark).place(e.up, e.fwd, a.length).opacity = 0.08 + 0.14 * k;   // ...and will cover all of this
       e.coneMark.place(e.up, e.breathDir, a.length).opacity = 0.2 + 0.45 * k;
-      if (Math.random() < dt * 20) sparkles.emit(mouth(e), { count: 1, color: mpick(FIRE), speed: 0.6, up: e.up, upBias: 1, life: 0.4, size: 0.35 });
+      if (rng() < dt * 20) sparkles.emit(mouth(e), { count: 1, color: mpick(FIRE), speed: 0.6, up: e.up, upBias: 1, life: 0.4, size: 0.35 });
     },
     fire(e) { e.breathAxis.copy(e.fwd); e.tickT = 0; audio.fireBreath(A(e, 'breath').time); return 'active'; },
     active(e, dt) {
@@ -91,11 +91,11 @@ const moves = {
       projectTangent(e.breathAxis, e.up).normalize();
       e.breathDir.copy(e.breathAxis).applyAxisAngle(e.up, e.sweepSign * sweep * (k - 0.5));
       e.fwd.copy(e.breathDir);
-      e.coneMark.place(e.up, e.breathDir, a.length).opacity = 0.3 + Math.random() * 0.15;
+      e.coneMark.place(e.up, e.breathDir, a.length).opacity = 0.3 + rng() * 0.15;
       for (let i = 0; i < 4; i++) {                                                           // the flames
-        const t = 1.5 + Math.random() * (a.length - 1.5), side = (Math.random() - 0.5) * rad(a.arc) * Math.min(1, t / 4);
+        const t = 1.5 + rng() * (a.length - 1.5), side = (rng() - 0.5) * rad(a.arc) * Math.min(1, t / 4);
         const d = dirAlong(e.up, _tv.copy(e.breathDir).applyAxisAngle(e.up, side), t);
-        sparkles.emit(groundPoint(d, 0.5 + Math.random()), { count: 1, color: mpick(FIRE), speed: 1.4, up: d, upBias: 1.2, life: 0.45, size: 0.6 + t * 0.04 });
+        sparkles.emit(groundPoint(d, 0.5 + rng()), { count: 1, color: mpick(FIRE), speed: 1.4, up: d, upBias: 1.2, life: 0.45, size: 0.6 + t * 0.04 });
       }
       sparkles.emit(mouth(e), { count: 2, color: 0xffd36b, speed: 6, up: e.breathDir, upBias: 1.4, life: 0.35, size: 0.5 });
       if ((e.tickT -= dt) <= 0) {
@@ -113,7 +113,7 @@ const moves = {
     begin() { audio.charge(); },
     windup(e, dt) {
       turnToward(e.fwd, e.toP, e.up, damp(5, dt));
-      if (Math.random() < dt * 25) sparkles.emit(mouth(e), { count: 1, color: mpick(FIRE), speed: 0.8, up: e.up, upBias: 1, life: 0.4, size: 0.4 });
+      if (rng() < dt * 25) sparkles.emit(mouth(e), { count: 1, color: mpick(FIRE), speed: 0.8, up: e.up, upBias: 1, life: 0.4, size: 0.4 });
     },
     fire(e) { e.shots = 0; e.shotT = 0; return 'active'; },
     active(e, dt) {
@@ -203,7 +203,7 @@ export const dragon = defineBoss({
     let neck = -0.6, head = 0.55, jaw = 0.06, glow = 1, fold = 1, flap = 0, yaw = 0, lean = 0, tuck = 0;
     if (st === 'windup' && at === 'bite') { neck = -0.6 - 0.45 * k; jaw = 0.5 * k; head = 0.75; }
     if (st === 'windup' && (at === 'breath' || at === 'fireballs')) { neck = -0.9; jaw = 0.35 * k; glow = 1 + 2.5 * k; }
-    if (st === 'active' && at === 'breath') { neck = -0.35; head = 0.8; jaw = 0.75; glow = 2.6 + Math.random() * 0.6; }
+    if (st === 'active' && at === 'breath') { neck = -0.35; head = 0.8; jaw = 0.75; glow = 2.6 + rng() * 0.6; }
     if (st === 'active' && at === 'fireballs') { neck = -0.8; jaw = e.snapT > 0 ? 0.7 : 0.25; glow = 2; }
     if (e.snapT > 0 && at === 'bite') { neck = -0.2; jaw = 0.02; head = 0.45; }
     if (st === 'windup' && at === 'tail') yaw = -0.5 * k;

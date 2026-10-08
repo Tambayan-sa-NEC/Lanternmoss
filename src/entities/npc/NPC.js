@@ -15,7 +15,7 @@ import { Walker } from '../../physics/Walker.js';
 import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
 import { damp } from '../../utils/math.js';
-import { mpick, mr } from '../../utils/random.js';
+import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist, offsetDir, projectTangent, tangentTo, tangentToward, turnToward } from '../../utils/sphere.js';
 import { SPAWN_DIR } from '../../world/World.js';
 import { groundHeight } from '../../world/terrain.js';
@@ -62,7 +62,7 @@ export class NPC extends Walker {
     const fresh = this.reaction(s); if (fresh) return fresh;
     for (let pass = 0; pass < 2; pass++) {
       while (this.bag.length) { const i = this.bag.pop(); if (ok(i)) { this.last = i; return lines[i]; } }
-      this.bag = [...lines.keys()].filter(ok).sort(() => Math.random() - 0.5);
+      this.bag = [...lines.keys()].filter(ok).sort(() => rng() - 0.5);
       if (this.bag[this.bag.length - 1] === this.last && this.bag.length > 1) [this.bag[0], this.bag[this.bag.length - 1]] = [this.bag[this.bag.length - 1], this.bag[0]];
     }
     return lines[0];
@@ -113,7 +113,7 @@ export class NPC extends Walker {
     this.stuckN = 0;
     if (!place.wander) return 0;                                     // strolls around the place
     this.timer -= dt;
-    if (this.state !== 'walk' && this.timer < 0) { this.state = 'walk'; this.timer = mr(4, 8); this.goal = offsetDir(place.dir, Math.random() * 6.28, Math.random() * place.wander); }
+    if (this.state !== 'walk' && this.timer < 0) { this.state = 'walk'; this.timer = mr(4, 8); this.goal = offsetDir(place.dir, rng() * 6.28, rng() * place.wander); }
     else if (this.state === 'walk') {
       _tv.copy(this.goal).sub(this.up); projectTangent(_tv, this.up).normalize(); turnToward(this.fwd, _tv, this.up, damp(3, dt));
       if (arcDist(this.up, this.goal) < 1 || this.timer < 0) { this.state = 'idle'; this.timer = mr(2, 5); }

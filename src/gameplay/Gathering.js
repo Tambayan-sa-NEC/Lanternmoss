@@ -19,7 +19,7 @@ import { itemRegistry } from '../items/ItemRegistry.js';
 import { freeOfColliders } from '../physics/colliders.js';
 import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
-import { mulberry32 } from '../utils/random.js';
+import { mulberry32, rng } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir, tangentToward, turnToward } from '../utils/sphere.js';
 import { damp } from '../utils/math.js';
 import { groundHeight, ponds, slopeAt } from '../world/terrain.js';
@@ -170,7 +170,7 @@ export const Gathering = {
     j.node?.hit();
     const kind = j.need.tool;
     if (kind === 'axe') { audio.noise(0.12, 0.09, 1500); audio.tone(190, 0.1, 'triangle', 0.05); }
-    else if (kind === 'pick') { audio.tone(1300 + Math.random() * 300, 0.09, 'square', 0.025); audio.noise(0.08, 0.06, 3000); }
+    else if (kind === 'pick') { audio.tone(1300 + rng() * 300, 0.09, 'square', 0.025); audio.noise(0.08, 0.06, 3000); }
     else if (kind) audio.noise(0.1, 0.05, 900);
     else audio.plip();
   },

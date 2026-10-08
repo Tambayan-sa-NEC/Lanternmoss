@@ -12,6 +12,7 @@ import { turnToward } from '../../../utils/sphere.js';
 import { groundHeight } from '../../../world/terrain.js';
 import { ENGAGED } from '../states.js';
 import { showDisc } from './telegraphs.js';
+import { rng } from '../../../utils/random.js';
 
 const DUST = 0xc8a67a;
 
@@ -27,7 +28,7 @@ export const burrower = {
         return d.speed;
       case 'windup':                                                     // the tremor: a growing warning disc under the hero
         showDisc(e, e.pos, d.eruptRadius, 1 - e.timer / d.windup);
-        if (Math.random() < dt * 20) sparkles.emit(groundPoint(e.pos, 0.1), { count: 2, color: DUST, speed: 1.5, up: e.up, upBias: 1, life: 0.5, size: 0.3 });
+        if (rng() < dt * 20) sparkles.emit(groundPoint(e.pos, 0.1), { count: 2, color: DUST, speed: 1.5, up: e.up, upBias: 1, life: 0.5, size: 0.3 });
         if (e.timer <= 0) erupt(e, dist);
         return 0;
       case 'recover':                                                    // exposed and vulnerable
@@ -42,7 +43,7 @@ export const burrower = {
     e.selfCollider.active = !e.hidden;                                   // the hero can walk over a tunnel
     e.body.position.y += ((e.hidden ? -1.1 : 0) - e.body.position.y) * damp(10, dt);
     e.mound.visible = e.hidden;
-    if (e.hidden && Math.abs(e.speed) > 1 && Math.random() < dt * 14) sparkles.emit(groundPoint(e.pos, 0.15), { count: 1, color: DUST, speed: 1, up: e.up, upBias: 0.8, life: 0.5, size: 0.32 });
+    if (e.hidden && Math.abs(e.speed) > 1 && rng() < dt * 14) sparkles.emit(groundPoint(e.pos, 0.15), { count: 1, color: DUST, speed: 1, up: e.up, upBias: 0.8, life: 0.5, size: 0.32 });
   },
   animate(e) {
     e.body.scale.setScalar(1 + e.hitPop * 0.14);

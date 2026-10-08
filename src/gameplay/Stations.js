@@ -16,6 +16,7 @@ import { InventoryUI } from '../ui/InventoryUI.js';
 import { arcDist, dirAlong, matrixAt, offsetDir, tangentToward } from '../utils/sphere.js';
 import { isFree } from '../world/placement.js';
 import { groundHeight, slopeAt } from '../world/terrain.js';
+import { rng } from '../utils/random.js';
 
 const V3 = THREE.Vector3, _p = new V3();
 const PUFF = { workbench: null, forge: { color: 0xffa040, speed: 1.6, upBias: 1.4 }, pot: { color: 0xffffff, speed: 0.6, upBias: 1.6 },
@@ -51,7 +52,7 @@ export const Stations = {
       const dir = dirAlong(c, side, (i - (ids.length - 1) / 2) * C.spacing), f = tangentToward(dir, world.spawnDir);
       const parts = STATION_BUILDERS[id](); parts.root.matrixAutoUpdate = false;
       parts.root.matrix.copy(matrixAt(dir.clone().multiplyScalar(groundHeight(dir) - 0.04), dir, f)); scene.add(parts.root);
-      this.list.push({ id, def: STATIONS[id], dir, fwd: f, parts, collider: addCollider(dir, 0.6, { r: 0.8, base: 0, top: 1.4 }), puffT: Math.random() });
+      this.list.push({ id, def: STATIONS[id], dir, fwd: f, parts, collider: addCollider(dir, 0.6, { r: 0.8, base: 0, top: 1.4 }), puffT: rng() });
     });
     return [c, rad + 1];
   },
@@ -93,7 +94,7 @@ export const Stations = {
     for (const s of this.list) {
       s.parts.glow.forEach((g, i) => g.scale.setScalar(1 + Math.sin(t * (7 + i * 2.3) + i) * 0.08));
       const puff = PUFF[s.id]; if (!near || !puff || (s.puffT -= dt) > 0) continue;
-      s.puffT = 0.35 + Math.random() * 0.4;
+      s.puffT = 0.35 + rng() * 0.4;
       _p.set(0, 0, 0).copy(s.parts.smoke).applyMatrix4(s.parts.root.matrix);
       sparkles.emit(_p, { count: 2, color: puff.color, speed: puff.speed, up: s.dir, upBias: puff.upBias, life: 1, size: 0.26 });
     }

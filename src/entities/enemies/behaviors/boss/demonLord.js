@@ -30,6 +30,7 @@ import { damp } from '../../../../utils/math.js';
 import { arcDist, dirAlong, projectTangent, slerpDir, tangentTo, tangentToward, turnToward } from '../../../../utils/sphere.js';
 import { groundHeight } from '../../../../world/terrain.js';
 import { bossDecal, defineBoss, finish, glowOf, inWedge, keepInArena, phaseOf, predictHero, roar, shortName } from './core.js';
+import { rng } from '../../../../utils/random.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3(), _aim = new V3();
@@ -98,7 +99,7 @@ const moves = {
         const d = dirAlong(e.laneFrom, e.laneDir, e.nextBurst), p = groundPoint(d, 0.2);
         sparkles.emit(p, { count: 10, color: glowOf(e), speed: 2.6, up: d, upBias: 1.6, life: 0.6, size: 0.5 });
         sparkles.emit(p, { count: 6, color: 0x3a2030, speed: 2, up: d, upBias: 1.2, life: 0.7, size: 0.6 });
-        if (Math.random() < 0.5) ringFX(p, a.width * 0.6, glowOf(e), 0.3);
+        if (rng() < 0.5) ringFX(p, a.width * 0.6, glowOf(e), 0.3);
       }
       if (!e.hitPlayer && !P.dead && e.front <= e.laneLen + 1) {
         const o = laneOffset(e.laneFrom, e.laneDir, P.pos);
@@ -115,7 +116,7 @@ const moves = {
     begin() { audio.charge(); },
     windup(e, dt) {
       turnToward(e.fwd, e.toP, e.up, damp(4, dt));
-      if (Math.random() < dt * 30) sparkles.emit(e.armL.getWorldPosition(_tv), { count: 1, color: glowOf(e), speed: 1, up: e.up, upBias: 2, life: 0.6, size: 0.45 });
+      if (rng() < dt * 30) sparkles.emit(e.armL.getWorldPosition(_tv), { count: 1, color: glowOf(e), speed: 1, up: e.up, upBias: 2, life: 0.6, size: 0.45 });
     },
     fire(e) {
       const a = A(e, 'hellfire'), aim = predictHero(0.5);
@@ -138,7 +139,7 @@ const moves = {
       e.disc.place(e.doomAt, e.fwd, a.radius).opacity = 0.16 + 0.3 * k;
       e.edge.place(e.doomAt, e.fwd, a.radius).opacity = 0.5 + 0.5 * pulse;
       e.fill.place(e.doomAt, e.fwd, Math.max(0.1, a.radius * k)).opacity = 0.2 + 0.25 * k;      // fills up as the blow nears
-      if (Math.random() < dt * 40) sparkles.emit(e.sword.getWorldPosition(_tv), { count: 2, color: DOOM, speed: 1.5, up: e.up, upBias: 1, life: 0.5, size: 0.55 });
+      if (rng() < dt * 40) sparkles.emit(e.sword.getWorldPosition(_tv), { count: 2, color: DOOM, speed: 1.5, up: e.up, upBias: 1, life: 0.5, size: 0.55 });
       if (k > 0.5 && playerInArea(e.doomAt, a.radius)) shakeCamera(0.06 + 0.1 * k);           // the ground trembles under you
     },
     fire(e) {
@@ -187,7 +188,7 @@ const moves = {
     begin() { audio.charge(); },
     windup(e, dt) {
       turnToward(e.fwd, e.toP, e.up, damp(5, dt));
-      if (Math.random() < dt * 30) sparkles.emit(e.armL.getWorldPosition(_tv), { count: 1, color: glowOf(e), speed: 1, life: 0.5, size: 0.45 });
+      if (rng() < dt * 30) sparkles.emit(e.armL.getWorldPosition(_tv), { count: 1, color: glowOf(e), speed: 1, life: 0.5, size: 0.45 });
     },
     fire(e) { e.wave = 0; e.waveT = 0; return 'active'; },
     active(e, dt) {
@@ -204,7 +205,7 @@ const moves = {
     begin() { audio.charge(); },
     windup(e, dt) {
       turnToward(e.fwd, e.toP, e.up, damp(4, dt)); e.hoverGoal = e.def.flight.hover + 1.2;
-      if (Math.random() < dt * 40) sparkles.emit(e.center(), { count: 1, color: glowOf(e), speed: 2, up: e.up, upBias: 1.5, life: 0.6, size: 0.45 });
+      if (rng() < dt * 40) sparkles.emit(e.center(), { count: 1, color: glowOf(e), speed: 2, up: e.up, upBias: 1.5, life: 0.6, size: 0.45 });
     },
     fire(e) {
       const a = A(e, 'rain'), aim = ctx.player.up.clone();
@@ -299,7 +300,7 @@ export const demonLord = defineBoss({
   transition(e, dt) {
     const T = e.def.transition; e.transT += dt;
     if (e.transT < T.burstAt) {                                             // kneels, gathering darkness
-      if (Math.random() < dt * 60) sparkles.emit(dirAlong(e.up, _tv.copy(e.fwd).applyAxisAngle(e.up, Math.random() * 6.28), 6).multiplyScalar(groundHeight(e.up) + 0.5),
+      if (rng() < dt * 60) sparkles.emit(dirAlong(e.up, _tv.copy(e.fwd).applyAxisAngle(e.up, rng() * 6.28), 6).multiplyScalar(groundHeight(e.up) + 0.5),
         { count: 1, color: glowOf(e), speed: 3, up: e.up, upBias: 0.8, life: 0.6, size: 0.5 });
       shakeCamera(0.08);
     } else if (!e.burst) {                                                  // the burst throws the hero clear
@@ -323,7 +324,7 @@ export const demonLord = defineBoss({
     if (dist > f.orbit + 2) e.move.copy(e.toP);
     else if (dist < f.orbit - 2) e.move.copy(e.toP).negate();
     else { e.move.crossVectors(e.up, e.toP).multiplyScalar(e.orbit); speed *= 0.6; }
-    if (Math.random() < dt * 0.3) e.orbit = -e.orbit;
+    if (rng() < dt * 0.3) e.orbit = -e.orbit;
     if (arcDist(e.up, e.home) > d.leash - 6) e.move.copy(tangentToward(e.up, e.home));   // never drifts out of the arena
     return speed;
   },

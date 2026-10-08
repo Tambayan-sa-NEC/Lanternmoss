@@ -14,7 +14,7 @@ import { itemRegistry } from '../../items/ItemRegistry.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { showBanner } from '../../ui/banner.js';
 import { toast } from '../../ui/toast.js';
-import { mpick, mr } from '../../utils/random.js';
+import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist } from '../../utils/sphere.js';
 import { spawnSpot } from '../../world/placement.js';
 import { ponds } from '../../world/terrain.js';
@@ -90,7 +90,7 @@ export function befriend(c) {
     gifted.add(gift); grantItem(gift, 1, { rarity: R.giftRarity });
     showBanner(`${c.rare.name} befriended!`, `It leaves you a gift: ${itemRegistry.get(gift).name}.`);
   } else {
-    const { coins, items } = rollLoot(R.laterLoot, ctx.planet, Math.random, ctx.player.charId);
+    const { coins, items } = rollLoot(R.laterLoot, ctx.planet, rng, ctx.player.charId);
     if (coins) gainCoins(coins); for (const it of items) grantItem(it.item, it.qty, it.props);
     toast(`The ${c.rare.name} nuzzles you and leaves a little something behind.`);
   }

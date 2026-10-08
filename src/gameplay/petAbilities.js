@@ -13,6 +13,7 @@ import { toast } from '../ui/toast.js';
 import { arcDist, offsetDir } from '../utils/sphere.js';
 import { buff } from './buffs.js';
 import { Chests } from './Chests.js';
+import { rng } from '../utils/random.js';
 
 /** Lasting effects: spotted = [{ enemy, until }], scent = { dir, until } | null, mend = { left, perSec }. */
 export const petEffects = { spotted: [], scent: null, mend: null };
@@ -83,7 +84,7 @@ export function updatePetAbilities(dt) {
   if (m) {
     const k = Math.min(dt, m.left); m.left -= dt;
     if (!P.dead) P.hp = Math.min(P.stats.maxHp, P.hp + m.perSec * k);
-    if (ctx.companion && Math.random() < dt * 8) sparkles.emit(_p.copy(P.pos).addScaledVector(P.up, 1.2), { count: 2, color: 0xffd36b, speed: 1, up: P.up, upBias: 1.4, life: 0.8, size: 0.3 });
+    if (ctx.companion && rng() < dt * 8) sparkles.emit(_p.copy(P.pos).addScaledVector(P.up, 1.2), { count: 2, color: 0xffd36b, speed: 1, up: P.up, upBias: 1.4, life: 0.8, size: 0.3 });
     if (m.left <= 0) petEffects.mend = null;
   }
   petEffects.spotted = petEffects.spotted.filter(s => s.until > ctx.time && alive(s.enemy));
