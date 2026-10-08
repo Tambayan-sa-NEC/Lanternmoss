@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import { addCollider, freeOfColliders } from '../physics/colliders.js';
 import { G, LM } from '../render/meshes.js';
 import { rpick, rr } from '../utils/random.js';
-import { arcDist, dirAlong, offsetDir, randomDir, slerpDir, tangentToward } from '../utils/sphere.js';
-import { placed, isFree } from './placement.js';
+import { arcDist, dirAlong, offsetDir, slerpDir, tangentToward } from '../utils/sphere.js';
+import { placed } from './placement.js';
 import { propCottage, propLantern, propMushroomHouse } from './props.js';
 import { ponds, surfM, surfMFacing } from './terrain.js';
 
@@ -72,15 +72,14 @@ function buildPaths(B, spawnDir, stoneCenter, houses) {
   }
 }
 
-/** Builds the whole village into B. Returns the house list plus the named houses villagers live by. */
-export function buildVillage(B, spawnDir, stoneCenter) {
+/** Builds the whole village into B: three houses round the square, and the outer houses at `outer` (spots the world
+    picked and levelled before baking the terrain). Returns the house list plus the named houses villagers live by. */
+export function buildVillage(B, spawnDir, stoneCenter, outer) {
   const houses = [], place = (dir, kind) => placeHouse(B, houses, spawnDir, dir, kind);
   const houseA = place(offsetDir(spawnDir, 0.65, 11), 0xf26d6d);
   const cottage = place(offsetDir(spawnDir, 2.35, 11.5), 'cottage');
   place(offsetDir(spawnDir, 4.3, 12), 0xf49ac1);
-  for (const kind of [0xe8795a, 'cottage', 0xa98cf0]) {
-    for (let i = 0; i < 200; i++) { const d = randomDir(); if (arcDist(d, spawnDir) > 26 && isFree(d, 4)) { place(d, kind); break; } }
-  }
+  [0xe8795a, 'cottage', 0xa98cf0].forEach((kind, i) => { if (outer[i]) place(outer[i], kind); });
   buildStoneCircle(B, stoneCenter);
   buildPaths(B, spawnDir, stoneCenter, houses);
   return { houses, houseA, cottage };

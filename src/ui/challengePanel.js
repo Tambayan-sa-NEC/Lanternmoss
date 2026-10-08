@@ -1,5 +1,6 @@
 /* The active-challenge panel (top right) and the big Clear / Failed banner. */
 import { clamp } from '../utils/math.js';
+import { showBanner } from './banner.js';
 import { dom } from './dom.js';
 
 export function showChallengePanel() { dom.challenge.style.display = 'block'; dom.hud.style.top = '112px'; }   // status chips slide below the panel
@@ -13,7 +14,4 @@ export function renderChallengePanel({ title, progress, timeText, left, limit, w
     `<div class="ch">${footer}</div>`;
 }
 
-export function showChallengeResult(win, title, sub) {
-  const el = dom.challengeResult; el.className = win ? '' : 'fail';
-  el.innerHTML = `<h2>${win ? 'Challenge Clear!' : 'Challenge Failed'}</h2><p>${title} · ${sub}</p>`; void el.offsetWidth; el.classList.add('show');
-}
+export function showChallengeResult(win, title, sub) { showBanner(win ? 'Challenge Clear!' : 'Challenge Failed', `${title} · ${sub}`, !win); }

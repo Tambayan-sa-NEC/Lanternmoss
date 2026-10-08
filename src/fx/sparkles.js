@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { makePointsMaterial } from '../render/materials.js';
 import { scene } from '../render/scene.js';
 import { audio } from '../systems/AudioSystem.js';
-import { mr } from '../utils/random.js';
+import { mr, rng } from '../utils/random.js';
 
 class Sparkles {
   constructor(max = 700) {
@@ -29,7 +29,7 @@ class Sparkles {
     const { count = 10, color = 0xfff0a0, speed = 2, up = null, upBias = 0.6, life = 1, size = 0.3, spread = 1 } = o; const c = new THREE.Color(color);
     for (let n = 0; n < count; n++) {
       const i = this.head; this.head = (this.head + 1) % this.max;
-      const rx = Math.random() * 2 - 1, ry = Math.random() * 2 - 1, rz = Math.random() * 2 - 1;
+      const rx = rng() * 2 - 1, ry = rng() * 2 - 1, rz = rng() * 2 - 1;
       this.pos[i * 3] = p.x + rx * 0.15 * spread; this.pos[i * 3 + 1] = p.y + ry * 0.15 * spread; this.pos[i * 3 + 2] = p.z + rz * 0.15 * spread;
       let vx = rx * speed * spread, vy = ry * speed * spread, vz = rz * speed * spread;
       if (up) { vx += up.x * speed * upBias; vy += up.y * speed * upBias; vz += up.z * speed * upBias; }

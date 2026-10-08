@@ -11,11 +11,12 @@ import { groundHeight } from './terrain.js';
 const V3 = THREE.Vector3;
 export const CLOUD_AXIS = new V3(0.3, 1, 0.2).normalize();
 
-export function createSky() {
+/** colors: horizon / mid / zenith gradient stops. */
+export function createSky({ horizon, mid, zenith }) {
   const sky = new THREE.Mesh(new THREE.SphereGeometry(800, 32, 16), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false,
     uniforms: { uUp: { value: new V3(0, 1, 0) }, uSun: { value: new V3(1, 0.2, 0) }, uTime: { value: 0 },
-      cHorizon: { value: new THREE.Color(0xffd9ae) }, cMid: { value: new THREE.Color(0xf6b1c8) }, cZenith: { value: new THREE.Color(0x8d9be6) },
+      cHorizon: { value: new THREE.Color(horizon) }, cMid: { value: new THREE.Color(mid) }, cZenith: { value: new THREE.Color(zenith) },
       cSun: { value: new THREE.Color(0xffc987) }, cCloud: { value: new THREE.Color(0xfff1ec) } },
     vertexShader: `varying vec3 vDir; void main(){ vDir = (modelMatrix * vec4(position,1.0)).xyz - cameraPosition; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0); }`,
     fragmentShader: `uniform vec3 uUp, uSun, cHorizon, cMid, cZenith, cSun, cCloud; uniform float uTime; varying vec3 vDir;
@@ -44,7 +45,7 @@ export function createSky() {
 
 export function createClouds() {
   const cb = new Batcher();
-  for (let i = 0; i < 18; i++) { const d = randomDir(), rad = R + rr(19, 27), [t1] = tangentFrame(d);
+  for (let i = 0; i < 40; i++) { const d = randomDir(), rad = R + rr(26, 38), [t1] = tangentFrame(d);
     const M = matrixAt(d.clone().multiplyScalar(rad), d, t1), col = rpick([0xfff6f0, 0xffe4ee, 0xfff0dc]);
     const n = 3 + Math.floor(rand() * 3);
     for (let k = 0; k < n; k++) { const s = rr(1.3, 2.4) * (k === 0 ? 1.3 : 1);

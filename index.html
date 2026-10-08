@@ -4,8 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lanternmoss — a tiny cozy planet</title>
+<link rel="icon" href="favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<!-- Grandstander (display) + Nunito (body): see docs/typography.md -->
+<link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/main.css">
 <script type="importmap">
 { "imports": {
@@ -18,34 +20,73 @@
 </head>
 <body class="menu">
 <div id="hint">
-  <b>✦ Lanternmoss</b><br>
-  <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> move &nbsp; <kbd>Shift</kbd> sprint<br>
-  <kbd>Space</kbd> jump &nbsp; <kbd>E</kbd> talk / accept &nbsp; <kbd>X</kbd> decline &nbsp; <kbd>M</kbd> mute &nbsp; <kbd>C</kbd> change hero<br>
-  <kbd>Drag</kbd> rotate camera &nbsp; <kbd>Wheel</kbd> zoom<br>
-  <span id="hint-skills"></span>
+  <div class="full"><b>✦ Lanternmoss</b> <span class="hide-tip"></span><div id="hint-keys"></div></div>
+  <div class="mini"></div>
 </div>
+<div id="compass"><div class="track"></div><i class="notch"></i></div>
+<div id="markers"></div>
+<div id="lowhp"></div>
 <div id="ebars"></div>
 <div id="reticle"></div>
+<div id="aimhint"></div>
 <div id="hurt"></div>
 <div id="combat">
-  <div class="bar hp"><i></i><span></span></div>
-  <div class="bar mp"><i></i><span></span></div>
-  <div class="bar xp"><i></i><span></span></div>
-  <div id="spells"></div>
+  <div id="center">
+    <div id="status"></div>
+    <div id="heldname"></div>
+    <div class="vitals">
+      <div class="bar hp"><b></b><i></i><span><em>HP</em><strong></strong></span></div>
+      <div class="lvl"><small>LV</small><b></b></div>
+      <div class="bar mp"><b></b><i></i><span><em></em><strong></strong></span></div>
+    </div>
+    <div class="needrow"><div class="bar en" title="Energy: food fills it. Running low slows healing and sprinting."><b></b><i></i><span><em>Energy</em><strong></strong></span></div>
+      <div class="bar xp"><i></i><span><em>XP</em><strong></strong></span></div></div>
+    <div id="hotbar"></div>
+  </div>
+  <div id="skills"><div id="spells"></div></div>
 </div>
+<div id="tip"></div>
 <div id="hud"></div>
 <div id="prompt"></div>
-<div id="dialog"><div id="dlg-name"></div><div id="dlg-text"></div>
-  <div id="dlg-choices"><button class="yes"></button><button class="no"></button></div><div id="dlg-next">▼ E</div></div>
+<div id="dialog"><div id="dlg-face"></div><div id="dlg-name"></div><div id="dlg-text"></div>
+  <div id="dlg-choices"><button class="yes"></button><button class="no"></button></div><div id="dlg-next"></div></div>
 <div id="challenge"></div>
+<div id="bossbar"><div class="bn"></div><div class="bb"><b></b><i></i><div class="ticks"></div><span class="pct"></span></div></div>
+<div id="fade"></div>
 <div id="cresult"></div>
+<div id="inventory">
+  <div class="inv-head"><b>✦ Bag</b><span class="inv-count"></span><button class="inv-close" type="button">✕</button></div>
+  <div class="inv-body"><div class="inv-grid"></div></div>
+  <div class="inv-actions"><button class="inv-use" type="button">Use</button><button class="inv-drop" type="button">Drop</button><span class="inv-msg"></span></div>
+  <div class="inv-hint"></div>
+  <div class="inv-detail"></div>
+</div>
 <div id="toast"></div>
-<div id="start">
-  <h1>Lanternmoss</h1>
-  <p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p>
-  <div id="cards"></div>
+<div id="pause" class="modal"></div>
+<div id="shop" class="modal"></div>
+<div id="petmenu"></div>
+<div id="title">
+  <div class="logo"><h1>Lanternmoss</h1><p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p></div>
+  <div class="tmenu">
+    <button type="button" class="primary" data-act="play">Play</button>
+    <button type="button" data-act="settings">Settings</button>
+    <button type="button" data-act="journal">Journal</button>
+    <button type="button" data-act="controls">Controls</button>
+    <button type="button" data-act="credits">Credits</button>
+  </div>
+  <div class="campaign"></div>
+  <div class="keys">Enter to play · ↑ ↓ to choose</div>
+</div>
+<div id="start" style="display:none">
+  <button type="button" class="back" id="selback">◀ Back</button>
+  <h2 id="selhead">Choose your hero</h2>
+  <div id="cards" class="sel-cards"></div>
+  <div id="hero-detail" class="sel-detail"></div>
+  <div id="pet-cards" class="sel-cards"></div>
+  <div id="pet-detail" class="sel-detail"></div>
+  <div class="drag-hint">⟲ drag to turn</div>
   <div class="go disabled" id="go">Choose your hero</div>
-  <div class="keys">← → or click to choose · Enter to start</div>
+  <div class="keys" id="selkeys">← → or click to choose · drag to turn · Enter for the pet · Esc back</div>
 </div>
 <div id="err"></div>
 </body>

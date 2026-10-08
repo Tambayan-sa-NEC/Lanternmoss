@@ -1,10 +1,15 @@
 /* The hero: a surface Walker driven by camera-relative input, with combat state and a swappable model. */
 import * as THREE from 'three';
 import { COMBAT } from '../../config/combat.js';
-import { BUFFS, PLAYER } from '../../config/game.js';
+import { BUFFS, PLAYER, WORLD } from '../../config/game.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buffs } from '../../gameplay/buffs.js';
+import { EQUIP_SLOTS, HOTBAR, INVENTORY } from '../../config/items.js';
+import { NEEDS } from '../../config/survival.js';
+import { hotbarFirst, Inventory } from '../../inventory/Inventory.js';
+import { held } from '../../core/keybinds.js';
+import { itemRegistry } from '../../items/ItemRegistry.js';
 import { HERO_BUILDERS } from '../../models/heroes.js';
 import { addDyn } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
@@ -14,7 +19,8 @@ import { audio } from '../../systems/AudioSystem.js';
 import { projectTangent, tangentFrame, turnToward } from '../../utils/sphere.js';
 import { damp } from '../../utils/math.js';
 import { groundHeight } from '../../world/terrain.js';
-import { animateHero, animateKnight } from './poses.js';
+import { animateHero, HERO_POSES } from './poses.js';
+import { rng } from '../../utils/random.js';
 
 const V3 = THREE.Vector3;
 const _cf = new V3(), _cr = new V3(), _wish = new V3(), _tv = new V3(), _tv2 = new V3();
@@ -33,18 +39,24 @@ export class Player extends Walker {
     this.fwd.copy(tangentFrame(spawnDir)[0]);
     // combat
     Object.assign(this, { charId: 'witch', stats: COMBAT.player, hp: COMBAT.player.maxHp, mana: COMBAT.player.maxMana, invuln: 0, hurtT: 0,
-      dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, ...KNIGHT_TIMERS });
+      dead: false, deadT: 0, lastHurt: -99, knock: new V3(), castT: 0, castFaceT: 0, level: 1, xp: 0, coins: 0, motion: null, leapK: 0, ...KNIGHT_TIMERS });
+    this.equipment = Object.fromEntries(Object.keys(EQUIP_SLOTS).map(k => [k, null]));   // worn gear (src/gameplay/equipment.js)
+    this.energy = NEEDS.start; this.regenK = 1; this.sprintK = 1;                      // gameplay/Needs.js
+    // the hero's items: slots 0-8 are the hotbar, the rest the bag (kept across planets and fainting; emptied on a new adventure)
+    this.inventory = new Inventory(HOTBAR.size + INVENTORY.slots, itemRegistry,
+      { fillOrder: hotbarFirst(HOTBAR.size, HOTBAR.size + INVENTORY.slots, HOTBAR.holdCategories) });
   }
 
   /** Replaces the visible model; every part key the old build added is removed first. */
   swapModel(parts) {
     if (this.root) { scene.remove(this.root); disposeTree(this.root); }
     for (const k of this.partKeys) delete this[k];
+    this.vanityHat = this.vanityCape = this.capeKids = this.heldTool = null;     // they belonged to the old model
     this.partKeys = Object.keys(parts); Object.assign(this, parts); scene.add(this.root);
   }
 
   /** Clears every short-lived combat / ability timer. */
-  clearTimers() { Object.assign(this, { castT: 0, castFaceT: 0, invuln: 0, hurtT: 0, ...KNIGHT_TIMERS }); }
+  clearTimers() { Object.assign(this, { castT: 0, castFaceT: 0, invuln: 0, hurtT: 0, motion: null, leapK: 0, petrifyT: 0, ...KNIGHT_TIMERS }); }
 
   /** Stands the hero on the ground at dir, at rest, facing the first tangent axis there. */
   placeAt(dir) {
@@ -54,18 +66,37 @@ export class Player extends Walker {
     return t1;
   }
 
-  /** Movement for one frame. input: { keys, viewFwd (camera heading), enabled (false while menus own the keys) }. */
+  /** Water: a splash on the way in, ripples while wading or swimming (the Walker slows and floats the hero). */
+  splashes(dt) {
+    if (this.waterDepth <= 0.15) { this.wet = false; return; }
+    const surf = this.swimming ? this.r + WORLD.water.swimDepth : this.r + this.waterDepth, moving = this.vel.lengthSq() > 0.6;
+    const burst = (count, speed) => { _tv.copy(this.up).multiplyScalar(surf);
+      sparkles.emit(_tv, { count, color: 0xe8fbff, speed, up: this.up, upBias: 0.9, life: 0.55, size: 0.3 }); };
+    if (!this.wet) { this.wet = true; this.rippleT = 0.2; burst(26, 3); audio.splash(); return; }
+    if (moving && (this.rippleT -= dt) < 0) { this.rippleT = this.swimming ? 0.32 : 0.24; burst(5, 1.2); if (rng() < 0.35) audio.splash(false); }
+  }
+  /** Movement for one frame. input: { keys, viewFwd (camera heading), enabled (false while menus own the keys) }.
+      While a scripted move runs (this.motion(player, dt) -> false when finished, e.g. Leap Slam) it replaces steering and physics. */
   update(dt, { keys, viewFwd, enabled }) {
+    if (this.motion) {
+      if (this.dead || !this.motion(this, dt)) this.motion = null;
+      const hs = this.motionHs || 0; animateHero(this, dt, hs); HERO_POSES[this.charId]?.(this, dt, hs);   // indoors walking animates too
+      this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
+      return;
+    }
     let f = 0, s = 0;
+    if (this.petrifyT > 0) { this.petrifyT -= dt; enabled = false; }   // turned to stone (the Basilisk's gaze)
     if (enabled && !this.dead) {
-      if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1;
-      if (keys.KeyD || keys.ArrowRight) s += 1; if (keys.KeyA || keys.ArrowLeft) s -= 1;
+      if (held('moveForward', keys)) f += 1; if (held('moveBack', keys)) f -= 1;
+      if (held('moveRight', keys)) s += 1; if (held('moveLeft', keys)) s -= 1;
     }
     // Camera-relative input, built in the player's CURRENT tangent plane: W always = away from the camera.
     _cf.copy(viewFwd); projectTangent(_cf, this.up).normalize(); _cr.crossVectors(_cf, this.up);
     _wish.set(0, 0, 0).addScaledVector(_cf, f).addScaledVector(_cr, s); if (_wish.lengthSq() > 1) _wish.normalize();
-    const sprint = keys.ShiftLeft || keys.ShiftRight;
-    const speed = (sprint ? PLAYER.sprintSpeed : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1);
+    const sprint = held('sprint', keys);
+    const run = PLAYER.walkSpeed + (PLAYER.sprintSpeed - PLAYER.walkSpeed) * (this.sprintK ?? 1);    // a hungry hero sprints slower (gameplay/Needs.js)
+    const speed = (sprint ? run : PLAYER.walkSpeed) * (buffs.feather > 0 ? BUFFS.featherSpeed : 1) * (buffs.swift > 0 ? BUFFS.swiftSpeed : 1) * (1 + (this.stats.moveSpeed || 0));
+    this.sprinting = sprint && _wish.lengthSq() > 0.01;
     _tv.copy(_wish).multiplyScalar(speed);
     this.vel.lerp(_tv, damp(this.grounded ? PLAYER.accelGround : PLAYER.accelAir, dt));
     // jump with coyote time + input buffer
@@ -74,10 +105,11 @@ export class Player extends Walker {
       this.vy = PLAYER.jumpVel * (buffs.moon > 0 ? BUFFS.moonJump : 1); this.grounded = false; this.coyote = 0; this.jumpBuf = 0; this.squash = 0.22; audio.jump();
       sparkles.emit(this.pos, { count: 6, color: 0xfff0e0, speed: 1.2, up: this.up, upBias: 0.3, life: 0.45, size: 0.3 });
     }
-    const g = (this.vy > 0 && keys.Space) ? PLAYER.gravityRise * (buffs.moon > 0 ? BUFFS.moonGravity : 1) : PLAYER.gravityFall;
+    const g = (this.vy > 0 && held('jump', keys)) ? PLAYER.gravityRise * (buffs.moon > 0 ? BUFFS.moonGravity : 1) : PLAYER.gravityFall;
     const wasGrounded = this.grounded, vyBefore = this.vy, spd = this.vel.length();
     _tv2.copy(this.vel).add(this.knock);                         // knockback from hits rides on top of steering
     const n = this.step(_tv2, dt, g);
+    this.splashes(dt);
     projectTangent(this.knock, this.up).multiplyScalar(Math.exp(-6 * dt));
     // transport velocity into the new tangent plane, then remove the part pushing into obstacles => smooth sliding
     projectTangent(this.vel, this.up); if (this.vel.lengthSq() > 1e-8) this.vel.setLength(spd);
@@ -94,7 +126,7 @@ export class Player extends Walker {
     if (this.grounded && hs > 6 && this.trail < 0) {
       this.trail = 0.07; sparkles.emit(this.pos, { count: 1, color: buffs.feather > 0 ? 0xb8ffe0 : 0xfff0e0, speed: 0.6, up: this.up, upBias: 0.5, life: 0.5, size: 0.28 });
     }
-    animateHero(this, dt, hs); if (this.charId === 'knight') animateKnight(this, dt);
+    animateHero(this, dt, hs); HERO_POSES[this.charId]?.(this, dt, hs);
     this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
   }
 }

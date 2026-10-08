@@ -1,0 +1,46 @@
+// The pet menu during play: opens with its key, pauses the world, frames the pet with a still camera while it idles,
+// swaps / renames / commands, remembers the pick, closes back to play; never over the pause menu; indoors it opens
+// without a showcase; the bag no longer has a Pets tab.
+import { boot, imp } from './lib/boot.mjs';
+const { ctx } = await imp('core/context.js');
+const { Pets } = await imp('gameplay/Pets.js');
+const { PetMenu } = await imp('ui/PetMenu.js');
+const { PauseMenu } = await imp('ui/PauseMenu.js');
+const { emit } = await imp('core/events.js');
+const { cam } = await imp('systems/CameraSystem.js');
+const { camera } = await imp('render/scene.js');
+const { H, step } = await boot('knight');
+let fails = 0; const check = (ok, m) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${m}`); if (!ok) fails++; };
+const press = code => { __fire('keydown', { code }); __fire('keyup', { code }); };
+const src = (await import('node:fs')).readFileSync(new URL('../../src/ui/InventoryUI.js', import.meta.url), 'utf8');
+step(2);
+const foe = H.spawnEnemy('goblin', 9); step(0.2); const foePos = foe.pos.clone(), t0 = ctx.time;
+press('KeyB');
+check(PetMenu.isOpen && ctx.paused && !!cam.show, 'B opens the pet menu: the world pauses, the camera frames the pet');
+const tail0 = ctx.companion.tail.rotation.z; step(3);
+check(foe.pos.distanceTo(foePos) < 1e-6 && ctx.time === t0, 'monsters (and the clock) stand still meanwhile');
+check(Math.abs(ctx.companion.tail.rotation.z - tail0) > 1e-3, 'the pet still idles (its tail wags)');
+const d = camera.position.distanceTo(ctx.companion.pos), p0 = camera.position.clone(); step(2);
+check(d < 4 && camera.position.distanceTo(p0) < 0.02, `still, close framing on the pet (${d.toFixed(2)} m)`);
+press('KeyQ'); press('KeyZ'); check(!ctx.player.castT && PetMenu.isOpen, 'play keys do nothing while it is open');
+press('ArrowDown'); check(PetMenu.view === 'fox' && Pets.id === 'wolf', 'arrows look through the pets; a locked one stays home');
+emit('chestopened', { kind: 'rare', planet: 0 });
+PetMenu.pick('fox');
+check(Pets.id === 'fox' && ctx.companion.petId === 'fox' && Pets.picks.knight === 'fox', 'an unlocked pet swaps in right there, and is remembered for the knight');
+step(2); check(camera.position.distanceTo(ctx.companion.pos) < 4.2, 'the camera follows to the new pet');
+PetMenu.pick('owl'); step(3);
+const wing0 = ctx.companion.wingL.rotation.z; step(0.13);
+check(Pets.id === 'owl' && Math.abs(ctx.companion.wingL.rotation.z - wing0) > 1e-3, 'a flyer swaps in and flaps while paused');
+check(ctx.companion.pos.distanceTo(ctx.player.pos) < 3.5, `and settles in front of the hero (${ctx.companion.pos.distanceTo(ctx.player.pos).toFixed(2)} m)`);
+check(Pets.rename('owl', 'Hootie') === 'Hootie' && Pets.nameOf() === 'Hootie', 'rename in the menu');
+Pets.command('stay'); check(Pets.mode === 'stay', 'commands from the menu'); Pets.command('follow');
+press('KeyT'); check(Pets.mode === 'stay', 'T still cycles the command in the menu'); Pets.command('follow');
+__fire('blur'); check(!PauseMenu.isOpen, "the auto-pause doesn't stack over it");
+press('Escape'); step(0.5);
+check(!PetMenu.isOpen && !ctx.paused && !cam.show && ctx.time > t0, 'Esc closes it: play resumes, the camera follows the hero again');
+press('KeyB'); press('KeyB'); check(!PetMenu.isOpen && !ctx.paused, 'B toggles it shut too');
+H.Pets.hurt(9999); step(0.1); press('KeyB');
+check(PetMenu.isOpen && !cam.show, 'a resting pet: the menu opens, without a showcase'); press('Escape');
+H.Pets.revive(); step(0.2);
+check(!src.includes("data-tab=\"pets\"") && !src.includes('renderPets'), 'the bag has no Pets tab any more (one place for each action)');
+console.log(fails ? `${fails} FAILED` : 'all passed');

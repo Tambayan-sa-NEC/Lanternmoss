@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RENDER } from '../config/render.js';
-import { FOG_COLOR, PIXEL_RATIO } from './scene.js';
+import { FOG_COLOR, FOG_FAR, FOG_NEAR, PIXEL_RATIO } from './scene.js';
 
 export const gradientMap = (() => {
   const d = new Uint8Array([92, 92, 92, 255, 172, 172, 172, 255, 255, 255, 255, 255]);
@@ -24,7 +24,7 @@ export const poolMat = new THREE.MeshBasicMaterial({ vertexColors: true, transpa
    so every object gets a crisp ink line regardless of size; it thins slightly with distance and fades into fog. */
 export const outlineMat = new THREE.ShaderMaterial({
   uniforms: { uRes: { value: new THREE.Vector2(1, 1) }, uWidth: { value: RENDER.outline.width * PIXEL_RATIO }, uColor: { value: new THREE.Color(RENDER.outline.color) },
-    uFogColor: { value: FOG_COLOR }, uFogNear: { value: RENDER.fog.near }, uFogFar: { value: RENDER.fog.far } },
+    uFogColor: { value: FOG_COLOR }, uFogNear: FOG_NEAR, uFogFar: FOG_FAR },
   vertexShader: `uniform vec2 uRes; uniform float uWidth; varying float vDepth;
     void main(){
       vec4 mv = modelViewMatrix * vec4(position, 1.0);
@@ -48,10 +48,14 @@ export function outlineGeo(geo) {
   g = mergeVertices(g, 1e-3); g.computeVertexNormals(); return g;
 }
 
-/** Additive point-sprite material (fireflies, sparkles). uScale tracks the viewport; RenderSystem updates every one created here. */
-export const pointMaterials = [];
+/** Additive point-sprite material (fireflies, sparkles). uScale tracks the viewport (setPointScale, from RenderSystem). */
+const pointMaterials = [];
+let pointScale = 400;
 export function makePointsMaterial(vertexShader, fragmentShader) {
   const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uScale: { value: 400 } }, vertexShader, fragmentShader });
+    uniforms: { uTime: { value: 0 }, uScale: { value: pointScale } }, vertexShader, fragmentShader });
   pointMaterials.push(m); return m;
 }
+export function setPointScale(scale) { pointScale = scale; for (const m of pointMaterials) m.uniforms.uScale.value = scale; }
+/** Stops resizing a points material that is being thrown away (a planet's fireflies). */
+export function releasePointsMaterial(m) { const i = pointMaterials.indexOf(m); if (i >= 0) pointMaterials.splice(i, 1); }

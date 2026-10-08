@@ -1,6 +1,11 @@
 /* ENEMIES: reuse Walker physics/collisions; behaviour is chosen by def.ai
-   ('melee' goblins & ogres, 'ranged' wisps, 'hopper' slimes). Balance numbers live in COMBAT.enemies.
-   States: idle / wander / return (out of combat) and chase / windup / recover / charge / flee (ENGAGED). */
+   ('melee' goblins & ogres, 'ranged' wisps, 'hopper' slimes here; newer AIs such as 'bomber', 'charger', 'burrower',
+   'support' and 'boss' are behaviour modules in ./behaviors). Balance numbers live in COMBAT.enemies, scaled per planet.
+   States: idle / wander / return (out of combat) and chase / windup / recover / charge / flee, plus the bosses'
+   active / transition (ENGAGED).
+   dormant: a planet boss asleep in its sealed lair (src/gameplay/BossGate.js): hidden, untouchable and still; 'show'
+   while it rises during its waking sequence. def.static: an object that never moves or attacks (lair seals).
+   elite: a tougher, golden-haloed monster (makeElite) that carries a sigil. */
 import * as THREE from 'three';
 import { COMBAT } from '../../config/combat.js';
 import { ctx } from '../../core/context.js';
@@ -17,60 +22,114 @@ import { audio } from '../../systems/AudioSystem.js';
 import { shakeCamera } from '../../systems/CameraSystem.js';
 import { dom } from '../../ui/dom.js';
 import { damp } from '../../utils/math.js';
-import { mr } from '../../utils/random.js';
+import { mr, rng } from '../../utils/random.js';
 import { arcDist, dirAlong, frameQuat, projectTangent, tangentFrame, tangentTo, tangentToward, turnToward } from '../../utils/sphere.js';
 import { SPAWN_DIR } from '../../world/World.js';
 import { groundHeight } from '../../world/terrain.js';
 import { hurtPlayer } from '../../combat/damage.js';
 import { forgetTarget } from '../../combat/targeting.js';
+import { encounterEvents } from '../../combat/events.js';
 import { Projectile } from '../Projectile.js';
 import { ENGAGED } from './states.js';
+import { BEHAVIORS } from './behaviors/index.js';
+import { enemyDef } from '../../combat/enemyDefs.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3(), _a2 = new V3();
+/** Boss states in which a stun lands (never in the middle of a telegraphed attack). */
+const STUNNABLE = new Set(['chase', 'recover']);
 
-/** Enemies never fight inside the village safe zone, or a fainted hero. */
-function playerSafe() { return ctx.player.dead || arcDist(ctx.player.up, SPAWN_DIR) < COMBAT.player.safeRadius; }
+/** Enemies never fight inside the village safe zone, indoors, or a fainted hero. */
+function playerSafe() { return ctx.player.dead || ctx.indoors || arcDist(ctx.player.up, SPAWN_DIR) < COMBAT.player.safeRadius; }
 
 export class Enemy extends Walker {
-  constructor(type, dir) {
-    const def = COMBAT.enemies[type]; super(dir, def.radius);
+  /** def defaults to this planet's scaled stats for the type (a boss passes its own, with per-planet overrides). */
+  constructor(type, dir, def = enemyDef(type)) {
+    super(dir, def.radius);
     this.type = type; this.def = def; this.hover = def.hover || 0; this.height = def.height; this.hitR = def.radius + 0.3;
-    Object.assign(this, ENEMY_BUILDERS[type]()); this.baseScale = this.root.scale.x; scene.add(this.root);
+    Object.assign(this, ENEMY_BUILDERS[type](def)); this.baseScale = this.root.scale.x; scene.add(this.root);
     this.shadow = makeShadow(def.radius * 1.5); this.selfCollider = addDyn(this.up, def.radius);
-    this.home = dir.clone(); this.knock = new V3(); this.move = new V3(); this.toP = new V3(); this._c = new V3(); this.seed = Math.random() * 10;
-    if (def.slamRadius) { this.tele = new THREE.Mesh(discGeo, fxMaterial(0xff4d6d, 1.2)); this.tele.renderOrder = 3; this.tele.visible = false; scene.add(this.tele); }
+    this.home = dir.clone(); this.knock = new V3(); this.move = new V3(); this.toP = new V3(); this._c = new V3(); this.seed = rng() * 10;
+    if (def.slamRadius || def.telegraph) { this.tele = new THREE.Mesh(discGeo, fxMaterial(0xff4d6d, 1.2)); this.tele.renderOrder = 3; this.tele.visible = false; scene.add(this.tele); }
+    this.fxMeshes = [];                               // extra warning meshes a behaviour owns: hidden by hideTele, removed by dispose
+    this.behavior = BEHAVIORS[def.behavior ?? def.ai] || null; this.behavior?.init?.(this);   // def.behavior: a boss's own AI
     this.bar = document.createElement('div'); this.bar.className = 'eb'; this.bar.innerHTML = '<i></i>'; dom.enemyBars.appendChild(this.bar); this.barFill = this.bar.firstChild;
     this.spawn(dir);
   }
   spawn(dir) {
     this.up.copy(dir); this.r = groundHeight(this.up); this.pos.copy(this.up).multiplyScalar(this.r); this.vy = 0; this.grounded = true;
-    this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, Math.random() * 6.28);
+    this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, rng() * 6.28);
     Object.assign(this, { hp: this.def.hp, alive: true, state: 'idle', timer: mr(0.5, 2.5), cool: 0, speed: 0, phase: 0, deadT: 0, turn: 0,
-      slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false });
+      slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false,
+      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0 });   // hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
     this.knock.set(0, 0, 0); this.selfCollider.active = true; this.root.visible = this.shadow.visible = true; this.root.scale.setScalar(this.baseScale);
+    this.behavior?.reset?.(this);
   }
   center() { return this._c.copy(this.pos).addScaledVector(this.up, this.hover + this.height * 0.5); }
-  aggro() { if (!this.alive || ENGAGED.has(this.state) || playerSafe()) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
-  hideTele() { if (this.tele) this.tele.visible = false; }
+  aggro() { if (!this.alive || this.dormant || this.def.static || ENGAGED.has(this.state) || playerSafe()) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
+  hideTele() { if (this.tele) this.tele.visible = false; for (const m of this.fxMeshes) m.visible = false; }
   interrupt(t) {
+    if (this.def.staggerImmune) return;
     this.stunT = Math.max(this.stunT, t);
     if (this.state === 'windup' || this.state === 'charge') { this.state = 'recover'; this.timer = this.cool = this.def.cooldown * 0.5; this.hideTele(); emote(this, '?', '#8a6ae0'); }
+  }
+  /** Freezes the monster for t seconds (Leap Slam and other heavy stuns). Ordinary monsters also lose the attack they
+      were winding up; bosses only feel it between attacks (chase / recover), shortened by def.stunResist. */
+  stun(t) {
+    if (this.def.staggerImmune) { if (!STUNNABLE.has(this.state)) return; t *= 1 - (this.def.stunResist ?? 0.6); }
+    else this.interrupt(t);
+    if (t < 0.05) return;
+    this.stunT = Math.max(this.stunT, t); emote(this, '★', '#ffd24a');
   }
   die() {
     this.alive = false; this.state = 'dead'; this.deadT = 0; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
     sparkles.emit(this.center(), { count: 36, color: this.def.color, speed: 3, up: this.up, upBias: 0.6, life: 0.9, size: 0.4 });
     audio.enemyDie(); forgetTarget(this);
+    this.behavior?.onDie?.(this);
+    encounterEvents.dispatchEvent(new CustomEvent('enemydefeated', { detail: { enemy: this } }));
     for (let i = 0; i < (this.def.splitCount || 0); i++) {
       const e = new Enemy(this.def.splitInto, dirAlong(this.up, _tv.copy(this.fwd).applyAxisAngle(this.up, i * Math.PI * 2 / this.def.splitCount + 0.8), 0.9));
       e.home.copy(this.home); e.state = 'chase'; e.vy = 4; e.grounded = false; ctx.enemies.push(e); }
   }
+  /** Leaves without a fight (no XP, no splitting): used when a planet is cleared. */
+  vanish() {
+    if (!this.alive) return;
+    this.alive = false; this.state = 'dead'; this.deadT = 0; this.temporary = true; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
+    sparkles.emit(this.center(), { count: 24, color: 0xfff0a0, speed: 2.2, up: this.up, upBias: 1, life: 0.9, size: 0.34 });
+    forgetTarget(this);
+  }
+  /** Calls in a temporary helper that fights alongside this enemy (boss summons). */
+  spawnMinion(type, dir) {
+    const m = new Enemy(type, dir); m.temporary = true; m.owner = this; m.home.copy(this.home);
+    ctx.enemies.push(m); m.aggro(); return m;
+  }
   dispose() {
     scene.remove(this.root, this.shadow); if (this.tele) scene.remove(this.tele); this.bar.remove(); disposeTree(this.root);
+    for (const m of this.fxMeshes) { scene.remove(m); m.material.dispose(); }
+    this.behavior?.dispose?.(this);
     removeDyn(this.selfCollider);
+  }
+  /** Turns this monster into an elite: tougher, bigger, worth more, with a golden halo (it never respawns as one). */
+  makeElite(k) {
+    const d = this.def;
+    this.def = { ...d, hp: d.hp * k.hp, damage: (d.damage ?? 0) * k.damage, xp: Math.round(d.xp * k.xp), respawn: 0, elite: true };
+    this.elite = true; this.hp = this.def.hp; this.baseScale *= k.scale; this.root.scale.setScalar(this.baseScale);
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.06, 6, 20), fxMaterial(k.halo, 2.2));
+    halo.rotation.x = Math.PI / 2; halo.position.y = d.height / this.baseScale * k.scale + 0.25 + (d.hover ?? 0); this.root.add(halo); this.halo = halo;
+    this.bar.classList.add('elite');
   }
   update(dt) {
     const d = this.def;
+    if (this.dormant) {                                            // asleep in its lair (or rising, while 'show')
+      const show = this.dormant === 'show'; this.root.visible = this.shadow.visible = show; this.bar.style.display = 'none';
+      if (show) { this.animate(dt); this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.hover + this.r - groundHeight(this.up)); }
+      return;
+    }
+    if (this.alive && d.static) {                                  // a lair seal: just stands there, glowing
+      this.hitPop = Math.max(0, this.hitPop - dt * 6); this.animate(dt); this.place(this.root);
+      updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up)); return;
+    }
+    if (this.halo) this.halo.rotation.z += dt * 1.5;
     if (!this.alive) {
       this.deadT += dt; const k = Math.min(1, this.deadT / 0.45);
       this.root.scale.setScalar(this.baseScale * Math.max(0.01, 1 - k)); this.root.visible = this.shadow.visible = k < 1;
@@ -79,6 +138,7 @@ export class Enemy extends Walker {
       return;
     }
     this.slowT = Math.max(0, this.slowT - dt); this.markT = Math.max(0, this.markT - dt); this.stunT = Math.max(0, this.stunT - dt);
+    this.shieldT = Math.max(0, this.shieldT - dt); this.stunnedT = Math.max(0, this.stunnedT - dt);
     this.cool -= dt; this.timer -= dt; this.hitPop = Math.max(0, this.hitPop - dt * 6);
     const dist = tangentTo(this.pos, this.up, ctx.player.pos, this.toP), safe = playerSafe();
     if (!ENGAGED.has(this.state) && this.state !== 'return' && dist < d.aggro) this.aggro();
@@ -97,10 +157,13 @@ export class Enemy extends Walker {
     projectTangent(this.knock, this.up).multiplyScalar(Math.exp(-7 * dt));
     if (this.hopDir) projectTangent(this.hopDir, this.up).normalize();
     if (n && this.state === 'wander') { this.fwd.addScaledVector(n, 0.9); projectTangent(this.fwd, this.up).normalize(); this.turn = -this.turn; }
+    this.behavior?.update?.(this, dt, n);
     if (d.contact && ENGAGED.has(this.state) && !safe && this.cool <= 0 && dist < this.radius + ctx.player.radius + 0.3 && ctx.player.r - groundHeight(ctx.player.up) < 1) {
       hurtPlayer(d.damage, this.pos, d.knockback); this.cool = d.contactCooldown; }
-    if (this.slowT > 0 && Math.random() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
-    if (this.markT > 0 && Math.random() < dt * 6) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.6), { count: 1, color: 0xc7a8ff, speed: 0.4, up: this.up, upBias: 1.5, life: 0.6, size: 0.3 });
+    if (this.stunT > 0.1 && rng() < dt * 12) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.55), { count: 1, color: 0xffe066, speed: 1.4, up: this.up, upBias: 0.3, life: 0.5, size: 0.32 });   // dazed stars
+    if (this.slowT > 0 && rng() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
+    if (this.shieldT > 0 && rng() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
+    if (this.markT > 0 && rng() < dt * 6) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.6), { count: 1, color: 0xc7a8ff, speed: 0.4, up: this.up, upBias: 1.5, life: 0.6, size: 0.3 });
     this.animate(dt);
     this.place(this.root);
     if (this.hover) this.root.position.addScaledVector(this.up, Math.sin(ctx.time * 2 + this.seed) * 0.15);
@@ -122,6 +185,7 @@ export class Enemy extends Walker {
         if (arcDist(this.up, this.home) < 1.5) { this.state = 'idle'; this.timer = 1; this.hp = d.hp; }
         return d.speed;
     }
+    if (this.behavior) return this.behavior.think(this, dt, dist);
     return d.ai === 'ranged' ? this.thinkRanged(dt, dist) : d.ai === 'hopper' ? this.thinkHopper(dt) : this.thinkMelee(dt, dist);
   }
   /** Goblins (fast hit-and-run, flee when hurt) and ogres (slow telegraphed ground slam you can jump over). */
@@ -184,6 +248,7 @@ export class Enemy extends Walker {
   thinkHopper(dt) { this.state = 'chase'; turnToward(this.fwd, this.toP, this.up, damp(6, dt)); this.move.copy(this.toP); return this.def.speed; }
   animate(dt) {
     const d = this.def, s = Math.abs(this.speed), pop = 1 + this.hitPop * 0.14; this.phase += dt * (2 + s * 3.2);
+    if (this.behavior?.animate) { this.behavior.animate(this, dt); return; }
     if (this.legL) {
       const sw = Math.sin(this.phase) * Math.min(1, s / 2) * 0.8;
       this.legL.rotation.x = sw; this.legR.rotation.x = -sw; this.armL.rotation.x = -sw * 0.6;
