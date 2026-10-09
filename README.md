@@ -319,7 +319,8 @@ tests/                     unit tests: XP / level math, inventory, planets + ene
                            heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,
                            the seeded random stream
 tests/sim/                 gameplay sims (npm run sim): the real game played headless; balance.sim.mjs is the balance report
-favicon.ico                the lantern in the browser tab
+favicon.ico                the Girl Witch character mark in the browser tab (16–48 px)
+favicon.png                the 32 px PNG browser icon, from docs/logo/witch-A1.png
 src/
 ├── main.js                entry point: builds the Game, starts the loop, exposes window.LANTERNMOSS
 ├── errorOverlay.js        classic script that shows load/runtime errors on screen
