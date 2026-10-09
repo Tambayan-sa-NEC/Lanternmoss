@@ -18,6 +18,10 @@ const CAST = { ...WITCH_ABILITIES, ...KNIGHT_ABILITIES, ...RANGER_ABILITIES, ...
 
 /** cd[id] = seconds until ready, gcd = global cooldown, queued = id pressed just before it was ready. */
 export const spellState = { cd: {}, gcd: 0, queued: null, queuedT: 0 };
+export const CombatState = {
+  toJSON() { return { ...spellState.cd }; },
+  load(data) { resetCooldowns(kit()); spellState.cd = { ...data }; },
+};
 
 /** The active character's ability table. */
 export function kit() { return CHARACTERS[ctx.player.charId].abilities; }

@@ -55,7 +55,7 @@ export const Farm = {
     this.center = c;
     const fwd = tangentToward(c, spawn), side = new V3().crossVectors(fwd, c).normalize(), up = c;
     this.frame = buildFarmFrame(w, d); this.frame.matrixAutoUpdate = false; this.frame.matrix.copy(matrixAt(c.clone().multiplyScalar(groundHeight(c) - 0.05), c, fwd)); scene.add(this.frame);
-    const saved = this.state[planet] ??= Array.from({ length: cols * rows }, newPlot);
+    const saved = this.state[PLANETS[planet].id] ??= Array.from({ length: cols * rows }, newPlot);
     let k = 0;
     for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
       const pos = c.clone().multiplyScalar(groundHeight(c)).addScaledVector(side, (i - (cols - 1) / 2) * sp).addScaledVector(fwd, (j - (rows - 1) / 2) * sp - 0.2);
@@ -72,6 +72,12 @@ export const Farm = {
     this.plots = []; this.frame = null; this.center = null;
   },
   resetRun() { this.state = {}; },
+
+  toJSON() { return { day: this.day, plots: structuredClone(this.state[ctx.planetId] ?? []) }; },
+  load(data) {
+    this.day = data.day; this.state[ctx.planetId] = structuredClone(data.plots);
+    this.plots.forEach((p, i) => { p.s = this.state[ctx.planetId][i]; p.stage = -1; this.look(p); });
+  },
 
   /** Soil colour, weeds, furrows and the crop model for a plot's state. */
   look(p) {

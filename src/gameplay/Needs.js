@@ -10,6 +10,8 @@ const WARN = { 0.3: 'Your tummy rumbles. Eat something soon: hungry heroes heal 
   0.1: "You're running on empty! Eat something: you'll barely heal or sprint until you do." };
 
 export const Needs = {
+  toJSON() { return ctx.player.energy; },
+  load(energy) { ctx.player.energy = energy; const fx = needEffects(energy); ctx.player.regenK = fx.regen; ctx.player.sprintK = fx.sprint; },
   get level() { return needLevel(ctx.player.energy); },
   update(dt) {
     const P = ctx.player;

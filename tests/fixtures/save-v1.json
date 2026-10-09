@@ -1,0 +1,281 @@
+{
+  "game": "lanternmoss",
+  "version": 1,
+  "slot": 0,
+  "savedAt": "2026-10-09T00:00:00.000Z",
+  "planetId": "emberfall",
+  "systems": {
+    "player": {
+      "charId": "witch",
+      "level": 4,
+      "xp": 19,
+      "coins": 237,
+      "hp": 87,
+      "mana": 51,
+      "time": 0,
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "fwd": [
+        1,
+        0,
+        0
+      ],
+      "lastHurt": -99,
+      "indoors": null,
+      "roomX": 0,
+      "roomZ": 0
+    },
+    "inventory": [
+      {
+        "itemId": "wood",
+        "quantity": 12,
+        "props": null
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "equipment": {
+      "head": null,
+      "armor": null,
+      "feet": null,
+      "weapon": null,
+      "charm": null,
+      "charm2": null,
+      "hat": null,
+      "back": null
+    },
+    "hotbar": {
+      "selected": 0,
+      "cd": 0
+    },
+    "pets": {
+      "unlocked": [
+        "owl",
+        "wolf",
+        "fox"
+      ],
+      "active": "fox",
+      "names": {
+        "fox": "Ember"
+      },
+      "mode": "stay",
+      "stayDir": [
+        0,
+        1,
+        0
+      ],
+      "hp": 48,
+      "faintT": 0,
+      "hurtAt": -99,
+      "abilityCd": 0,
+      "petCool": 0,
+      "swapCool": 0,
+      "mend": null
+    },
+    "quests": {
+      "state": {},
+      "tracked": null
+    },
+    "challenges": {
+      "progress": {},
+      "run": null
+    },
+    "story": {},
+    "dayClock": {
+      "t": 36,
+      "day": 1
+    },
+    "buffs": {
+      "timers": {
+        "moon": 0,
+        "feather": 0,
+        "howl": 0,
+        "might": 0,
+        "ward": 0,
+        "swift": 0,
+        "mend": 0
+      },
+      "energy": 80
+    },
+    "houses": {
+      "opened": [],
+      "lore": {},
+      "ovenDay": {},
+      "teaAt": -99
+    },
+    "rareGifts": [],
+    "progression": {
+      "defeated": [],
+      "introShown": false,
+      "lairs": {}
+    },
+    "combat": {
+      "bolt": 0,
+      "fireball": 0,
+      "nova": 0,
+      "blink": 0,
+      "meteor": 0
+    }
+  },
+  "planets": {
+    "lanternmoss": {
+      "farm": {
+        "day": 1,
+        "plots": [
+          {
+            "tilled": true,
+            "crop": "carrot",
+            "growth": 0.5,
+            "watered": true
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          }
+        ]
+      },
+      "gathering": {
+        "nodes": [],
+        "rest": {},
+        "tipsShown": []
+      },
+      "chests": {
+        "opened": [
+          "lanternmoss:0"
+        ],
+        "sinceKey": 0,
+        "list": []
+      },
+      "bossGate": {
+        "awake": false,
+        "beaten": false,
+        "broken": [],
+        "hinted": [],
+        "praised": []
+      },
+      "pickups": []
+    },
+    "emberfall": {
+      "farm": {
+        "day": 1,
+        "plots": [
+          {
+            "tilled": true,
+            "crop": "carrot",
+            "growth": 0.5,
+            "watered": true
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          },
+          {
+            "tilled": false,
+            "crop": null,
+            "growth": 0,
+            "watered": false
+          }
+        ]
+      },
+      "gathering": {
+        "nodes": [],
+        "rest": {},
+        "tipsShown": []
+      },
+      "chests": {
+        "opened": [
+          "lanternmoss:0"
+        ],
+        "sinceKey": 0,
+        "list": []
+      },
+      "bossGate": {
+        "awake": false,
+        "beaten": false,
+        "broken": [],
+        "hinted": [],
+        "praised": []
+      },
+      "pickups": []
+    }
+  }
+}

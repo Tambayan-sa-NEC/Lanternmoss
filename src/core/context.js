@@ -4,6 +4,7 @@ export const ctx = {
   time: 0,            // seconds of simulated time
   started: false,     // false while the character-select screen is open
   planet: 0,          // index into PLANETS (config/planets.js)
+  planetId: 'lanternmoss', // stable identity used by saves and story conditions
   transitioning: false,  // true while fading between planets (input is locked)
   paused: false,      // the pause menu is open: the simulation is frozen (src/ui/PauseMenu.js)
   cutscene: false,    // a boss is waking (src/gameplay/BossGate.js): the hero can't act, the camera is on the lair

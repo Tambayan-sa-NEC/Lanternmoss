@@ -64,17 +64,21 @@
 </div>
 <div id="toast"></div>
 <div id="pause" class="modal"></div>
+  <div id="save-notice" role="status" aria-live="polite">Saved</div>
 <div id="shop" class="modal"></div>
 <div id="petmenu"></div>
 <div id="title">
   <div class="logo"><h1>Lanternmoss</h1><p>a tiny cozy planet of lanterns, moss &amp; friendly critters</p></div>
   <div class="tmenu">
-    <button type="button" class="primary" data-act="play">Play</button>
+    <button type="button" class="primary" data-act="continue" hidden>Continue</button>
+    <button type="button" data-act="play">New Adventure</button>
+    <button type="button" data-act="import">Import Save</button>
     <button type="button" data-act="settings">Settings</button>
     <button type="button" data-act="journal">Journal</button>
     <button type="button" data-act="controls">Controls</button>
     <button type="button" data-act="credits">Credits</button>
   </div>
+    <div id="save-summary" class="keys" aria-live="polite"></div>
   <div class="campaign"></div>
   <div class="keys">Enter to play · ↑ ↓ to choose</div>
 </div>

@@ -40,7 +40,7 @@ export const TRANSITION = {
 
 export const PLANETS = [
   {
-    name: 'Lanternmoss', tagline: 'a tiny cozy planet of lanterns and moss', seed: 20260930,
+    id: 'lanternmoss', outfit: null, outfitColors: [], lowLevel: 3, name: 'Lanternmoss', tagline: 'a tiny cozy planet of lanterns and moss', seed: 20260930,
     terrain: { hills: { amp: 5, freq: 2.2 }, ridges: { amp: 2, freq: 3.4 }, lakes: 2 },
     palette: { ground: [0x8fd07a, 0x9edb86, 0xb3e393, 0x84c874], meadow: 0xd4eb9c, sand: 0xf3dcaa, bed: 0x5fae9e, cliff: 0xb8ae9c, peak: 0xb6e39a,
       grass: [0x7fc574, 0x9adb7e, 0xa9e28a, 0x8fd07a], water: { deep: 0x3f9cc4, light: 0x9fe8e4 },
@@ -62,7 +62,7 @@ export const PLANETS = [
     arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to travel on!',
   },
   {
-    name: 'Emberfall', tagline: 'warm winds, ember ponds and quicker foes', seed: 77412,
+    id: 'emberfall', outfit: 'neckerchief', outfitColors: [0xe0482a, 0x3a8ad0, 0xffd36b, 0x2f9a5a], lowLevel: 5, name: 'Emberfall', tagline: 'warm winds, ember ponds and quicker foes', seed: 77412,
     terrain: { hills: { amp: 3, freq: 1.9 }, plateaus: { amp: 11, freq: 1.6, step: 3.2, sharp: 0.85 }, lakes: 1 },
     palette: { ground: [0xd99a6c, 0xe0a878, 0xe8b88a, 0xcf8f62], meadow: 0xf0c890, sand: 0xf6d8a8, bed: 0xc9603c, cliff: 0xb0644a, peak: 0xf2c18e,
       grass: [0xc98a50, 0xd89a5a, 0xe0a868, 0xbf7f48], water: { deep: 0xe0603a, light: 0xffb070 },
@@ -87,7 +87,7 @@ export const PLANETS = [
     arrival: 'Emberfall! Watch for puffcaps that burst and ramhorns that charge. Pyrrhax the red dragon sleeps under the orange light: the golden elites carry the sigils that wake it.',
   },
   {
-    name: 'Frostveil', tagline: 'the last, coldest and fiercest planet', seed: 31415,
+    id: 'frostveil', outfit: 'scarf', outfitColors: [0xe0605a, 0x4a7ae0, 0xffc83a, 0xff8fc0], lowLevel: 7, name: 'Frostveil', tagline: 'the last, coldest and fiercest planet', seed: 31415,
     terrain: { hills: { amp: 3, freq: 2.0 }, ridges: { amp: 11, freq: 1.7 }, lakes: 2 },
     palette: { ground: [0xcfe3f0, 0xdbeaf5, 0xe8f2fa, 0xc4dbea], meadow: 0xffffff, sand: 0xe6eef6, bed: 0x7fb6d6, cliff: 0x9aa6c4, peak: 0xffffff,
       grass: [0xa8d8c8, 0xb8e0d8, 0xc8eae0, 0x98ccc0], water: { deep: 0x6fb6e0, light: 0xd8f6ff },

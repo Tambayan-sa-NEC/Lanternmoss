@@ -54,7 +54,8 @@ export const Gathering = {
         if (arcDist(d, world.lairDir) < 30 || slopeAt(d) > 0.6 || !freeOfColliders(d, def.r + 0.5)) continue;
         if (ponds.some(p => arcDist(d, p.dir) < p.r + 1.2) || avoid.some(([a, r]) => arcDist(d, a) < r)) continue;
         if (this.nodes.some(n => arcDist(d, n.up) < n.def.r + def.r + 1.5)) continue;
-        this.nodes.push(new ResourceNode(kind, d, this.nodes.length + 1)); return;
+        const node = new ResourceNode(kind, d, this.nodes.length + 1);
+        node.id = `${P.id}:node:${this.nodes.length}`; this.nodes.push(node); return;
       }
     };
     for (const [kind, count, near] of res.nodes) for (let i = 0; i < count; i++) place(kind, near);
@@ -63,6 +64,21 @@ export const Gathering = {
   clear() { this.stop(); for (const n of this.nodes) n.dispose(); this.nodes = []; this.rest.clear(); },
   /** A fresh adventure: the first-time tips may show again. */
   resetRun() { this.tipsShown.clear(); this.tip = null; },
+
+  toJSON() {
+    return { nodes: this.nodes.map(n => ({ id: n.id, kind: n.kind, dir: n.up.toArray(), regrowT: Math.max(0, n.regrowT) })),
+      rest: Object.fromEntries(this.rest), tipsShown: [...this.tipsShown] };
+  },
+  load(data) {
+    this.clear();
+    this.nodes = data.nodes.map((saved, i) => {
+      const n = new ResourceNode(saved.kind, ctx.player.up.clone().fromArray(saved.dir), i + 1);
+      n.id = saved.id; n.regrowT = saved.regrowT;
+      if (n.regrowT > 0) { if (n.def.vanish) { n.root.visible = false; if (n.collider) n.collider.active = false; } else n.fruit.visible = false; }
+      return n;
+    });
+    this.rest = new Map(Object.entries(data.rest)); this.tipsShown = new Set(data.tipsShown); this.tip = null;
+  },
 
   /** The best tool of `kind` on the hotbar ({ def, slot }), or null. */
   hotbarTool(kind) {

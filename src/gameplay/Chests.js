@@ -28,9 +28,24 @@ const MIN_APART = 8;          // chests keep at least this far (arc) from each o
 
 export const Chests = {
   list: [],
-  opened: new Set(),          // `${planet}:${n}` / `${planet}:boss`, for the whole adventure
+  opened: new Set(),          // `${p.id}:${n}` / `${planet}:boss`, for the whole adventure
   bossChest: null,
   sinceKey: 0,                // kills since the last key drop (pity counter)
+
+  toJSON() {
+    return { opened: [...this.opened].filter(id => id.startsWith(`${ctx.planetId}:`)), sinceKey: this.sinceKey,
+      list: this.list.map(c => ({ id: c.id, kind: c.kind, dir: c.up.toArray(), fwd: c.fwd.toArray() })) };
+  },
+  load(data) {
+    this.clear(); this.sinceKey = data.sinceKey;
+    for (const id of [...this.opened]) if (id.startsWith(`${ctx.planetId}:`)) this.opened.delete(id);
+    for (const id of data.opened) if (id.startsWith(`${ctx.planetId}:`)) this.opened.add(id);
+    for (const saved of data.list) {
+      if (!saved.id.startsWith(`${ctx.planetId}:`)) continue;
+      const chest = new Chest(saved.kind, ctx.player.up.clone().fromArray(saved.dir), ctx.player.up.clone().fromArray(saved.fwd), { id: saved.id, opened: this.opened.has(saved.id) });
+      this.list.push(chest); if (saved.kind === 'boss') this.bossChest = chest;
+    }
+  },
 
   /** Places PLANETS[planet].chests (call right after the planet and its boss are spawned). lair = the boss's home. */
   spawnFor(planet, lair = null) {
@@ -41,7 +56,7 @@ export const Chests = {
       const def = CHEST_KINDS[kind];
       for (let i = 0; i < count; i++, n++) {
         const dir = this.findSpot(def, rng, lair); if (!dir) continue;
-        const id = `${planet}:${n}`, fwd = tangentFrame(dir)[0].applyAxisAngle(dir, rng() * Math.PI * 2);
+        const id = `${p.id}:${n}`, fwd = tangentFrame(dir)[0].applyAxisAngle(dir, rng() * Math.PI * 2);
         this.list.push(new Chest(kind, dir, fwd, { id, opened: this.opened.has(id) }));
       }
     }
@@ -60,7 +75,7 @@ export const Chests = {
 
   /** A boss has fallen at `dir`: its treasure chest drops in. */
   spawnBossChest(dir) {
-    const id = `${ctx.planet}:boss`; if (this.opened.has(id)) return null;
+    const id = `${ctx.planetId}:boss`; if (this.opened.has(id)) return null;
     const at = spawnSpot(dir, 0, 2.5, 1.1), fwd = tangentToward(at, ctx.player.up);
     this.bossChest = new Chest('boss', at, fwd, { id, fall: true });
     this.list.push(this.bossChest);

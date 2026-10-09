@@ -53,3 +53,4 @@ __fire('blur'); check(PauseMenu.isOpen, 'losing window focus pauses');
 PauseMenu.show('quit'); PauseMenu.onClick({ target: { closest: s => (s === '[data-go]' ? { dataset: { go: 'confirm-quit' } } : null) } });
 check(!PauseMenu.isOpen && !ctx.started && !ctx.paused, 'quit returns to the menu (not paused, run stopped)');
 console.log(fails ? `${fails} FAILED` : 'all passed');
+process.exitCode = fails ? 1 : 0;

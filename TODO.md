@@ -41,7 +41,7 @@ Code: `src/ui/PauseMenu.js`, `src/core/controls.js` (Esc / P), `src/core/Game.js
 - [x] **Settings**: opens the settings screen (section 2a).
 - [x] **Controls**: the current hero's abilities (icon, keys, description) generated from `CHARACTERS`, then the fixed
       keys from `src/config/controls.js`.
-- [x] **Quit to menu**: with a confirmation that says what is lost (the adventure restarts; no saving yet).
+- [x] **Quit to menu**: confirms, saves the adventure, then returns to the title (Continue restores it).
 - [x] Esc priority: closes the bag, then ability aiming, then dialogue; only then opens the pause menu. Esc on a sub-page
       goes back; Esc on the main page resumes.
 
@@ -63,13 +63,13 @@ Code: `src/ui/MainMenu.js`, `index.html` (`#title`, `#start`), `src/ui/Character
 
 - [x] Title screen with the floating logo and tagline over a slow, wide, high orbit of the planet; the music starts on
       the first click or key press (browsers block audio until then).
-- [x] Buttons: **Play**, **Settings**, **Controls**, **Credits** (credits text in `src/config/credits.js`); mouse or
+- [x] Buttons: **Continue**, **New Adventure**, **Import Save**, **Settings**, **Journal**, **Controls**, **Credits** (credits text in `src/config/credits.js`); mouse or
       ↑ ↓ + Enter. Settings / Controls / Credits open as panels of the pause menu (`PauseMenu.openPanel`).
-- [ ] **Continue**: needs the save system (see 19); add the button then.
+- [x] **Continue**: restores the adventure; New Adventure confirms before replacing the slot (done in 19).
 - [x] Animated transitions: the title lifts away as the hero cards slide in (and the camera moves in close); character
       select has Back / Esc; starting fades the overlay while the camera swoops into play, with the planet banner.
 - [x] Campaign strip: Lanternmoss → Emberfall → Frostveil with each planet's colour and boss (from `config/planets.js`).
-- [x] "Quit to menu" in the pause menu now returns to the title screen (restarting the run).
+- [x] "Quit to menu" in the pause menu now returns to the title screen after saving (Continue restores the run).
 
 ## 4. Character selection **(core)** ✓
 
@@ -708,7 +708,7 @@ Promoted from the suggested additions. **Size:** S. **Needs:** nothing.
 - [x] While here, from Small fixes: add a `favicon.ico` (the server returns 404 for it).
   - Done: a 32 px lantern in the game's colours with an ink outline, linked from `index.html`.
 
-## 19. Save / load **(core)**
+## 19. Save / load **(core)** ?
 
 **Goal:** an adventure survives closing the browser: come back and carry on where you left off.
 Code: new `src/core/save.js` (format, versions, cleaning on load), `src/core/Game.js` (gathering and restoring state),
@@ -719,10 +719,10 @@ snapshots). **Size:** L. **Needs:** 18.
 **Risk:** it grows with every feature (risk 2), and indices saved today break with portals and new worlds (risk 3).
 **Recommendation:** ids first, a registry and round-trip tests, and a fixture save checked into the repo.
 
-- [ ] **Planet ids first:** `'lanternmoss'`, `'emberfall'`, `'frostveil'`; `ctx.planetId` next to `ctx.planet`. Replace
+- [x] **Planet ids first:** `'lanternmoss'`, `'emberfall'`, `'frostveil'`; `ctx.planetId` next to `ctx.planet`. Replace
       the index checks in `npcDefs.js`, `models/villagers.js`, `Game.js` and `achievements.js` (risk 3), and add a test
       that fails on `planet === <number>`.
-- [ ] **What's saved:**
+- [x] **What's saved:**
   - The adventure: current planet, hero, level, XP, coins, health and mana.
   - The bag, the hotbar and the gear worn.
   - Pets: unlocked, names, the one out, the command, health.
@@ -730,20 +730,23 @@ snapshots). **Size:** L. **Needs:** 18.
   - The survival state: energy, farm plots, gathered nodes and their regrow times, active buffs.
   - A per-planet section in the format from day one, keyed by planet id, even before 24 fills it.
   - Later: each planet's own state (24) and what's been built (25).
-- [ ] **A save registry:** each system registers `{ key, toJSON, load }`; a test fails if a system with state isn't in
+- [x] **A save registry:** each system registers `{ key, toJSON, load }`; a test fails if a system with state isn't in
       it, and each one has a round-trip test (`load(toJSON(x))` gives `x` back).
-- [ ] **When:** autosave on arriving at a planet, after a boss, on quitting to the menu, and every few minutes; a
+- [x] **When:** autosave on arriving at a planet, after a boss, on quitting to the menu, and every few minutes; a
       "Save" button on the pause menu too. A small "Saved" note when it happens.
-- [ ] **Continue** on the title screen loads the save (and starts a new adventure only after asking, if one exists).
-- [ ] **A safe format:** versioned, and cleaned on load like the settings (unknown items, pets or planets dropped,
+- [x] **Continue** on the title screen loads the save (and starts a new adventure only after asking, if one exists).
+- [x] **A safe format:** versioned, and cleaned on load like the settings (unknown items, pets or planets dropped,
       numbers clamped), so an old or broken save never crashes the game. Unit-tested, with a fixture save in
       `tests/fixtures/` that must keep loading after every format change.
 - [x] Settings, keys, the journal and remembered pets already save themselves; decide whether they join the save
       or stay separate (they're per device, not per adventure).
   - Decided (Round 3): they stay separate, per device. The adventure save holds only the adventure.
-- [ ] More than one save slot, and export / import a save as a file.
+- [x] One save slot with an explicit slot field, and export / import a save as a file.
   - Start with one slot, but make the slot a field in the format. Export / import is cheap and helps with bug reports,
-    so do it in this item; extra slots can wait.
+    so do it in this item; extra slots are deferred.
+
+Implementation notes: [save format and ownership](docs/save-format.md), version-1 fixture, registry coverage and
+real-system round trips. House interiors, active challenges and uncollected boss loot restore without replaying rewards.
 
 ## 20. Performance budget **(core)**
 

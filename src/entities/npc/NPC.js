@@ -78,6 +78,10 @@ export class NPC extends Walker {
     const o = buildOutfit(planet, { headR: this.def.headR, color: outfitColor(planet, this.def.color), hat: this.def.hat });
     if (o) { this.head.add(o); this.outfit = o; }
   }
+  /** Dialogue memory, without transient presentation state. */
+  toJSON() { return { seen: [...this.seen], last: this.last }; }
+  load(data) { this.seen = new Set(data.seen.filter(i => this.def.lines[i])); this.last = data.last; this.bag = []; }
+
   /** Back to the start-of-adventure chatter. */
   resetLines() { this.def.lines.length = this.baseLineCount; this.bag = []; this.last = -1; this.seen.clear(); }
   /** Wakes up for a chat (they doze off again a while after you leave, if it is still night). */

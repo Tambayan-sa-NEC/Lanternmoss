@@ -38,7 +38,7 @@ export class PlanetProgression {
   constructor(world) {
     this.world = world;
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
-    this.lairs = [];                     // each planet's boss lair, kept so a revisited planet's boss waits in the same place
+    this.lairs = {}; this.defeated = new Set(); // stable planet IDs, independent of campaign order
     encounterEvents.addEventListener('bossdefeated', e => this.onBossDefeated(e.detail.boss));
   }
 
@@ -50,8 +50,8 @@ export class PlanetProgression {
   populate() {
     spawnRoster(this.world, this.planet.roster);
     spawnMiniBosses(this.world, this.planet.miniBosses);                // the hydra / basilisk out in the wilds
-    const boss = spawnBoss(this.world, this.planet.boss, this.lairs[ctx.planet]);
-    this.lairs[ctx.planet] = boss.home.clone();
+    const boss = spawnBoss(this.world, this.planet.boss, this.lairs[ctx.planetId]);
+    this.lairs[ctx.planetId] = boss.home.clone();
     BossGate.setup(ctx.planet, boss);                                   // it sleeps until the planet's conditions are met
     spawnForage(this.planet.forage);
     Chests.spawnFor(ctx.planet, boss.home);
@@ -65,13 +65,16 @@ export class PlanetProgression {
   }
 
   /** First adventure only: once play starts, point the hero at the boss after a moment. */
-  onBegin() { if (ctx.planet === 0 && !this.introShown) { this.introShown = true; this.introAt = ctx.time + TRANSITION.introHintDelay; } }
+  onBegin() { if (ctx.planetId === PLANETS[0].id && !this.introShown) { this.introShown = true; this.introAt = ctx.time + TRANSITION.introHintDelay; } }
+
+  toJSON() { return { defeated: [...this.defeated], introShown: this.introShown,
+    lairs: Object.fromEntries(Object.entries(this.lairs).map(([id, dir]) => [id, dir.toArray()])) }; }
 
   /** Raised from inside the combat update (possibly mid-iteration over enemies), so the clean-up is deferred to update(). */
   onBossDefeated(boss) {
     if (this.state !== 'playing' || boss !== ctx.boss) return;          // once per planet, and only for this planet's boss
     this.state = 'victory'; this.timer = TRANSITION.outroDelay; this.pendingClear = true;
-    ctx.bossesDefeated = Math.max(ctx.bossesDefeated, ctx.planet + 1);
+    this.defeated.add(ctx.planetId); ctx.bossesDefeated = this.defeated.size;
   }
 
   update(dt) {
@@ -113,12 +116,21 @@ export class PlanetProgression {
     showBanner(`${boss.def.name.split(',')[0]} defeated!`, next ? `The lanterns of ${next.name} are calling...` : 'Every planet shines again. Thank you, hero!');
     audio.melody();
     Chests.spawnBossChest(boss.up);                                     // the trophy and the boss's treasure
+    this.onSave?.();                                                   // after loot exists, so reloading cannot lose the reward
   }
 
   /** Replaces the world with PLANETS[index] and everything living on it. The hero keeps level, XP, buffs and the bag. */
-  load(index) {
+  load(index, { restoring = false } = {}) {
+    if (index && typeof index === 'object') {                         // registry restore, before rebuilding the world
+      this.defeated = new Set(index.defeated); ctx.bossesDefeated = this.defeated.size; this.introShown = index.introShown;
+      this.lairs = Object.fromEntries(Object.entries(index.lairs).map(([id, dir]) => [id, ctx.player.up.clone().fromArray(dir)]));
+      return;
+    }
+    if (typeof index === 'string') index = PLANETS.findIndex(p => p.id === index);
+    if (!PLANETS[index]) throw new Error('Unknown planet');
+    this.beforeLoad?.();
     const P = ctx.player, world = this.world;
-    ctx.planet = index; this.state = 'playing'; this.pendingClear = false;   // (a travel in progress sets its own state after this)
+    ctx.planet = index; ctx.planetId = PLANETS[index].id; this.state = 'playing'; this.pendingClear = false;
     Dialog.close(); Challenges.cancel(); Houses.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
@@ -133,11 +145,14 @@ export class PlanetProgression {
     for (const n of ctx.npcs) if (n.def.local) n.dispose();
     travellers.forEach((n, i) => { n.relocate(homes[i]); n.dress(index); });
     ctx.npcs = [...travellers, ...createLocalDefs(world, index).map(d => new NPC(d))];
-    Quests.onPlanetChange();
+    if (!restoring) Quests.onPlanetChange();
     spawnWildlife(world, this.planet);
     this.populate();
     if (ctx.companion) resetCompanion();
     snapCamera(world.spawnDir, fwd); releaseAllKeys();
+    this.afterLoad?.();
+    if (this.defeated.has(ctx.planetId)) this.state = this.nextPlanet ? 'loot' : 'complete';
+    this.onSave?.();
   }
 
   announceArrival() { showBanner(`Planet ${ctx.planet + 1} · ${this.planet.name}`, this.planet.tagline); toast(this.planet.arrival); }
@@ -146,10 +161,10 @@ export class PlanetProgression {
       Expects the caller to have reset the enemies already (which removes bosses). */
   reset() {
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
-    ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0;
-    if (ctx.planet !== 0) this.load(0);
+    ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0; this.defeated.clear();
+    if (ctx.planetId !== PLANETS[0].id) this.load(PLANETS[0].id);
     else {
-      BossGate.setup(0, spawnBoss(this.world, this.planet.boss, this.lairs[0])); spawnMiniBosses(this.world, this.planet.miniBosses); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(0, this.lairs[0]);
+      BossGate.setup(ctx.planet, spawnBoss(this.world, this.planet.boss, this.lairs[ctx.planetId])); spawnMiniBosses(this.world, this.planet.miniBosses); clearWorldItems(); spawnForage(this.planet.forage); Chests.spawnFor(ctx.planet, this.lairs[ctx.planetId]);
       this.spawnResources();
     }
   }

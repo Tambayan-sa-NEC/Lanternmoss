@@ -59,6 +59,18 @@ export const BossGate = {
   state: 'sealed', boss: null, lair: null, summon: {}, wall: null, seals: [], elites: [], hinted: new Set(), praised: new Set(),
   seqT: 0, cardShown: false, ring: null, ringK: 0, posts: [], arenaGroup: null, card: null, buzzT: 0, warned: false, lastMet: null,
 
+  toJSON() { return { awake: ['summoning', 'awake'].includes(this.state), beaten: this.state === 'beaten',
+    broken: this.seals.flatMap((e, i) => e.alive ? [] : [i]), hinted: [...this.hinted], praised: [...this.praised] }; },
+  load(data) {
+    for (const i of data.broken) this.seals[i]?.vanish();
+    this.hinted = new Set(data.hinted); this.praised = new Set(data.praised);
+    if (data.beaten) {
+      this.boss?.vanish(); this.state = 'beaten'; this.ring?.hide(); this.styleBeacon();
+      audio.battle(false);
+    } else if (data.awake) this.wake();   // sigils were already consumed; don't offer them a second time
+    else { this.state = 'sealed'; this.styleBeacon(); }
+  },
+
   /** A new planet (or a fresh adventure): the boss goes to sleep in its lair, the seals and elites appear. */
   setup(planetIndex, boss) {
     this.teardown();

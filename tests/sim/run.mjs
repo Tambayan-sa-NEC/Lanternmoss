@@ -28,7 +28,12 @@ function run(name) {
     const child = spawn(process.execPath, [`${name}.sim.mjs`], { cwd: dir, env: process.env });
     const timer = setTimeout(() => { out += `\nFAIL  timed out after ${TIMEOUT / 60000} min`; child.kill(); }, TIMEOUT);
     child.stdout.on('data', d => { out += d; }); child.stderr.on('data', d => { out += d; });
-    child.on('close', code => { clearTimeout(timer); done({ name, code, out: out.trimEnd(), secs: (Date.now() - t0) / 1000 }); });
+    child.on('close', code => {
+      clearTimeout(timer);
+      // Older scripts report failed assertions without setting their exit status; don't silently accept them.
+      if (code === 0 && !REPORTS.has(name) && /(?:^|\n)(?:FAIL\b|\d+ FAILED\b)/.test(out)) code = 1;
+      done({ name, code, out: out.trimEnd(), secs: (Date.now() - t0) / 1000 });
+    });
   });
 }
 

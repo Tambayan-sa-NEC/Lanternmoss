@@ -6,11 +6,19 @@ import { PLANETS } from '../config/planets.js';
 import { ctx } from '../core/context.js';
 import { dayClock } from './dayClock.js';
 
+export const StoryMemory = {
+  state: {},
+  toJSON() { for (const npc of ctx.npcs) this.state[npc.name] = npc.toJSON(); return structuredClone(this.state); },
+  load(data) { this.state = structuredClone(data); this.restore(); },
+  restore() { for (const npc of ctx.npcs) if (this.state[npc.name]) npc.load(this.state[npc.name]); },
+  reset() { this.state = {}; },
+};
+
 /** planet (index), planetName, hero (id), heroTitle, level, bosses (defeated this adventure), phase, night, coins, day, boss. */
 export function storyState() {
   const P = ctx.player, p = PLANETS[ctx.planet];
   return {
-    planet: ctx.planet, planetName: p.name, hero: P.charId, heroTitle: CHARACTERS[P.charId].title, level: P.level,
+    planet: ctx.planet, planetId: ctx.planetId, planetName: p.name, hero: P.charId, heroTitle: CHARACTERS[P.charId].title, level: P.level,
     bosses: ctx.bossesDefeated, phase: dayClock.phase, night: dayClock.phase === 'night', coins: P.coins ?? 0, day: dayClock.day,
     boss: ({ ...COMBAT.enemies[p.boss.type], ...p.boss }).name.split(',')[0],
   };

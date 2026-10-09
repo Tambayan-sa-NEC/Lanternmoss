@@ -17,6 +17,8 @@ import { useItemInSlot } from './itemUse.js';
 
 export const Hotbar = {
   selected: 0,      // the held slot (0-based)
+  toJSON() { return { selected: this.selected, cd: this.cd }; },
+  load(data) { this.selected = data.selected; this.cd = data.cd; this.changedAt = ctx.time; },
   cd: 0,            // seconds before the next use
   changedAt: -99,   // when the held item last changed (the HUD shows its name for a moment)
 

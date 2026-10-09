@@ -23,6 +23,8 @@ const itemName = id => itemRegistry.get(id)?.name ?? id;
 
 export const Quests = {
   state: {}, tracked: null, checkT: 0,
+  toJSON() { return { state: structuredClone(this.state), tracked: this.tracked }; },
+  load(data) { this.state = structuredClone(data.state); this.tracked = data.tracked; this.checkT = 0; },
   init() { encounterEvents.addEventListener('enemydefeated', e => this.onDefeat(e.detail.enemy)); },
   reset() { this.state = {}; this.tracked = null; },
   st(id) { return this.state[id] ??= { status: 'new', step: 0, n: 0, readyAt: 0 }; },

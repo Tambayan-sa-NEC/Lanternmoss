@@ -74,6 +74,7 @@ import { showBanner } from '../ui/banner.js';
 import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
 import { rng } from '../utils/random.js';
+import { AdventureSave } from './AdventureSave.js';
 
 export class Game {
   /** ORDER MATTERS: world generation and the initial enemy spawn share one seeded random stream, and moving bodies
@@ -81,7 +82,7 @@ export class Game {
   init() {
     this.renderSystem = new RenderSystem();
     this.world = new World();
-    ctx.planet = 0;
+    ctx.planet = 0; ctx.planetId = PLANETS[0].id;
     this.world.generate(PLANETS[0]);
     createSparkles(); setOverlayWorld(this.world);
 
@@ -111,8 +112,11 @@ export class Game {
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
-    PauseMenu.init({ onQuit: () => MainMenu.showTitle(true), onPanelClosed: () => MainMenu.onPanelClosed() });   // quitting restarts the run
-    MainMenu.init({ onReset: () => this.resetRun() });
+    this.saves = new AdventureSave(this);
+    PauseMenu.init({ onQuit: () => { if (!this.saves.save().ok) return false; PauseMenu.close(); MainMenu.showTitle(true); return true; },
+      onSave: () => this.saves.save(), onExport: () => this.saves.export(), onImport: file => this.saves.importFile(file),
+      onConfirmImport: data => this.saves.importData(data), onNew: () => MainMenu.startNew(), onPanelClosed: () => MainMenu.onPanelClosed() });
+    MainMenu.init({ onReset: () => this.resetRun(), saveSummary: () => this.saves.summary(), onContinue: () => this.saves.continue() });
     this.applySettings();
     onSettingsChange(key => { this.applySettings(); if (key === 'cameraDistance' || key === null) cam.dist = settings.cameraDistance; });
     addEventListener('resize', () => { this.renderSystem.resize(); applyUiScale(); }); this.renderSystem.resize();
@@ -157,6 +161,7 @@ export class Game {
     sparkles.update(dt); updateEmotes(dt);
     Dialog.update(dt);
     updateOverlay(dt); updateBuffs(dt); updateToast(dt); updatePetCard();
+    this.saves.update(dt);
   }
 
   beginGame() {
@@ -168,29 +173,34 @@ export class Game {
     showBanner(`Planet ${ctx.planet + 1} · ${PLANETS[ctx.planet].name}`, PLANETS[ctx.planet].tagline);
     this.planets.onBegin();
     Journal.noteStart();                                           // the starter pets and the bag count as found
+    this.saves.save({ quiet: true });
   }
 
   /** Back to a fresh adventure: clears everything the previous character left behind. */
   resetRun() {
-    const P = ctx.player, world = this.world;
-    Dialog.close(); InventoryUI.close(); PetMenu.close();
-    resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
-    Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
-    for (const n of ctx.npcs) n.resetLines();
-    resetBuffs(); dayClock.reset();
-    for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
-    clearHazards(); ctx.hitStop = 0;
-    resetEnemies();
-    clearTargets();
-    if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
-    this.planets.reset();                                          // back to the first planet (and its boss)
-    Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, coins: 0, equipment: emptyEquipment() });   // a fresh adventure starts back at level 1
-    P.stats = computeStats(P); applyVanity(P);
-    P.clearTimers(); P.inventory.clear();
-    const fwd = P.placeAt(world.spawnDir);
-    P.root.visible = true; snapCamera(world.spawnDir, fwd);
-    world.resetSun();
-    releaseAllKeys();
+    if (this.saves) { this.saves.suspended = true; this.saves.reset(); }
+    try {
+      const P = ctx.player, world = this.world;
+      Dialog.close(); InventoryUI.close(); PetMenu.close();
+      resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
+      Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
+      for (const n of ctx.npcs) n.resetLines();
+      resetBuffs(); dayClock.reset();
+      ctx.time = 0; Journal.fight = null;
+      for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
+      clearHazards(); ctx.hitStop = 0;
+      resetEnemies();
+      clearTargets();
+      if (ctx.companion) { ctx.companion.dispose(); ctx.companion = null; }
+      this.planets.reset();                                          // back to the first planet (and its boss)
+      Object.assign(P, { dead: false, deadT: 0, vy: 0, level: 1, xp: 0, coins: 0, equipment: emptyEquipment() });   // a fresh adventure starts back at level 1
+      P.stats = computeStats(P); applyVanity(P);
+      P.clearTimers(); P.inventory.clear();
+      const fwd = P.placeAt(world.spawnDir);
+      P.root.visible = true; snapCamera(world.spawnDir, fwd);
+      world.resetSun();
+      releaseAllKeys();
+    } finally { if (this.saves) this.saves.suspended = false; }
   }
 
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
@@ -204,6 +214,7 @@ export class Game {
       get planet() { return ctx.planet; }, get boss() { return ctx.boss; }, planets: game.planets, PLANETS,
       goToPlanet: i => { game.planets.load(i); game.planets.announceArrival(); },
       setWeather: kind => game.world.weather.set(kind, true), get weather() { return game.world.weather; },
+      saves: game.saves, get planetId() { return ctx.planetId; },
       begin: () => game.beginGame(), update: dt => game.update(dt),
       spawnEnemy: (type, arc = 7) => addEnemy(type, offsetDir(ctx.player.up, rng() * 6.28, arc)) };
   }

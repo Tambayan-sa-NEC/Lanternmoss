@@ -57,6 +57,9 @@ export const Houses = {
   fade: null,          // { phase: 'out' | 'in', t, then }
   opened: new Set(), lore: {}, ovenDay: {}, teaAt: -99,
 
+  toJSON() { return { opened: [...this.opened], lore: { ...this.lore }, ovenDay: { ...this.ovenDay }, teaAt: this.teaAt }; },
+  load(data) { this.opened = new Set(data.opened); this.lore = { ...data.lore }; this.ovenDay = { ...data.ovenDay }; this.teaAt = data.teaAt; },
+
   // ---------------------------------------------------------------- entering and leaving
   enter(index) {
     if (this.fade || this.inside) return;
@@ -88,7 +91,7 @@ export const Houses = {
     } else if (def.note) state.noteAt = room.tableAt;                // nobody home: a note on the table
     ctx.indoors = def.name;
     const chest = room.spots.find(p => p.kind === 'chest');            // emptied earlier this adventure: lid's still up
-    if (chest && this.opened.has(`${ctx.planet}:${index}`)) chest.obj.userData.lid.rotation.x = -1.9;
+    if (chest && this.opened.has(`${ctx.planetId}:${index}`)) chest.obj.userData.lid.rotation.x = -1.9;
     if (ctx.companion) { ctx.companion.root.visible = false; if (ctx.companion.shadow) ctx.companion.shadow.visible = false; }
     setRoomView({ up: ROOM_UP, back: BACK });
   },
@@ -180,7 +183,7 @@ export const Houses = {
   },
   /** Furniture. */
   use(spot) {
-    const P = ctx.player, s = this.inside, def = s.def, key = `${ctx.planet}:${s.index}`;
+    const P = ctx.player, s = this.inside, def = s.def, key = `${ctx.planetId}:${s.index}`;
     switch (spot.kind) {
       case 'bed': {
         const night = dayClock.phase === 'night' || dayClock.phase === 'evening' && dayClock.frac > 0.7;

@@ -38,11 +38,15 @@ function nearestToHero(dirs) {
 export const CHALLENGE_KINDS = {
   /** Pick up glowing items scattered around the giver. params: count, minRadius, radius, color, size, height, drift?, label */
   collect: {
-    start(run) { const p = run.def.params; run.got = 0;
-      run.items = spotsAround(run.anchor, p.count, p.minRadius ?? 2, p.radius, 0.6).map(d => {
+    toJSON(run) { return { items: run.items.map(it => ({ dir: it.d.toArray(), got: it.got })) }; },
+    start(run, saved = null) { const p = run.def.params; run.got = 0;
+      const points = saved ? saved.items.map(it => new THREE.Vector3().fromArray(it.dir)) : spotsAround(run.anchor, p.count, p.minRadius ?? 2, p.radius, 0.6);
+      run.items = points.map((d, i) => {
         const m = part(G.ico(p.size ?? 0.2, 1), p.color, { glow: true, intensity: 2.6 }); scene.add(m);
         m.position.copy(d).multiplyScalar(groundHeight(d) + (p.height ?? 1));
-        return { d, m, seed: rng() * 6.28, got: false }; }); },
+        const got = saved?.items[i].got ?? false;
+        if (got) { run.got++; scene.remove(m); disposeTree(m); }
+        return { d, m, seed: rng() * 6.28, got }; }); },
     update(run, dt) { const p = run.def.params;
       for (const it of run.items) { if (it.got) continue;
         if (p.drift && tangentTo(ctx.player.pos, ctx.player.up, it.m.position, _tv) < 5) {                     // shy items float away from you, but stay inside the play area
@@ -61,14 +65,15 @@ export const CHALLENGE_KINDS = {
   },
   /** Run through glowing rings in order, laid out in a loop around the giver. params: count, radius, color */
   race: {
-    start(run) { const p = run.def.params, base = rng() * Math.PI * 2; run.idx = 0;
-      const pts = [];
-      for (let i = 0; i < p.count; i++) for (let k = 0; k < 30; k++) {
+    toJSON(run) { return { idx: run.idx, items: run.rings.map(r => ({ dir: r.d.toArray() })) }; },
+    start(run, saved = null) { const p = run.def.params, base = rng() * Math.PI * 2; run.idx = saved?.idx ?? 0;
+      const pts = saved ? saved.items.map(it => new THREE.Vector3().fromArray(it.dir)) : [];
+      for (let i = 0; !saved && i < p.count; i++) for (let k = 0; k < 30; k++) {
         const d = offsetDir(run.anchor, base + i / p.count * Math.PI * 2 + mr(-0.25, 0.25), mr(p.radius * 0.7, p.radius));
         if (freeOfColliders(d, 1.6) && !ponds.some(q => arcDist(d, q.dir) < q.r + 1.5)) { pts.push(d); break; } }
       run.rings = pts.map((d, i) => { const m = part(new THREE.TorusGeometry(1.3, 0.12, 6, 20), p.color, { glow: true, intensity: 0.9 });
         m.position.copy(d).multiplyScalar(groundHeight(d) + 1.5); frameQuat(d, tangentToward(d, pts[i + 1] || run.anchor), m.quaternion);
-        scene.add(m); return { d, m }; });
+        scene.add(m); if (i < run.idx) { scene.remove(m); disposeTree(m); } return { d, m }; });
       run.beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 14, 8, 1, true), fxMaterial(p.color, 0.9)); scene.add(run.beacon); },
     update(run) { const p = run.def.params, ring = run.rings[run.idx];
       if (!ring) return 'success';
@@ -85,9 +90,13 @@ export const CHALLENGE_KINDS = {
   },
   /** Defeat summoned enemies (uses the combat system). params: spawn { type: count }, minRadius, radius */
   defeat: {
-    start(run) { const p = run.def.params; run.foes = [];
-      for (const [type, n] of Object.entries(p.spawn)) for (const d of spotsAround(run.anchor, n, p.minRadius ?? 4, p.radius ?? 8, 1)) {
+    toJSON(run) { return { foes: run.foes.map(e => ({ type: e.type, dir: e.up.toArray(), hp: e.hp, alive: e.alive })) }; },
+    start(run, saved = null) { const p = run.def.params; run.foes = [];
+      const foes = saved ? saved.foes.filter(f => Object.hasOwn(p.spawn, f.type)) : Object.entries(p.spawn).flatMap(([type, n]) =>
+        spotsAround(run.anchor, n, p.minRadius ?? 4, p.radius ?? 8, 1).map(d => ({ type, dir: d.toArray(), alive: true })));
+      for (const foe of foes) { const { type } = foe, d = new THREE.Vector3().fromArray(foe.dir);
         const e = addEnemy(type, d); e.temporary = true; e.aggro(); run.foes.push(e);
+        if (saved) { e.hp = Math.min(e.def.hp, foe.hp); if (!foe.alive) e.vanish(); }
         sparkles.emit(e.center(), { count: 24, color: e.def.color, speed: 2.5, up: e.up, upBias: 0.8, life: 0.8, size: 0.36 }); } },
     update: run => (run.foes.every(e => !e.alive) ? 'success' : null),
     progress: run => `${run.foes.filter(e => !e.alive).length} / ${run.foes.length} defeated`,

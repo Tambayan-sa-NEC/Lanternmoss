@@ -33,6 +33,9 @@ const winListeners = {};
 /** Fires a window event the way the browser would (sim only). */
 globalThis.__fire = (type, ev = {}) => { for (const fn of winListeners[type] ?? []) fn({ preventDefault() {}, repeat: false, ...ev }); };
 globalThis.window = globalThis;
+const storage = new Map();
+globalThis.localStorage ??= { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, String(value)),
+  removeItem: key => storage.delete(key), clear: () => storage.clear() };
 Object.assign(globalThis, {
   innerWidth: 1280, innerHeight: 720, devicePixelRatio: 1,
   addEventListener(type, fn) { (winListeners[type] ??= []).push(fn); }, removeEventListener() {}, requestAnimationFrame() {}, cancelAnimationFrame() {},

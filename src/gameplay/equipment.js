@@ -14,6 +14,11 @@ import { audio } from '../systems/AudioSystem.js';
 
 export function emptyEquipment() { return Object.fromEntries(Object.keys(EQUIP_SLOTS).map(k => [k, null])); }
 
+export const Equipment = {
+  toJSON() { return structuredClone(ctx.player.equipment); },
+  load(data) { ctx.player.equipment = structuredClone(data); ctx.player.stats = computeStats(); applyVanity(); },
+};
+
 /** [{ def, props, slot }] for every worn piece. */
 export function wornPieces(P = ctx.player) {
   return Object.entries(P.equipment ?? {}).filter(([, w]) => w).map(([slot, w]) => ({ slot, def: itemRegistry.get(w.itemId), props: w.props }));

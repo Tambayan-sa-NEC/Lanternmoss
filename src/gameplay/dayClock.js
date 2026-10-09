@@ -10,6 +10,8 @@ const light = { sun: new THREE.Color(), sunIntensity: 0, ambient: 0 };
 
 export const dayClock = {
   t: DAY.startAt * DAY.length, day: 1,
+  toJSON() { return { t: this.t, day: this.day }; },
+  load(data) { this.t = data.t; this.day = data.day; },
   reset() { this.t = DAY.startAt * DAY.length; this.day = 1; },
   update(dt) { this.t += dt; while (this.t >= DAY.length) { this.t -= DAY.length; this.day++; } },
   /** 0..1 through the current day. */
