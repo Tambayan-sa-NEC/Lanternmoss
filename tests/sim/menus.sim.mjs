@@ -35,5 +35,7 @@ press('Escape'); check(PauseMenu.isOpen && !PauseMenu.panel && ctx.paused, 'in p
 PauseMenu.show('quit'); PauseMenu.onClick({ target: { closest: s => (s === '[data-go]' ? { dataset: { go: 'confirm-quit' } } : null) } });
 check(MainMenu.screen === 'title' && !ctx.started && !ctx.paused, 'Quit to menu lands on the title screen');
 check(ctx.player.level === 1 && ctx.planet === 0, 'and the adventure was reset');
-press('Enter'); check(MainMenu.screen === 'select', 'and you can play again');
+press('Enter'); check(PauseMenu.page === 'new', 'New Adventure confirms before replacing the save');
+PauseMenu.handlers.onNew(); check(MainMenu.screen === 'select', 'confirmed New Adventure opens selection');
 console.log(fails ? `${fails} FAILED` : 'all passed');
+process.exitCode = fails ? 1 : 0;

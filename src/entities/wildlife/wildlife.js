@@ -69,6 +69,10 @@ export function updatePonds(dt) {
 
 // ---------------------------------------------------------------- rare creatures
 const gifted = new Set();                                              // charms already given this adventure
+export const RareGifts = {
+  toJSON() { return [...gifted]; },
+  load(data) { gifted.clear(); for (const id of data) gifted.add(id); },
+};
 /** A new adventure: every rare creature has its charm to give again. */
 export function resetRareGifts() { gifted.clear(); }
 

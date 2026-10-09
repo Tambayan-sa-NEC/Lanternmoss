@@ -204,6 +204,9 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Save / load:** Continue restores your adventure after closing the browser. Autosave on arrival, after bosses,
+  every two minutes and when quitting; manual Save plus JSON export/import in the pause menu. New Adventure asks
+  before replacing the single slot. Settings, keys and the lifetime journal stay per device.
 - **Smelting:** ore and fuel (wood, charcoal, ember shards) become copper and iron ingots at the forge, and ingots make
   the metal gear. New Iron Axe and Iron Pickaxe; better tools take fewer swings.
 - **Crafting stations:** a crafting corner in every village (workbench, forge and anvil, cooking pot, brewing stand).
@@ -261,7 +264,7 @@ npm run sim -- balance           # the balance report: time to kill and damage t
 
 The **gameplay sims** in `tests/sim/` boot the real game in Node with a fake browser (`tests/sim/lib/`: no WebGL, the
 renderer is a stub) and play it by script: fights and bosses, boss gates, menus, the HUD, pets, villagers, houses,
-chests, items, terrain, survival and stations. Each prints `PASS` / `FAIL` lines; `npm run sim` runs them a few at a
+chests, items, terrain, survival, stations and save/load. Each prints `PASS` / `FAIL` lines; `npm run sim` runs them a few at a
 time and sums up. Randomness is seeded (`SIM_SEED`, default 1), so a run plays out the same every time: game code
 draws from the play stream in `src/utils/random.js`, never `Math.random` (a unit test checks).
 
@@ -273,6 +276,7 @@ headless Chrome (a few minutes with software rendering):
 ```sh
 npm i --no-save puppeteer-core     # once; not a project dependency
 node scripts/screenshots.mjs       # all shots, or e.g. `node scripts/screenshots.mjs bag,pets` for some
+node scripts/save-smoke.mjs        # real reload/export/import check; retake title and save menus
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
@@ -313,7 +317,9 @@ index.html                 markup only: HUD, dialogue box, challenge panel, char
 styles/main.css            all styling
 scripts/serve.mjs          zero-dependency dev server
 scripts/screenshots.mjs    retakes the README screenshots (headless Chrome)
+scripts/save-smoke.mjs     checks real browser save/reload/export/import; retakes save-menu screenshots
 docs/screenshots/          the README screenshots
+docs/logs/                 timestamped decisions, tasks, actions and verification
 docs/typography.md         the type brief, the pairings compared (type-specimen.html) and the choice
 tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
                            heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,
@@ -352,6 +358,8 @@ src/
 ├── core/
 │   ├── Game.js            startup order, per-frame update order, run lifecycle (begin / reset)
 │   ├── GameLoop.js        requestAnimationFrame loop with a clamped timestep
+│   ├── save.js            versioned adventure format, cleaning, storage and state ownership registry
+│   ├── AdventureSave.js   save lifecycle, planet snapshots, Continue and file import/export
 │   ├── context.js         the shared live state (time, player, enemies, NPCs, paused...)
 │   ├── settings.js        live player settings: validated, saved to localStorage, change listeners
 │   ├── keybinds.js        live key bindings: is / held / labels, remapping with swaps, saved to localStorage
@@ -636,7 +644,21 @@ quest items are inspected and can't be dropped. **Drop** sets a stack on the gro
 `itemUse.js`. A new item source calls `spawnWorldItem` or `grantItem` (or rolls a loot table: `gameplay/loot.js`).
 A new picture = a drawing in `ui/itemArt.js` and a model in `models/items.js` under a new `ITEM_ART_KINDS` entry.
 A new gear stat = an entry in `STATS` plus where it's read (like `damageBonus` in `combat/damage.js`). Save / load can use `inventory.toJSON()` and
-`inventory.load()`. The bag is kept across planets and fainting, and emptied on a new adventure (there is no save system).
+`inventory.load()`. The bag is kept across planets, fainting and Continue, and emptied on a new adventure.
+
+## Saving an adventure
+
+<p>
+  <img src="docs/screenshots/continue.jpg" width="49%" alt="Continue a saved adventure">
+  <img src="docs/screenshots/save-menu.jpg" width="49%" alt="Save, export and import in the pause menu">
+</p>
+
+The browser keeps one adventure. Choose **Continue** to resume, or **New Adventure** to replace it after confirmation.
+Autosave runs every two minutes of play, on arrival, after a boss and before quitting. **Save** in the pause menu
+writes immediately; the small **Saved** note confirms success. **Export Save** downloads a JSON copy; **Import Save**
+validates a file and asks before replacing the slot. Export copies to keep multiple adventures or move between devices.
+Browser storage must be available; clearing it removes the slot. Settings, keys, the journal and pet preferences are
+separate. Format, state ownership and compatibility checks: [docs/save-format.md](docs/save-format.md).
 
 ## Pets
 

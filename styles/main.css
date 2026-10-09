@@ -68,7 +68,9 @@ kbd { display:inline-block; min-width:14px; padding:0 5px; margin:0 1px; border:
 #title h1 { font-size:clamp(56px,10vw,118px); margin:0; color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill;
   text-shadow:0 8px 0 var(--ink); letter-spacing:2px; font-weight:800; animation:logofloat 5s ease-in-out infinite; }
 #title .logo p { display:inline-block; margin:12px 0 0; font-size:18px; font-weight:800; background:rgba(255,255,255,.75); padding:4px 16px; border-radius:999px; }
-#title .tmenu { display:flex; flex-direction:column; gap:12px; width:min(270px,72vw); margin-top:7vh; }
+#title .tmenu { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:min(390px,86vw); margin-top:4vh; }
+#title .tmenu button[hidden] { display:none; }
+#title .tmenu [data-act="continue"], #title .tmenu [data-act="play"], #title .tmenu [data-act="credits"] { grid-column:1/-1; }
 #title .tmenu button { font:inherit; font-weight:800; font-size:18px; padding:9px 18px; cursor:pointer; color:var(--ink); background:#fff8ee;
   border:4px solid var(--ink); border-radius:999px; box-shadow:0 4px 0 var(--ink); transition:transform .12s, background .12s; }
 #title .tmenu button.primary { font-size:24px; padding:11px 18px; background:var(--pink); color:#fff; }
@@ -101,6 +103,7 @@ kbd { display:inline-block; min-width:14px; padding:0 5px; margin:0 1px; border:
 @keyframes liftout { to { opacity:0; transform:translateY(-50px) scale(.92); } }
 @keyframes sinkout { to { opacity:0; transform:translateY(30px); } }
 body.menu #toast, body.menu #prompt { visibility:hidden; }
+body.menu #toast.menu-visible { visibility:visible; }
 #start .go { position:absolute; bottom:8vh; left:50%; transform:translateX(-50%); margin-top:28px; padding:12px 30px; white-space:nowrap; cursor:pointer;
   background:var(--pink); color:#fff; border:4px solid var(--ink); border-radius:999px;
   font-weight:800; font-size:21px; box-shadow:0 5px 0 var(--ink); animation:bob 1.4s ease-in-out infinite; }
@@ -493,6 +496,9 @@ img.item-icon { background:none; border:none; object-fit:contain; }
 .modal .sub { text-align:center; font-weight:800; font-size:13px; opacity:.7; margin-top:4px; }
 .modal .menu { display:flex; flex-direction:column; gap:9px; margin:18px 0 4px; }
 .modal .menu.row2 { flex-direction:row; justify-content:flex-end; }
+.modal .menu .row2 { display:flex; gap:9px; }
+.modal .menu .row2 button { flex:1; }
+#save-notice { position:fixed; bottom:16px; right:20px; z-index:100; opacity:0; pointer-events:none; font-size:12px; color:#f4e6ce; text-shadow:0 1px 3px #392938; transition:opacity .3s; }
 .modal button { font:inherit; font-weight:800; font-size:16px; padding:8px 18px; border:3px solid var(--ink); border-radius:999px; background:#fff;
   color:var(--ink); box-shadow:0 3px 0 var(--ink); cursor:pointer; transition:transform .1s; }
 .modal button:hover, .modal button:focus-visible { transform:translateY(-2px); outline:none; background:#fff8ee; }

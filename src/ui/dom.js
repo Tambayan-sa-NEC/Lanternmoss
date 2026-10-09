@@ -29,6 +29,8 @@ export const dom = {
   petMenu: $('petmenu'),
   // title screen
   title: $('title'), titleMenu: document.querySelector('#title .tmenu'), campaign: document.querySelector('#title .campaign'),
+  saveSummary: $('save-summary'),
+  saveNotice: $('save-notice'),
   // pause menu
   pause: $('pause'), shop: $('shop'),
 };

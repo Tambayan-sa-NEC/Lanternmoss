@@ -56,7 +56,7 @@ export const Journal = {
     this.data.stats.bosses++;
     if (f && !f.hit) flags.flawless = true;
     if (f && !f.pet) flags.petless = true;
-    if (Math.min(f?.level ?? 99, ctx.player.level) <= (BOSS_CHALLENGES.lowLevel[ctx.planet] ?? 0)) flags.underdog = true;   // (the level the fight began at: the kill's XP comes first)
+    if (Math.min(f?.level ?? 99, ctx.player.level) <= (BOSS_CHALLENGES.byPlanet[ctx.planetId] ?? 0)) flags.underdog = true;   // (the level the fight began at: the kill's XP comes first)
     this.fight = null; this.changed();
   },
 

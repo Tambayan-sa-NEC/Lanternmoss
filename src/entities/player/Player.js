@@ -9,6 +9,7 @@ import { EQUIP_SLOTS, HOTBAR, INVENTORY } from '../../config/items.js';
 import { NEEDS } from '../../config/survival.js';
 import { hotbarFirst, Inventory } from '../../inventory/Inventory.js';
 import { held } from '../../core/keybinds.js';
+import { ctx } from '../../core/context.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
 import { HERO_BUILDERS } from '../../models/heroes.js';
 import { addDyn } from '../../physics/colliders.js';
@@ -53,6 +54,17 @@ export class Player extends Walker {
     for (const k of this.partKeys) delete this[k];
     this.vanityHat = this.vanityCape = this.capeKids = this.heldTool = null;     // they belonged to the old model
     this.partKeys = Object.keys(parts); Object.assign(this, parts); scene.add(this.root);
+  }
+
+  /** Plain adventure state; placement happens after world restoration. */
+  toJSON() {
+    return { charId: this.charId, level: this.level, xp: this.xp, coins: this.coins, hp: this.hp, mana: this.mana,
+      time: ctx.time, up: this.up.toArray(), fwd: this.fwd.toArray(), lastHurt: this.lastHurt };
+  }
+  load(data) {
+    Object.assign(this, { charId: data.charId, level: data.level, xp: data.xp, coins: data.coins, hp: data.hp, mana: data.mana, lastHurt: data.lastHurt });
+    ctx.time = data.time;
+    this.dead = this.hp <= 0; this.deadT = 0; this.vy = 0; this.clearTimers();
   }
 
   /** Clears every short-lived combat / ability timer. */

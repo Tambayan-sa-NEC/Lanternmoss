@@ -1,5 +1,5 @@
 /* MAIN MENU: the title screen (#title) in front of character selection, over a slow, wide orbit of the planet.
-     Play       -> character selection (#start, src/ui/CharacterSelect.js): the hero, then the pet; Back / Esc
+     New Adventure -> character selection (#start, src/ui/CharacterSelect.js): the hero, then the pet; Back / Esc
                    goes back a step, then returns here
      Settings / Controls / Credits -> single pages of the pause menu (PauseMenu.openPanel), no pausing involved
      Journal    the journal (src/ui/JournalUI.js): achievements, bestiary and collection, kept across adventures
@@ -21,9 +21,9 @@ const hex = c => `#${c.toString(16).padStart(6, '0')}`;
 export const MainMenu = {
   handlers: null, focus: 0,
   get screen() { return ctx.started ? null : CharacterSelect.visible ? 'select' : 'title'; },
-  get buttons() { return [...dom.titleMenu.querySelectorAll('button')]; },
+  get buttons() { return [...dom.titleMenu.querySelectorAll('button')].filter(b => !b.hidden && !b.disabled); },
 
-  /** handlers.onReset() restarts the adventure (used when quitting back here from play). */
+  /** The title receives reset, Continue and save-summary callbacks from Game. */
   init(handlers) {
     this.handlers = handlers;
     dom.campaign.innerHTML = PLANETS.map((p, i) => {
@@ -43,11 +43,17 @@ export const MainMenu = {
   showTitle(reset = false) {
     if (reset) this.handlers.onReset();
     ctx.started = false; document.body.classList.add('menu');
+    this.refreshSave();
     dom.title.classList.remove('leave', 'enter'); dom.title.style.display = 'flex'; void dom.title.offsetWidth; dom.title.classList.add('enter');
     this.setFocus(0);
   },
   play() {
     if (this.screen !== 'title') return;
+    if (this.handlers.saveSummary()) { PauseMenu.openPanel('new'); return; }
+    this.startNew();
+  },
+  startNew() {
+    PauseMenu.close();
     if (dom.title.contains(document.activeElement)) document.activeElement.blur();   // or Enter on the select screen would click Play again
     dom.title.classList.remove('enter'); dom.title.classList.add('leave');
     setTimeout(() => { if (this.screen !== 'title') dom.title.style.display = 'none'; }, 380);
@@ -60,7 +66,18 @@ export const MainMenu = {
   onBegin() { dom.title.classList.remove('enter', 'leave'); dom.title.style.display = 'none'; },
   act(name) {
     audio.init();
-    if (name === 'play') this.play(); else if (name === 'journal') JournalUI.open(); else PauseMenu.openPanel(name);
+    if (name === 'play') this.play();
+    else if (name === 'continue') this.handlers.onContinue();
+    else if (name === 'import') PauseMenu.chooseImport();
+    else if (name === 'journal') JournalUI.open(); else PauseMenu.openPanel(name);
+  },
+  refreshSave() {
+    if (!this.handlers) return;
+    const summary = this.handlers.saveSummary();
+    const button = dom.titleMenu.querySelector('[data-act="continue"]');
+    if (button) button.hidden = !summary;
+    dom.saveSummary.textContent = summary ? `${summary.hero} · level ${summary.level} · ${summary.planet}` : '';
+    this.setFocus(Math.min(this.focus, Math.max(0, this.buttons.length - 1)));
   },
   setFocus(i) { this.focus = i; this.buttons.forEach((b, k) => b.classList.toggle('focus', k === i)); },
   onPanelClosed() { this.setFocus(this.focus); },
@@ -71,6 +88,7 @@ export const MainMenu = {
     if (PauseMenu.isOpen) { PauseMenu.key(code); return; }
     if (this.screen === 'select') { if (code === 'Escape') this.back(); else CharacterSelect.key(code); return; }
     const n = this.buttons.length;
+    if (!n) return;
     if (code === 'ArrowDown' || code === 'KeyS') this.setFocus((this.focus + 1) % n);
     else if (code === 'ArrowUp' || code === 'KeyW') this.setFocus((this.focus + n - 1) % n);
     else if ((code === 'Enter' || code === 'Space') && !dom.title.contains(document.activeElement)) this.act(this.buttons[this.focus].dataset.act);   // a focused button clicks itself

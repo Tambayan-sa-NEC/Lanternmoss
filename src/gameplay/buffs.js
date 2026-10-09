@@ -1,12 +1,17 @@
 /* Temporary buffs (Moon-Hop, Feather-Step, a pet's Howl; from food and potions: Mighty, Stoneskin, Quickstep, Mending).
    Their numbers are config/game.js BUFFS; they're read where they act (Player speed, combat/damage.js, regeneration). */
 import { ctx } from '../core/context.js';
+import { Needs } from './Needs.js';
 import { sparkles } from '../fx/sparkles.js';
 import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
 
 /** Seconds left on each buff. */
 export const buffs = { moon: 0, feather: 0, howl: 0, might: 0, ward: 0, swift: 0, mend: 0 };
+export const BuffState = {
+  toJSON() { return { timers: { ...buffs }, energy: Needs.toJSON() }; },
+  load(data) { Object.assign(buffs, data.timers); Needs.load(data.energy); },
+};
 export const BUFF_NAMES = { moon: 'Moon-Hop', feather: 'Feather-Step', howl: 'Howl', might: 'Mighty', ward: 'Stoneskin', swift: 'Quickstep', mend: 'Mending' };
 const BUFF_COLORS = { moon: 0xd6ccff, feather: 0xb8ffe0, howl: 0x7fb8ff, might: 0xff7a4a, ward: 0xb6aec8, swift: 0x7fe07a, mend: 0xff8fb1 };
 

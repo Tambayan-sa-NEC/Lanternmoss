@@ -11,6 +11,8 @@
    `petless` if your pet never strikes the boss, and `underdog` if you win at or under BOSS_CHALLENGES.lowLevel.
    --------------------------------------------------------------------- */
 
+import { PLANETS } from './planets.js';
+
 /** Counters the journal keeps (all lifetime totals). */
 export const JOURNAL_STATS = {
   monsters: 'Monsters defeated', bosses: 'Bosses defeated', bossKinds: 'Different bosses defeated', chests: 'Chests opened',
@@ -23,7 +25,7 @@ export const ACHIEVEMENTS = [
   // ---- firsts
   { id: 'firstBlood', group: 'Firsts', icon: 'slash', name: 'First Steps', text: 'Defeat your first monster.', goal: { stat: 'monsters', at: 1 }, reward: { coins: 5 } },
   { id: 'firstBoss', group: 'Firsts', icon: 'boss', name: 'Crown Breaker', text: 'Defeat a planet boss.', goal: { stat: 'bosses', at: 1 }, reward: { coins: 40 } },
-  { id: 'allBosses', group: 'Firsts', icon: 'trophy', name: 'Lantern of Three Worlds', text: 'Defeat Gloomcap, Pyrrhax and Malgrath.', goal: { stat: 'bossKinds', at: 3 }, reward: { coins: 150 } },
+  { id: 'allBosses', group: 'Firsts', icon: 'trophy', name: 'Lantern of Three Worlds', text: 'Defeat Gloomcap, Pyrrhax and Malgrath.', goal: { stat: 'bossKinds', at: PLANETS.length }, reward: { coins: 150 } },
   { id: 'firstChest', group: 'Firsts', icon: 'chest', name: 'Finders Keepers', text: 'Open a treasure chest.', goal: { stat: 'chests', at: 1 }, reward: { coins: 5 } },
   { id: 'firstCraft', group: 'Firsts', icon: 'craft', name: 'Handmade', text: 'Craft an item.', goal: { stat: 'crafted', at: 1 }, reward: { coins: 10 } },
   { id: 'firstLegendary', group: 'Firsts', icon: 'gem', name: 'The Real Treasure', text: 'Find a Legendary piece of gear.', goal: { stat: 'legendary', at: 1 }, reward: { coins: 50 } },
@@ -53,7 +55,7 @@ export const ACHIEVEMENTS = [
 ];
 
 /** Boss challenges: the highest hero level that still counts as "low", per planet (index into PLANETS). */
-export const BOSS_CHALLENGES = { lowLevel: [3, 5, 7] };
+export const BOSS_CHALLENGES = { lowLevel: PLANETS.map(p => p.lowLevel), byPlanet: Object.fromEntries(PLANETS.map(p => [p.id, p.lowLevel])) };
 
 /** How the unlock toast behaves. */
 export const ACHIEVEMENT_TOAST = { seconds: 4.5, gap: 0.4 };

@@ -10,6 +10,7 @@
    portrait = face drawn in the dialogue box; headR / hat size and limit the outfit each planet adds (models/villagers.js).
    sleepsIndoors = their night spot is their own front door: asleep, they go inside to bed (config/houses.js owner). */
 import * as THREE from 'three';
+import { PLANETS } from '../../config/planets.js';
 import { ctx } from '../../core/context.js';
 import { emote } from '../../fx/emotes.js';
 import { burstAt, sparkles } from '../../fx/sparkles.js';
@@ -62,8 +63,8 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { once: true, when: () => Chests.lockedWaiting() && !Chests.hasKey(), e: 'excited',
           t: "Found a Lantern chest out there, have you? Locked, of course. Here, my spare key. I keep it in my hat. Don't ask what else is in the hat.",
           a: n => giftItem(n, 'lanternKey') },
-        { once: true, when: s => s.planet === 1, t: "So you toppled Gloomcap AND carried an old wizard across the stars. Emberfall tastes of cinnamon and danger." },
-        { once: true, when: s => s.planet === 2, t: 'Frostveil. My beard has opinions about this cold, {hero}. None of them polite.', e: 'sad' },
+        { once: true, when: s => s.planetId === 'emberfall', t: "So you toppled Gloomcap AND carried an old wizard across the stars. Emberfall tastes of cinnamon and danger." },
+        { once: true, when: s => s.planetId === 'frostveil', t: 'Frostveil. My beard has opinions about this cold, {hero}. None of them polite.', e: 'sad' },
         { once: true, when: s => s.bosses >= 2, t: 'Two dark kings down. One more, and the lanterns of every world will sing together.', e: 'excited' },
         { when: s => s.night, t: 'Shh... the stars are reading tonight. Out loud, if you listen very carefully.', e: 'thinking' },
       ] },
@@ -83,8 +84,8 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { t: 'Try a moonberry tart! The crows gave it four stars.', a: n => giftItem(n, 'moonberryTart') },
         { once: true, when: s => s.hero === 'knight', t: 'A big strong warrior like you needs two buns. At least. Doctor\'s orders. I am not a doctor.' },
         { once: true, when: s => s.level >= 3, t: "You look stronger, {hero}! It's the buns. It's always the buns.", e: 'excited' },
-        { once: true, when: s => s.planet === 1, t: 'Emberfall ovens heat themselves! I could bake a pie on a pebble here.', e: 'excited' },
-        { once: true, when: s => s.planet === 2, t: 'Brr! Even my dough is shivering. A warm bun for the road, {hero}?', e: 'sad' },
+        { once: true, when: s => s.planetId === 'emberfall', t: 'Emberfall ovens heat themselves! I could bake a pie on a pebble here.', e: 'excited' },
+        { once: true, when: s => s.planetId === 'frostveil', t: 'Brr! Even my dough is shivering. A warm bun for the road, {hero}?', e: 'sad' },
       ] },
     { name: 'Lio', title: 'Wandering Bard', color: '#5fae55', build: buildBard, height: 2.15, radius: 0.55,
       portrait: 'bard', headR: 0.36, hat: true, sleepsIndoors: true,
@@ -104,8 +105,8 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
           sparkles.emit(ctx.player.pos.clone().addScaledVector(ctx.player.up, 1), { count: 30, color: 0xffd6f5, speed: 2.5, up: ctx.player.up, life: 1, size: 0.3 }); } },
         { t: 'A bard without an audience is just someone humming at a tree. Thanks for listening!', a: n => emote(n, 'heart') },
         { once: true, when: s => s.bosses >= 1, t: "I'm writing 'The Ballad of the {hero} and the Moss King'. I rhymed 'Gloomcap' with 'doom nap'. Thoughts?", e: 'excited' },
-        { once: true, when: s => s.planet === 1, t: 'New planet, new chords! Everything here sounds a little bit... toasted.' },
-        { once: true, when: s => s.planet === 2, t: 'My lute strings keep freezing into icicles. Very crisp notes, though.', e: 'surprised' },
+        { once: true, when: s => s.planetId === 'emberfall', t: 'New planet, new chords! Everything here sounds a little bit... toasted.' },
+        { once: true, when: s => s.planetId === 'frostveil', t: 'My lute strings keep freezing into icicles. Very crisp notes, though.', e: 'surprised' },
         { once: true, when: s => s.bosses >= 2, t: 'A moss king AND a dragon? The ballad needs a third act... and a much bigger lute.', e: 'excited' },
         { when: s => s.phase === 'evening', t: 'Evening is my favourite. The lanterns hum the harmony for free. ♪' },
       ] },
@@ -129,8 +130,8 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
           sparkles.emit(p, { count: 3, color: mpick(FLOWER_COLORS), speed: 1, up: ctx.player.up, upBias: 1.4, life: 1.3, size: 0.32 }); } audio.sparkle(); } },
         { once: true, when: s => s.hero === 'ranger', t: 'Your hair is the colour of moonlight! Can I braid flowers into it? ...Later! Hee~', e: 'excited' },
         { once: true, when: s => s.level >= 5, t: "You're so strong now! The moss says so. The moss is never wrong~" },
-        { once: true, when: s => s.planet === 1, t: "Ooh, it's warm here! My wings feel all toasty~" },
-        { once: true, when: s => s.planet === 2, t: 'Snow! It looks like the flowers turned into sugar!', e: 'excited' },
+        { once: true, when: s => s.planetId === 'emberfall', t: "Ooh, it's warm here! My wings feel all toasty~" },
+        { once: true, when: s => s.planetId === 'frostveil', t: 'Snow! It looks like the flowers turned into sugar!', e: 'excited' },
         { when: s => s.night, t: 'At night the mushrooms tell glowing stories. Shh, listen~', e: 'thinking' },
       ] },
   ];
@@ -139,7 +140,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
 /** The villager who lives only on planet `planet` (none on the first planet): they stay behind when you travel on. */
 export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet) {
   const home = houses[3 + (planet % 3)]?.door ?? offsetDir(spawnDir, 4.8, 9);
-  if (planet === 1) return [
+  if (PLANETS[planet].id === 'emberfall') return [
     { name: 'Cinder', title: 'Ember Smith', color: '#e0682a', build: buildSmith, height: 2.3, radius: 0.62, gesture: 'raise',
       portrait: 'smith', headR: 0.36, hat: true, local: true, sleepsIndoors: true,
       dir: offsetDir(spawnDir, 3.6, 6.5),
@@ -157,7 +158,7 @@ export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet) {
         { when: s => s.night, t: "The forge stays warm all night. So do I, if I'm honest. Smiths run hot.", e: 'sleepy' },
       ] },
   ];
-  if (planet === 2) return [
+  if (PLANETS[planet].id === 'frostveil') return [
     { name: 'Tuva', title: 'Snow Keeper', color: '#6fa8dc', build: buildSnowKeeper, height: 2.3, radius: 0.66, gesture: 'wave',
       portrait: 'snowkeeper', headR: 0.36, hat: true, local: true, sleepsIndoors: true,
       dir: dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 5.5),

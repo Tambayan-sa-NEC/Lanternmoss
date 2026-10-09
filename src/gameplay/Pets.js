@@ -23,7 +23,7 @@ import { showBanner } from '../ui/banner.js';
 import { toast } from '../ui/toast.js';
 import { mpick } from '../utils/random.js';
 import { arcDist } from '../utils/sphere.js';
-import { PET_ABILITIES, resetPetAbilities, updatePetAbilities } from './petAbilities.js';
+import { PET_ABILITIES, petEffects, resetPetAbilities, updatePetAbilities } from './petAbilities.js';
 import { loadPicks, savePicks } from './petPicks.js';
 
 const STARTERS = Object.keys(PETS).filter(id => !PETS[id].unlock);
@@ -35,6 +35,20 @@ export const Pets = {
   unlocked: new Set(STARTERS), active: null, names: {}, mode: 'follow', stayDir: null, picks: loadPicks(),
   hp: null, hpFor: null, faintT: 0, hurtAt: -99, abilityCd: 0, petCool: 0, swapCool: 0,
   presenting: false,     // a menu is showing the pet off: it comes round in front of the hero (PET_SHOWCASE)
+
+  toJSON() {
+    return { unlocked: [...this.unlocked], active: this.id, names: { ...this.names }, mode: this.mode,
+      stayDir: this.stayDir?.toArray() ?? null, hp: this.hp, faintT: this.faintT, hurtAt: this.hurtAt,
+      abilityCd: this.abilityCd, petCool: this.petCool, swapCool: this.swapCool, mend: petEffects.mend ? { ...petEffects.mend } : null };
+  },
+  load(data) {
+    const { unlocked, stayDir, mend, ...state } = data;
+    Object.assign(this, state); this.unlocked = new Set(unlocked); this.hpFor = this.id;
+    this.hp = Math.min(this.maxHp(), this.hp); this.presenting = false;
+    resetPetAbilities(); petEffects.mend = mend;
+    this.spawn();
+    this.stayDir = stayDir ? ctx.player.up.clone().fromArray(stayDir) : null;
+  },
 
   /** The pet that's out: the one picked (pet step or pet menu), else the hero's own. */
   get id() { return this.active ?? CHARACTERS[ctx.player.charId].companion; },

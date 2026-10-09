@@ -1,5 +1,6 @@
 /* NPC villager models. */
 import * as THREE from 'three';
+import { PLANETS } from '../config/planets.js';
 import { addTo, G, part } from '../render/meshes.js';
 import { addFace, buildHumanoid } from './humanoid.js';
 
@@ -106,19 +107,20 @@ export function buildSnowKeeper() {
 // ---- outfits: the travelling villagers dress for each new planet ----
 
 /** Outfit colours per planet; each villager gets one that stands out from their own clothes (outfitColor). */
-export const OUTFIT_COLORS = { 1: [0xe0482a, 0x3a8ad0, 0xffd36b, 0x2f9a5a], 2: [0xe0605a, 0x4a7ae0, 0xffc83a, 0xff8fc0] };
+export const OUTFIT_COLORS = Object.fromEntries(PLANETS.map(p => [p.id, p.outfitColors]));
 /** The palette colour furthest from the villager's own colour (so a scarf never vanishes against a robe). */
 export function outfitColor(planet, own) {
   const o = new THREE.Color(own), dist = c => { const x = new THREE.Color(c); return (x.r - o.r) ** 2 + (x.g - o.g) ** 2 + (x.b - o.b) ** 2; };
-  return (OUTFIT_COLORS[planet] ?? [0xffffff]).reduce((best, c) => (dist(c) > dist(best) ? c : best));
+  return (OUTFIT_COLORS[PLANETS[planet]?.id]?.length ? OUTFIT_COLORS[PLANETS[planet].id] : [0xffffff]).reduce((best, c) => (dist(c) > dist(best) ? c : best));
 }
 
 /** An accessory set for planet `planet` on a villager's head pivot (headR = head radius, to scale it), or null on
     the home planet. color = the scarf / neckerchief colour. hat = they already wear a big hat (no earmuffs). */
 export function buildOutfit(planet, { headR = 0.36, color = 0xffffff, hat = false } = {}) {
-  if (!planet) return null;
+  const outfit = PLANETS[planet]?.outfit;
+  if (!outfit) return null;
   const g = new THREE.Group(), s = headR / 0.36; g.scale.setScalar(s);
-  if (planet === 1) {                                     // Emberfall: a bright neckerchief knotted at the front
+  if (outfit === 'neckerchief') {                         // Emberfall: a bright neckerchief knotted at the front
     addTo(g, part(new THREE.TorusGeometry(0.27, 0.06, 4, 12), color), [0, -0.36, 0], [Math.PI / 2, 0, 0]);
     addTo(g, part(G.cone(0.14, 0.24, 3), color), [0, -0.48, 0.24], [Math.PI + 0.3, 0, 0], [1, 1, 0.35]);
   } else {                                                // Frostveil: a chunky knitted scarf (+ earmuffs unless hatted)

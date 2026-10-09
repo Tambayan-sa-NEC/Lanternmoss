@@ -5,7 +5,8 @@
      settings  generated from SETTINGS_SCHEMA (config/settings.js); changes apply and save immediately. Its Keys section
                remaps any KEYBINDS action (click one, press the new key; a key already in use swaps over)
      controls  the current keybinds, the fixed keys (config/controls.js) and the hero's abilities, never out of date
-     quit      confirmation: going back to the menu restarts the adventure (there is no saving yet)
+     quit      save before returning to the title; Continue restores the adventure
+     new / import   confirmation before replacing the adventure slot
      credits   who made it (config/credits.js); title screen only
    Esc on a sub-page goes back to the main page; Esc / P on the main page resumes.
    The title screen opens single pages with openPanel(page) (no pausing): Back / Esc closes the panel again. */
@@ -23,6 +24,7 @@ import { releaseAllKeys } from '../systems/InputSystem.js';
 import { dom } from './dom.js';
 import { icon } from './icons.js';
 import { JournalUI } from './JournalUI.js';
+import { toast } from './toast.js';
 
 const keys = list => list.map(k => `<kbd>${k}</kbd>`).join(' ');
 const fmt = (def, v) => `${v}${def.unit ?? ''}`;
@@ -54,6 +56,8 @@ const PAGES = {
     return `<h2>Paused</h2><div class="sub">${PLANETS[ctx.planet].name} · ${hero.title} · level ${ctx.player.level}</div>
       <div class="menu">
         <button type="button" class="primary" data-go="resume">Resume</button>
+        <button type="button" data-go="save">Save</button>
+        <div class="row2"><button type="button" data-go="export">Export Save</button><button type="button" data-go="import">Import Save</button></div>
         <button type="button" data-go="journal">Journal</button>
         <button type="button" data-go="settings">Settings</button>
         <button type="button" data-go="controls">Controls</button>
@@ -81,9 +85,12 @@ const PAGES = {
       <p class="note wide">Change any of these in Settings → Keys.</p></div>
       <div class="menu"><button type="button" class="primary" data-go="main">Back</button></div><div class="foot"><kbd>Esc</kbd> back</div>`;
   },
-  quit: () => `<h2>Quit to menu?</h2><p class="warn">Your adventure restarts from the first planet: your level, bag and progress on
-    ${PLANETS[ctx.planet].name} are lost (there is no saving yet).</p>
-    <div class="menu row2"><button type="button" data-go="main">Keep playing</button><button type="button" class="danger" data-go="confirm-quit">Quit to menu</button></div>`,
+  quit: () => `<h2>Quit to menu?</h2><p class="warn">Your adventure will be saved. Choose Continue on the title screen to return here.</p>
+    <div class="menu row2"><button type="button" data-go="main">Keep playing</button><button type="button" class="primary" data-go="confirm-quit">Save and quit</button></div>`,
+  new: () => `<h2>New adventure?</h2><p class="warn">Starting an adventure replaces your saved adventure. Export a copy first if you want to keep it.</p>
+    <div class="menu"><button type="button" data-go="export">Export Save</button><div class="row2"><button type="button" data-go="main">Back</button><button type="button" class="danger" data-go="confirm-new">Start new</button></div></div>`,
+  import: () => `<h2>Import adventure?</h2><p class="warn">Importing replaces your saved adventure and continues the imported game. Export your current adventure first if you want to keep it.</p>
+    <div class="menu"><button type="button" data-go="export">Export Save</button><div class="row2"><button type="button" data-go="main">Cancel</button><button type="button" class="danger" data-go="confirm-import">Import and continue</button></div></div>`,
   credits: () => `<h2>Credits</h2><div class="scroll credits">${CREDITS.map(([h, lines]) =>
       `<section><h3>${h}</h3>${lines.map(l => `<p>${l}</p>`).join('')}</section>`).join('')}</div>
     <div class="menu"><button type="button" class="primary" data-go="main">Back</button></div><div class="foot"><kbd>Esc</kbd> back</div>`,
@@ -91,6 +98,7 @@ const PAGES = {
 
 export const PauseMenu = {
   isOpen: false, page: 'main', handlers: null, panel: false,
+  pendingImport: null,
   capture: null, bindMsg: '',      // the action waiting for its new key (Settings → Keys), and the last remap's note
   /** handlers.onQuit() returns to the main menu (it restarts the adventure); onPanelClosed() after a title-screen panel. */
   init(handlers) {
@@ -115,6 +123,7 @@ export const PauseMenu = {
   close() {
     if (!this.isOpen) return;
     this.isOpen = false; dom.pause.style.display = 'none'; this.capture = null; this.bindMsg = '';
+    this.pendingImport = null;
     if (this.panel) { this.panel = false; this.handlers.onPanelClosed?.(); return; }
     ctx.paused = false; audio.duck(false); document.body.classList.remove('paused');
   },
@@ -149,13 +158,30 @@ export const PauseMenu = {
     if (go === 'reset-keys') { resetBinds(); this.bindMsg = 'Keys are back to their defaults.'; this.show('settings'); return; }
     if (go === 'resume') this.close();
     else if (go === 'journal') JournalUI.open();                         // on top; closing it comes back here
-    else if (go === 'confirm-quit') { this.close(); this.handlers.onQuit(); }
+    else if (go === 'save') this.handlers.onSave();
+    else if (go === 'export') this.handlers.onExport();
+    else if (go === 'import') this.chooseImport();
+    else if (go === 'confirm-quit') this.handlers.onQuit();
+    else if (go === 'confirm-new') this.handlers.onNew();
+    else if (go === 'confirm-import') { const data = this.pendingImport; if (data) this.handlers.onConfirmImport(data); }
     else if (go === 'reset') { resetSettings(); this.show('settings'); }
     else if (go === 'main' && this.panel) this.close();                  // a title-screen panel's Back
     else if (go) this.show(go);
     else if (set) {                                                        // toggles and choice buttons
       const key = set.dataset.set; setSetting(key, set.dataset.value ?? !settings[key]); this.show('settings');
     }
+  },
+  chooseImport() {
+    const input = document.createElement('input'); input.type = 'file'; input.accept = '.json,application/json';
+    input.addEventListener('change', async () => {
+      const result = await this.handlers.onImport(input.files?.[0]); input.remove();
+      if (result.cancelled) return;
+      if (!result.ok) { toast(result.message, { menu: true }); return; }
+      this.pendingImport = result.data;
+      if (this.isOpen) this.show('import'); else if (ctx.started) { this.open(); this.show('import'); } else this.openPanel('import');
+    });
+    input.addEventListener('cancel', () => input.remove(), { once: true });
+    input.hidden = true; document.body.appendChild(input); input.click();
   },
   onInput(e) {                                                             // sliders apply while dragging
     const el = e.target; if (!el.dataset?.set) return;

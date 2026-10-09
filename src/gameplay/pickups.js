@@ -24,6 +24,18 @@ export function spawnWorldItem(itemId, quantity, dir, options) {
 
 export function clearWorldItems() { for (const w of ctx.worldItems) w.dispose(); ctx.worldItems.length = 0; }
 
+export const Pickups = {
+  toJSON() { return ctx.worldItems.map(w => ({ itemId: w.itemId, quantity: w.quantity, props: w.props, up: w.up.toArray(),
+    bossLoot: !!w.bossLoot, delay: Math.max(0, w.delay), stepAway: w.stepAway, armed: w.armed })); },
+  load(data) {
+    clearWorldItems();
+    for (const s of data) {
+      const w = spawnWorldItem(s.itemId, s.quantity, ctx.player.up.clone().fromArray(s.up), { props: s.props, pickupDelay: s.delay, stepAway: s.stepAway });
+      w.bossLoot = s.bossLoot; w.armed = s.armed;
+    }
+  },
+};
+
 /** Scatters a planet's forage (PLANETS[i].forage) over free ground. */
 export function spawnForage(forage) {
   for (const { item, count } of forage) for (let i = 0; i < count; i++) spawnWorldItem(item, 1, spawnSpot(null, 0, 0, 0.6));

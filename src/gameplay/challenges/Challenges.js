@@ -18,6 +18,24 @@ const FAIL_REASONS = { timeout: 'Out of time!', left: 'You wandered too far.', f
 /** Challenge runtime. progress[id] is the player's record for that challenge (kept in memory, like `buffs`). */
 export const Challenges = {
   run: null, progress: {}, nudgeT: 2,
+  pendingRun: null,
+  toJSON() {
+    const r = this.run;
+    return { progress: structuredClone(this.progress), run: r ? { id: r.id, t: r.t, anchor: r.anchor.toArray(), ...r.kind.toJSON(r) } : this.pendingRun };
+  },
+  load(data) { this.cancel(); this.progress = structuredClone(data.progress); this.pendingRun = data.run; },
+  restoreRun() {
+    for (const npc of ctx.npcs) {
+      npc.def.lines.length = npc.baseLineCount;
+      for (const id of this.idsFor(npc)) if (this.progress[id]?.wins && CHALLENGES[id].unlockLines)
+        npc.def.lines.push(...CHALLENGES[id].unlockLines.map(t => ({ t })));
+    }
+    const saved = this.pendingRun; this.pendingRun = null;
+    if (!saved) return;
+    const def = CHALLENGES[saved.id], npc = ctx.npcs.find(n => n.name === def.giver); if (!npc) return;
+    const r = this.run = { id: saved.id, def, kind: CHALLENGE_KINDS[def.kind], npc, anchor: npc.up.clone().fromArray(saved.anchor), t: saved.t, done: false };
+    r.kind.start(r, saved); showChallengePanel();
+  },
   state(id) { return this.progress[id] || (this.progress[id] = { attempts: 0, wins: 0, losses: 0, best: null, last: null, readyAt: 0, reaction: null }); },
   idsFor(npc) { return Object.keys(CHALLENGES).filter(id => CHALLENGES[id].giver === npc.name); },
   isAvailable(id) { const c = CHALLENGES[id], s = this.state(id); return !this.run && (c.repeatable || !s.wins) && ctx.time >= s.readyAt; },
@@ -90,6 +108,6 @@ export const Challenges = {
   /** Abandons any active run without rewards, losses or reactions (leaving the planet, restarting). */
   cancel() { const r = this.run; if (r) { r.done = true; this.run = null; r.kind.cleanup(r); hideChallengePanel(); } },
   /** cancel() and forget all records (a fresh adventure). */
-  reset() { this.cancel(); this.progress = {}; },
+  reset() { this.cancel(); this.progress = {}; this.pendingRun = null; },
   tagFor(npc) { return this.availableFor(npc) ? ' <span class="ctag">✦ Challenge</span>' : ''; },
 };
