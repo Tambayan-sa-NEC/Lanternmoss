@@ -3,10 +3,12 @@
 import { CHARACTERS } from '../config/characters.js';
 import { GEAR_KINDS, ITEM_CATEGORIES, ITEM_EFFECTS, RARITIES, TOOL_KINDS } from '../config/items.js';
 import { CROPS } from '../config/resources.js';
-import { FUEL } from '../config/crafting.js';
+import { FUEL, RECIPES } from '../config/crafting.js';
+import { RUNES } from '../config/magic.js';
 import { BUFF_NAMES } from '../gameplay/buffs.js';
 import { formatStat, gearStats, itemRarity } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
 import { itemArtSvg } from './itemArt.js';
 
 const hex = n => '#' + n.toString(16).padStart(6, '0');
@@ -24,7 +26,8 @@ export function rarityColor(def, props = null) { return RARITIES[itemRarity(def,
 
 /** "Restores 35 HP", "Moon-Hop for 30s"... from the ITEM_EFFECTS templates. */
 function describeEffect(e) {
-  const vars = { ...e, buffName: BUFF_NAMES[e.kind] ?? e.kind };
+  const vars = { ...e, buffName: BUFF_NAMES[e.kind] ?? e.kind,
+    recipeName: itemRegistry.get(RECIPES.find(r => r.id === e.recipeId)?.result)?.name ?? 'a recipe' };
   return ITEM_EFFECTS[e.effect].replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
 }
 
@@ -47,6 +50,8 @@ export function describeItem(def, stack, o = {}) {
     `<p class="inv-d-desc">${def.description}</p>` +
     (lines.length ? `<ul class="inv-d-fx">${lines.join('')}</ul>` : '') +
     (def.equip?.vanity ? '<div class="inv-d-note worn">Vanity: changes how you look, not your stats.</div>' : '') +
+    (def.tags.includes('meal') ? '<div class="inv-d-note worn">Meal buff: replaces your previous meal buff. Potion and pet buffs are kept.</div>' : '') +
+    (def.equip && !def.equip.vanity ? `<div class="inv-d-note worn">Rune slot: ${RUNES[stack?.props?.enchantment]?.name ?? 'empty'}. Enchant at the forge from the Enchant tab.</div>` : '') +
     (def.tool && !o.worn ? '<div class="inv-d-note worn">Keep it on the hotbar: press E (or right click) by what it works on.</div>' : '') +
     (crop && !o.worn ? '<div class="inv-d-note worn">Press E at a tilled plot in the village farm to plant.</div>' : '') +
     (FUEL[def.id] && !o.worn ? `<div class="inv-d-note worn">Fuel for smelting at the forge: burns for ${FUEL[def.id]}.</div>` : '') +

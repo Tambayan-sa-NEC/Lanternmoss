@@ -90,7 +90,7 @@ export const Stations = {
   update(dt) {
     if (!this.list.length) return;
     const h = this.here();                                             // walked up to (or away from) one with the Craft tab open
-    if (h !== this.last) { this.last = h; if (InventoryUI.isOpen && InventoryUI.tab === 'craft') InventoryUI.render(); }
+    if (h !== this.last) { this.last = h; if (InventoryUI.isOpen && ['craft', 'enchant'].includes(InventoryUI.tab)) InventoryUI.render(); }
     const P = ctx.player, near = arcDist(P.up, this.center) < 26, t = ctx.time;
     for (const s of this.list) {
       s.parts.glow.forEach((g, i) => g.scale.setScalar(1 + Math.sin(t * (7 + i * 2.3) + i) * 0.08));

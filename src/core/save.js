@@ -16,6 +16,8 @@ import { TUTORIAL_STEPS, HELP_TOPICS, GATHERING_TIPS } from '../config/tutorial.
 import { CRITTER_DEFS } from '../config/critters.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { equipProblem } from '../items/gear.js';
+import { RECIPES } from '../config/crafting.js';
+import { RUNES } from '../config/magic.js';
 import { xpToNext } from '../progression/leveling.js';
 
 export const SAVE_KEY = 'lanternmoss.adventure';
@@ -30,7 +32,7 @@ export const SAVE_SYSTEMS = {
   player: 'adventure', inventory: 'adventure', equipment: 'adventure', hotbar: 'adventure',
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
-  progression: 'adventure', combat: 'adventure', tutorial: 'adventure',
+  progression: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
   farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
@@ -52,6 +54,7 @@ export const SAVE_OWNERS = {
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
   'gameplay/Chests.js:Chests': 'chests', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
+  'gameplay/RecipeBook.js:RecipeBook': 'crafting',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
 export const STATELESS_EXPORTS = new Set(['BUFF_NAMES', 'REWARDS', 'TOOL_USES', 'ACTION_HANDLERS', 'PET_ABILITIES']);
@@ -71,13 +74,16 @@ export function direction(v) {
   if (!Array.isArray(v) || v.length !== 3 || !v.every(n => typeof n === 'number' && Number.isFinite(n) && Math.abs(n) <= 1e6)) return null;
   const length = Math.hypot(...v); return length > 1e-8 ? v.map(n => n / length) : null;
 }
-export function cleanProps(v) {
-  const p = record(v); return Object.hasOwn(RARITIES, p.rarity) ? { rarity: p.rarity } : null;
+export function cleanProps(v, def = null) {
+  const p = record(v), out = {};
+  if (Object.hasOwn(RARITIES, p.rarity)) out.rarity = p.rarity;
+  if (def?.equip && !def.equip.vanity && Object.hasOwn(RUNES, p.enchantment)) out.enchantment = p.enchantment;
+  return Object.keys(out).length ? out : null;
 }
 export function cleanStack(v) {
   const s = record(v), def = itemRegistry.get(s.itemId);
   if (!def || !integer(s.quantity)) return null;
-  return { itemId: def.id, quantity: integer(s.quantity, 0, 0, def.maxStack), props: cleanProps(s.props) };
+  return { itemId: def.id, quantity: integer(s.quantity, 0, 0, def.maxStack), props: cleanProps(s.props, def) };
 }
 const stringIds = (v, allowed) => [...new Set(list(v).filter(id => allowed(id)))];
 const chestId = id => typeof id === 'string' && PLANETS.some(p => {
@@ -94,6 +100,10 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
 export function cleanState(key, value, hero = 'witch') {
   const s = record(value);
   switch (key) {
+    case 'crafting': {
+      const learned = stringIds(s.learned, id => RECIPES.some(r => r.id === id && r.discovery));
+      return { learned, favourites: stringIds(s.favourites, id => RECIPES.some(r => r.id === id && (!r.discovery || learned.includes(id)))) };
+    }
     case 'tutorial': {
       const recap = record(s.recap);
       return { status: choice(s.status, ['idle', 'active', 'skipped', 'complete'], 'skipped'),
@@ -116,7 +126,7 @@ export function cleanState(key, value, hero = 'witch') {
     case 'inventory': return Array.from({ length: HOTBAR.size + INVENTORY.slots }, (_, i) => cleanStack(list(value)[i]));
     case 'equipment': return Object.fromEntries(Object.keys(EQUIP_SLOTS).map(slot => {
       const w = record(s[slot]), def = itemRegistry.get(w.itemId);
-      return [slot, def?.equip?.slot === EQUIP_SLOTS[slot].fits && !equipProblem(def, hero) ? { itemId: def.id, props: cleanProps(w.props) } : null];
+      return [slot, def?.equip?.slot === EQUIP_SLOTS[slot].fits && !equipProblem(def, hero) ? { itemId: def.id, props: cleanProps(w.props, def) } : null];
     }));
     case 'hotbar': return { selected: integer(s.selected, 0, 0, HOTBAR.size - 1), cd: number(s.cd, 0, 0, 3) };
     case 'pets': {
@@ -131,7 +141,9 @@ export function cleanState(key, value, hero = 'witch') {
         mend: s.mend ? { left: number(s.mend.left, 0, 0, 120), perSec: number(s.mend.perSec, 0, 0, 100) } : null };
     }
     case 'dayClock': return { t: number(s.t, DAY.startAt * DAY.length, 0, DAY.length - 1e-6), day: integer(s.day, 1, 1) };
-    case 'buffs': return { timers: Object.fromEntries(buffKeys.map(k => [k, number(record(s.timers)[k], 0, 0, 3600)])), energy: number(s.energy, NEEDS.start, 0, NEEDS.max) };
+    case 'buffs': return { timers: Object.fromEntries(buffKeys.map(k => [k, number(record(s.timers)[k], 0, 0, 3600)])),
+      meal: ['might', 'ward', 'swift', 'mend'].includes(s.meal?.kind) && number(s.meal.seconds) > 0 ? { kind: s.meal.kind, seconds: number(s.meal.seconds, 0, 0, 3600) } : null,
+      energy: number(s.energy, NEEDS.start, 0, NEEDS.max) };
     case 'quests': {
       const state = Object.fromEntries(Object.entries(record(s.state)).filter(([id]) => Object.hasOwn(QUESTS, id)).map(([id, raw]) => {
         const q = record(raw), status = choice(q.status, ['new', 'active', 'done', 'dropped'], 'new');

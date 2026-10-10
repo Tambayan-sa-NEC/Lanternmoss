@@ -1,6 +1,6 @@
 /* The bag window. Renders the inventory's current state and turns clicks into commands; all rules (stacking,
    moving, using, equipping, crafting) live in the inventory, items and gameplay layers. Re-renders whenever the
-   inventory changes. Two tabs (pets have a menu of their own: src/ui/PetMenu.js):
+   inventory changes. Three tabs (pets have a menu of their own: src/ui/PetMenu.js):
      Bag    the grid on the left, with the hotbar row under it (the same slots as the hotbar at the bottom of the
             screen, keys 1-9: move things there to hold them). The equipment side on the right, like Minecraft: the
             hero (in their hat and cape) between the worn slots (head, body, feet / weapon, two trinkets), the vanity
@@ -10,16 +10,19 @@
             to take it off. Double-click or the first button uses / equips it.
     Craft  every recipe the hero can use (config/crafting.js), what it needs and what you have. Chips along the top
            filter by where it's made: by hand (anywhere) or at a station (config/stations.js); recipes for a station
-           can only be crafted standing at it. Opening a station (E) shows its recipes. */
+           can only be crafted standing at it. Opening a station (E) shows its recipes.
+   Enchant choose bag or worn combat gear and replace its one fixed-stat rune at a forge. */
 import { CHARACTERS } from '../config/characters.js';
 import { RECIPES } from '../config/crafting.js';
+import { RUNES } from '../config/magic.js';
 import { STATIONS } from '../config/stations.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
 import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { ctx } from '../core/context.js';
-import { emit } from '../core/events.js';
+import { emit, gameEvents } from '../core/events.js';
 import { bindKbd } from '../core/keybinds.js';
-import { craftProblem, recipesFor, requirements } from '../items/crafting.js';
+import { craftProblem, maxCraftable, recipesFor, requirements } from '../items/crafting.js';
+import { enchantProblem } from '../items/enchanting.js';
 import { formatStat, gearTotals } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { dom } from './dom.js';
@@ -32,12 +35,13 @@ const PROBLEM = { materials: 'Not enough materials.', fuel: 'Not enough fuel: wo
 const FILTERS = [['all', 'All'], ['hand', 'By hand'], ...Object.entries(STATIONS).map(([id, s]) => [id, s.short])];
 const hex = n => '#' + n.toString(16).padStart(6, '0');
 const titleCase = w => w.charAt(0) + w.slice(1).toLowerCase();
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 /** The equipment side's layout: worn slots left of the hero, right of the hero, and the vanity row under them. */
 const SIDE = { left: ['head', 'armor', 'feet'], right: ['weapon', 'charm', 'charm2'], vanity: ['hat', 'back'] };
 
 export const InventoryUI = {
   isOpen: false, tab: 'bag', craftFilter: 'all', selected: -1, hovered: -1, hoveredGear: null, message: '', inventory: null, commands: null,
-  slotEls: [], gearEls: {}, quickBtns: [],
+  slotEls: [], gearEls: {}, quickBtns: [], enchantTarget: '',
 
   /** commands (supplied by the game): use(slot) / equip(slot, where) / unequip(where) / craft(recipe) -> { ok, message },
       drop(slot) -> boolean, held() -> the held hotbar slot, worn() -> P.equipment, station() -> the station the hero
@@ -47,7 +51,7 @@ export const InventoryUI = {
     const root = dom.inventory;
     // tabs
     const tabs = document.createElement('div'); tabs.className = 'inv-tabs';
-    tabs.innerHTML = '<button type="button" data-tab="bag">Bag</button><button type="button" data-tab="craft">Craft</button>';
+    tabs.innerHTML = '<button type="button" data-tab="bag">Bag</button><button type="button" data-tab="craft">Craft</button><button type="button" data-tab="enchant">Enchant</button>';
     tabs.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t) this.setTab(t.dataset.tab); });
     root.querySelector('.inv-head b').after(tabs); this.tabsEl = tabs;
     // the bag grid (inventory slots HOTBAR.size and up) and, under it, the hotbar row (slots 0 .. HOTBAR.size - 1)
@@ -87,14 +91,18 @@ export const InventoryUI = {
     this.craftEl = document.createElement('div'); this.craftEl.className = 'inv-craft';
     this.craftEl.addEventListener('click', e => {
       const f = e.target.closest('[data-filter]'); if (f) { this.craftFilter = f.dataset.filter; this.message = ''; this.render(); return; }
-      const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe);
+      const fav = e.target.closest('[data-favourite]'); if (fav) { this.commands.favourite(fav.dataset.favourite); this.render(); return; }
+      const en = e.target.closest('[data-enchant]'); if (en) { this.message = this.commands.enchant(this.enchantTarget, en.dataset.enchant).message; this.render(); return; }
+      const b = e.target.closest('[data-recipe]'); if (b) this.craft(b.dataset.recipe, b.dataset.batches === 'all' ? 'all' : Number(b.dataset.batches ?? 1));
     });
+    this.craftEl.addEventListener('change', e => { if (e.target.matches('[data-enchant-target]')) { this.enchantTarget = e.target.value; this.message = ''; this.render(); } });
     root.querySelector('.inv-actions').after(this.craftEl);
     this.hintEl = root.querySelector('.inv-hint');
     dom.invUse.addEventListener('click', () => this.use(this.selected));
     dom.invDrop.addEventListener('click', () => this.drop(this.selected));
     dom.invClose.addEventListener('click', () => this.close());
     inventory.addEventListener('change', () => this.render());
+    gameEvents.addEventListener('recipelearned', () => this.render());
   },
 
   toggle() { if (this.isOpen) this.close(); else this.open(); },
@@ -134,20 +142,21 @@ export const InventoryUI = {
     this.message = this.commands.drop(i) ? `Dropped ${name}.` : `${name} can't be dropped.`;
     this.selected = -1; this.render();
   },
-  craft(id) {
+  craft(id, batches = 1) {
     const r = RECIPES.find(x => x.id === id); if (!r) return;
-    this.message = this.commands.craft(r).message; this.render();
+    this.message = this.commands.craft(r, batches).message; this.render();
   },
 
   render() {
     if (!this.isOpen) return;
     for (const b of this.tabsEl.children) b.classList.toggle('on', b.dataset.tab === this.tab);
-    dom.inventory.classList.toggle('crafting', this.tab === 'craft');
+    dom.inventory.classList.toggle('crafting', this.tab === 'craft' || this.tab === 'enchant');
     const inv = this.inventory;
     const bagUsed = inv.getSlots().slice(HOTBAR.size).filter(Boolean).length;
     dom.invCount.textContent = `${bagUsed} / ${inv.size - HOTBAR.size}`;
     dom.invHint.innerHTML = `click an item, then another slot to move / swap (a worn slot to wear it) · double-click to use · ${bindKbd('bag')} or <kbd>Esc</kbd> to close`;
     if (this.tab === 'craft') { this.renderCraft(); return; }
+    if (this.tab === 'enchant') { this.renderEnchant(); return; }
     const slots = inv.getSlots();
     if (this.selected >= 0 && !slots[this.selected]) this.selected = -1;
     slots.forEach((s, i) => {
@@ -206,26 +215,55 @@ export const InventoryUI = {
 
   renderCraft() {
     const inv = this.inventory, P = ctx.player, reg = inv.registry, at = this.commands.station?.() ?? null, f = this.craftFilter;
+    const scroll = this.craftEl.querySelector('.rc-list')?.scrollTop ?? 0, favourites = this.commands.favourites?.() ?? new Set();
     let group = '';
-    const shown = recipesFor(P.charId, reg).filter(r => f === 'all' || (f === 'hand' ? !r.station : r.station === f));
+    const shown = recipesFor(P.charId, reg).filter(r => f === 'all' || (f === 'hand' ? !r.station : r.station === f))
+      .sort((a, b) => Number(favourites.has(b.id)) - Number(favourites.has(a.id)));
     const chips = FILTERS.map(([id, label]) => `<button type="button" data-filter="${id}" class="${id === f ? 'on' : ''}${id === at ? ' here' : ''}"` +
       `${STATIONS[id] ? ` style="--sc:${hex(STATIONS[id].color)}"` : ''}>${label}${id === at ? ' ★' : ''}</button>`).join('');
     const where = at ? `You're at the <b>${STATIONS[at].name}</b>: you can make its recipes and anything by hand.`
       : 'Not at a station: you can make things by hand. Recipes with a station tag need you to stand at it (the crafting corner in the village).';
     const rows = shown.map(r => {
-      const out = reg.get(r.result), req = requirements(r, inv, P.coins), problem = craftProblem(r, inv, P.coins, at);
+      const known = this.commands.known?.(r.id) ?? !r.discovery;
+      const out = reg.get(r.result), req = requirements(r, inv, P.coins), problem = known ? craftProblem(r, inv, P.coins, at) : 'locked';
+      const five = known ? craftProblem(r, inv, P.coins, at, 5) : 'locked';
+      const all = known && r.group === 'Smelting' ? maxCraftable(r, inv, P.coins, at) : 0;
       const col = rarityColor(out, r.rarity ? { rarity: r.rarity } : null);
       const needs = req.items.map(n => `<span class="need${n.have >= n.need ? ' ok' : ''}">${itemIconHtml(reg.get(n.item))}${Math.min(n.have, 99)}/${n.need}</span>`).join('') +
         (req.fuel.need ? `<span class="need fuel${req.fuel.have >= req.fuel.need ? ' ok' : ''}" title="Fuel: wood burns for 1, ember shards 2, charcoal 3">🔥 ${Math.min(req.fuel.have, 99)}/${req.fuel.need}</span>` : '') +
         (req.coins.need ? `<span class="need coin${req.coins.have >= req.coins.need ? ' ok' : ''}">✦ ${req.coins.need}</span>` : '');
-      const head = r.group && r.group !== group ? `<div class="rc-group">${(group = r.group)}</div>` : '';
+      const g = favourites.has(r.id) ? 'Favourites' : r.group;
+      const head = g && g !== group ? `<div class="rc-group">${(group = g)}</div>` : '';
       const kind = out.equip ? GEAR_KINDS[out.equip.slot].label : out.tool ? 'Tool' : '';
-      return `${head}<div class="recipe${problem ? '' : ' can'}" title="${out.description.replace(/"/g, '&quot;')}">${itemIconHtml(out)}` +
+      return `${head}<div class="recipe${problem ? '' : ' can'}${known ? '' : ' locked'}" data-card="${r.id}" title="${esc(out.description)}">` +
+        `<button type="button" class="rc-favourite" data-favourite="${r.id}" aria-label="${favourites.has(r.id) ? 'Unpin' : 'Pin'} ${esc(out.name)}" aria-pressed="${favourites.has(r.id)}" ${known ? '' : 'disabled'}>${favourites.has(r.id) ? '★' : '☆'}</button>${itemIconHtml(out)}` +
         `<div class="rc-name" style="color:${col}">${r.qty > 1 ? `${r.qty}x ` : ''}${out.name}<small>${kind}${r.rarity ? `${kind ? ' · ' : ''}${RARITIES[r.rarity].label}` : ''}</small>` +
         `${r.station ? `<span class="rc-st${r.station === at ? ' here' : ''}" style="--sc:${hex(STATIONS[r.station].color)}">${STATIONS[r.station].short}</span>` : ''}</div>` +
-        `<div class="rc-needs">${needs}</div><button type="button" data-recipe="${r.id}" ${problem ? `disabled title="${PROBLEM[problem]}"` : ''}>Craft</button></div>`;
+        `<div class="rc-needs">${needs}${!known ? `<small class="rc-discovery">${r.discovery.text}</small>` : ''}</div>` +
+        `<div class="rc-buttons"><button type="button" data-recipe="${r.id}" ${problem ? `disabled title="${esc(PROBLEM[problem] ?? r.discovery?.text)}"` : ''}>${known ? 'Craft' : 'Learn first'}</button>` +
+        (known ? `<button type="button" data-recipe="${r.id}" data-batches="5" ${five ? `disabled title="${PROBLEM[five]}"` : ''}>Craft x5</button>` +
+          (r.group === 'Smelting' ? `<button type="button" data-recipe="${r.id}" data-batches="all" ${all ? '' : 'disabled'}>Smelt all${all ? ` (${all * (r.qty ?? 1)})` : ''}</button>` : '') : '') + '</div></div>';
     });
     this.craftEl.innerHTML = `<div class="rc-filters">${chips}</div><div class="rc-where">${where}</div>` +
       `<div class="rc-list">${rows.join('') || '<p class="rc-empty">Nothing to make here for your hero.</p>'}</div><div class="inv-msg rc-msg">${this.message}</div>`;
+    const list = this.craftEl.querySelector('.rc-list'); if (list) list.scrollTop = scroll;
+  },
+  renderEnchant() {
+    const inv = this.inventory, P = ctx.player, reg = inv.registry;
+    const pieces = [
+      ...Object.entries(this.commands.worn()).filter(([, w]) => w).map(([slot, w]) => ({ key: `worn:${slot}`, label: `Worn ${EQUIP_SLOTS[slot].label}`, ...w })),
+      ...inv.getSlots().flatMap((w, slot) => w ? [{ key: `bag:${slot}`, label: 'Bag', ...w }] : []),
+    ].filter(w => { const e = reg.get(w.itemId).equip; return e && !e.vanity && (!e.hero || e.hero === P.charId); });
+    if (!pieces.some(w => w.key === this.enchantTarget)) this.enchantTarget = pieces[0]?.key ?? '';
+    const target = pieces.find(w => w.key === this.enchantTarget), def = target && reg.get(target.itemId), at = this.commands.station?.() ?? null;
+    const options = pieces.map(w => `<option value="${w.key}" ${w.key === this.enchantTarget ? 'selected' : ''}>${w.label}: ${esc(reg.get(w.itemId).name)}${w.props?.enchantment ? ` · ${RUNES[w.props.enchantment]?.name ?? ''}` : ''}</option>`).join('');
+    this.craftEl.innerHTML = `<div class="rc-where">Enchant at the forge. Each combat piece has one rune slot, including trinkets. Applying a different rune replaces the old one. Rarity stays the same.</div>` +
+      (pieces.length ? `<label class="enchant-target">Gear <select data-enchant-target>${options}</select></label>` : '<p>Carry or wear a weapon, armour piece or trinket to enchant it.</p>') +
+      `<div class="rc-list">${Object.entries(RUNES).map(([id, rune]) => {
+        const problem = enchantProblem(def, target?.props, id, inv, P.charId, at);
+        const stats = Object.entries(rune.stats).map(([k, v]) => formatStat(k, v, CHARACTERS[P.charId].resource)).join(', ');
+        return `<div class="recipe">${itemIconHtml(reg.get(id))}<div class="rc-name">${rune.name}<small>${stats}</small></div><div class="rc-needs">${inv.count(id)} available${problem ? `<small class="rc-discovery">${esc(problem)}</small>` : ''}</div>` +
+          `<button type="button" data-enchant="${id}" ${problem ? 'disabled' : ''}>${target?.props?.enchantment ? 'Replace rune' : 'Enchant'}</button></div>`;
+      }).join('')}</div><div class="inv-msg rc-msg">${esc(this.message)}</div>`;
   },
 };

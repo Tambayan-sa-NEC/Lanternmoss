@@ -153,6 +153,13 @@ export class Inventory extends EventTarget {
     return true;
   }
 
+  /** Replace per-copy data without removing/re-adding the item (no collection or pickup reward). */
+  updateProps(slot, props) {
+    if (!this.isValidSlot(slot) || !this.#slots[slot]) return false;
+    this.#slots[slot].props = copyProps(props);
+    this.notify('change', { slots: [slot] }); return true;
+  }
+
   /** Empties every slot. */
   clear() {
     const changed = this.#slots.map((s, i) => (s ? i : -1)).filter(i => i >= 0);

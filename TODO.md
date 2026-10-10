@@ -807,20 +807,27 @@ The open half of the old 17, in the order to build it. **Size:** M–L. **Needs:
 **Risk:** Magic is where this item can sprawl (risk 7). **Recommendation:** build it last, with no rarity upgrades and
 one enchantment slot per piece; recipe discovery never hides a recipe that a quest, the tutorial or a first tool needs.
 
-- [ ] **Cooking:** meals for the needs and buffs from 16.
+- [x] **Cooking:** meals for the needs and buffs from 16.
   - Assumption: the pot already cooks the meals from 16, so what's open is depth: meals from the farm's crops and each
     planet's fish, stronger versions from rarer ingredients (a Golden Koi feast), and one meal buff at a time so buffs
     don't stack into silliness.
-- [ ] **Brewing:** herbs and water become potions and tonics, with stronger versions from rarer ingredients.
-- [ ] Recipe discovery: recipes are learned from villagers, books, the bestiary, or found as scrolls.
+- [x] **Brewing:** herbs and water become potions and tonics, with stronger versions from rarer ingredients.
+- [x] Recipe discovery: bookshelves, chest scrolls and defeated monsters' bestiary pages teach twelve advanced recipes.
   - Start with books (the bookshelves in the houses), scrolls in chests and bestiary pages; villagers teach recipes once
     Friendship (33) lands.
-- [ ] **Magic:**
-  - Enchanting gear with runes or essences (extra stats, elemental effects).
-  - Infusing charms; maybe upgrading a piece's rarity.
+- [x] **Magic:**
+  - Enchanting combat gear with Moss, Ember and Frost runes for fixed extra stats, subject to the existing caps.
+  - Infusing Moon-Hop and Feather-Step charms to extend their magic from 30 to 90 seconds.
   - Trimmed (Round 3): one enchantment slot per piece and three or four rune kinds (one per world's material), no
     rarity upgrades.
-- [ ] From Quality of life: a "Craft x5" / "Smelt all" button, and favourite recipes pinned at the top of the Craft tab.
+- [x] From Quality of life: a "Craft x5" / "Smelt all" button, and favourite recipes pinned at the top of the Craft tab.
+
+Implemented in the trimmed scope: each world's fish and crops feed a stronger meal, rare gems feed water-based
+brews, and each combat piece has one replaceable rune without changing rarity. One meal buff coexists with
+independent potion/pet timers. Existing essential recipes stay available. Learned recipes, favourites, enchantments
+and meal timers persist in version-1 saves, including old-save defaults. Bulk exchanges preflight exact bag capacity
+and pool fuel before spending anything; their output counts toward crafting achievements. See
+[docs/crafting.md](docs/crafting.md) for recipes and discovery sources.
 
 ## 23. Balance and pacing pass **(core)**
 
@@ -1351,7 +1358,7 @@ Smaller ideas, and where the promoted ones went.
       are made in code, as part of each world item. Revisit only if that becomes the limit.
 - [~] **Achievements / bestiary (suggested):** promoted to item 13.
 - [~] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
-      chests, and favourite recipes pinned at the top of the Craft tab. Split: crafting ones into 22, bag sorting and
+      chests, and favourite recipes pinned at the top of the Craft tab. Split: crafting ones into 22 (done), bag sorting and
       storage into 25b.
 - [x] **Gameplay checks in the repo (suggested):** promoted to item 18 (done).
 - [~] **Performance budget (suggested):** promoted to item 20.

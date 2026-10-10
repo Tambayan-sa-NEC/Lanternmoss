@@ -27,6 +27,9 @@
      props.crop   seeds only: the crop they grow (config/resources.js CROPS)
    --------------------------------------------------------------------- */
 
+import { DISCOVERY_RECIPES } from './crafting.js';
+import { RUNES } from './magic.js';
+
 export const ITEM_CATEGORIES = {
   consumable: 'Consumable',
   material: 'Material',
@@ -85,6 +88,7 @@ export const HOTBAR = { size: 9, useCooldown: 0.8, holdCategories: ['consumable'
 
 /** Effects a usable item can apply ({param} placeholders are filled from the effect entry for tooltips). */
 export const ITEM_EFFECTS = {
+  recipe: 'Teaches {recipeName}',
   heal: 'Restores {amount} HP',
   mana: 'Restores {amount} mana / stamina',
   energy: 'Fills {amount} energy',
@@ -94,7 +98,7 @@ export const ITEM_EFFECTS = {
 /** Procedural icon / world-model shapes (CSS in styles/main.css, meshes in src/models/items.js). */
 export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', 'crown', 'key'];
 /** Per-item pictures (an icon.art value): each has an SVG icon (src/ui/itemArt.js) and a world model (src/models/items.js). */
-export const ITEM_ART_KINDS = ['bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
+export const ITEM_ART_KINDS = ['scroll', 'bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
   'staff', 'axe', 'bow', 'cloak', 'mail', 'mantle', 'pendant', 'ring', 'locket', 'key', 'crown',
   'log', 'stone', 'ore', 'gemstone', 'herb', 'pepper', 'plum', 'carrot', 'wheat', 'pumpkin', 'seeds', 'fish', 'bread', 'skewer',
   'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal'];
@@ -109,6 +113,31 @@ export const INVENTORY = {
 };
 
 export const ITEM_DEFINITIONS = [
+  // ---- deeper cooking, brewing and one-slot enchanting (TODO 22) ----
+  { id: 'springWater', name: 'Spring Water', description: 'Clean water in a wooden flask. Fill a flask at the brewing stand using one wood.', category: 'material', maxStack: 20, icon: { shape: 'orb', color: 0x91d8f4, art: 'bottle' } },
+  { id: 'perchChowder', name: 'Perch Chowder', description: 'Pond perch, moon carrots and wheat. A hearty meal for a long walk.', category: 'consumable', tags: ['food', 'meal'], rarity: 'uncommon', maxStack: 10, value: 22,
+    icon: { shape: 'bun', color: 0xcfe596, art: 'bowl' }, use: [{ effect: 'heal', amount: 50 }, { effect: 'energy', amount: 65 }, { effect: 'buff', kind: 'mend', seconds: 90 }] },
+  { id: 'emberPepperBroth', name: 'Ember Pepper Broth', description: 'Cinder eel with fire peppers and pumpkin. A meal with a fierce kick.', category: 'consumable', tags: ['food', 'meal'], rarity: 'rare', maxStack: 10, value: 32,
+    icon: { shape: 'bun', color: 0xff9a54, art: 'bowl' }, use: [{ effect: 'heal', amount: 65 }, { effect: 'energy', amount: 75 }, { effect: 'buff', kind: 'might', seconds: 120 }] },
+  { id: 'glacialPlumSoup', name: 'Glacial Plum Soup', description: 'Ice trout, snow plums and wheat. A warming meal that lightens your step.', category: 'consumable', tags: ['food', 'meal'], rarity: 'rare', maxStack: 10, value: 32,
+    icon: { shape: 'bun', color: 0xbde4f5, art: 'bowl' }, use: [{ effect: 'mana', amount: 60 }, { effect: 'energy', amount: 75 }, { effect: 'buff', kind: 'swift', seconds: 90 }] },
+  { id: 'goldenBanquet', name: 'Golden Harvest Banquet', description: 'Golden koi with a generous harvest of pumpkin, wheat and herbs.', category: 'consumable', tags: ['food', 'meal'], rarity: 'legendary', maxStack: 5, value: 90,
+    icon: { shape: 'bun', color: 0xffd96b, art: 'bowl' }, use: [{ effect: 'heal', amount: 120 }, { effect: 'energy', amount: 100 }, { effect: 'buff', kind: 'ward', seconds: 180 }] },
+  { id: 'restorativeElixir', name: 'Restorative Elixir', description: 'Sweetleaf and an amethyst dissolved in clear spring water. A powerful restorative.', category: 'consumable', rarity: 'rare', maxStack: 5, value: 45,
+    icon: { shape: 'orb', color: 0xb991f5, art: 'flask' }, use: [{ effect: 'heal', amount: 120 }, { effect: 'mana', amount: 90 }] },
+  { id: 'emberTonic', name: 'Emberheart Tonic', description: 'Herbs, ember essence and a fire opal brewed in spring water. Sustains a fighting spirit.', category: 'consumable', rarity: 'rare', maxStack: 5, value: 50,
+    icon: { shape: 'orb', color: 0xff8656, art: 'flask' }, use: [{ effect: 'buff', kind: 'might', seconds: 120 }] },
+  { id: 'glacialTonic', name: 'Glacial Guard Tonic', description: 'Frost petals, herbs and a frost diamond brewed in spring water. Long-lasting protection.', category: 'consumable', rarity: 'rare', maxStack: 5, value: 55,
+    icon: { shape: 'orb', color: 0x9fe6ff, art: 'flask' }, use: [{ effect: 'buff', kind: 'ward', seconds: 180 }] },
+  { id: 'infusedMoonCharm', name: 'Infused Moon-Hop Charm', description: 'A moon charm steeped with a moss rune. Its magic lasts three times as long.', category: 'consumable', rarity: 'rare', maxStack: 5, value: 55,
+    icon: { shape: 'charm', color: 0xceb7ff, art: 'moonCharm' }, use: [{ effect: 'buff', kind: 'moon', seconds: 90 }] },
+  { id: 'infusedLeafCharm', name: 'Infused Feather-Step Charm', description: 'A leaf charm steeped with a frost rune. Its magic lasts three times as long.', category: 'consumable', rarity: 'rare', maxStack: 5, value: 55,
+    icon: { shape: 'charm', color: 0xb0efd8, art: 'leafCharm' }, use: [{ effect: 'buff', kind: 'feather', seconds: 90 }] },
+  ...Object.entries(RUNES).map(([id, rune]) => ({ id, name: rune.name, description: 'Enchant one combat gear piece at the forge. Replaces its previous rune; its rarity stays the same.', category: 'material', tags: ['rune'], maxStack: 10, rarity: 'rare', value: 30,
+    icon: { shape: 'gem', color: rune.color, art: 'gemstone' } })),
+  ...DISCOVERY_RECIPES.filter(r => r.discovery.kind === 'scroll').map(r => ({ id: `${r.id}Scroll`, name: `${({ goldenBanquet: 'Golden Harvest Banquet', restorativeElixir: 'Restorative Elixir', emberTonic: 'Emberheart Tonic', glacialTonic: 'Glacial Guard Tonic' })[r.id]} Recipe Scroll`,
+    description: 'Use to learn its recipe for this adventure. An already learned scroll is kept.', category: 'consumable', tags: ['recipe-scroll'], maxStack: 5, rarity: 'rare', value: 10,
+    icon: { shape: 'charm', color: 0xefdc9f, art: 'scroll' }, use: [{ effect: 'recipe', recipeId: r.id }] })),
   // ---- consumables ----
   { id: 'honeyBun', name: 'Honey-moss Bun', description: "Pim's warm, sticky bun. A favourite treat.", category: 'consumable',
     icon: { shape: 'bun', color: 0xe8a858, art: 'bun' }, maxStack: 10, value: 8, use: [{ effect: 'heal', amount: 35 }, { effect: 'energy', amount: 30 }], tags: ['treat'] },
@@ -140,17 +169,17 @@ export const ITEM_DEFINITIONS = [
   // ---- meals (cooked in the Craft tab): fill up and give a buff
   { id: 'grilledFish', name: 'Grilled Fish', description: 'Any fish, a stick and a little fire. Simple and filling.', category: 'consumable',
     icon: { shape: 'bun', color: 0xd89a5a, art: 'skewer' }, maxStack: 10, value: 12, use: [{ effect: 'heal', amount: 40 }, { effect: 'energy', amount: 40 }] },
-  { id: 'veggieStew', name: 'Veggie Stew', description: 'Moon carrots and sweetleaf, simmered slow. Wounds mend while it warms you.', category: 'consumable',
+  { id: 'veggieStew', name: 'Veggie Stew', description: 'Moon carrots and sweetleaf, simmered slow. Wounds mend while it warms you.', category: 'consumable', tags: ['food', 'meal'],
     icon: { shape: 'bun', color: 0xf0a040, art: 'bowl' }, maxStack: 10, rarity: 'uncommon', value: 18, use: [{ effect: 'energy', amount: 55 }, { effect: 'buff', kind: 'mend', seconds: 60 }] },
   { id: 'sunBread', name: 'Sun Bread', description: 'A golden loaf from your own wheat. Keeps you going for ages.', category: 'consumable',
     icon: { shape: 'bun', color: 0xe8b860, art: 'bread' }, maxStack: 10, value: 12, use: [{ effect: 'energy', amount: 50 }, { effect: 'heal', amount: 15 }] },
-  { id: 'pumpkinPie', name: 'Pumpkin Pie', description: 'A whole pie, just for you. You feel mighty after a slice (or four).', category: 'consumable',
+  { id: 'pumpkinPie', name: 'Pumpkin Pie', description: 'A whole pie, just for you. You feel mighty after a slice (or four).', category: 'consumable', tags: ['food', 'meal'],
     icon: { shape: 'bun', color: 0xf08a2a, art: 'tart' }, maxStack: 10, rarity: 'rare', value: 26, use: [{ effect: 'energy', amount: 70 }, { effect: 'buff', kind: 'might', seconds: 90 }] },
-  { id: 'pepperSkewer', name: 'Ember Skewer', description: "Emberfall's favourite: fish and fire peppers on a stick. Spicy strength.", category: 'consumable',
+  { id: 'pepperSkewer', name: 'Ember Skewer', description: "Emberfall's favourite: fish and fire peppers on a stick. Spicy strength.", category: 'consumable', tags: ['food', 'meal'],
     icon: { shape: 'bun', color: 0xff5a3a, art: 'skewer' }, maxStack: 10, rarity: 'uncommon', value: 20, use: [{ effect: 'energy', amount: 50 }, { effect: 'buff', kind: 'might', seconds: 60 }] },
-  { id: 'plumPorridge', name: 'Plum Porridge', description: "Frostveil's breakfast: warm wheat and snow plums. Light on your feet all morning.", category: 'consumable',
+  { id: 'plumPorridge', name: 'Plum Porridge', description: "Frostveil's breakfast: warm wheat and snow plums. Light on your feet all morning.", category: 'consumable', tags: ['food', 'meal'],
     icon: { shape: 'bun', color: 0x8fa8ff, art: 'bowl' }, maxStack: 10, rarity: 'uncommon', value: 20, use: [{ effect: 'energy', amount: 50 }, { effect: 'buff', kind: 'swift', seconds: 60 }] },
-  { id: 'koiFeast', name: 'Koi Feast', description: 'A golden koi, roasted with sweetleaf. Full, healed and hard to hurt.', category: 'consumable',
+  { id: 'koiFeast', name: 'Koi Feast', description: 'A golden koi, roasted with sweetleaf. Full, healed and hard to hurt.', category: 'consumable', tags: ['food', 'meal'],
     icon: { shape: 'bun', color: 0xffc23a, art: 'skewer' }, maxStack: 5, rarity: 'legendary', value: 60, use: [{ effect: 'energy', amount: 100 }, { effect: 'heal', amount: 100 }, { effect: 'buff', kind: 'ward', seconds: 120 }] },
   // ---- potions
   { id: 'healingPotion', name: 'Healing Potion', description: 'Sweetleaf and moonberry, bottled. A big gulp of health.', category: 'consumable',

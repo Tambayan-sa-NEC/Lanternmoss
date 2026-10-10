@@ -5,7 +5,8 @@ import { ITEM_EFFECTS } from '../config/items.js';
 import { ctx } from '../core/context.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { audio } from '../systems/AudioSystem.js';
-import { BUFF_NAMES, buff, buffs } from './buffs.js';
+import { itemBuff } from './buffs.js';
+import { RecipeBook } from './RecipeBook.js';
 import { equipFromSlot } from './equipment.js';
 import { Needs } from './Needs.js';
 
@@ -18,7 +19,8 @@ const EFFECTS = {
   heal: e => { const P = ctx.player; if (P.hp >= P.stats.maxHp) return false; P.hp = Math.min(P.stats.maxHp, P.hp + e.amount); return true; },
   mana: e => { const P = ctx.player; if (P.mana >= P.stats.maxMana) return false; P.mana = Math.min(P.stats.maxMana, P.mana + e.amount); return true; },
   energy: e => Needs.eat(e.amount),
-  buff: e => { buff(e.kind, Math.max(buffs[e.kind], e.seconds), `${BUFF_NAMES[e.kind]}! (${e.seconds}s)`); return true; },
+  buff: (e, def) => { itemBuff(e.kind, e.seconds, def.tags.includes('meal')); return true; },
+  recipe: (e, def) => !!RecipeBook.readScroll(def.id),
 };
 for (const id of Object.keys(ITEM_EFFECTS)) if (!EFFECTS[id]) console.warn(`Item effect "${id}" has no handler in gameplay/itemUse.js`);
 
@@ -34,7 +36,8 @@ export function useItemInSlot(inventory, slot) {
   if (ACTION_HANDLERS[action]) return ACTION_HANDLERS[action](inventory, slot, def);
   if (action === 'tool' || action === 'plant') return { ok: false, message: `${def.name}: use it from the hotbar.` };
   if (ctx.player.dead) return { ok: false, message: "You can't do that while fainted." };
-  const applied = def.use.map(e => EFFECTS[e.effect]?.(e) ?? false).some(Boolean);
+  if (def.tags.includes('recipe-scroll') && RecipeBook.knows(def.use[0].recipeId)) return { ok: false, message: 'You already know that recipe. The scroll was kept.' };
+  const applied = def.use.map(e => EFFECTS[e.effect]?.(e, def) ?? false).some(Boolean);
   if (!applied) return { ok: false, message: 'It would have no effect right now.' };
   inventory.removeFromSlot(slot, 1);
   audio.sparkle();

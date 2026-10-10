@@ -31,6 +31,13 @@ respawn seconds. Existing v1 files remain readable and default to a skipped guid
 Missing tutorial state does not alter player or planet data. The original v1 fixture is retained unchanged.
 Fainting saves resume the recap and countdown; pause freezes the countdown. Tutorial completion gives no rewards.
 
+TODO 22 adds `systems.crafting: { learned, favourites }`, `systems.buffs.meal: { kind, seconds } | null`, and
+validated `props.enchantment` on combat gear in inventory, equipment and ground pickups. Learned recipe IDs and
+favourites belong to the adventure; essential recipes remain available even when crafting state is absent.
+Potion/pet timers and the one meal timer save independently. Old v1 files default to no meal and empty discoveries
+and favourites; their existing buff timers remain intact. Unknown runes and enchantments on vanity or materials
+are discarded. The original v1 fixture remains unchanged.
+
 Foreign, damaged and future-version files are rejected before writing. Supported snapshots drop unknown IDs,
 clamp finite numbers, normalize valid directions and fill safe defaults. Files are limited to 2 MiB. A future format
 change must migrate version 1 explicitly and retain `tests/fixtures/save-v1.json` as a compatibility check.

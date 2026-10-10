@@ -91,7 +91,7 @@ encounterEvents.addEventListener('enemyhit', e => { const f = Journal.fight; if 
 globalThis.addEventListener?.('pagehide', () => { if (Journal.saveT > 0) Journal.save(); });   // don't lose the last few seconds
 gameEvents.addEventListener('chestopened', () => Journal.add('chests'));
 gameEvents.addEventListener('questcomplete', () => Journal.add('quests'));
-gameEvents.addEventListener('crafted', () => Journal.add('crafted'));
+gameEvents.addEventListener('crafted', ev => Journal.add('crafted', ev.detail?.qty ?? 1));
 gameEvents.addEventListener('rarefriend', () => Journal.add('rareFriends'));
 gameEvents.addEventListener('gathered', () => Journal.add('gathered'));
 gameEvents.addEventListener('fishcaught', () => Journal.add('fish'));

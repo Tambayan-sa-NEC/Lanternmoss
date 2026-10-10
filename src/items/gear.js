@@ -4,6 +4,7 @@
    the stack's own (props.rarity, rolled when it dropped or set by a recipe) or else the definition's. */
 import { CHARACTERS } from '../config/characters.js';
 import { RARITIES, STATS } from '../config/items.js';
+import { RUNES } from '../config/magic.js';
 
 /** The rarity of this particular stack. */
 export function itemRarity(def, props = null) { return props?.rarity && RARITIES[props.rarity] ? props.rarity : def.rarity; }
@@ -15,6 +16,8 @@ export function gearStats(def, props = null) {
   const out = {}; if (!def?.equip) return out;
   const m = RARITIES[itemRarity(def, props)].statMult;
   for (const [k, v] of Object.entries(def.equip.stats)) out[k] = round(k, v * m);
+  if (!def.equip.vanity && Object.hasOwn(RUNES, props?.enchantment ?? ''))
+    for (const [k, v] of Object.entries(RUNES[props.enchantment].stats)) out[k] = round(k, (out[k] ?? 0) + v);
   return out;
 }
 

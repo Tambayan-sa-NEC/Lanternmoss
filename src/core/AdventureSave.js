@@ -21,6 +21,7 @@ import { Pickups } from '../gameplay/pickups.js';
 import { Quests } from '../gameplay/quests/Quests.js';
 import { StoryMemory } from '../gameplay/storyState.js';
 import { Tutorial } from '../gameplay/Tutorial.js';
+import { RecipeBook } from '../gameplay/RecipeBook.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -44,7 +45,7 @@ export class AdventureSave {
     };
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
-      houses: Houses, rareGifts: RareGifts, progression: game.planets, combat: CombatState, tutorial: Tutorial,
+      houses: Houses, rareGifts: RareGifts, progression: game.planets, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook,
       farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.planets.beforeLoad = () => { if (!this.restoring && !this.suspended && ctx.started) { StoryMemory.toJSON(); this.registry.capturePlanet(ctx.planetId); } };

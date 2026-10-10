@@ -15,6 +15,7 @@ const GOLD = '#ffd36b', WOOD = '#b0703a', STEEL = '#dfe6f0';
 
 /** kind -> (main colour hex, light, dark) -> SVG body (viewBox 0 0 32 32). */
 const ART = {
+  scroll: () => `<path ${S} fill="#efdc9f" d="M8 5h17v21H8z"/><path ${S} fill="#fff1c5" d="M6 5h20v5H6zM6 23h20v5H6z"/><path ${S} fill="none" d="M11 14h10M11 18h7"/>`,
   bun: (c, l) => `<path ${S} fill="${c}" d="M4 20c0-7 5.5-11 12-11s12 4 12 11z"/><path ${S} fill="#f6e0c0" d="M4 20h24v3a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/>
     <path fill="none" stroke="${l}" stroke-width="2" stroke-linecap="round" d="M10 14q3-2 6 0M16 12q3-2 6 1"/>`,
   tart: (c, l) => `<path ${S} fill="#e8b878" d="M3 18h26l-3 8H6z"/><ellipse ${S} fill="${c}" cx="16" cy="18" rx="13" ry="4"/>
