@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   PLANETS: the campaign, in order. Defeating a planet's boss carries the hero to the next entry
+   PLANETS: the campaign, in order. Defeating a planet's boss unlocks the next entry at the village portal
    (runtime: src/gameplay/PlanetProgression.js). Add a planet = add an entry here.
      seed     world-generation seed (same seed => same layout)
      palette  ground / grass / water / sky / fog colours
@@ -32,7 +32,7 @@
    --------------------------------------------------------------------- */
 
 export const TRANSITION = {
-  outroDelay: 4,          // seconds between the boss falling and the fade (victory banner time)
+  outroDelay: 4,          // seconds of victory banner before free exploration resumes
   fadeTime: 0.9,          // fade out, and fade in again on arrival
   healOnArrival: true,    // the hero lands on a new planet with full HP and mana / stamina
   introHintDelay: 6,      // seconds into the first adventure before the "find the boss" hint
@@ -59,7 +59,7 @@ export const PLANETS = [
     forage: [{ item: 'glowcap', count: 18 }, { item: 'moonberry', count: 14 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
     resources: { nodes: [['branches', 8, 'village'], ['pebbles', 7, 'village'], ['sweetleaf', 7, 'village'], ['branches', 10], ['pebbles', 8],
       ['sweetleaf', 14], ['moonberryBush', 12], ['glowcaps', 10], ['copperVein', 10]], rare: [['amethystVein', 2]] },
-    arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to travel on!',
+    arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to open the village lantern gate!',
   },
   {
     id: 'emberfall', outfit: 'neckerchief', outfitColors: [0xe0482a, 0x3a8ad0, 0xffd36b, 0x2f9a5a], lowLevel: 5, name: 'Emberfall', tagline: 'warm winds, ember ponds and quicker foes', seed: 77412,

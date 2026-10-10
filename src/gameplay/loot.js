@@ -1,6 +1,6 @@
 /* Rolling a loot table (config/chests.js) into coins and item stacks: chests, monster drops. Pure: no scene, no state,
    so it can be tested on its own and reused by anything else that hands out random rewards. */
-import { GEAR_RARITY, LOOT, LOOT_TABLES } from '../config/chests.js';
+import { CHEST_KINDS, GEAR_RARITY, LOOT, LOOT_TABLES, WAYFARER_KEYS } from '../config/chests.js';
 import { GEAR_KINDS, ITEM_DEFINITIONS, RARITIES } from '../config/items.js';
 import { PLANETS } from '../config/planets.js';
 import { rng as playRng } from '../utils/random.js';
@@ -40,6 +40,13 @@ export function rollGear(planet, hero, source = 'chest', rng = playRng) {
 }
 
 const qtyOf = (q, rng) => (Array.isArray(q) ? q[0] + Math.floor(rng() * (q[1] - q[0] + 1)) : q ?? 1);
+
+/** Travel keys belong to actual Lantern chests, not every source that shares their rare loot table. */
+export function rollChestLoot(kind, planet, rng = playRng, hero = null) {
+  const loot = rollLoot(CHEST_KINDS[kind]?.loot, planet, rng, hero);
+  if (kind === 'rare' && rng() < WAYFARER_KEYS.chance) loot.items.push({ item: WAYFARER_KEYS.item, qty: 1, props: null });
+  return loot;
+}
 
 /** { coins, items: [{ item, qty, props? }] } for loot table `tableId` on planet index `planet`, for `hero`.
     rng() in [0, 1). Gear comes as its own stacks (each piece has its own rarity); everything else is merged. */

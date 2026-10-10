@@ -38,6 +38,13 @@ export class Chest {
   }
   /** Still dropping in (can't be opened yet). */
   get landing() { return this.fallT >= 0; }
+  /** Restore a seed chest's lid without playing an opening or awarding loot. */
+  restoreOpened(opened) {
+    this.opened = opened; this.openT = opened ? 99 : -1; this.parts.lid.rotation.x = opened ? OPEN_ANGLE : 0;
+    this.parts.inner.visible = false;
+    if (this.parts.lock) this.parts.lock.visible = !opened;
+    if (this.parts.beam) this.parts.beam.visible = !opened;
+  }
   place(lift) { this.root.position.copy(this.up).multiplyScalar(this.ground + lift); }
   /** A world point above the chest, for the "E Open" prompt and loot. */
   top(extra = 0, out = new THREE.Vector3()) { return out.copy(this.up).multiplyScalar(this.ground + this.height + extra); }

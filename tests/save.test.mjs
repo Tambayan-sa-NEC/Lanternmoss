@@ -8,7 +8,7 @@ import { PLANETS } from '../src/config/planets.js';
 const fixture = () => JSON.parse(readFileSync(new URL('fixtures/save-v1.json', import.meta.url), 'utf8'));
 test('v1 fixture remains readable, with independent planet snapshots and one explicit slot', () => {
   const raw = fixture(), clean = sanitizeSave(raw);
-  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, tutorial: cleanState('tutorial', null), crafting: cleanState('crafting', null), buffs: cleanState('buffs', raw.systems.buffs) } });
+  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, portals: cleanState('portals', null), progression: cleanState('progression', raw.systems.progression), tutorial: cleanState('tutorial', null), crafting: cleanState('crafting', null), buffs: cleanState('buffs', raw.systems.buffs) } });
   assert.equal(clean.systems.tutorial.status, 'skipped', 'older adventures do not unexpectedly start a guide');
   assert.equal(clean.slot, 0); assert.equal(clean.planetId, 'emberfall');
   assert.equal(clean.systems.player.level, 4);

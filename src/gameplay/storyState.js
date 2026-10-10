@@ -8,9 +8,14 @@ import { dayClock } from './dayClock.js';
 
 export const StoryMemory = {
   state: {},
-  toJSON() { for (const npc of ctx.npcs) this.state[npc.name] = npc.toJSON(); return structuredClone(this.state); },
+  toJSON() { for (const npc of ctx.npcs) this.state[npc.def.local ? `${ctx.planetId}:${npc.name}` : npc.name] = npc.toJSON(); return structuredClone(this.state); },
   load(data) { this.state = structuredClone(data); this.restore(); },
-  restore() { for (const npc of ctx.npcs) if (this.state[npc.name]) npc.load(this.state[npc.name]); },
+  restore() {
+    for (const npc of ctx.npcs) {
+      const key = npc.def.local ? `${ctx.planetId}:${npc.name}` : npc.name, data = this.state[key] ?? this.state[npc.name];
+      if (data) npc.load(data);
+    }
+  },
   reset() { this.state = {}; },
 };
 

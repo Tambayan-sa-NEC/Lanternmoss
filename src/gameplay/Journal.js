@@ -55,6 +55,7 @@ export const Journal = {
     const f = this.fight?.boss === boss ? this.fight : null, flags = this.data.flags;
     this.data.stats.bosses++;
     if (f && !f.hit) flags.flawless = true;
+    emit('bosschallenge', { boss, flawless: !!f && !f.hit });
     if (f && !f.pet) flags.petless = true;
     if (Math.min(f?.level ?? 99, ctx.player.level) <= (BOSS_CHALLENGES.byPlanet[ctx.planetId] ?? 0)) flags.underdog = true;   // (the level the fight began at: the kill's XP comes first)
     this.fight = null; this.changed();

@@ -16,6 +16,7 @@ import { settings } from '../core/settings.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { BossGate } from '../gameplay/BossGate.js';
 import { Chests } from '../gameplay/Chests.js';
+import { Portals } from '../gameplay/Portals.js';
 import { Farm } from '../gameplay/Farm.js';
 import { Stations } from '../gameplay/Stations.js';
 import { petEffects } from '../gameplay/petAbilities.js';
@@ -42,6 +43,9 @@ function pointsOfInterest() {
   for (const [key, dir, ic, label] of [['craft', Stations.center, 'craft', 'Crafting'], ['farm', Farm.center, 'sprout', 'Farm']])   // the village's corners
     if (dir && arcDist(dir, ctx.player.up) < 60 && arcDist(dir, ctx.player.up) > 5) list.push({ key, dir, icon: ic, label });
   const B = ctx.boss;
+  if (Portals.gate) list.push({ key: 'portal', dir: Portals.gate.dir, icon: 'star', label: 'Lantern gate',
+    edge: Portals.progression.defeated.has(ctx.planetId), far: true,
+    point: Portals.gate.dir.clone().multiplyScalar(groundHeight(Portals.gate.dir) + 3) });
   list.push(...BossGate.waypoints());                                   // the sealed lair, and elites carrying sigils
   for (const e of ctx.enemies) if (e.def.miniBoss && e.alive && arcDist(e.up, ctx.player.up) < 75)   // a mini boss nearby
     list.push({ key: `mini:${e.type}`, dir: e.up, icon: 'boss', label: e.def.name.split(',')[0] });
