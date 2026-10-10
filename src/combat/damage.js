@@ -1,6 +1,7 @@
 /* Damage in both directions, plus fainting and respawning. */
 import * as THREE from 'three';
 import { COMBAT } from '../config/combat.js';
+import { BESTIARY_ENTRIES } from '../config/bestiary.js';
 import { BUFFS } from '../config/game.js';
 import { NEEDS } from '../config/survival.js';
 import { PETS } from '../config/pets.js';
@@ -77,17 +78,19 @@ export function hurtPlayer(amount, from, knock = 0, o = {}) {
   } else amount = Math.max(1, Math.round(amount));
   const heavy = amount >= P.stats.maxHp * 0.25;
   P.hp -= amount; P.invuln = P.hurtT = COMBAT.player.invuln; P.lastHurt = ctx.time; P.squash = -0.2;
-  encounterEvents.dispatchEvent(new CustomEvent('playerhurt', { detail: { amount } }));
+  const source = o.source?.def?.name ?? BESTIARY_ENTRIES[o.source?.type]?.name ?? (typeof o.source === 'string' ? o.source : 'An unknown hazard');
+  encounterEvents.dispatchEvent(new CustomEvent('playerhurt', { detail: { amount, source } }));
   if (settings.damageNumbers) floatText(_tv.copy(P.pos).addScaledVector(P.up, 2.3), `-${amount}`, '#ff5a7a', heavy ? 1.5 : 1);
   showPlayerHurt(); audio.hurt(); shakeCamera(heavy ? 0.5 : 0.25); if (heavy) hitStop(0.08);
   if (knock && from) { P.knock.addScaledVector(knockDir(from, P, _tv), knock); if (P.grounded) { P.vy = knock * 0.5; P.grounded = false; } }
-  if (P.hp <= 0) faint();
+  if (P.hp <= 0) faint(source, amount);
 }
 
-function faint() {
+function faint(source, amount) {
   const P = ctx.player; P.hp = 0; P.dead = true; P.deadT = COMBAT.player.respawnTime; P.root.visible = false; P.vel.set(0, 0, 0);
   sparkles.emit(_tv.copy(P.pos).addScaledVector(P.up, 1), { count: 50, color: 0xffd6f5, speed: 3, up: P.up, upBias: 0.8, life: 1.2, size: 0.4 });
   if (Dialog.open) Dialog.close(); toast('You fainted... the lanterns will guide you home.'); audio.faint();
+  encounterEvents.dispatchEvent(new CustomEvent('playerfainted', { detail: { source, amount } }));
 }
 
 function respawnPlayer(world) {
@@ -98,6 +101,7 @@ function respawnPlayer(world) {
   snapCamera(world.spawnDir, fwd); world.resetSun();
   P.root.visible = true; sparkles.emit(P.pos, { count: 40, color: 0xfff0a0, speed: 2, up: P.up, upBias: 1, life: 1, size: 0.35 });
   toast('Back home, safe and sound.');
+  encounterEvents.dispatchEvent(new CustomEvent('playerrespawned'));
 }
 
 /** Per-frame hero timers, regeneration, and the respawn countdown after fainting. */

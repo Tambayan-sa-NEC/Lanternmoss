@@ -204,6 +204,10 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
 
+- **Tutorial and help:** a skippable guided first walk teaches movement, talking, your bag, fighting and boss lairs.
+  Restart it from the pause menu; Journal → Help keeps advice on energy, tools, stations, smelting, fishing, farming
+  and pets. Progress survives Continue. Fainting shows the last hit, time since waking, a countdown and a recovery tip.
+  See [tutorial notes](docs/tutorial.md).
 - **Save / load:** Continue restores your adventure after closing the browser. Autosave on arrival, after bosses,
   every two minutes and when quitting; manual Save plus JSON export/import in the pause menu. New Adventure asks
   before replacing the single slot. Settings, keys and the lifetime journal stay per device.
@@ -285,6 +289,7 @@ headless Chrome (a few minutes with software rendering):
 npm i --no-save puppeteer-core     # once; not a project dependency
 node scripts/screenshots.mjs       # all shots, or e.g. `node scripts/screenshots.mjs bag,pets` for some
 node scripts/save-smoke.mjs        # real reload/export/import check; retake title and save menus
+node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing

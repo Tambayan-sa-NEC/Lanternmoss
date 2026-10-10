@@ -159,7 +159,7 @@ export class Enemy extends Walker {
     if (n && this.state === 'wander') { this.fwd.addScaledVector(n, 0.9); projectTangent(this.fwd, this.up).normalize(); this.turn = -this.turn; }
     this.behavior?.update?.(this, dt, n);
     if (d.contact && ENGAGED.has(this.state) && !safe && this.cool <= 0 && dist < this.radius + ctx.player.radius + 0.3 && ctx.player.r - groundHeight(ctx.player.up) < 1) {
-      hurtPlayer(d.damage, this.pos, d.knockback); this.cool = d.contactCooldown; }
+      hurtPlayer(d.damage, this.pos, d.knockback, { source: this }); this.cool = d.contactCooldown; }
     if (this.stunT > 0.1 && rng() < dt * 12) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.55), { count: 1, color: 0xffe066, speed: 1.4, up: this.up, upBias: 0.3, life: 0.5, size: 0.32 });   // dazed stars
     if (this.slowT > 0 && rng() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
     if (this.shieldT > 0 && rng() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
@@ -220,10 +220,10 @@ export class Enemy extends Walker {
       const c = this.slamCenter().clone();
       ringFX(c, d.slamRadius, 0xffb08a, 0.5); sparkles.emit(groundPoint(c, 0.3), { count: 30, color: 0xe8d6c0, speed: 3.5, up: this.up, upBias: 0.5, life: 0.7, size: 0.45 });
       if (dist < 12) shakeCamera(0.35); audio.slam();
-      if (!ctx.player.dead && ctx.player.pos.distanceTo(c) < d.slamRadius + ctx.player.radius && ctx.player.r - groundHeight(ctx.player.up) < 0.9) hurtPlayer(d.damage, c, d.knockback);
+      if (!ctx.player.dead && ctx.player.pos.distanceTo(c) < d.slamRadius + ctx.player.radius && ctx.player.r - groundHeight(ctx.player.up) < 0.9) hurtPlayer(d.damage, c, d.knockback, { source: this });
     } else {
       this.knock.addScaledVector(this.fwd, d.lunge || 0); audio.swipe();
-      if (!ctx.player.dead && dist < d.range + 0.6 && this.fwd.dot(this.toP) > 0.3) hurtPlayer(d.damage, this.pos, d.knockback);
+      if (!ctx.player.dead && dist < d.range + 0.6 && this.fwd.dot(this.toP) > 0.3) hurtPlayer(d.damage, this.pos, d.knockback, { source: this });
     }
   }
   /** Wisps keep their distance, strafe, and fire slow homing orbs after a visible charge. */
@@ -241,7 +241,7 @@ export class Enemy extends Walker {
     const d = this.def;
     ctx.projectiles.push(new Projectile({ team: 'enemy', up: this.up, dir: this.toP, alt: 1.1, speed: d.projectileSpeed, range: d.aggro * 1.8, radius: 0.35,
       size: 0.22, color: d.color, homing: d.projectileHoming, homeTo: () => (ctx.player.dead ? null : _a2.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1)),
-      onHit: (p, h) => { if (h === ctx.player) hurtPlayer(d.damage, p.pos, 2.5); sparkles.emit(p.pos, { count: 14, color: d.color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
+      onHit: (p, h) => { if (h === ctx.player) hurtPlayer(d.damage, p.pos, 2.5, { source: this }); sparkles.emit(p.pos, { count: 14, color: d.color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
     audio.wispShot();
   }
   /** Slimes bounce straight at you and hurt on contact; big ones split when popped. */

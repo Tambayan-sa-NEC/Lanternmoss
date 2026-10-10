@@ -8,6 +8,7 @@
      hotbarTool(kind)         the best tool of a kind on the hotbar ({ def, slot }), or null
    Fishing (./Fishing.js) and farming (./Farm.js) build on these. */
 import { PLANETS } from '../config/planets.js';
+import { GATHERING_TIPS as TIPS } from '../config/tutorial.js';
 import { GATHER, NODE_KINDS, SCENERY } from '../config/resources.js';
 import { TOOL_KINDS, HOTBAR } from '../config/items.js';
 import { TREE_KINDS } from '../config/flora.js';
@@ -29,12 +30,6 @@ import { ACTION_HANDLERS } from './itemUse.js';
 import { grantItem } from './pickups.js';
 import { rollDrops, toolCheck, bestTool } from './resourceRules.js';
 
-const TIPS = {
-  wood: 'Wood! Craft a Woodcutter\'s Axe (bag, Craft tab) to chop trees for more, or a fishing rod for the ponds.',
-  stone: 'Stone! A Stone Pickaxe (bag, Craft tab) mines rocks and ore veins.',
-  seed: 'Seeds! Plant them in the farm by the village: till a plot with a hoe first, then water them.',
-  copperOre: 'Copper! A Copper Pickaxe can break iron and gem veins. Copper also makes a watering can.',
-};
 const CHIPS = { tree: 0x9a6a44, rock: 0xb6aec8 };
 
 export const Gathering = {
@@ -200,7 +195,7 @@ export const Gathering = {
     emit('gathered', { what: j.node?.kind ?? j.scenery, items: drops });
     for (const [item] of drops) {
       const tip = TIPS[item] ?? (itemRegistry.get(item)?.category === 'seed' ? TIPS.seed : null), key = TIPS[item] ? item : 'seed';
-      if (tip && !this.tipsShown.has(key)) { this.tipsShown.add(key); this.tip = { text: tip, at: ctx.time + 1.6 }; break; }
+      if (tip && !this.tipsShown.has(key)) { this.tipsShown.add(key); emit('gatheringtip', { key }); this.tip = { text: tip, at: ctx.time + 1.6 }; break; }
     }
   },
 };

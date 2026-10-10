@@ -53,7 +53,7 @@ const moves = {
       const a = A(e, 'gaze'), P = ctx.player; e.gazeK = 0; e.flareT = 0.4;
       ringFX(e.pos, 6, GAZE, 0.5); audio.nova(); shakeCamera(0.25);
       if (P.dead || dist > a.range) return;
-      if (lookingAt(e)) { petrify(a.petrify); hurtPlayer(a.damage, e.pos, 0); toast('Turned to stone! Look away from the Basilisk\'s gaze.'); }
+      if (lookingAt(e)) { petrify(a.petrify); hurtPlayer(a.damage, e.pos, 0, { source: e }); toast('Turned to stone! Look away from the Basilisk\'s gaze.'); }
       else { emote(P, '✓', '#7fd06a'); }
     },
     cancel(e) { e.gazeK = 0; },
@@ -67,7 +67,7 @@ const moves = {
     active(e, dt) {
       const a = A(e, 'whip');
       e.fwd.applyAxisAngle(e.up, dt * 16);
-      if (!e.hitPlayer && playerInArea(e.up, a.radius, true)) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); shakeCamera(0.3); }
+      if (!e.hitPlayer && playerInArea(e.up, a.radius, true)) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback, { source: e }); shakeCamera(0.3); }
       if (e.actT > 0.4) finish(e);
       return 0;
     },
@@ -85,7 +85,7 @@ const moves = {
     active(e, dt, dist) {
       const a = A(e, 'lunge'), P = ctx.player;
       projectTangent(e.lungeDir, e.up).normalize(); e.fwd.copy(e.lungeDir); e.move.copy(e.lungeDir);
-      if (!e.hitPlayer && !P.dead && dist < e.radius + P.radius + a.width * 0.5) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); }
+      if (!e.hitPlayer && !P.dead && dist < e.radius + P.radius + a.width * 0.5) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback, { source: e }); }
       if ((e.lungeT -= dt) <= 0 || arcDist(e.up, e.home) > e.def.leash - 3) finish(e);
       return a.speed;
     },
@@ -100,7 +100,7 @@ const moves = {
         const dir = e.toP.clone().applyAxisAngle(e.up, (i / (a.count - 1) - 0.5) * spread);
         ctx.projectiles.push(new Projectile({ team: 'enemy', up: e.up, dir, alt: 1.2, speed: a.speed, range: 22, radius: 0.4, size: 0.3, color: VENOM,
           homing: a.homing, homeTo: () => (ctx.player.dead ? null : _aim.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1)),
-          onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 2); sparkles.emit(p.pos, { count: 12, color: VENOM, speed: 2.2, life: 0.5, size: 0.3 }); } }));
+          onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 2, { source: e }); sparkles.emit(p.pos, { count: 12, color: VENOM, speed: 2.2, life: 0.5, size: 0.3 }); } }));
       }
       audio.wispShot();
     },

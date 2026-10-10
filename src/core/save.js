@@ -12,6 +12,7 @@ import { NEEDS } from '../config/survival.js';
 import { DAY } from '../config/day.js';
 import { HOUSES } from '../config/houses.js';
 import { COMBAT } from '../config/combat.js';
+import { TUTORIAL_STEPS, HELP_TOPICS, GATHERING_TIPS } from '../config/tutorial.js';
 import { CRITTER_DEFS } from '../config/critters.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { equipProblem } from '../items/gear.js';
@@ -29,7 +30,7 @@ export const SAVE_SYSTEMS = {
   player: 'adventure', inventory: 'adventure', equipment: 'adventure', hotbar: 'adventure',
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
-  progression: 'adventure', combat: 'adventure',
+  progression: 'adventure', combat: 'adventure', tutorial: 'adventure',
   farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
@@ -50,6 +51,7 @@ export const SAVE_OWNERS = {
   'gameplay/Houses.js:Houses': 'houses', 'gameplay/PlanetProgression.js:PlanetProgression': 'progression',
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
   'gameplay/Chests.js:Chests': 'chests', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
+  'gameplay/Tutorial.js:Tutorial': 'tutorial',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
 export const STATELESS_EXPORTS = new Set(['BUFF_NAMES', 'REWARDS', 'TOOL_USES', 'ACTION_HANDLERS', 'PET_ABILITIES']);
@@ -92,6 +94,16 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
 export function cleanState(key, value, hero = 'witch') {
   const s = record(value);
   switch (key) {
+    case 'tutorial': {
+      const recap = record(s.recap);
+      return { status: choice(s.status, ['idle', 'active', 'skipped', 'complete'], 'skipped'),
+        done: stringIds(s.done, id => TUTORIAL_STEPS.some(step => step.id === id)),
+        seen: stringIds(s.seen, id => HELP_TOPICS.some(t => t.id === id) || Object.hasOwn(GATHERING_TIPS, id)),
+        moved: number(s.moved, 0, 0, 3), lifeStartedAt: number(s.lifeStartedAt),
+        recap: s.recap ? { source: typeof recap.source === 'string' ? recap.source.slice(0, 120) : 'An unknown hazard',
+          amount: integer(recap.amount), duration: number(recap.duration) } : null,
+        remaining: number(s.remaining, 0, 0, COMBAT.player.respawnTime) };
+    }
     case 'player': {
       const charId = known(s.charId, CHARACTERS, 'witch'), level = integer(s.level, 1, 1, LEVELING.maxLevel);
       return { charId, level, xp: integer(s.xp, 0, 0, Math.max(0, xpToNext(level) - 1)), coins: integer(s.coins),

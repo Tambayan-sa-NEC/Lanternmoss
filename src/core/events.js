@@ -4,6 +4,9 @@
      'crafted'        detail { itemId, qty, rarity }  (src/gameplay/bagCommands.js)
      'petfound'       detail { id }               a pet unlocked (src/gameplay/Pets.js)
      'achievement'    detail { achievement }      one unlocked (src/gameplay/Journal.js; the toast listens)
+     'cameradrag', 'talked', 'bagopened', 'hotbarselected', 'abilitycast', 'aimstarted'
+                      successful actions observed by the guided walk
+     'gatheringtip'   detail { key }               a first-find tip kept in Journal Help
    Combat has its own bus (src/combat/events.js), levelling too (src/progression/experience.js). */
 export const gameEvents = new EventTarget();
 export const emit = (type, detail) => gameEvents.dispatchEvent(new CustomEvent(type, { detail }));

@@ -1,7 +1,7 @@
 /* PAUSE MENU (Esc / P during play, or automatically when the window loses focus). Pausing freezes the simulation
    (Game.update skips while ctx.paused; the scene keeps rendering), ducks the audio and releases held keys.
    Pages:
-     main      Resume · Settings · Controls · Quit to menu
+     main      Resume · Save/files · Journal/Help · Restart guided walk · Settings · Controls · Quit to menu
      settings  generated from SETTINGS_SCHEMA (config/settings.js); changes apply and save immediately. Its Keys section
                remaps any KEYBINDS action (click one, press the new key; a key already in use swaps over)
      controls  the current keybinds, the fixed keys (config/controls.js) and the hero's abilities, never out of date
@@ -59,6 +59,7 @@ const PAGES = {
         <button type="button" data-go="save">Save</button>
         <div class="row2"><button type="button" data-go="export">Export Save</button><button type="button" data-go="import">Import Save</button></div>
         <button type="button" data-go="journal">Journal</button>
+        <div class="row2"><button type="button" data-go="help">Help</button><button type="button" data-go="tutorial">Restart guided walk</button></div>
         <button type="button" data-go="settings">Settings</button>
         <button type="button" data-go="controls">Controls</button>
         <button type="button" class="quiet" data-go="quit">Quit to menu</button>
@@ -158,6 +159,8 @@ export const PauseMenu = {
     if (go === 'reset-keys') { resetBinds(); this.bindMsg = 'Keys are back to their defaults.'; this.show('settings'); return; }
     if (go === 'resume') this.close();
     else if (go === 'journal') JournalUI.open();                         // on top; closing it comes back here
+    else if (go === 'help') JournalUI.open('help');
+    else if (go === 'tutorial') { this.close(); this.handlers.onTutorial?.(); }
     else if (go === 'save') this.handlers.onSave();
     else if (go === 'export') this.handlers.onExport();
     else if (go === 'import') this.chooseImport();

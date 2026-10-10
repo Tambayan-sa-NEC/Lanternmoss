@@ -8,7 +8,8 @@ import { PLANETS } from '../src/config/planets.js';
 const fixture = () => JSON.parse(readFileSync(new URL('fixtures/save-v1.json', import.meta.url), 'utf8'));
 test('v1 fixture remains readable, with independent planet snapshots and one explicit slot', () => {
   const raw = fixture(), clean = sanitizeSave(raw);
-  assert.deepEqual(clean, raw);
+  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, tutorial: cleanState('tutorial', null) } });
+  assert.equal(clean.systems.tutorial.status, 'skipped', 'older adventures do not unexpectedly start a guide');
   assert.equal(clean.slot, 0); assert.equal(clean.planetId, 'emberfall');
   assert.equal(clean.systems.player.level, 4);
   assert.equal(clean.planets.lanternmoss.chests.opened[0], 'lanternmoss:0');
@@ -44,14 +45,14 @@ test('load clamps numbers and drops unknown items, heroes, pets, directions and 
 test('quota, blocked and absent storage report failure and keep the existing save', () => {
   const old = JSON.stringify(fixture());
   const store = new SaveStore(() => ({ getItem: () => old, setItem: () => { throw new Error('quota'); } }));
-  assert.equal(store.write(fixture()).ok, false); assert.deepEqual(store.read().data, fixture());
+  assert.equal(store.write(fixture()).ok, false); assert.deepEqual(store.read().data, sanitizeSave(fixture()));
   assert.equal(new SaveStore(() => { throw new Error('blocked'); }).read().ok, false);
   assert.equal(new SaveStore(() => undefined).write(fixture()).ok, false);
   assert.equal(parseSave('x'.repeat(3 * 1024 * 1024)).ok, false);
 });
 test('registry requires every owner, rejects duplicate keys and round-trips every system in the fixture', () => {
   const registry = new SaveRegistry(); assert.throws(() => registry.assertComplete(), /Missing save system/);
-  const data = fixture(), states = {};
+  const data = sanitizeSave(fixture()), states = {};
   for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) {
     states[key] = structuredClone(scope === 'adventure' ? data.systems[key] : data.planets.emberfall[key]);
     registry.register(key, { toJSON: () => states[key], load: value => { states[key] = value; } });

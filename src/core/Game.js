@@ -76,6 +76,8 @@ import { initControls } from './controls.js';
 import { GameLoop } from './GameLoop.js';
 import { rng } from '../utils/random.js';
 import { AdventureSave } from './AdventureSave.js';
+import { Tutorial } from '../gameplay/Tutorial.js';
+import { TutorialUI } from '../ui/TutorialUI.js';
 
 export class Game {
   /** ORDER MATTERS: world generation and the initial enemy spawn share one seeded random stream, and moving bodies
@@ -113,8 +115,10 @@ export class Game {
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
+    Tutorial.init(); TutorialUI.init();
     this.saves = new AdventureSave(this);
     PauseMenu.init({ onQuit: () => { if (!this.saves.save().ok) return false; PauseMenu.close(); MainMenu.showTitle(true); return true; },
+      onTutorial: () => Tutorial.start(),
       onSave: () => this.saves.save(), onExport: () => this.saves.export(), onImport: file => this.saves.importFile(file),
       onConfirmImport: data => this.saves.importData(data), onNew: () => MainMenu.startNew(), onPanelClosed: () => MainMenu.onPanelClosed() });
     MainMenu.init({ onReset: () => this.resetRun(), saveSummary: () => this.saves.summary(), onContinue: () => this.saves.continue() });
@@ -122,7 +126,7 @@ export class Game {
     onSettingsChange(key => { this.applySettings(); if (key === 'cameraDistance' || key === null) cam.dist = settings.cameraDistance; });
     addEventListener('resize', () => { this.renderSystem.resize(); applyUiScale(); }); this.renderSystem.resize();
 
-    this.loop = new GameLoop(dt => this.update(dt), () => this.renderSystem.render(ctx.time));
+    this.loop = new GameLoop(dt => this.update(dt), () => { TutorialUI.render(); this.renderSystem.render(ctx.time); });
   }
 
   start() { this.loop.start(); }
@@ -164,7 +168,8 @@ export class Game {
     sparkles.update(dt); updateEmotes(dt);
     Dialog.update(dt);
     updateOverlay(dt); updateBuffs(dt); updateToast(dt); updatePetCard();
-    this.saves.update(dt);
+    Tutorial.update(this.world, keys);
+    TutorialUI.render(); this.saves.update(dt);
   }
 
   beginGame() {
@@ -176,6 +181,7 @@ export class Game {
     showBanner(`Planet ${ctx.planet + 1} · ${PLANETS[ctx.planet].name}`, PLANETS[ctx.planet].tagline);
     this.planets.onBegin();
     Journal.noteStart();                                           // the starter pets and the bag count as found
+    Tutorial.begin(); TutorialUI.render();
     this.saves.save({ quiet: true });
   }
 
@@ -185,6 +191,7 @@ export class Game {
     try {
       const P = ctx.player, world = this.world;
       Dialog.close(); InventoryUI.close(); PetMenu.close();
+      Tutorial.reset(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
       for (const n of ctx.npcs) n.resetLines();
@@ -209,7 +216,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

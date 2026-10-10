@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { CAMERA, PLAYER } from '../config/game.js';
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { settings } from '../core/settings.js';
 import { cameraBlocked, viewBlocked } from '../physics/colliders.js';
 import { camera } from '../render/scene.js';
@@ -28,6 +29,7 @@ export function resetView(fwd) { cam.fwd.copy(fwd); cam.dist = settings.cameraDi
 export function dragCamera(dx, dy) {
   const k = settings.mouseSensitivity / 100, sy = settings.invertY ? -1 : 1;
   cam.fwd.applyAxisAngle(cam.up, -dx * 0.005 * k); cam.pitch = clamp(cam.pitch + dy * 0.004 * k * sy, -0.05, 1.15); cam.lastDrag = ctx.time;
+  if (dx || dy) emit('cameradrag', {});
 }
 export function zoomCamera(sign) { cam.dist = clamp(cam.dist * (1 + sign * 0.1), CAMERA.minDist, CAMERA.maxDist); }
 /** Indoors: a fixed dollhouse view looking down into the room from `back` (null = the normal follow camera). */

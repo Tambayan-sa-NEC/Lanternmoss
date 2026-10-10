@@ -5,6 +5,7 @@
    nearest spot the hero can stand on; when there is none the marker turns red and the cast is refused.
    Cooldown and cost are only paid when the cast is confirmed (src/combat/casting.js). */
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { GroundDecal } from '../fx/groundDecals.js';
 import { dom } from '../ui/dom.js';
 import { clamp } from '../utils/math.js';
@@ -36,6 +37,7 @@ export function beginAim(id, s) {
   dom.aimHint.innerHTML = `<b>${s.name}</b> · move to turn, <kbd>Wheel</kbd> nearer / farther · <kbd>Click</kbd> or <kbd>${s.label}</kbd> to cast · <kbd>Esc</kbd> / right click to cancel`;
   dom.aimHint.style.display = 'block';
   updateAiming();
+  emit('aimstarted', { id });
 }
 /** Mouse wheel while aiming: the marker comes nearer (sign < 0) or goes farther. */
 export function nudgeAim(sign) { if (aim.id) aim.reach = clamp(aim.reach + sign * STEP, NEAREST, 1); }

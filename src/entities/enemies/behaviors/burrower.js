@@ -60,5 +60,5 @@ function erupt(e, dist) {
   ringFX(e.pos, d.eruptRadius, DUST, 0.4);
   sparkles.emit(groundPoint(e.pos, 0.3), { count: 36, color: DUST, speed: 3.5, up: e.up, upBias: 1.2, life: 0.8, size: 0.4 });
   audio.slam(); if (dist < 10) shakeCamera(0.15);
-  if (!P.dead && dist < d.eruptRadius + P.radius && P.r - groundHeight(P.up) < 1) hurtPlayer(d.damage, e.pos, d.knockback);
+  if (!P.dead && dist < d.eruptRadius + P.radius && P.r - groundHeight(P.up) < 1) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
 }

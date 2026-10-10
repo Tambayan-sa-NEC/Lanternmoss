@@ -100,7 +100,7 @@ export class Blast {
       for (const e of enemiesInArea(c, this.radius))
         damageEnemy(e, this.damage * (1 - this.falloff * edgeFraction(e.up, c, this.radius)),
           { from: p, knock: this.knock, stun: this.stun, slow: this.slow, slowTime: this.slowTime, color: this.color });
-    } else if (playerInArea(c, this.radius, this.jumpable)) hurtPlayer(this.damage, p, this.knock, { lethal: this.lethal });
+    } else if (playerInArea(c, this.radius, this.jumpable)) hurtPlayer(this.damage, p, this.knock, { lethal: this.lethal, source: this.owner });
     this.onImpact?.(this);
   }
   dispose() {
@@ -139,7 +139,7 @@ export class Zone {
   pulse() {
     if (this.team === 'player') {
       for (const e of enemiesInArea(this.center, this.radius)) damageEnemy(e, this.damage, { slow: this.slow, slowTime: this.slowTime, color: this.color });
-    } else if (playerInArea(this.center, this.radius, true)) hurtPlayer(this.damage, null, 0);
+    } else if (playerInArea(this.center, this.radius, true)) hurtPlayer(this.damage, null, 0, { source: this.owner });
   }
   updateArrows(dt) {
     if (this.live) for (this.spawnT += dt * ARROW_RATE; this.spawnT >= 1; this.spawnT--) {

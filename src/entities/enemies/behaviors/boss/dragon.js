@@ -49,7 +49,7 @@ const moves = {
     fire(e) {
       const a = A(e, 'bite'), P = ctx.player; e.snapT = 0.25;
       arcFX(e.pos, e.up, e.fwd, a.range, a.arc, 0xffd0a0); audio.bite();
-      if (!P.dead && inWedge(e, e.fwd, P.pos, a.range + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback);
+      if (!P.dead && inWedge(e, e.fwd, P.pos, a.range + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback, { source: e });
     },
   },
 
@@ -65,7 +65,7 @@ const moves = {
     fire(e) { e.hitPlayer = false; audio.whoosh(); audio.tailSweep(); return 'active'; },
     active(e, dt) {
       const a = A(e, 'tail');
-      if (!e.hitPlayer && playerInArea(e.up, a.radius, true)) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); shakeCamera(0.3); }
+      if (!e.hitPlayer && playerInArea(e.up, a.radius, true)) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback, { source: e }); shakeCamera(0.3); }
       if (rng() < dt * 40) sparkles.emit(groundPoint(dirAlong(e.up, _tv.copy(e.fwd).applyAxisAngle(e.up, rng() * 6.28), a.radius * 0.8), 0.2),
         { count: 2, color: 0xe8d6c0, speed: 2, up: e.up, upBias: 0.5, life: 0.5, size: 0.4 });
       if (e.actT >= a.spinTime) { ringFX(e.pos, a.radius, 0xffd0a0, 0.4); finish(e); }
@@ -100,7 +100,7 @@ const moves = {
       sparkles.emit(mouth(e), { count: 2, color: 0xffd36b, speed: 6, up: e.breathDir, upBias: 1.4, life: 0.35, size: 0.5 });
       if ((e.tickT -= dt) <= 0) {
         e.tickT = a.tick;
-        if (!P.dead && inWedge(e, e.breathDir, P.pos, a.length + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, 2);
+        if (!P.dead && inWedge(e, e.breathDir, P.pos, a.length + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, 2, { source: e });
       }
       if (k >= 1) finish(e);
       return 0;

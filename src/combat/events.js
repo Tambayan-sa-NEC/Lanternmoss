@@ -3,5 +3,7 @@
      'minibossdefeated' detail { boss }  a mini boss (hydra, basilisk) dies
      'enemydefeated'  detail { enemy }   any monster dying (quest defeat steps count these)
      'enemyhit'       detail { enemy, amount, source }   a monster took damage (source 'pet' = your pet's)
-     'playerhurt'     detail { amount }  a hit landed on the hero (the journal's boss challenges listen) */
+     'playerhurt'     detail { amount, source }  a hit landed on the hero (the journal's boss challenges listen)
+     'playerfainted'  detail { amount, source }  the hit that caused fainting
+     'playerrespawned'  the hero returned home; resets the time-since-waking recap */
 export const encounterEvents = new EventTarget();

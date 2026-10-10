@@ -775,7 +775,7 @@ reproduction steps](docs/performance.md). **Target status:** the available Intel
 
 # Phase B: A good first hour
 
-## 21. Tutorial and first-time help **(suggested)**
+## 21. Tutorial and first-time help **(suggested)** ✓
 
 **Goal:** new players learn the game's many systems without reading toasts that vanish in two seconds.
 Code: new `src/gameplay/Tutorial.js`, `src/ui/` (a hint panel), `src/config/` (tutorial steps); builds on the
@@ -784,13 +784,19 @@ Promoted from the suggested additions (tutorial, death screen). **Size:** M. **N
 **Risk:** it teaches systems that 22 and 24 will still change. **Recommendation:** keep the steps as data in
 `src/config/`, so a changed system means changing one line, not rewriting the tutorial.
 
-- [ ] **A guided start:** a short first walk out of the village that teaches moving, the camera, talking (`E`),
+- [x] **A guided start:** a short first walk out of the village that teaches moving, the camera, talking (`E`),
       the bag and hotbar, a first fight (dodging, abilities, the ultimate's aim) and the sealed boss lair's conditions.
       It can be skipped, and offered again from the pause menu.
-- [ ] **Hints that stay:** a small hint panel (or a "help" page in the journal) that keeps the first-time tips:
+- [x] **Hints that stay:** a small hint panel (or a "help" page in the journal) that keeps the first-time tips:
       energy, tools, stations, smelting, fishing, farming, pets.
-- [ ] **A death screen:** "You fainted", with a short recap (what hit you, how long you lasted), a respawn countdown
+- [x] **A death screen:** "You fainted", with a short recap (what hit you, how long you lasted), a respawn countdown
       and a tip.
+
+Implemented: an action-driven, skippable first walk with pause-menu replay, Journal Help and saved progress/seen
+tips. Prompts follow the current hero and bindings; the fainting recap identifies enemies and hazard owners and
+preserves its countdown across Continue. Original v1 saves still load. See [tutorial notes and screenshots](docs/tutorial.md).
+Verified: 134 unit tests, all 21 gameplay simulations, and real-browser refresh/replay, help and fainting checks
+at 720p and 1080p for all three heroes.
 
 ## 22. More crafting, part 2 **(core)**
 
