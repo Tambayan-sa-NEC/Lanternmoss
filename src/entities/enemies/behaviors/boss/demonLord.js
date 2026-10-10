@@ -103,7 +103,7 @@ const moves = {
       }
       if (!e.hitPlayer && !P.dead && e.front <= e.laneLen + 1) {
         const o = laneOffset(e.laneFrom, e.laneDir, P.pos);
-        if (o.along > 0 && Math.abs(o.along - e.front) < 1.3 && o.side < a.width / 2 + P.radius) { e.hitPlayer = true; hurtPlayer(a.damage, P.pos, a.knockback); }
+        if (o.along > 0 && Math.abs(o.along - e.front) < 1.3 && o.side < a.width / 2 + P.radius) { e.hitPlayer = true; hurtPlayer(a.damage, P.pos, a.knockback, { source: e }); }
       }
       if (e.front >= e.laneLen) finish(e);
       return 0;
@@ -148,7 +148,7 @@ const moves = {
       sparkles.emit(groundPoint(e.doomAt, 0.5), { count: 80, color: DOOM, speed: 6, up: e.doomAt, upBias: 0.8, life: 1.1, size: 0.6 });
       sparkles.emit(groundPoint(e.doomAt, 0.5), { count: 40, color: 0xffe0e8, speed: 4, up: e.doomAt, upBias: 1.2, life: 0.8, size: 0.5 });
       shakeCamera(0.9); hitStop(0.12); audio.doomSlam();
-      if (playerInArea(e.doomAt, a.radius)) hurtPlayer(a.damage, c, 16, { lethal: true });
+      if (playerInArea(e.doomAt, a.radius)) hurtPlayer(a.damage, c, 16, { lethal: true, source: e });
     },
   },
 
@@ -229,7 +229,7 @@ const moves = {
       const here = dirAlong(e.laneFrom, e.laneDir, went), ahead = dirAlong(e.laneFrom, e.laneDir, went + 1);
       e.up.copy(here); e.r = groundHeight(e.up); e.pos.copy(e.up).multiplyScalar(e.r); e.fwd.copy(tangentToward(e.up, ahead));
       e.hover = e.flyH;
-      if (!e.hitPlayer && !P.dead && arcDist(P.up, e.up) < a.width / 2 + P.radius + 0.4 && P.r - groundHeight(P.up) < 3) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); }
+      if (!e.hitPlayer && !P.dead && arcDist(P.up, e.up) < a.width / 2 + P.radius + 0.4 && P.r - groundHeight(P.up) < 3) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback, { source: e }); }
       for (; e.dropped * gap <= went; e.dropped++)                         // the trail of blasts behind him
         addHazard(new Blast({ owner: e, team: 'enemy', center: dirAlong(e.laneFrom, e.laneDir, e.dropped * gap), radius: a.width * 0.6, delay: a.trailDelay,
           damage: a.damage * 0.6, color: glowOf(e), warnColor: WARN, knock: a.knockback * 0.5, shake: 0.15 }));
@@ -245,14 +245,14 @@ function finisherAt(e) { return dirAlong(e.up, e.fwd, A(e, 'combo').reach); }
 function sweep(e) {
   const a = A(e, 'combo'), P = ctx.player; e.swingT = 0.2; e.side = -e.side;
   arcFX(e.pos, e.up, e.fwd, a.radius, a.arc, glowOf(e)); audio.swipe(); audio.whoosh();
-  if (!P.dead && inWedge(e, e.fwd, P.pos, a.radius + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback);
+  if (!P.dead && inWedge(e, e.fwd, P.pos, a.radius + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback, { source: e });
 }
 /** The overhead finisher, into the circle in front of him. */
 function slam(e) {
   const a = A(e, 'combo'), at = finisherAt(e), c = groundPoint(at, 0); e.slamT = 0.5;
   ringFX(c, a.slamRadius, glowOf(e), 0.5); sparkles.emit(groundPoint(at, 0.3), { count: 30, color: 0xe8d6c0, speed: 3.5, up: at, upBias: 0.6, life: 0.7, size: 0.5 });
   shakeCamera(0.4); audio.slam();
-  if (playerInArea(at, a.slamRadius)) hurtPlayer(a.finisherDamage, c, a.knockback * 1.5);
+  if (playerInArea(at, a.slamRadius)) hurtPlayer(a.finisherDamage, c, a.knockback * 1.5, { source: e });
 }
 /** count marked circles (first from where(0), the rest from where(i)), each struck by a falling bolt in turn. */
 function bolts(e, a, where) {
@@ -268,7 +268,7 @@ function fan(e, a, wave) {
     const dir = e.toP.clone().applyAxisAngle(e.up, ((i + off) / (a.count - 1) - 0.5) * spread);
     ctx.projectiles.push(new Projectile({ team: 'enemy', up: e.up, dir, startAlt: e.hover + 3.5, alt: 1.2, altRate: 2.4, speed: a.speed, range: 30, radius: 0.45, size: 0.34,
       color, homing: a.homing, homeTo: () => (ctx.player.dead ? null : _aim.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1)),
-      onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 3); sparkles.emit(p.pos, { count: 14, color, speed: 2.4, life: 0.5, size: 0.34 }); } }));
+      onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 3, { source: e }); sparkles.emit(p.pos, { count: 14, color, speed: 2.4, life: 0.5, size: 0.34 }); } }));
   }
   audio.wispShot();
 }
@@ -308,7 +308,7 @@ export const demonLord = defineBoss({
       ringFX(e.pos, T.radius, glowOf(e), 0.8); ringFX(e.pos, T.radius * 0.6, 0xffffff, 0.5);
       sparkles.emit(e.center(), { count: 90, color: glowOf(e), speed: 7, up: e.up, upBias: 0.6, life: 1.2, size: 0.6 });
       shakeCamera(0.8); hitStop(0.1); audio.phaseShift();
-      if (playerInArea(e.up, T.radius)) hurtPlayer(T.damage, e.pos, T.push);
+      if (playerInArea(e.up, T.radius)) hurtPlayer(T.damage, e.pos, T.push, { source: e });
     } else e.hover += (e.def.flight.hover - e.hover) * damp(2.5, dt);       // rises on its wings
     if (e.transT >= T.time) { e.invulnerable = false; e.state = 'chase'; e.cool = 0.8; }
     return 0;

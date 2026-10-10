@@ -20,6 +20,7 @@ import { Pets } from '../gameplay/Pets.js';
 import { Pickups } from '../gameplay/pickups.js';
 import { Quests } from '../gameplay/quests/Quests.js';
 import { StoryMemory } from '../gameplay/storyState.js';
+import { Tutorial } from '../gameplay/Tutorial.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -43,7 +44,7 @@ export class AdventureSave {
     };
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
-      houses: Houses, rareGifts: RareGifts, progression: game.planets, combat: CombatState,
+      houses: Houses, rareGifts: RareGifts, progression: game.planets, combat: CombatState, tutorial: Tutorial,
       farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.planets.beforeLoad = () => { if (!this.restoring && !this.suspended && ctx.started) { StoryMemory.toJSON(); this.registry.capturePlanet(ctx.planetId); } };
@@ -94,6 +95,7 @@ export class AdventureSave {
       this.game.planets.load(data.planetId, { restoring: true });
       // World loading heals the hero and rebuilds the pet. Restore saved vitals after those steps.
       ctx.player.load(data.systems.player); ctx.player.stats = computeStats();
+      if (ctx.player.dead) ctx.player.deadT = Tutorial.state.remaining;
       ctx.player.hp = Math.min(ctx.player.stats.maxHp, ctx.player.hp);
       ctx.player.mana = Math.min(ctx.player.stats.maxMana, ctx.player.mana);
       const p = ctx.player, saved = data.systems.player;

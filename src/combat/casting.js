@@ -5,6 +5,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { COMBAT } from '../config/combat.js';
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { audio } from '../systems/AudioSystem.js';
 import { flashManaBar, flashSlot } from '../ui/hud.js';
 import { KNIGHT_ABILITIES } from './abilities/knight.js';
@@ -62,6 +63,7 @@ export function tryCast(id) {
   if ((id === 'blink') && player.vel.lengthSq() > 1) dir.copy(player.vel).normalize();   // blink goes where you're running
   player.fwd.copy(dir); player.castFaceT = COMBAT.castFaceTime; player.castT = 0.28;
   CAST[id](s, dir);
+  emit('abilitycast', { id });
 }
 
 /** Casts the ability being aimed at the marked spot (click, or its key again). An invalid spot keeps the aim open. */
@@ -74,6 +76,7 @@ export function confirmAim() {
   pay(id, s);
   const player = ctx.player; player.fwd.copy(dir); player.castFaceT = COMBAT.castFaceTime;
   CAST[id].execute(s, dir, target);
+  emit('abilitycast', { id });
 }
 
 /** Cooldowns, buffered presses, and hold-to-repeat for abilities whose key is held down. */

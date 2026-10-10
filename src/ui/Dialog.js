@@ -2,6 +2,7 @@
    ({hero} {planet}...), an optional yes/no choice; closes when the hero walks away. A sleeping villager wakes up
    with a yawn first. */
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { bindKbd, bindLabel } from '../core/keybinds.js';
 import { fillStory } from '../gameplay/storyState.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -22,6 +23,7 @@ export const Dialog = {
     if (sleepy) line = { ...line, t: `*yawn*... Oh! ${line.t}`, e: line.e ?? 'sleepy' };
     dom.dlgName.innerHTML = `${npc.name}<small>${npc.def.title}</small>`; dom.dlgName.style.background = npc.def.color;
     this.say(line);
+    emit('talked', { name: npc.name });
   },
   /** A line from something that isn't a walking villager (furniture, a note, an indoor resident):
       speaker = { name, def: { title, color, portrait }, pos }. Closes when the hero walks off, like any talk. */

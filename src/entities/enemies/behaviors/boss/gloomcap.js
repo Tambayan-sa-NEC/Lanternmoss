@@ -45,7 +45,7 @@ function updateWaves(e, dt) {
     if (w.r > a.maxRadius) { hideDots(w.slot); e.waves.splice(i, 1); continue; }
     layRing(w.slot, w.center, w.r, a.width * 0.5, 0.1 + 0.9 * (1 - w.r / a.maxRadius));
     if (!w.hit && !P.dead && Math.abs(arcDist(P.up, w.center) - w.r) < a.width * 0.5 + P.radius && P.r - groundHeight(P.up) < 0.6) {
-      w.hit = true; hurtPlayer(a.damage, _tv.copy(w.center).multiplyScalar(groundHeight(w.center)), a.knockback);
+      w.hit = true; hurtPlayer(a.damage, _tv.copy(w.center).multiplyScalar(groundHeight(w.center)), a.knockback, { source: e });
     }
   }
 }
@@ -60,7 +60,7 @@ const moves = {
       ringFX(c, a.radius, 0xffb08a, 0.55); ringFX(c, a.radius * 0.6, 0xffffff, 0.4);
       sparkles.emit(groundPoint(c, 0.3), { count: 40, color: 0xe8d6c0, speed: 4, up: e.up, upBias: 0.5, life: 0.8, size: 0.5 });
       shakeCamera(dist < 16 ? 0.45 : 0.2); audio.slam();
-      if (!P.dead && P.pos.distanceTo(c) < a.radius + P.radius && P.r - groundHeight(P.up) < 0.9) hurtPlayer(a.damage, c, a.knockback);
+      if (!P.dead && P.pos.distanceTo(c) < a.radius + P.radius && P.r - groundHeight(P.up) < 0.9) hurtPlayer(a.damage, c, a.knockback, { source: e });
     },
   },
   charge: {
@@ -75,7 +75,7 @@ const moves = {
     active(e, dt, dist) {
       const a = e.def.attacks.charge, P = ctx.player;
       projectTangent(e.chargeDir, e.up).normalize(); e.fwd.copy(e.chargeDir); e.move.copy(e.chargeDir);
-      if (!e.hitPlayer && !P.dead && dist < e.radius + P.radius + a.width * 0.5) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback); shakeCamera(0.3); }
+      if (!e.hitPlayer && !P.dead && dist < e.radius + P.radius + a.width * 0.5) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback, { source: e }); shakeCamera(0.3); }
       if (rng() < dt * 30) sparkles.emit(groundPoint(e.pos, 0.2), { count: 1, color: 0xe8d6c0, speed: 1.6, up: e.up, upBias: 0.6, life: 0.5, size: 0.4 });
       if ((e.chargeT -= dt) <= 0 || arcDist(e.up, e.home) > e.def.leash - 4) endCharge(e, false);   // pulls up short of the arena's edge
       return a.speed;
@@ -90,7 +90,7 @@ const moves = {
         const dir = e.toP.clone().applyAxisAngle(e.up, a.count > 1 ? (i / (a.count - 1) - 0.5) * spread : 0);
         ctx.projectiles.push(new Projectile({ team: 'enemy', up: e.up, dir, alt: 1.2, speed: a.speed, range: 26, radius: 0.4, size: 0.3, color,
           homing: a.homing, homeTo: () => (ctx.player.dead ? null : _aim.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1)),
-          onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 2.5); sparkles.emit(p.pos, { count: 14, color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
+          onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 2.5, { source: e }); sparkles.emit(p.pos, { count: 14, color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
       }
       audio.wispShot();
     },

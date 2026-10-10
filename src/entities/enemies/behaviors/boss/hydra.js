@@ -32,7 +32,7 @@ const moves = {
     fire(e) {
       const a = A(e, 'bite'), P = ctx.player; e.snapT = 0.3;
       arcFX(e.pos, e.up, e.fwd, a.range, a.arc, 0xd8ffa0); audio.bite();
-      if (!P.dead && inWedge(e, e.fwd, P.pos, a.range + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback);
+      if (!P.dead && inWedge(e, e.fwd, P.pos, a.range + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback, { source: e });
     },
   },
   spit: {
@@ -46,7 +46,7 @@ const moves = {
         const dir = e.toP.clone().applyAxisAngle(e.up, n > 1 ? (i / (n - 1) - 0.5) * spread : 0);
         ctx.projectiles.push(new Projectile({ team: 'enemy', up: e.up, dir, alt: 2.6, speed: a.speed, range: 24, radius: 0.45, size: 0.34, color: ACID,
           homing: a.homing, homeTo: () => (ctx.player.dead ? null : _aim.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1)),
-          onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 2); sparkles.emit(p.pos, { count: 16, color: ACID, speed: 2.4, life: 0.6, size: 0.32 }); } }));
+          onHit: (p, h) => { if (h === ctx.player) hurtPlayer(a.damage, p.pos, 2, { source: e }); sparkles.emit(p.pos, { count: 16, color: ACID, speed: 2.4, life: 0.6, size: 0.32 }); } }));
       }
       e.snapT = 0.25; audio.wispShot();
     },
@@ -59,7 +59,7 @@ const moves = {
     fire(e) {
       const a = A(e, 'sweep'), P = ctx.player; e.sweepT = 0.5;
       arcFX(e.pos, e.up, e.fwd, a.radius, a.arc, 0xd8ffa0); audio.tailSweep(); shakeCamera(0.3);
-      if (!P.dead && inWedge(e, e.fwd, P.pos, a.radius + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback);
+      if (!P.dead && inWedge(e, e.fwd, P.pos, a.radius + P.radius, a.arc)) hurtPlayer(a.damage, e.pos, a.knockback, { source: e });
     },
   },
 };

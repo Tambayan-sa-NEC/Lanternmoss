@@ -1,11 +1,12 @@
 /* JOURNAL SCREEN (#journal): J during play (remappable), Journal on the pause menu, or Journal on the title screen.
-   Three tabs over the journal's data (src/gameplay/Journal.js):
+   Four tabs over the journal's data (src/gameplay/Journal.js) and adventure help:
      Achievements  every achievement (config/achievements.js) by group, with progress, reward and when it was earned,
                    and the lifetime totals
      Bestiary      a page per monster and boss (config/bestiary.js): its portrait (src/ui/monsterPortraits.js; a
                    silhouette until met), where it lives, how it attacks and how to beat it; its stats per planet,
                    its drops and how many you've defeated once you've beaten one
      Collection    every item, the ones found so far in colour
+     Help          lasting first-time tips and the guided walk; seen/progress belongs to the adventure
    During play it pauses the world (unless the pause menu already has); on the title screen nothing is running. */
 import { ACHIEVEMENTS, JOURNAL_STATS } from '../config/achievements.js';
 import { BESTIARY_DROPS, BESTIARY_ENTRIES } from '../config/bestiary.js';
@@ -24,8 +25,9 @@ import { releaseAllKeys } from '../systems/InputSystem.js';
 import { icon } from './icons.js';
 import { itemIconHtml } from './itemTooltip.js';
 import { monsterPortrait } from './monsterPortraits.js';
+import { helpHtml } from './help.js';
 
-const TABS = { achievements: 'Achievements', bestiary: 'Bestiary', collection: 'Collection' };
+const TABS = { achievements: 'Achievements', bestiary: 'Bestiary', collection: 'Collection', help: 'Help' };
 const GROUPS = ['Firsts', 'Counts', 'Challenges'];
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const when = t => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
@@ -98,10 +100,10 @@ export const JournalUI = {
     for (const b of this.tabsEl.children) b.classList.toggle('on', b.dataset.tab === this.tab);
     const scroll = this.body.querySelector('.jscroll')?.scrollTop ?? 0, same = this.body.dataset.tab === this.tab;
     this.body.dataset.tab = this.tab;
-    this.body.innerHTML = this.tab === 'bestiary' ? this.bestiaryHtml() : this.tab === 'collection' ? this.collectionHtml() : this.achievementsHtml();
+    this.body.innerHTML = this.tab === 'help' ? helpHtml() : this.tab === 'bestiary' ? this.bestiaryHtml() : this.tab === 'collection' ? this.collectionHtml() : this.achievementsHtml();
     if (same) { const s = this.body.querySelector('.jscroll'); if (s) s.scrollTop = scroll; }
-    this.foot.innerHTML = `<span>Kept on this device across adventures.</span>` +
-      `<button type="button" class="quiet" data-clear>${this.clearArmed ? 'Click again to erase the whole journal' : 'Start the journal over'}</button>` +
+    this.foot.innerHTML = (this.tab === 'help' ? `<span>Guide progress and seen tips are saved with your adventure.</span>` : `<span>Kept on this device across adventures.</span>` +
+      `<button type="button" class="quiet" data-clear>${this.clearArmed ? 'Click again to erase the whole journal' : 'Start the journal over'}</button>`) +
       `<span>← → tabs${this.tab === 'bestiary' ? ' · ↑ ↓ pages' : ''} · ${bindKbd('journal')} or <kbd>Esc</kbd> to close</span>`;
   },
 

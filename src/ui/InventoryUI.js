@@ -17,6 +17,7 @@ import { STATIONS } from '../config/stations.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
 import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { bindKbd } from '../core/keybinds.js';
 import { craftProblem, recipesFor, requirements } from '../items/crafting.js';
 import { formatStat, gearTotals } from '../items/gear.js';
@@ -101,6 +102,7 @@ export const InventoryUI = {
   open(tab = 'bag', { filter = 'all' } = {}) {
     this.isOpen = ctx.inventoryOpen = true; this.message = ''; this.tab = tab; this.craftFilter = filter;
     dom.inventory.classList.add('show'); this.render();
+    emit('bagopened', { tab, filter });
   },
   close() { this.isOpen = ctx.inventoryOpen = false; this.selected = this.hovered = -1; this.hoveredGear = null; dom.inventory.classList.remove('show'); },
   setTab(t) { this.tab = t; this.selected = -1; this.message = ''; this.render(); },

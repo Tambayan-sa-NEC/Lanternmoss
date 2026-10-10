@@ -9,6 +9,7 @@
    Placeable things (TODO 25) will be put down from here. */
 import { HOTBAR } from '../config/items.js';
 import { ctx } from '../core/context.js';
+import { emit } from '../core/events.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { actionFor } from '../items/itemActions.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -31,6 +32,7 @@ export const Hotbar = {
     if (i < 0 || i >= HOTBAR.size) return null;
     if (i === this.selected && fromKey) return this.use();
     this.selected = i; this.changedAt = ctx.time; audio.blip();
+    emit('hotbarselected', { slot: i });
     return null;
   },
   /** Uses the held item. Returns the use result, or null when nothing happened. */

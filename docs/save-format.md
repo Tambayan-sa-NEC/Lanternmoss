@@ -25,6 +25,12 @@ and momentary movement/attack animations rebuild; an unfinished fishing cast end
 with a fresh combat body. Planet ecosystem simulation while away and building state remain future TODOs 24/25.
 Settings, key bindings, the lifetime journal and remembered pet selections stay separate, per device.
 
+TODO 21 adds an optional adventure-owned `systems.tutorial` record to version 1: guide status and completed step
+IDs, seen help IDs, movement practice distance, time since the last waking, the last fainting recap and its remaining
+respawn seconds. Existing v1 files remain readable and default to a skipped guide; the pause menu can restart it.
+Missing tutorial state does not alter player or planet data. The original v1 fixture is retained unchanged.
+Fainting saves resume the recap and countdown; pause freezes the countdown. Tutorial completion gives no rewards.
+
 Foreign, damaged and future-version files are rejected before writing. Supported snapshots drop unknown IDs,
 clamp finite numbers, normalize valid directions and fill safe defaults. Files are limited to 2 MiB. A future format
 change must migrate version 1 explicitly and retain `tests/fixtures/save-v1.json` as a compatibility check.
