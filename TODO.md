@@ -1293,6 +1293,43 @@ three-day spike right after 19. If it stays, it stays last.
 
 ---
 
+## 42. Game wiki website **(suggested)**
+
+**Goal:** a complete, searchable wiki website where players can learn about every part of Lanternmoss, from a
+character's abilities to an item's uses, a planet's wildlife and a boss's attacks.
+Code: new `wiki/` (website and written guides), a wiki build script under `scripts/`, and the existing game data in
+`src/config/`. **Size:** L. **Needs:** the existing game content and journal/help data (13, 21); no dependency on
+mobile or multiplayer. It can be built alongside the remaining gameplay work and expanded as content lands.
+**Risk:** copied stats and recipes become outdated as the game changes. **Recommendation:** generate factual entries
+from the game's configuration, keep explanatory guides alongside them, and distinguish released content from plans.
+
+- [ ] **Characters and people:** every playable character's profile, stats, abilities, resource costs, cooldowns,
+      strengths, playstyle and starter companion; villagers, their locations, schedules, shops, dialogue and quests.
+- [ ] **Plants and resources:** trees, flowers, herbs, forage, crops, seeds, resource nodes and ores; where they grow,
+      how to gather or cultivate them, tool requirements, growth/regrowth and their uses.
+- [ ] **Animals and companions:** wildlife, birds, fish and pets; habitats, rarity, behaviour, interactions, fishing,
+      pet unlocking, abilities, commands and care.
+- [ ] **Mobs:** every ordinary enemy and variant, with images, locations, stats, behaviour, attacks, counters, drops
+      and XP rewards.
+- [ ] **Mini bosses and main bosses:** individual pages covering lore, lairs, awakening conditions, attack patterns,
+      telegraphs, phases, strategies, rewards and the progression they unlock.
+- [ ] **Items and crafting:** all materials, food, potions, tools, weapons, armour, accessories, vanity items, keys
+      and trophies; images, rarity, stats/effects, sources, recipes, ingredient quantities, stations, fuel and prices.
+- [ ] **Environments and planets:** every planet, biome, village and other location; terrain, ponds, weather,
+      day/night, local plants, animals, enemies, bosses, resources, travel routes and unlock conditions.
+- [ ] **Game systems and guides:** getting started, controls and settings, combat and ultimate aiming, leveling,
+      gathering, energy, farming, fishing, smelting, cooking, brewing, quests, challenges, chests, achievements,
+      houses, save/load and other systems as they are implemented.
+- [ ] **Wiki navigation:** a clear home page, category indexes, search and filters, readable mobile layouts,
+      accessible navigation and stable links between related entries (item → recipe → ingredient → planet).
+- [ ] **Complete and current information:** cover every released entry in the game data, include screenshots or
+      illustrations, show the game version/update date, and check for missing pages, stale generated data and broken
+      internal links when content changes.
+- [ ] **Publish and maintain:** document how to build, preview, update and deploy the wiki; host the website and link
+      it from the game's menus and README.
+
+---
+
 ## Suggested additions
 
 Smaller ideas, and where the promoted ones went.

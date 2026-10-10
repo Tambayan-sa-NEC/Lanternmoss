@@ -3,7 +3,7 @@
 Record every meaningful task, decision, change, and verification in a Markdown file under `docs/logs/`.
 Use a Markdown table with one entry per row, keeping these six columns in this order:
 
-| DATETIME | DECISION/TASK | TODO ID | ACTION | BRANCH | REMARK0 |
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-09T16:45:22+08:00 | TASK | TODO 19 | Describe the action | feat/todo-19-save-load | Record the outcome or limitation |
 
