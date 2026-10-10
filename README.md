@@ -249,6 +249,8 @@ ES modules can't be loaded from `file://`, so the game needs a local web server:
 ```sh
 npm start            # zero-dependency static server -> http://localhost:8080/
 npm start -- 3000    # or pick a port
+npm stop             # stop this project's server on port 8080
+npm stop -- 3000     # stop it on a custom port (PORT also works, as with npm start)
 ```
 
 Any static server works too (`npx serve`, `python -m http.server`). An internet connection is needed: Three.js and the

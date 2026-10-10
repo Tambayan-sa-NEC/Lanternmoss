@@ -1,0 +1,11 @@
+﻿# Project server stop command
+
+| DATETIME | DECISION/TASK | TODO ID | ACTION | BRANCH | REMARK0 |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-10T11:48:33+08:00 | TASK | TODO N/A | Inspect port collision and create feature branch | feat/npm-stop | Existing server is node process 48868; branch starts from origin/master; add and verify npm stop before the standing test/merge/push workflow |
+| 2026-10-10T11:48:33+08:00 | DECISION | TODO N/A | Verify checkout ownership before stopping a port listener | feat/npm-stop | Use a temporary random file and authenticated shutdown for new servers; support the existing Windows server by checking its served directory, listener PID and Node command before termination |
+| 2026-10-10T11:51:13+08:00 | TASK | TODO N/A | Implement npm stop, custom ports, directory verification and a helpful startup collision message | feat/npm-stop | New servers accept authenticated shutdown tied to a temporary file in this checkout; legacy Windows fallback validates both directory and listener process; probes are ignored and removed |
+| 2026-10-10T11:51:13+08:00 | TASK | TODO N/A | Test actual default-port npm start and npm stop commands | feat/npm-stop | Stopped original PID 48868; repeat stop succeeds with nothing running; a new npm start serves HTTP 200, duplicate start reports a concise port message, and npm stop frees port 8080 |
+| 2026-10-10T11:51:13+08:00 | TASK | TODO N/A | Run focused server integration tests | feat/npm-stop | All five checks pass: port validation, matching server shutdown and cleanup, different-checkout refusal, shutdown authentication, and legacy absolute-path Windows server; full unit and gameplay suites running |
+| 2026-10-10T11:53:01+08:00 | TASK | TODO N/A | Complete full unit checks and verify branch synchronization | feat/npm-stop | All 131 unit tests pass, including the five server checks; origin/master has no commits missing from this branch; gameplay suite still running |
+| 2026-10-10T11:55:09+08:00 | TASK | TODO N/A | Finish required tests and prepare publication | feat/npm-stop | All 131 unit tests and all 20 gameplay simulations pass; actual npm start/duplicate-start/npm stop smoke checks pass; branch already up to date with origin/master; port 8080 remains free |
