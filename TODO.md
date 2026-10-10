@@ -450,7 +450,7 @@ Code: `src/config/items.js`, new gathering systems in `src/gameplay/`, `src/worl
 - [x] **Needs:** a hunger or energy meter (gentle, cozy-friendly: running low slows regeneration and sprinting rather
       than killing you), plus potions and food that matter more in long expeditions.
   - Done (`config/survival.js`, `gameplay/Needs.js`): an Energy bar beside the XP bar.
-    - It drains slowly while you play (full to empty in about 17 minutes), faster sprinting or swimming.
+    - It drains slowly while you play (full to empty in about 21 minutes), faster sprinting or swimming.
     - Under 30% you're Hungry: half healing and a slower sprint, a status chip and a pulsing bar. Empty means no
       healing and a sprint barely faster than walking. It never hurts you. Fainting wakes you with some energy.
 - [x] **Expand the consumables:**
@@ -848,17 +848,23 @@ Merges the two high-priority balance items from the suggested additions. **Size:
     Blade lands.
   - The knight is the fastest and takes the least damage everywhere (difficulty 1 in the hero picker, so maybe
     intended, but by this much?).
-- [ ] **Targets first** (risk 5), reported by the sims per hero: a regular monster falls in 2–6 s at the planet's
+- [x] **Targets first** (risk 5), reported by the sims per hero: a regular monster falls in 2–6 s at the planet's
       expected level; a mini boss takes 1.5–3 min, a boss 3–5 min; a natural play-through reaches each boss's summon
       level (2, 4, 6) without grinding. Write them in `docs/balance.md`.
-- [ ] Balance and pacing (was a suggested addition): play through with each hero and tune the numbers that were set by
+- [x] Balance and pacing (was a suggested addition): play through with each hero and tune the numbers that were set by
       hand and never tested together: energy drain, node regrow times, crop growth, fuel costs, mini boss health, coin
       prices and shop costs.
-- [ ] Balance pass on the new bosses (was a suggested addition): playtest Pyrrhax and Malgrath with each hero. In
+- [x] Balance pass on the new bosses (was a suggested addition): playtest Pyrrhax and Malgrath with each hero. In
       particular, check how often the Doom Blade is used, the damage of the Demon Lord's flying phase, and the 50%
       transition timing.
-- [ ] **The economy:** coins in (monsters, chests, quests, selling) against coins out (shop, seeds); a planet's chests and
+- [x] **The economy:** coins in (monsters, chests, quests, selling) against coins out (shop, seeds); a planet's chests and
       quests should pay for its next gear tier, not more.
+
+Implemented: combat/resource tuning, longer bosses and mini bosses, fairer melee dive punish windows,
+energy/growth/fuel and seed-price adjustments, and coin/XP budgets covering first visits without respawn grinding.
+All nine hero/planet timing profiles meet the documented targets. Reports expose individual monster outliers,
+Doom warnings, transition timing, flying damage and HP top-ups. See [docs/balance.md](docs/balance.md) for the
+target definitions, raw measurements, economy ledger and verification limits.
 
 ---
 
@@ -1342,8 +1348,8 @@ from the game's configuration, keep explanatory guides alongside them, and disti
 Smaller ideas, and where the promoted ones went.
 
 - [~] **Save / load (suggested):** promoted to item 19.
-- [~] **Balance and pacing pass (suggested, high priority):** promoted to item 23.
-- [~] **Balance pass on the new bosses (suggested, high priority):** promoted to item 23.
+- [x] **Balance and pacing pass (suggested, high priority):** implemented in item 23.
+- [x] **Balance pass on the new bosses (suggested, high priority):** implemented in item 23.
 - [x] **Minimap or compass (suggested):** the compass strip and off-screen arrows landed with TODO 1 (a minimap could follow once planets get bigger, see 11).
 - [~] **Tutorial / onboarding (suggested, promoted to item 21):** a short guided first fight that teaches dodging, abilities and the ultimate's aim mode.
 - [~] **Death / respawn screen (suggested, promoted to item 21):** "You fainted" with a short recap and a respawn countdown, instead of only a toast.

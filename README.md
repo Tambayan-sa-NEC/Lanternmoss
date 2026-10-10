@@ -274,17 +274,23 @@ UI font come from CDNs, declared in the import map in `index.html`.
 ```sh
 npm test             # unit tests (Node's built-in test runner, no dependencies)
 npm install          # once, for the sims: installs three (the same version as the import map) as a dev dependency
-npm run sim          # gameplay sims: the real game, headless, played by scripts (about 2 minutes)
+npm run sim          # gameplay sims and pacing audits (several minutes)
 npm run sim -- bosses combat     # only some sims
-npm run sim -- balance           # the balance report: time to kill and damage taken, per hero and planet (~7 min)
+npm run sim -- balance           # time to kill, damage, phases and moves, per hero and planet (several minutes)
+npm run sim -- pacing balancePhases # campaign XP/economy audit and real flying-boss hit checks
 node scripts/performance.mjs     # optional real-WebGL 1080p measurements and per-planet ceiling checks
 ```
 
 The **gameplay sims** in `tests/sim/` boot the real game in Node with a fake browser (`tests/sim/lib/`: no WebGL, the
 renderer is a stub) and play it by script: fights and bosses, boss gates, menus, the HUD, pets, villagers, houses,
-chests, items, terrain, survival, stations and save/load. Each prints `PASS` / `FAIL` lines; `npm run sim` runs them a few at a
+chests, items, terrain, survival, stations, campaign pacing and save/load. Each prints `PASS` / `FAIL` lines; `npm run sim` runs them a few at a
 time and sums up. Randomness is seeded (`SIM_SEED`, default 1), so a run plays out the same every time: game code
 draws from the play stream in `src/utils/random.js`, never `Math.random` (a unit test checks).
+
+The [balance notes](docs/balance.md) define combat targets, the first-visit XP route, coin reserves and survival/farming
+budgets. Set `BALANCE_CHECK=1` for a timing report that fails outside those targets, and `BALANCE_JSON` to export its
+measurements. `node scripts/balance-smoke.mjs` optionally checks tuned boss phases and seed purchases in real WebGL
+(requires `puppeteer-core` and Edge, or a browser path in `CHROME`).
 
 **Performance:** press `F3` during play (including while paused), or enable **Performance overlay** in Settings →
 Graphics, to see FPS, frame time, draw calls and triangles. Quality presets now reduce scenery decoration, grass,

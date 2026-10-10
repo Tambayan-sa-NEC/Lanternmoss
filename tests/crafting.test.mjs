@@ -44,10 +44,10 @@ test('preflight counts exact output stacks and slots freed by fuel, without any 
 });
 test('Smelt all respects materials, pooled fuel, station and capacity even when smaller batches do not fit', () => {
   const inv = new Inventory(6); inv.add('copperOre', 14); inv.add('charcoal', 2);
-  assert.equal(maxCraftable(recipe('copperIngot'), inv, 0, 'forge'), 6);
+  assert.equal(maxCraftable(recipe('copperIngot'), inv, 0, 'forge'), 7);
   assert.equal(maxCraftable(recipe('copperIngot'), inv, 0, 'pot'), 0);
-  craft(recipe('copperIngot'), inv, 0, () => true, 'forge', 6);
-  assert.equal(inv.count('copperIngot'), 6); assert.equal(inv.count('charcoal'), 0); assert.equal(inv.count('copperOre'), 2);
+  craft(recipe('copperIngot'), inv, 0, () => true, 'forge', 7);
+  assert.equal(inv.count('copperIngot'), 7); assert.equal(inv.count('charcoal'), 0); assert.equal(inv.count('copperOre'), 0);
   const wood = new Inventory(1); wood.add('wood', 16);
   const sharedFuel = { ...recipe('charcoal'), fuel: 1 };
   assert.deepEqual(requirements(sharedFuel, wood, 0, 4).fuel, { have: 4, need: 4 });

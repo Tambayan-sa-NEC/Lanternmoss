@@ -66,7 +66,7 @@ check(r.ok && inv.count('copperIngot') === 1 && inv.count('copperOre') === 2 && 
 r = cmd.craft(R('charcoal'));
 check(r.ok && inv.count('charcoal') === 2 && inv.count('wood') === 0, 'wood burns down into charcoal (a better fuel)');
 r = cmd.craft(R('ironIngot'));
-check(r.ok && inv.count('ironIngot') === 1 && inv.count('charcoal') === 1, 'iron smelts with charcoal (one charcoal burns for three)');
+check(r.ok && inv.count('ironIngot') === 1 && inv.count('charcoal') === 1, 'iron smelts with charcoal (one charcoal burns for four)');
 InventoryUI.open('craft', { filter: 'forge' }); step(0.05);
 check(/Smelting/.test(InventoryUI.craftEl.innerHTML) && /🔥/.test(InventoryUI.craftEl.innerHTML), 'the forge lists Smelting first, with a fuel chip');
 inv.add('ironIngot', 2); inv.add('wood', 2); P.coins += 20; r = cmd.craft(R('ironPick'));

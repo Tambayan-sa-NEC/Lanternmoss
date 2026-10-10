@@ -101,6 +101,6 @@ test('scaled per planet, each boss hits harder than the last (difficulty from at
   };
   const peaks = PLANETS.map(peak);
   for (let i = 1; i < peaks.length; i++) assert.ok(peaks[i] > peaks[i - 1], `planet ${i + 1} boss peak hit ${peaks[i]} > ${peaks[i - 1]}`);
-  const hp = PLANETS.map(p => COMBAT.enemies[p.boss.type].hp);
-  assert.ok(Math.max(...hp) / Math.min(...hp) < 1.5, 'base boss health stays in the same range');
+  const hp = PLANETS.map(p => scaleEnemyDef(COMBAT.enemies[p.boss.type], p.scale).hp);
+  assert.ok(Math.max(...hp) / Math.min(...hp) < 1.5, 'actual boss health stays in the same range across planets');
 });

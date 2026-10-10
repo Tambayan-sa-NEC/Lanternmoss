@@ -29,10 +29,10 @@ export const CHARACTERS = {
     profile: { role: 'Melee bruiser', difficulty: 1, ratings: { damage: 4, toughness: 5, range: 1, mobility: 3 },
       companionText: 'stays at your heel, bites whatever you fight and howls to rally you (V)',
       voice: { pitch: 300, slide: 0.8 } },
-    resource: 'STAMINA', stats: { ...COMBAT.player, maxHp: 140, manaRegen: 16, armor: 0.2 },   // armor = damage taken reduction
+    resource: 'STAMINA', stats: { ...COMBAT.player, maxHp: 140, manaRegen: 13, armor: 0.2 },   // armor = damage taken reduction
     abilities: {
       slash: { name: 'Axe Cleave',  mouse: true, repeat: true, color: 0xdfe8ff,
-               cost: 5, cooldown: 0.42, damage: 14, range: 2.7, arc: 110, knockback: 3.5 },
+               cost: 6, cooldown: 0.42, damage: 11, range: 2.7, arc: 110, knockback: 3.5 },
       dash:  { name: 'Shoulder Charge', color: 0x8fb8ff,                  // evasion (i-frames): was 4 s
                cost: 20, cooldown: 3, damage: 18, distance: 5.5, time: 0.3, width: 1.3, knockback: 7, stun: 0.8 },
       whirl: { name: 'Whirlwind', color: 0xffd36b,

@@ -101,7 +101,7 @@ export const PLANETS = [
     flora: { trees: { snowpine: 5, birch: 2, crystal: 2 }, treeCount: 54, flowers: [0xbff4ff, 0xd8b8ff, 0xffffff, 0x9fd8ff],
       tallGrass: [0xa8d8c8, 0xc8eae0, 0x98ccc0], meadow: 0.5 },
     weather: { clear: 3, snow: 4, blizzard: 2, fog: 2, breezy: 1 },
-    miniBosses: [{ type: 'hydra', near: 'lake', overrides: { name: 'The Frost Hydra, Ice-Fanged', color: 0x7fb8e0, capColor: 0xbff4ff,
+    miniBosses: [{ type: 'hydra', near: 'lake', overrides: { hp: 3700, name: 'The Frost Hydra, Ice-Fanged', color: 0x7fb8e0, capColor: 0xbff4ff,
       look: { skin: 0x7aa8d0, belly: 0xe8f4ff, fin: 0xbff4ff, eye: 0x9ff3ff } } }],
     wildlife: { critters: [['snowHare', 6], ['reindeer', 3, 'far']], rare: 'auroraHare', birds: 6, flocks: 1,
       plumage: [{ body: 0xffffff, belly: 0xe8f4ff, wing: 0xc8dcf0 }, { body: 0x7fb8ff, belly: 0xffffff, wing: 0x5f98e8 }, { body: 0x3a3a4a, belly: 0xffffff, wing: 0x2a2a38 }],

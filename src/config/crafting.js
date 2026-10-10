@@ -14,7 +14,7 @@
    Weapons only show up for the hero who can wield them.
    --------------------------------------------------------------------- */
 
-export const FUEL = { wood: 1, charcoal: 3, emberShard: 2 };
+export const FUEL = { wood: 1, charcoal: 4, emberShard: 2 };
 
 export const DISCOVERY_RECIPES = [
   { id: 'perchChowder', group: 'Cooking', station: 'pot', result: 'perchChowder', needs: [['pondPerch', 2], ['moonCarrot', 2], ['sunWheat', 1]], discovery: { kind: 'book', planet: 'lanternmoss', text: 'Read a bookshelf in a Lanternmoss house.' } },

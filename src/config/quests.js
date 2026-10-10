@@ -77,7 +77,7 @@ export const QUESTS = {
       { kind: 'collect', item: 'frostPetal', count: 3, text: 'Find 3 Frost Petals' },
       { kind: 'deliver', to: 'Lio', item: 'frostPetal', count: 3, text: 'Bring the Frost Petals to Lio', say: 'And these chime in A! Fire and frost... the ballad is complete!' },
     ],
-    reward: { coins: 100, xp: 150, items: [['featherCharm', 1]] },
+    reward: { coins: 40, xp: 150, items: [['featherCharm', 1]] },
     text: {
       offer: "Every planet has its own music, they say. Bring me a little sound from each world we visit? It's a long tune.",
       accept: 'Splendid! Nothing to do until we reach the next planet. Then: listen to the rocks.',
@@ -92,7 +92,7 @@ export const QUESTS = {
       { kind: 'defeat', enemy: 'ramhorn', count: 2, text: 'Defeat 2 ramhorns' },
       { kind: 'deliver', to: 'Cinder', item: 'emberShard', count: 4, text: 'Bring the shards to Cinder', say: 'Good shards. Hot, angry, perfect. Stand back.' },
     ],
-    reward: { coins: 60, xp: 80, items: [['featherCharm', 1]] },
+    reward: { coins: 100, xp: 80, items: [['featherCharm', 1]] },
     text: {
       offer: "My forge needs ember shards, and the ramhorns keep butting my gatherers. Fetch four and teach two ramhorns some manners?",
       accept: 'Good. Shards glow on the slopes. Ramhorns glow with rage. Easy to tell apart.',
@@ -107,7 +107,7 @@ export const QUESTS = {
       { kind: 'collect', item: 'frostPetal', count: 4, text: 'Gather 4 Frost Petals' },
       { kind: 'deliver', to: 'Tuva', item: 'frostPetal', count: 4, text: 'Bring the petals to Tuva', say: 'They never melt, these. Like a promise. Thank you.' },
     ],
-    reward: { coins: 80, xp: 120, items: [['moonberryTart', 2]] },
+    reward: { coins: 90, xp: 120, items: [['moonberryTart', 2]] },
     text: {
       offer: 'Thornmoles are digging up my frost-petal garden. Chase three away, then help me replant?',
       accept: "Thank you! Feel the ground tremble, then jump. That's the thornmole dance.",
