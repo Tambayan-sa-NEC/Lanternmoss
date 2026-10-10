@@ -26,13 +26,15 @@ import { PetMenu } from '../ui/PetMenu.js';
 import { JournalUI } from '../ui/JournalUI.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
+import { PortalUI } from '../ui/PortalUI.js';
 
 /** Keys whose browser default (page scroll, quick-find, focus moves...) would get in the way. */
-const GAME_KEYS = { has: code => code === 'Escape' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
+const GAME_KEYS = { has: code => PortalUI.isOpen ? code === 'Escape' : code === 'Escape' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
 
 function onKey(code) {
   if (is('togglePerformance', code) && !PauseMenu.capture) { setSetting('perfOverlay', !settings.perfOverlay); return; }
   const player = ctx.player;
+  if (PortalUI.isOpen) { PortalUI.key(code); return; }
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens
   if (PetMenu.isOpen) { PetMenu.key(code); return; }      // the pet menu pauses too
@@ -66,7 +68,7 @@ function onKey(code) {
 /** Clicking casts the active hero's mouse ability (the hero first turns to face the clicked ground: that's how the
     mouse aims, since the camera doesn't), or the area ability being aimed. */
 function onClick() {
-  if (ctx.inventoryOpen) return;
+  if (ctx.paused || ctx.transitioning || ctx.inventoryOpen) return;
   if (Fishing.active) { Fishing.press(); return; }      // fishing: a click reels in
   if (isAiming()) { confirmAim(); return; }
   faceClick();
@@ -78,6 +80,7 @@ function faceClick() {
 }
 /** Right click: cancels aiming, otherwise uses the held hotbar item. */
 function onRightClick() {
+  if (ctx.paused || ctx.transitioning) return;
   if (isAiming()) { cancelAim(); return; }
   if (!ctx.inventoryOpen && !Dialog.open) Hotbar.use();
 }

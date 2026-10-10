@@ -33,7 +33,7 @@ export function spawnRoster(world, roster) {
   const wildPonds = ponds.filter(p => arcDist(p.dir, world.spawnDir) > COMBAT.player.safeRadius + 8);   // pond dwellers gather around far ponds
   for (const g of roster) {
     if (g.groups) {
-      for (let c = 0; c < more(g.groups); c++) { const camp = enemySpot(world); for (let i = 0; i < g.size; i++) addEnemy(g.type, i ? spawnSpot(camp, 1.2, 3, 0.6) : camp); }
+      for (let c = 0; c < more(g.groups); c++) { const camp = enemySpot(world); for (let i = 0; i < g.size; i++) addEnemy(g.type, i ? spawnSpot(camp, 1.2, 3, 0.6, rand) : camp); }
     } else if (g.near === 'ponds') {
       for (let i = 0; i < more(g.count); i++) {
         const p = wildPonds[i % Math.max(1, wildPonds.length)];

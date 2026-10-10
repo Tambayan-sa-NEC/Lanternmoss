@@ -11,7 +11,7 @@ test('tutorial copy has unique stable IDs and only supported dynamic placeholder
   for (const topic of [...TUTORIAL_STEPS, ...HELP_TOPICS]) {
     for (const [, token] of topic.text.matchAll(/\{(\w+)\}/g)) assert.ok(tokens.has(token), token);
   }
-  assert.deepEqual(HELP_TOPICS.map(t => t.id), ['energy', 'tools', 'stations', 'smelting', 'fishing', 'farming', 'pets']);
+  assert.deepEqual(HELP_TOPICS.map(t => t.id), ['energy', 'tools', 'stations', 'smelting', 'fishing', 'farming', 'pets', 'portals']);
   assert.equal(TUTORIAL_STEPS.filter(s => s.acknowledge).length, 1);
 });
 

@@ -1,0 +1,105 @@
+// Real world rebuilds, key transactions, per-planet deltas and adventure reloads through the portal API.
+import assert from 'node:assert/strict';
+import { boot, imp } from './lib/boot.mjs';
+const { game, H, step } = await boot('witch', { wake: false });
+const { ctx } = await imp('core/context.js');
+const { currentInteraction } = await imp('gameplay/Houses.js');
+const { Quests } = await imp('gameplay/quests/Quests.js');
+const { StoryMemory } = await imp('gameplay/storyState.js');
+const { damageEnemy } = await imp('combat/damage.js');
+const { encounterEvents } = await imp('combat/events.js');
+const { spawnWorldItem } = await imp('gameplay/pickups.js');
+const P = H.player, portal = H.Portals;
+const seedNodes = H.Gathering.nodes.map(n => [n.id, n.up.clone()]);
+game.resetRun(); H.CharacterSelect.pick('witch');
+assert.ok(H.Gathering.nodes.every((n, i) => n.id === seedNodes[i][0] && n.up.distanceTo(seedNodes[i][1]) < 1e-6), 'fresh adventures restart from the same seed sites');
+assert.ok(ctx.enemies.filter(e => e.def.miniBoss).every(e => e.portalId), 'restarts register mini boss stable IDs');
+P.invuln = 1e9; H.Tutorial.skip();
+const gate = () => { P.placeAt(portal.gate.dir); P.invuln = 1e9; };
+const travel = id => { gate(); assert.ok(portal.travel(id), `travel to ${id}`); step(2); assert.equal(ctx.planetId, id); assert.equal(ctx.transitioning, false); };
+
+gate(); assert.match(currentInteraction().label, /lantern gate/);
+const before = ctx.time; H.PortalUI.open(); assert.ok(ctx.paused); step(5); assert.equal(ctx.time, before);
+H.PortalUI.key('Escape'); assert.equal(ctx.paused, false); assert.equal(ctx.transitioning, false);
+assert.equal(portal.travel('emberfall'), false); assert.equal(portal.travel('foreign'), false);
+assert.equal(ctx.planetId, 'lanternmoss');
+H.inventory.add('wayfarerKey', 2);
+assert.equal(portal.travel('frostveil'), false); assert.equal(H.inventory.count('wayfarerKey'), 2);
+H.PortalUI.open(); H.PortalUI.close(); assert.equal(H.inventory.count('wayfarerKey'), 2);
+console.log('PASS  E offers the village gate; picker pauses, Escape/cancel costs nothing, locked/distant routes are refused');
+
+const chest = H.Chests.list.find(c => c.kind === 'common'), chestId = chest.id, chestDir = chest.up.clone();
+H.Chests.open(chest);
+const node = H.Gathering.nodes[0], nodeId = node.id, nodeDir = node.up.clone(); node.deplete();
+const initialCooldown = node.regrowT, depletedAt = ctx.time; H.Gathering.rest.set('tree:0', 30);
+H.Farm.plots[0].s.tilled = true;
+const mini = ctx.enemies.find(e => e.def.miniBoss); damageEnemy(mini, mini.hp + 1, 'hero');
+const miniId = mini.portalId;
+spawnWorldItem('ironOre', 7, chestDir);
+travel('emberfall'); assert.equal(H.inventory.count('wayfarerKey'), 1); assert.deepEqual(portal.stranded, { at: 'emberfall', from: 'lanternmoss' });
+assert.equal(H.saves.save().ok, true); assert.ok(H.saves.continue());
+assert.deepEqual(portal.stranded, { at: 'emberfall', from: 'lanternmoss' });
+H.inventory.remove('wayfarerKey', 1); gate(); assert.equal(portal.travel('lanternmoss'), false);
+H.inventory.add('wayfarerKey', 1);
+const cinder = H.npcs.find(n => n.name === 'Cinder'); cinder.seen.add(0); StoryMemory.toJSON();
+Quests.start('dragonForge'); const quest = structuredClone(Quests.st('dragonForge'));
+const travellers = H.npcs.filter(n => !n.def.local); travellers[0].seen.add(0);
+// Only unpaused adventure time counts: the world waits during pause and advances while another world is played.
+ctx.paused = true; const pausedTime = ctx.time; step(100); assert.equal(ctx.time, pausedTime); ctx.paused = false;
+step(10); travel('lanternmoss'); assert.equal(H.inventory.count('wayfarerKey'), 0); assert.equal(portal.stranded, null);
+assert.equal(H.Chests.list.find(c => c.id === chestId).opened, true);
+assert.ok(H.Chests.list.find(c => c.id === chestId).up.distanceTo(chestDir) < 1e-6);
+const returned = H.Gathering.nodes.find(n => n.id === nodeId);
+assert.ok(returned.up.distanceTo(nodeDir) < 1e-6, 'seed node positions stable despite different play RNG');
+assert.ok(returned.regrowT < initialCooldown - 10 && returned.regrowT > 0);
+assert.ok(Math.abs(returned.regrowT - (initialCooldown - (ctx.time - depletedAt))) < 0.1, 'only elapsed unpaused play time advances node cooldown');
+assert.equal(H.Farm.plots[0].s.tilled, true);
+assert.ok(portal.progression.miniDefeated.has(miniId)); assert.ok(!ctx.enemies.some(e => e.portalId === miniId && e.alive));
+assert.ok(ctx.enemies.some(e => e.alive && !e.def.object && !e.def.miniBoss && e !== ctx.boss));
+assert.ok(ctx.worldItems.some(w => w.itemId === 'ironOre' && w.quantity === 7));
+assert.deepEqual(Quests.st('dragonForge'), quest); Quests.tracked = 'dragonForge';
+assert.match(Quests.trackerInfo().text, /Return to Emberfall/); assert.equal(Quests.target(), null);
+assert.ok(travellers.every(n => H.npcs.includes(n)), 'travelling villagers follow the portal trip');
+assert.ok(H.npcs.find(n => n.name === 'Old Bramble').seen.has(0)); assert.ok(!H.npcs.some(n => n.def.local));
+console.log('PASS  early trip and keyed return survive Continue; chest, node, farm, mini boss, pickups and local quests retain state');
+
+// A completed boss unlocks free travel but treasure opening never starts a trip. A saved hit prevents a no-hit key.
+H.wakeBoss(); H.Journal.fight = { boss: ctx.boss, hit: true, pet: false, level: P.level };
+assert.ok(H.saves.save().ok); assert.ok(H.saves.continue()); assert.equal(H.Journal.fight.hit, true);
+damageEnemy(ctx.boss, ctx.boss.hp + 1, 'hero'); step(5); assert.equal(ctx.planetId, 'lanternmoss');
+assert.equal(H.inventory.count('wayfarerKey'), 0);
+const treasure = H.Chests.bossChest; assert.ok(treasure && !treasure.opened);
+travel('emberfall'); assert.equal(portal.stranded, null); assert.equal(H.inventory.count('wayfarerKey'), 0);
+assert.ok(H.npcs.find(n => n.name === 'Cinder').seen.has(0)); assert.deepEqual(Quests.st('dragonForge'), quest);
+// Advance the adventure clock while away, without wall-clock waiting or offline growth.
+ctx.time += initialCooldown + 1;
+travel('lanternmoss'); assert.equal(H.BossGate.state, 'beaten'); assert.equal(ctx.boss.alive, false);
+assert.ok(H.Gathering.nodes.find(n => n.id === nodeId).ready); assert.equal(H.Gathering.rest.has('tree:0'), false);
+assert.ok(H.Chests.bossChest && !H.Chests.bossChest.opened); H.Chests.open(H.Chests.bossChest); step(5);
+assert.equal(ctx.planetId, 'lanternmoss'); assert.equal(ctx.transitioning, false);
+assert.equal(H.Gathering.toJSON().delta, true); assert.ok(!H.Gathering.toJSON().nodes.some(n => n.dir || n.kind));
+assert.ok(H.Chests.toJSON().list.every(c => c.kind === 'boss'));
+console.log('PASS  boss wins unlock voluntary free travel; bosses stay beaten, treasure waits and seed geometry is omitted from deltas');
+
+travel('emberfall'); H.wakeBoss(); H.Journal.fight = { boss: ctx.boss, hit: false, pet: false, level: P.level };
+damageEnemy(ctx.boss, ctx.boss.hp + 1, 'hero'); step(5);
+assert.equal(H.inventory.count('wayfarerKey'), 1);
+assert.ok(H.saves.save().ok); assert.ok(H.saves.continue());
+encounterEvents.dispatchEvent(new CustomEvent('bossdefeated', { detail: { boss: ctx.boss } }));
+assert.equal(H.inventory.count('wayfarerKey'), 1, 'reward never duplicated by reload or repeated event');
+gate(); assert.ok(portal.travel('frostveil')); const saved = localStorage.getItem('lanternmoss.adventure');
+assert.equal(H.saves.save({ arrival: true }).ok, false); assert.equal(H.saves.export(), false);
+__fire('pagehide'); assert.equal(localStorage.getItem('lanternmoss.adventure'), saved);
+step(2); assert.equal(ctx.planetId, 'frostveil'); assert.equal(H.saves.store.read().data.planetId, 'frostveil');
+assert.equal(H.inventory.count('wayfarerKey'), 1, 'unlocked travel costs no keys');
+const tuva = H.npcs.find(n => n.name === 'Tuva'); tuva.seen.add(0);
+travel('emberfall'); assert.ok(!H.npcs.some(n => n.name === 'Tuva')); travel('frostveil');
+assert.ok(H.npcs.find(n => n.name === 'Tuva').seen.has(0));
+// Early routes allow out-of-order wins: the last-listed boss alone is not campaign completion.
+game.planets.defeated.delete('emberfall'); H.wakeBoss(); damageEnemy(ctx.boss, ctx.boss.hp + 1, 'hero'); step(5);
+assert.equal(game.planets.complete, false); assert.equal(game.planets.state, 'playing');
+game.resetRun(); assert.equal(ctx.planetId, 'lanternmoss'); assert.equal(portal.stranded, null);
+assert.equal(portal.rewarded.size, 0); assert.equal(game.planets.defeated.size, 0); assert.equal(game.planets.miniDefeated.size, 0);
+assert.ok(ctx.boss.alive); assert.ok(H.Chests.list.every(c => !c.opened));
+console.log('PASS  no-hit keys awarded once; fades cannot save mixed-world state; both locals stay home and reset clears the adventure');
+console.log('all passed');

@@ -789,3 +789,21 @@ body.petrified canvas { filter:grayscale(0.85) contrast(1.08) brightness(0.95); 
 .help-card p { margin:0; line-height:1.6; }
 .help-card small { font-size:10px; color:#765685; margin-left:8px; }
 body.paused #tutorial, body.menu #tutorial, body.menu #faint-screen, body.cutscene #tutorial { display:none !important; }
+
+/* Village portal destinations */
+#portal-picker { position: fixed; inset: 0; z-index: 95; display: none; align-items: center; justify-content: center; background: #20192cc9; padding: 20px; }
+#portal-picker.show { display: flex; }
+.portal-panel { width: min(620px, 100%); max-height: calc(100vh - 40px); overflow: auto; border: 2px solid #ceb5dc; border-radius: 24px; padding: 24px; background: #f9f0df; color: #4b3659; box-shadow: 0 16px 60px #18112380; }
+.portal-panel header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.portal-panel h2 { margin: 0; }
+.portal-panel header button { border: 0; background: transparent; color: inherit; font-size: 28px; cursor: pointer; }
+.portal-destinations { display: grid; gap: 12px; }
+.portal-destinations button { display: grid; gap: 6px; text-align: left; padding: 16px 18px; border: 2px solid #b6a0c9; border-radius: 16px; background: #fffbf2; color: inherit; font: inherit; cursor: pointer; }
+.portal-destinations button strong { font-size: 20px; }
+.portal-destinations button small { font-size: 13px; line-height: 1.5; }
+.portal-destinations button:disabled { opacity: .6; cursor: default; background: #eae1df; }
+.portal-destinations button:not(:disabled):hover { background: #e2f2d9; border-color: #749468; }
+.portal-panel button:focus-visible { outline: 3px solid #8051ac; outline-offset: 3px; }
+.portal-warning { padding: 12px; border-radius: 12px; background: #f8dfbb; }
+.portal-foot { font-size: 13px; line-height: 1.6; margin-bottom: 0; }
+@media (max-height: 600px) { .portal-panel { padding: 16px; } .portal-destinations button { padding: 10px 14px; } }

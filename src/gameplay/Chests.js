@@ -20,7 +20,7 @@ import { arcDist, offsetDir, randomDir, tangentFrame, tangentToward } from '../u
 import { spawnSpot } from '../world/placement.js';
 import { ponds, slopeAt } from '../world/terrain.js';
 import { SPAWN_DIR } from '../world/World.js';
-import { lootName, rollLoot } from './loot.js';
+import { lootName, rollChestLoot } from './loot.js';
 import { grantItem, spawnWorldItem } from './pickups.js';
 import { gainCoins } from './wallet.js';
 import { RecipeBook } from './RecipeBook.js';
@@ -34,13 +34,16 @@ export const Chests = {
   sinceKey: 0,                // kills since the last key drop (pity counter)
 
   toJSON() {
-    return { opened: [...this.opened].filter(id => id.startsWith(`${ctx.planetId}:`)), sinceKey: this.sinceKey,
-      list: this.list.map(c => ({ id: c.id, kind: c.kind, dir: c.up.toArray(), fwd: c.fwd.toArray() })) };
+    return { delta: true, opened: [...this.opened].filter(id => id.startsWith(`${ctx.planetId}:`)), sinceKey: this.sinceKey,
+      list: this.list.filter(c => c.kind === 'boss').map(c => ({ id: c.id, kind: c.kind, dir: c.up.toArray(), fwd: c.fwd.toArray() })) };
   },
   load(data) {
-    this.clear(); this.sinceKey = data.sinceKey;
+    if (!data.delta) this.clear();
+    else { for (const c of this.list.filter(c => c.kind === 'boss')) c.dispose(); this.list = this.list.filter(c => c.kind !== 'boss'); this.bossChest = null; }
+    this.sinceKey = data.sinceKey;
     for (const id of [...this.opened]) if (id.startsWith(`${ctx.planetId}:`)) this.opened.delete(id);
     for (const id of data.opened) if (id.startsWith(`${ctx.planetId}:`)) this.opened.add(id);
+    if (data.delta) for (const c of this.list) c.restoreOpened(this.opened.has(c.id));
     for (const saved of data.list) {
       if (!saved.id.startsWith(`${ctx.planetId}:`)) continue;
       const chest = new Chest(saved.kind, ctx.player.up.clone().fromArray(saved.dir), ctx.player.up.clone().fromArray(saved.fwd), { id: saved.id, opened: this.opened.has(saved.id) });
@@ -110,7 +113,7 @@ export const Chests = {
       ctx.player.inventory.remove(KEYS.item, 1); audio.unlock(); toast('The Lantern Key turns with a click!');
     }
     c.open(); this.opened.add(c.id); emit('chestopened', { kind: c.kind, planet: ctx.planet });
-    const loot = rollLoot(c.def.loot, ctx.planet, rng, ctx.player.charId), names = [];
+    const loot = rollChestLoot(c.kind, ctx.planet, rng, ctx.player.charId), names = [];
     const scroll = RecipeBook.scrollFor(ctx.planetId); if (scroll) loot.items.push({ item: scroll, qty: 1, props: null });
     if (loot.coins) { gainCoins(loot.coins, c.top(0.6)); names.push(`${loot.coins} coins`); }
     loot.items.forEach(({ item, qty, props }, i) => {

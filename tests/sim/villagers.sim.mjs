@@ -79,6 +79,6 @@ P.placeAt(npc('Cinder').up); step(0.1); t = talk(npc('Cinder')); choose(true);
 check(Quests.st('dragonForge').status === 'active', "Cinder's quest accepted");
 H.goToPlanet(2); step(1);
 check(!npc('Cinder') && npc('Tuva') && ctx.npcs.length === 5, 'leaving Emberfall: Cinder stays behind, Tuva lives on Frostveil');
-check(Quests.st('dragonForge').status === 'dropped', "Cinder's unfinished quest is dropped when you leave");
-check(Quests.st('songsAfar').status === 'active' && Quests.step('songsAfar').item === 'frostPetal', `Lio's quest skipped the Emberfall part you missed and moved on to Frostveil (step ${Quests.st('songsAfar').step})`);
+check(Quests.st('dragonForge').status === 'active', "Cinder's unfinished quest waits for your return");
+check(Quests.st('songsAfar').status === 'active' && Quests.step('songsAfar').item === 'emberShard', `Lio's earlier-world quest step stays available for a return visit (step ${Quests.st('songsAfar').step})`);
 console.log(fails ? `${fails} FAILED` : 'all passed');

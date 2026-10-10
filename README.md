@@ -10,7 +10,7 @@ treasure chests, gear up, raise a pet, and fight the monsters beyond the village
 ![The village of Lanternmoss](docs/screenshots/village.jpg)
 
 **Campaign:** every planet has a boss in a lair on its far side, marked by a shaft of light. Defeat it, open the treasure
-chest it leaves, and the hero travels on to the next, harder planet (Lanternmoss, then Emberfall, then Frostveil),
+chest it leaves, and choose your next destination at the village lantern gate (Lanternmoss, Emberfall or Frostveil),
 keeping their level, gear, bag, coins and pets. Each boss is its own fight: Gloomcap the Moss King, Pyrrhax the red
 dragon, and Malgrath, the two-phase Winged Demon Lord.
 
@@ -465,7 +465,7 @@ src/
 │   ├── experience.js      applies XP to the hero and emits 'xp' / 'levelup' events
 │   └── levelFeedback.js   float text, burst, jingle and toast on those events
 ├── gameplay/
-│   ├── PlanetProgression.js  boss defeated -> victory -> fade -> next planet; restart back to planet 1
+│   ├── PlanetProgression.js  boss defeated -> victory; portal choice -> fade -> chosen planet; restart at planet 1
 │   ├── BossGate.js        the sealed lair: summon conditions (level, seals, elites' sigils, a quest, night), the waking
 │   │                      sequence, the arena ring, villager hints, the lair chip and compass marks
 │   ├── characters.js      switching heroes (model, stats, abilities, pet)
@@ -547,11 +547,14 @@ dialogue through `Dialog.lineProvider` instead of the dialogue importing them. L
 is the one place to look for "what is alive right now", instead of dozens of loose globals.
 
 **Planets:** `World.generate(planet)` builds a planet from its PLANETS entry (seed + palette) and `World.dispose()`
-tears it down. `PlanetProgression` listens for `'bossdefeated'` and runs the trip: the other monsters vanish (no XP),
-any challenge is called off, and after the victory banner the screen fades. Then the next planet is generated, the
-villagers move into its village, wildlife and the scaled roster spawn, and the hero arrives healed with level, XP and
-treats intact. The transition can't fire twice (it only accepts the event while playing), and returning to character
-select always restarts on planet 1.
+tears it down. `PlanetProgression` listens for `'bossdefeated'`: monsters vanish without XP, challenges end and
+boss treasure falls, while the hero stays to explore. `Portals` validates a destination and key cost at the village
+gate; explicit travel fades out, rebuilds the chosen world and restores its saved deltas. Boss wins open the next
+world and free return travel. A Wayfarer's Key (4% chance from a Lantern chest or one per no-hit boss win) opens
+the next locked world one way; returning costs another key until its boss falls. Beaten bosses and mini bosses stay
+beaten; ordinary monsters respawn. Chest lids, ground items, farms and local quests persist. Resources regrow by
+elapsed unpaused adventure time; crop growth still needs presence and watering. Travelling villagers follow;
+Cinder and Tuva stay home and remember their progress. See [portal travel and saves](docs/portals.md).
 
 **Enemy behaviours:** `def.behavior ?? def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
 `entities/enemies/behaviors/` (`think`, plus optional `init / reset / update / animate / onDie / dispose` hooks).
@@ -763,7 +766,7 @@ kept inside the ring too (`keepInArena`). In the console, `LANTERNMOSS.wakeBoss(
 roster, boss). Nothing else needs to change. `npm test` checks that every planet is complete and harder than the one before.
 
 **Quick test from the console** (after starting a game): `LANTERNMOSS.wakeBoss()`, then `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
-victory, open the treasure chest that falls, and travel on; or `LANTERNMOSS.goToPlanet(2)` to jump straight to
+victory, open the treasure chest that falls, and choose a destination at the village lantern gate; or `LANTERNMOSS.goToPlanet(2)` to jump straight to
 Frostveil. `LANTERNMOSS.Pets.unlock('whelp')`, `LANTERNMOSS.spawnItem('emberAxe')` and friends help try features out.
 
 ## Refactor notes

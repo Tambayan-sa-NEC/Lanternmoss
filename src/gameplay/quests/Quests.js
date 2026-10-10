@@ -101,22 +101,8 @@ export const Quests = {
     return ctx.player.inventory.count(item) >= count || PLANETS[ctx.planet].forage.some(f => f.item === item) || SHOP.stock.some(s => s.item === item)
       || planetSources(ctx.planet).has(item);
   },
-  /** After travelling: quests that still need a villager who stayed behind are dropped; a step whose items can no
-      longer be found (they grew on the planet you left) skips to the quest's next planet, or drops the quest. */
-  onPlanetChange() {
-    const here = new Set(ctx.npcs.map(n => n.name));
-    for (const id of this.active()) {
-      const q = QUESTS[id], s = this.st(id), rest = q.steps.slice(s.step), missing = [q.giver, ...rest.map(st => st.to).filter(Boolean)].find(n => !here.has(n));
-      if (missing && rest.some(st => st.to === missing)) { s.status = 'dropped'; toast(`Quest dropped: ${q.title} (${missing} stayed behind)`); continue; }
-      const st = this.step(id);
-      if ((st.kind === 'collect' || st.kind === 'deliver') && !this.obtainable(st.item, st.count)) {
-        const next = q.steps.findIndex((x, i) => i > s.step && x.kind === 'reach');
-        if (next < 0) { s.status = 'dropped'; toast(`Quest dropped: ${q.title} (no more ${itemName(st.item)} to be found)`); }
-        else { s.step = next; s.n = 0; toast(`${q.title}: that part is behind you now. Onward!`); this.check(id); }
-      }
-    }
-    if (this.tracked && this.st(this.tracked).status !== 'active') this.tracked = this.active()[0] ?? null;
-  },
+  /** Portals allow a return visit: retain local hand-ins and earlier-world resources. */
+  onPlanetChange() { for (const id of this.active()) this.check(id); },
   update(dt) {
     if ((this.checkT -= dt) > 0) return; this.checkT = 0.25;
     for (const id of this.active()) this.check(id);
@@ -128,7 +114,9 @@ export const Quests = {
     const st = this.step(id), s = this.st(id);
     const progress = st.kind === 'collect' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}`
       : st.kind === 'defeat' ? `${s.n}/${st.count}` : st.kind === 'deliver' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}` : '';
-    return { title: QUESTS[id].title, text: st.text, progress };
+    const person = st.to ?? QUESTS[id].giver, absent = !ctx.npcs.some(n => n.name === person);
+    const home = person === 'Cinder' ? 'Emberfall' : person === 'Tuva' ? 'Frostveil' : 'their home world';
+    return { title: QUESTS[id].title, text: absent ? `Return to ${home}: ${st.text}` : st.text, progress };
   },
   /** The villager the tracked quest needs next (deliver / talk), for the compass, or null. */
   target() {

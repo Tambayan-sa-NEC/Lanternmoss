@@ -82,8 +82,12 @@ check(/Treasure chest/.test(t?.label ?? ''), `prompt: "${t?.label}"`);
 t.run(); step(0.1);
 check(ctx.worldItems.some(w => w.itemId === PLANETS[0].boss.trophy), 'the trophy hops out');
 step(5);
-check(P.inventory.has(PLANETS[0].boss.trophy), 'boss loot left on the ground is swept into the bag on departure');
-check(ctx.planet === 1 || game.planets.state === 'fadeOut' || game.planets.state === 'fadeIn', `then the journey goes on (planet ${ctx.planet}, state ${game.planets.state})`);
+check(ctx.planet === 0 && !ctx.transitioning, 'opening treasure never triggers automatic departure');
+P.placeAt(H.Portals.gate.dir); check(H.Portals.travel('emberfall'), 'choose the newly unlocked world at the gate'); step(2);
+check(ctx.planet === 1 && !ctx.transitioning, 'the chosen portal destination loads');
+P.placeAt(H.Portals.gate.dir); check(H.Portals.travel('lanternmoss'), 'return freely to the cleared world'); step(2);
+check(!ctx.boss.alive && H.BossGate.state === 'beaten', 'its beaten boss stays beaten');
+check(P.inventory.has(PLANETS[0].boss.trophy) || ctx.worldItems.some(w => w.itemId === PLANETS[0].boss.trophy), 'uncollected treasure survives the return trip');
 // loot tables
 const r = rollLoot('boss', 2), bounds = LOOT_TABLES.boss.coins.map(n => Math.round(n * (1 + LOOT.coinsPerPlanet * 2)));
 check(r.items.some(i => i.item === 'frostCrown') && r.coins >= bounds[0] && r.coins <= bounds[1], `boss loot on Frostveil: ${JSON.stringify(r)}`);

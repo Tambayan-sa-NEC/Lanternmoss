@@ -879,22 +879,27 @@ Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/w
 **Risk:** storing whole planets is big and fragile (risk 8); one-off villager lines replay on revisits.
 **Recommendation:** store only what changed from the seed, with stable ids; one-off lines are keyed by planet id (19).
 
-- [ ] **A portal on each planet** (e.g. in the village) that takes you back and forth between the worlds you've
+- [x] **A portal on each planet** (e.g. in the village) that takes you back and forth between the worlds you've
       unlocked by defeating their boss.
   - A lantern gate at the edge of the village square, lit in the colour of each world it can reach.
-- [ ] **Going ahead early:** under a special condition (a rare key, a challenge, an item), you can travel to a planet
+- [x] **Going ahead early:** under a special condition (a rare key, a challenge, an item), you can travel to a planet
       whose boss you haven't beaten yet.
   - The consequence: you can't travel freely back and forth (for example, a one-way trip until that planet's boss
     falls, or until you find its portal key).
   - Decided (Round 3): a **Wayfarer's Key** (rare: Lantern chests, or a no-hit boss challenge) opens the next locked
     planet one way. The gate home stays dark until that planet's boss falls, or until you use another key.
-- [ ] Each planet keeps its state between visits: chests opened, monsters defeated, things built, villagers' progress.
+- [x] Each planet keeps its state between visits: chests opened, monsters defeated, things built, villagers' progress.
       Today a planet is rebuilt when you arrive, so this needs per-planet saved state.
   - Only what changed from the seed is stored (risk 8). Monsters respawn on a revisit (assumption); nodes regrow by
     the play time that passed.
-- [ ] Bosses you've beaten stay beaten (or offer a harder rematch, see 31). Travelling through a portal has its own
+- [x] Bosses you've beaten stay beaten (or offer a harder rematch, see 31). Travelling through a portal has its own
       fade and sound.
-- [ ] The travelling villagers come with you wherever you go (as now); the locals (Cinder, Tuva) stay home.
+- [x] The travelling villagers come with you wherever you go (as now); the locals (Cinder, Tuva) stay home.
+
+**Implemented (2026-10-11):** village lantern gates and a paused destination picker replace automatic departure.
+Wayfarer's Keys allow early one-way travel, with saved return restrictions and one-time no-hit rewards. Planet
+chest/resource deltas, farms, ground loot, defeated bosses and local progress survive revisits and Continue.
+Regular monsters respawn; resources regrow by elapsed unpaused play time. See [portal rules and saves](docs/portals.md).
 
 ## 25. Building **(core)**
 

@@ -317,6 +317,8 @@ export const ITEM_DEFINITIONS = [
   { id: 'auroraFeather', name: 'Aurora Feather', description: 'A shimmering feather left by an Aurora Hare. Your magic runs deep and returns fast.', category: 'equipment',
     icon: { shape: 'charm', color: 0x9ff3ff, art: 'moonCharm' }, value: 110, equip: { slot: 'charm', tier: 3, stats: { maxMana: 20, manaRegen: 1.5 } } },
   // ---- keys ----
+  { id: 'wayfarerKey', name: "Wayfarer's Key", description: 'Opens the next locked world for a one-way portal trip. Defeat its boss or spend another key to return home. Rarely found in Lantern chests; earned for a no-hit boss win.', category: 'misc',
+    icon: { shape: 'key', color: 0x9fe9ff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },
   { id: 'lanternKey', name: 'Lantern Key', description: 'A little brass key with a glowing bow. It opens one locked Lantern chest.', category: 'misc',
     icon: { shape: 'key', color: 0xffd36b, art: 'key' }, maxStack: 5, rarity: 'rare', value: 12, tags: ['key'] },
   // ---- sigils: carried by elites, offered at a boss's lair (config/bossSummon.js) ----

@@ -1,6 +1,6 @@
 /* Free-spot searches for scatter placement (seeded, at generation) and runtime spawning (unseeded). */
 import { freeOfColliders } from '../physics/colliders.js';
-import { mr, rand, rng, rr } from '../utils/random.js';
+import { rand, rng, rr } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir } from '../utils/sphere.js';
 import { ponds, slopeAt } from './terrain.js';
 
@@ -22,10 +22,10 @@ export function findSpot(r, near = null, tries = 120) {
 }
 /** Unseeded: a spot clear of colliders and ponds and not on a cliff, between minA and maxA from base (or anywhere when
     base is null). */
-export function spawnSpot(base, minA, maxA, rad = 0.8) {
+export function spawnSpot(base, minA, maxA, rad = 0.8, random = rng) {
   for (let i = 0; i < 80; i++) {
-    const d = base ? offsetDir(base, rng() * 6.28, mr(minA, maxA)) : randomDir(rng);
+    const d = base ? offsetDir(base, random() * 6.28, minA + random() * (maxA - minA)) : randomDir(random);
     if (freeOfColliders(d, rad) && !ponds.some(p => arcDist(d, p.dir) < p.r + 1) && (i > 60 || slopeAt(d) < 0.8)) return d;
   }
-  return base ? base.clone() : randomDir(rng);
+  return base ? base.clone() : randomDir(random);
 }

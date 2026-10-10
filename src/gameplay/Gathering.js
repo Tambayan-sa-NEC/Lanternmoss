@@ -61,10 +61,21 @@ export const Gathering = {
   resetRun() { this.tipsShown.clear(); this.tip = null; },
 
   toJSON() {
-    return { nodes: this.nodes.map(n => ({ id: n.id, kind: n.kind, dir: n.up.toArray(), regrowT: Math.max(0, n.regrowT) })),
+    return { delta: true, at: ctx.time, nodes: this.nodes.filter(n => n.regrowT > 0).map(n => ({ id: n.id, regrowT: n.regrowT })),
       rest: Object.fromEntries(this.rest), tipsShown: [...this.tipsShown] };
   },
   load(data) {
+    if (data.delta) {
+      const elapsed = Math.max(0, ctx.time - data.at), times = new Map(data.nodes.map(n => [n.id, n.regrowT]));
+      for (const n of this.nodes) {
+        n.regrowT = Math.max(0, (times.get(n.id) ?? 0) - elapsed);
+        n.root.visible = true; if (n.collider) n.collider.active = true;
+        if (n.fruit) n.fruit.visible = true;
+        if (n.regrowT > 0) { if (n.def.vanish) { n.root.visible = false; if (n.collider) n.collider.active = false; } else n.fruit.visible = false; }
+      }
+      this.rest = new Map(Object.entries(data.rest).map(([k, t]) => [k, Math.max(0, t - elapsed)]).filter(([, t]) => t > 0));
+      this.tipsShown = new Set(data.tipsShown); this.tip = null; this.stop(); return;
+    }
     this.clear();
     this.nodes = data.nodes.map((saved, i) => {
       const n = new ResourceNode(saved.kind, ctx.player.up.clone().fromArray(saved.dir), i + 1);

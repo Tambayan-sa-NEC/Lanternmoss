@@ -15,7 +15,7 @@
    KEYS          Lantern Keys for locked chests: monsters drop them now and then while a locked chest is still waiting
                  on the planet and you have none (pity = a guaranteed drop after that many kills without one);
                  Old Bramble also hands you one, once per adventure (src/entities/npc/npcDefs.js).
-   BOSS_CHEST    the chest that falls where a boss is beaten; the journey to the next planet starts once it's open.
+   BOSS_CHEST    the chest that falls where a boss is beaten; portal travel is a separate choice; unopened treasure remains here.
    --------------------------------------------------------------------- */
 
 export const CHEST_KINDS = {
@@ -105,10 +105,13 @@ export const KEYS = {
   pity: 10,                // kills without a key before one is guaranteed
 };
 
+/** Only an actual Lantern chest rolls this travel key; mini boss loot sharing the rare table does not. */
+export const WAYFARER_KEYS = { item: 'wayfarerKey', chance: 0.04 };
+
 export const BOSS_CHEST = {
   dropHeight: 7,           // it falls from this high...
   fallTime: 0.9,           // ...over this long
-  travelDelay: 3.5,        // seconds after opening it before the journey to the next planet (time to grab the loot)
+  travelDelay: 3.5,        // legacy timing constant; portal travel no longer starts automatically
 };
 
 export const CHEST_REACH = 2.0;   // arc distance at which "E Open ..." appears

@@ -22,6 +22,7 @@ export const HELP_TOPICS = [
   { id: 'fishing', title: 'Fishing', text: 'Craft a fishing rod from wood and sweetleaf, then keep it on the hotbar. Stand by a pond and use {interact} or right click to cast. Wait for the bite, then press {interact} or click. Press again when the reeling needle is in the green to catch the fish.' },
   { id: 'farming', title: 'Seeds and farming', text: 'Use a hoe to till a village farm plot. Hold seeds and use them on the tilled plot, then water it with a watering can. Water again each day; ripe crops can be harvested with {interact}. Plants wait on their own planet when you travel.' },
   { id: 'pets', title: 'Your companion', text: 'Open {petMenu} to see, swap or rename pets. {petCommand} cycles follow, stay, attack and passive; {petAbility} uses the pet’s special ability. Fainted pets rest and return automatically; pet a healthy companion with {interact} to heal it a little. Pets and commands are saved with your adventure.' },
+  { id: 'portals', title: 'Portals and travel', text: 'Use {interact} at the village lantern gate to choose a world. Defeating a boss opens onward and return travel; opening its treasure does not move you. A rare Wayfarer’s Key from a Lantern chest or no-hit boss win opens the next locked world one way. Its gate home stays dark until you defeat that world’s boss or spend another key. Opened chests, crops and local quests wait for your return; resource nodes regrow by the play time spent away. Cinder and Tuva stay home.' },
 ];
 
 export const GATHERING_TIPS = {

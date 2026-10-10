@@ -32,7 +32,7 @@ export const SAVE_SYSTEMS = {
   player: 'adventure', inventory: 'adventure', equipment: 'adventure', hotbar: 'adventure',
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
-  progression: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
+  progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
   farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
@@ -55,6 +55,7 @@ export const SAVE_OWNERS = {
   'gameplay/Chests.js:Chests': 'chests', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
+  'gameplay/Portals.js:Portals': 'portals',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
 export const STATELESS_EXPORTS = new Set(['BUFF_NAMES', 'REWARDS', 'TOOL_USES', 'ACTION_HANDLERS', 'PET_ABILITIES']);
@@ -166,23 +167,36 @@ export function cleanState(key, value, hero = 'witch') {
       if (run && def.kind === 'race') run.idx = Math.min(run.idx, run.items.length);
       return { progress, run };
     }
-    case 'story': return Object.fromEntries(Object.entries(s).filter(([name]) => ['Old Bramble', 'Pim', 'Lio', 'Fern', 'Cinder', 'Tuva'].includes(name))
+    case 'story': return Object.fromEntries(Object.entries(s).filter(([name]) => ['Old Bramble', 'Pim', 'Lio', 'Fern', 'Cinder', 'Tuva'].includes(name)
+      || PLANETS.some(p => ['Cinder', 'Tuva'].some(n => name === `${p.id}:${n}`)))
       .map(([name, raw]) => [name, { seen: stringIds(raw?.seen, n => Number.isInteger(n) && n >= 0 && n < 1000), last: integer(raw?.last, -1, -1, 999) }]));
     case 'houses': return { opened: stringIds(s.opened, houseId), lore: numericMap(s.lore, houseId, 100, -1), ovenDay: numericMap(s.ovenDay, houseId), teaAt: number(s.teaAt, -99, -99) };
     case 'rareGifts': return stringIds(value, id => Object.values(CRITTER_DEFS).some(c => c.rare?.gift === id));
+    case 'portals': {
+      const away = record(s.stranded);
+      return { stranded: ids.has(away.at) && ids.has(away.from) && away.at !== away.from ? { at: away.at, from: away.from } : null,
+        rewarded: stringIds(s.rewarded, id => ids.has(id)),
+        fight: ids.has(s.fight?.planetId) ? { planetId: s.fight.planetId, hit: bool(s.fight.hit), pet: bool(s.fight.pet), level: integer(s.fight.level, 1, 1, LEVELING.maxLevel) } : null };
+    }
     case 'progression': return { defeated: stringIds(s.defeated, id => ids.has(id)), introShown: bool(s.introShown),
+      miniDefeated: stringIds(s.miniDefeated, id => PLANETS.some(p => (p.miniBosses ?? []).some((m, i) => id === `${p.id}:mini:${i}`))),
       lairs: Object.fromEntries(Object.entries(record(s.lairs)).filter(([id, v]) => ids.has(id) && direction(v)).map(([id, v]) => [id, direction(v)])) };
     case 'combat': return Object.fromEntries(Object.keys(CHARACTERS[hero].abilities).map(id => [id, number(s[id], 0, 0, 3600)]));
     case 'farm': return { day: integer(s.day, 1, 1), plots: Array.from({ length: FARM.grid[0] * FARM.grid[1] }, (_, i) => {
       const p = record(list(s.plots)[i]), crop = known(p.crop, CROPS);
       return { tilled: bool(p.tilled) || !!crop, crop, growth: crop ? number(p.growth, 0, 0, 1) : 0, watered: bool(p.watered) };
     }) };
-    case 'gathering': return {
+    case 'gathering': return s.delta ? {
+      delta: true, at: number(s.at),
+      nodes: list(s.nodes, 1024).map(n => ({ id: typeof n?.id === 'string' ? n.id : '', regrowT: number(n?.regrowT, 0, 0, 3600) }))
+        .filter(n => PLANETS.some(p => n.id.startsWith(`${p.id}:node:`) && /^\d{1,4}$/.test(n.id.slice(p.id.length + 6)))),
+      rest: numericMap(s.rest, key => /^(tree|rock):\d+$/.test(key), Math.max(...Object.values(SCENERY).map(c => c.rest))),
+      tipsShown: stringIds(s.tipsShown, k => ['wood', 'stone', 'seed', 'copperOre'].includes(k)) } : {
       nodes: list(s.nodes, 1024).map(n => ({ id: typeof n?.id === 'string' ? n.id.slice(0, 120) : '', kind: known(n?.kind, NODE_KINDS), dir: direction(n?.dir),
         regrowT: number(n?.regrowT, 0, 0, NODE_KINDS[n?.kind]?.regrow ?? 600) })).filter(n => n.kind && n.dir && n.id),
       rest: numericMap(s.rest, key => /^(tree|rock):\d+$/.test(key), Math.max(...Object.values(SCENERY).map(c => c.rest))),
       tipsShown: stringIds(s.tipsShown, k => ['wood', 'stone', 'seed', 'copperOre'].includes(k)) };
-    case 'chests': return { opened: stringIds(s.opened, chestId), sinceKey: integer(s.sinceKey, 0, 0, 100),
+    case 'chests': return { ...(s.delta ? { delta: true } : {}), opened: stringIds(s.opened, chestId), sinceKey: integer(s.sinceKey, 0, 0, 100),
       list: list(s.list, 128).map(c => ({ id: c?.id, kind: choice(c?.kind, ['common', 'rare', 'boss'], null), dir: direction(c?.dir), fwd: direction(c?.fwd) }))
         .filter(c => chestId(c.id) && c.kind && c.dir && c.fwd) };
     case 'bossGate': return { awake: bool(s.awake), beaten: bool(s.beaten), broken: stringIds(s.broken, n => Number.isInteger(n) && n >= 0 && n < 10),

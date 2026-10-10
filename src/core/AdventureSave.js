@@ -22,6 +22,7 @@ import { Quests } from '../gameplay/quests/Quests.js';
 import { StoryMemory } from '../gameplay/storyState.js';
 import { Tutorial } from '../gameplay/Tutorial.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
+import { Portals } from '../gameplay/Portals.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -45,7 +46,7 @@ export class AdventureSave {
     };
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
-      houses: Houses, rareGifts: RareGifts, progression: game.planets, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook,
+      houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook,
       farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.planets.beforeLoad = () => { if (!this.restoring && !this.suspended && ctx.started) { StoryMemory.toJSON(); this.registry.capturePlanet(ctx.planetId); } };
@@ -61,6 +62,7 @@ export class AdventureSave {
   }
   save({ quiet = false, arrival = false } = {}) {
     if (!ctx.started || this.restoring || this.suspended) return { ok: false, message: 'Start an adventure before saving.' };
+    if (this.game.planets.state === 'fadeOut') return { ok: false, message: 'Wait until portal travel finishes to save.' };
     // A house fade can execute a sleep action; keep the last stable snapshot until that action finishes.
     if (Houses.fade || ctx.transitioning && !arrival) return { ok: false, message: 'Wait until travel finishes to save.' };
     if (this.game.planets.pendingClear) return { ok: false, message: 'Wait for the boss treasure to appear.' };
@@ -105,6 +107,7 @@ export class AdventureSave {
       if (saved.fwd) { projectTangent(p.fwd.fromArray(saved.fwd), p.up); if (p.fwd.lengthSq() > 1e-8) p.fwd.normalize(); else p.fwd.copy(p.placeAt(dir)); }
       Pets.load(data.systems.pets);
       Challenges.restoreRun(); StoryMemory.restore();
+      Portals.restoreFight();
       ctx.started = true; ctx.paused = ctx.transitioning = ctx.cutscene = false;
       document.body.classList.remove('menu', 'paused', 'cutscene'); setFade(false, 0);
       CharacterSelect.close(); MainMenu.onBegin(); audio.init(); resetView(p.fwd); snapCamera(p.up, p.fwd);
@@ -118,6 +121,9 @@ export class AdventureSave {
     } finally { this.restoring = false; }
   }
   export() {
+    if (ctx.started && (ctx.transitioning || Houses.fade || this.game.planets.pendingClear)) {
+      toast('Wait until travel or the boss reward finishes to export.'); return false;
+    }
     let data;
     try { data = ctx.started ? this.registry.snapshot(ctx.planetId) : this.store.read().data; }
     catch { toast('Could not export this adventure.', { menu: true }); return false; }
