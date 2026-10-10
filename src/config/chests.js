@@ -29,7 +29,7 @@ export const CHEST_KINDS = {
 
 export const LOOT_TABLES = {
   common: {
-    coins: [4, 10], rolls: 2,
+    coins: [4, 6], rolls: 2,
     pool: [
       { item: 'moonberry', qty: [2, 3], weight: 5 },
       { item: '@material', qty: [2, 3], weight: 5 },
@@ -43,7 +43,7 @@ export const LOOT_TABLES = {
     ],
   },
   rare: {
-    coins: [18, 28], rolls: 2,
+    coins: [14, 18], rolls: 2,
     guaranteed: [{ item: 'moonberryTart', qty: 2 }],
     pool: [
       { item: 'featherCharm', qty: 1, weight: 3 },
@@ -94,7 +94,7 @@ export const MONSTER_DROPS = {
 };
 
 export const LOOT = {
-  coinsPerPlanet: 0.5,     // each planet further multiplies chest coins by 1 + this x planet index
+  coinsPerPlanet: 0.25,     // each planet further multiplies chest coins by 1 + this x planet index
   popDistance: [1.3, 2.1], // loot hops out this far (arc) from the chest
   popTime: 0.55,           // seconds for an item's hop
 };

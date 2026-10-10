@@ -49,8 +49,8 @@ try {
     L.inventory.clear(); L.inventory.add('copperOre', 14); L.inventory.add('charcoal', 2); L.InventoryUI.open('craft', { filter: 'forge' });
   });
   await page.click('[data-card="copperIngot"] [data-batches="all"]');
-  await page.waitForFunction(() => window.LANTERNMOSS.inventory.count('copperIngot') === 6);
-  assert.deepEqual(await page.evaluate(() => { const i = window.LANTERNMOSS.inventory; return [i.count('copperIngot'), i.count('copperOre'), i.count('charcoal')]; }), [6, 2, 0]);
+  await page.waitForFunction(() => window.LANTERNMOSS.inventory.count('copperIngot') === 7);
+  assert.deepEqual(await page.evaluate(() => { const i = window.LANTERNMOSS.inventory; return [i.count('copperIngot'), i.count('copperOre'), i.count('charcoal')]; }), [7, 0, 0]);
   await page.evaluate(() => {
     const L = window.LANTERNMOSS; L.inventory.add('wood', 30); L.inventory.add('ironOre', 12); L.inventory.add('emberShard', 15); L.player.coins = 500;
     L.InventoryUI.render();

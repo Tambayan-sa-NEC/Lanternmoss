@@ -16,7 +16,7 @@ export const SHOP = {
     { item: 'honeyBun' }, { item: 'moonberryTart' }, { item: 'moonberry' },
     { item: 'featherCharm' }, { item: 'moonHopCharm' },
     // the garden shelf: seeds for the farm plot and a few simple tools (TODO 16)
-    { item: 'carrotSeeds' }, { item: 'wheatSeeds' }, { item: 'pumpkinSeeds' },
+    { item: 'carrotSeeds', price: 3 }, { item: 'wheatSeeds', price: 3 }, { item: 'pumpkinSeeds', price: 5 },
     { item: 'hoe' }, { item: 'wateringCan' }, { item: 'fishingRod' }, { item: 'woodAxe' }, { item: 'stonePick' },
   ],
   text: {

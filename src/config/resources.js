@@ -37,12 +37,12 @@ export const NODE_KINDS = {
   glowcaps: { name: 'Glowcap patch', verb: 'Pick', look: 'caps', color: 0x9ff0ff, drops: [['glowcap', [2, 3]]], regrow: 160, r: 0.6 },
   frostFlowers: { name: 'Frost flowers', verb: 'Pick', look: 'flowers', color: 0xbff4ff, drops: [['frostPetal', [2, 3]]], regrow: 160, r: 0.6 },
   // ---- mining: a pickaxe
-  copperVein: { name: 'Copper vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 3, look: 'vein', color: 0xd8844a, drops: [['copperOre', [1, 2]], ['stone', [0, 1]]], regrow: 240, r: 1.0 },
-  emberVein: { name: 'Ember vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 3, look: 'vein', color: 0xff8a4a, glow: true, drops: [['emberShard', [1, 2]], ['stone', [0, 1]]], regrow: 240, r: 1.0 },
-  ironVein: { name: 'Iron vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, look: 'vein', color: 0x8a8fa8, drops: [['ironOre', [1, 2]], ['stone', [0, 1]]], regrow: 300, r: 1.0 },
-  amethystVein: { name: 'Amethyst vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xb070ff, glow: true, drops: [['amethyst', 1]], regrow: 600, r: 1.1, rare: true },
-  opalVein: { name: 'Fire opal vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xff6a3a, glow: true, drops: [['fireOpal', 1]], regrow: 600, r: 1.1, rare: true },
-  diamondVein: { name: 'Frost diamond vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xbff4ff, glow: true, drops: [['frostDiamond', 1]], regrow: 600, r: 1.1, rare: true },
+  copperVein: { name: 'Copper vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 3, look: 'vein', color: 0xd8844a, drops: [['copperOre', [1, 2]], ['stone', [0, 1]]], regrow: 180, r: 1.0 },
+  emberVein: { name: 'Ember vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 3, look: 'vein', color: 0xff8a4a, glow: true, drops: [['emberShard', [1, 2]], ['stone', [0, 1]]], regrow: 180, r: 1.0 },
+  ironVein: { name: 'Iron vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, look: 'vein', color: 0x8a8fa8, drops: [['ironOre', [1, 2]], ['stone', [0, 1]]], regrow: 210, r: 1.0 },
+  amethystVein: { name: 'Amethyst vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xb070ff, glow: true, drops: [['amethyst', 1]], regrow: 450, r: 1.1, rare: true },
+  opalVein: { name: 'Fire opal vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xff6a3a, glow: true, drops: [['fireOpal', 1]], regrow: 450, r: 1.1, rare: true },
+  diamondVein: { name: 'Frost diamond vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xbff4ff, glow: true, drops: [['frostDiamond', 1]], regrow: 450, r: 1.1, rare: true },
 };
 
 export const SCENERY = {
@@ -69,9 +69,9 @@ export const FISHING = {
 export const CROPS = {
   carrot: { name: 'Moon Carrot', seed: 'carrotSeeds', harvest: [['moonCarrot', [2, 3]]], days: 0.6,
     look: { leaf: 0x6fbf62, fruit: 0xff9a3a, kind: 'root' } },
-  wheat: { name: 'Sun Wheat', seed: 'wheatSeeds', harvest: [['sunWheat', [3, 4]], ['wheatSeeds', [0, 1]]], days: 0.8,
+  wheat: { name: 'Sun Wheat', seed: 'wheatSeeds', harvest: [['sunWheat', [3, 4]], ['wheatSeeds', [0, 1]]], days: 0.75,
     look: { leaf: 0x9acf62, fruit: 0xf0c860, kind: 'stalks' } },
-  pumpkin: { name: 'Pumpkin', seed: 'pumpkinSeeds', harvest: [['pumpkin', [1, 2]], ['pumpkinSeeds', [0, 1]]], days: 1.3,
+  pumpkin: { name: 'Pumpkin', seed: 'pumpkinSeeds', harvest: [['pumpkin', [1, 2]], ['pumpkinSeeds', [0, 1]]], days: 1.0,
     look: { leaf: 0x5fa85a, fruit: 0xf08a2a, kind: 'gourd' } },
 };
 

@@ -42,7 +42,9 @@ async function bossFight({ hit = false, pet = false } = {}) {
   if (!Journal.fight) return 'no fight';
   if (hit) { ctx.player.invuln = 0; hurtPlayer(5, b.pos); }
   if (pet) damageEnemy(b, 5, { source: 'pet' });
-  kill(b); step(0.5); return b.alive ? 'alive' : 'won';
+  // This fixture controls whether a hit/pet strike happened. Boss combat is covered by bosses/balance sims;
+  // a growing HP pool must not turn the bookkeeping probe into an uncontrolled live fight.
+  damageEnemy(b, b.hp + 1); step(0.5); return b.alive ? 'alive' : 'won';
 }
 Journal.clear(); got.length = 0;
 let r = await bossFight();

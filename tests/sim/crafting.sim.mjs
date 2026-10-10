@@ -63,8 +63,8 @@ console.log('PASS  defeated bestiary pages teach runes; enchanting replaces one 
 
 inv.clear(); at('forge'); inv.add('copperOre', 14); inv.add('charcoal', 2);
 const beforeBulk = H.Journal.data.stats.crafted;
-assert.ok(cmd.craft(recipe('copperIngot'), 'all').ok); assert.equal(inv.count('copperIngot'), 6); assert.equal(inv.count('copperOre'), 2);
-assert.equal(H.Journal.data.stats.crafted, beforeBulk + 6, 'bulk output counts toward items-crafted achievements');
+assert.ok(cmd.craft(recipe('copperIngot'), 'all').ok); assert.equal(inv.count('copperIngot'), 7); assert.equal(inv.count('copperOre'), 0);
+assert.equal(H.Journal.data.stats.crafted, beforeBulk + 7, 'bulk output counts toward items-crafted achievements');
 inv.clear(); inv.add('wood', 15); assert.ok(cmd.craft(recipe('charcoal'), 'all').ok); assert.equal(inv.count('charcoal'), 10);
 inv.clear(); inv.add('glowcap', 15); assert.ok(cmd.craft(recipe('glowTonic'), 5).ok); assert.equal(inv.count('glowTonic'), 5);
 assert.equal(cmd.craft(recipe('glowTonic'), 'all').ok, false);

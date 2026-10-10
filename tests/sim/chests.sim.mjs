@@ -6,7 +6,7 @@ const { Chests } = await imp('gameplay/Chests.js');
 const { rollLoot } = await imp('gameplay/loot.js');
 const { Dialog } = await imp('ui/Dialog.js');
 const { PLANETS } = await imp('config/planets.js');
-const { KEYS } = await imp('config/chests.js');
+const { KEYS, LOOT, LOOT_TABLES } = await imp('config/chests.js');
 const { colliders } = await imp('physics/colliders.js');
 const { arcDist, dirAlong, tangentToward } = await imp('utils/sphere.js');
 const { SPAWN_DIR } = await imp('world/World.js');
@@ -85,7 +85,8 @@ step(5);
 check(P.inventory.has(PLANETS[0].boss.trophy), 'boss loot left on the ground is swept into the bag on departure');
 check(ctx.planet === 1 || game.planets.state === 'fadeOut' || game.planets.state === 'fadeIn', `then the journey goes on (planet ${ctx.planet}, state ${game.planets.state})`);
 // loot tables
-const r = rollLoot('boss', 2); check(r.items.some(i => i.item === 'frostCrown') && r.coins >= 80, `boss loot on Frostveil: ${JSON.stringify(r)}`);
+const r = rollLoot('boss', 2), bounds = LOOT_TABLES.boss.coins.map(n => Math.round(n * (1 + LOOT.coinsPerPlanet * 2)));
+check(r.items.some(i => i.item === 'frostCrown') && r.coins >= bounds[0] && r.coins <= bounds[1], `boss loot on Frostveil: ${JSON.stringify(r)}`);
 // a new adventure fills them again
 game.resetRun(); step(0.5);
 check(Chests.list.length === want && Chests.list.every(c => !c.opened) && !Chests.bossChest, 'a new adventure: all chests full again');

@@ -63,10 +63,11 @@ test('smelting: ore and fuel at the forge make ingots, and the metal gear is mad
   assert.ok(!RECIPES.some(r => r.needs.some(([i]) => i === 'copperOre' || i === 'ironOre') && get(r.result).equip), 'no gear from raw ore any more');
   // fuel counting and burning
   const inv = new Inventory(8); inv.add('wood', 2); inv.add('charcoal', 1);
-  assert.equal(fuelIn(inv), 5);
+  assert.equal(fuelIn(inv), 2 + FUEL.charcoal);
   assert.deepEqual(fuelToBurn(inv, 2), [['wood', 2]], 'plain wood burns first');
   assert.deepEqual(fuelToBurn(inv, 4), [['wood', 2], ['charcoal', 1]]);
-  assert.equal(fuelToBurn(inv, 6), null);
+  assert.deepEqual(fuelToBurn(inv, 2 + FUEL.charcoal), [['wood', 2], ['charcoal', 1]]);
+  assert.equal(fuelToBurn(inv, 3 + FUEL.charcoal), null);
   const iron = RECIPES.find(x => x.id === 'ironIngot'); inv.add('ironOre', 4);
   assert.equal(craftProblem(iron, new Inventory(4), 0, 'forge'), 'materials');
   const noFuel = new Inventory(4); noFuel.add('ironOre', 2);
