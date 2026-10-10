@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "measuredAt": "2026-10-10T03:38:30.395Z",
+  "mode": "full",
+  "device": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "devicePixelRatio": 1
+  },
+  "rows": [
+    {
+      "planetId": "lanternmoss",
+      "quality": "high",
+      "weather": "storm",
+      "samples": 90,
+      "fps": 19.40198762589331,
+      "frameMs": 51.541111110978655,
+      "p95FrameMs": 63,
+      "renderMs": 36.349999999337726,
+      "calls": 925,
+      "triangles": 269528,
+      "points": 1180,
+      "lines": 2200,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "lanternmoss",
+      "quality": "medium",
+      "weather": "storm",
+      "samples": 90,
+      "fps": 17.762339892116437,
+      "frameMs": 56.29888888928625,
+      "p95FrameMs": 67.5,
+      "renderMs": 40.7066666662693,
+      "calls": 857,
+      "triangles": 250444,
+      "points": 767,
+      "lines": 1430,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "lanternmoss",
+      "quality": "low",
+      "weather": "storm",
+      "samples": 90,
+      "fps": 25.883638664226766,
+      "frameMs": 38.63444444470935,
+      "p95FrameMs": 46.799999952316284,
+      "renderMs": 25.47444444762336,
+      "calls": 667,
+      "triangles": 234052,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        1344,
+        756
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "emberfall",
+      "quality": "high",
+      "weather": "embers",
+      "samples": 90,
+      "fps": 18.320983633121244,
+      "frameMs": 54.582222222619585,
+      "p95FrameMs": 61.89999997615814,
+      "renderMs": 37.357777780956695,
+      "calls": 782,
+      "triangles": 235451,
+      "points": 2280,
+      "lines": 0,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "emberfall",
+      "quality": "medium",
+      "weather": "embers",
+      "samples": 90,
+      "fps": 21.462297896816832,
+      "frameMs": 46.59333333306842,
+      "p95FrameMs": 57.69999998807907,
+      "renderMs": 30.323333336247337,
+      "calls": 682,
+      "triangles": 215087,
+      "points": 1482,
+      "lines": 0,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "emberfall",
+      "quality": "low",
+      "weather": "embers",
+      "samples": 90,
+      "fps": 25.647601949043494,
+      "frameMs": 38.99000000026491,
+      "p95FrameMs": 49,
+      "renderMs": 24.28777778148651,
+      "calls": 565,
+      "triangles": 199612,
+      "points": 797,
+      "lines": 0,
+      "drawingBuffer": [
+        1344,
+        756
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "frostveil",
+      "quality": "high",
+      "weather": "blizzard",
+      "samples": 90,
+      "fps": 18.21862348178138,
+      "frameMs": 54.888888888888886,
+      "p95FrameMs": 66,
+      "renderMs": 36.57555555237664,
+      "calls": 657,
+      "triangles": 240006,
+      "points": 2780,
+      "lines": 0,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "frostveil",
+      "quality": "medium",
+      "weather": "blizzard",
+      "samples": 90,
+      "fps": 21.439291074230244,
+      "frameMs": 46.643333333068426,
+      "p95FrameMs": 59.39999997615814,
+      "renderMs": 30.17666666507721,
+      "calls": 649,
+      "triangles": 223851,
+      "points": 1807,
+      "lines": 0,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "planetId": "frostveil",
+      "quality": "low",
+      "weather": "blizzard",
+      "samples": 90,
+      "fps": 29.298782472703543,
+      "frameMs": 34.13111111124356,
+      "p95FrameMs": 45,
+      "renderMs": 22.3277777797646,
+      "calls": 639,
+      "triangles": 210571,
+      "points": 972,
+      "lines": 0,
+      "drawingBuffer": [
+        1344,
+        756
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  ]
+}

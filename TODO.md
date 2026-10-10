@@ -1,7 +1,7 @@
 # Lanternmoss TODO
 
 Planned features, in the order to build them. Each entry says **what** it is, **why** it matters, and the main
-**tasks**, with pointers to the code it touches. Check items off as they land. Items 1–17 are done and keep their
+**tasks**, with pointers to the code it touches. Check items off as they land. Items 1–20 are done and keep their
 numbers; **Round 3** (after 17) explains the order of everything still open, the risks, and what changed on 2026-10-08.
 
 Legend: `[ ]` to do · `[~]` in progress · `[x]` done. Tags: **(core)** must-have, **(nice)** polish,
@@ -748,7 +748,7 @@ snapshots). **Size:** L. **Needs:** 18.
 Implementation notes: [save format and ownership](docs/save-format.md), version-1 fixture, registry coverage and
 real-system round trips. House interiors, active challenges and uncollected boss loot restore without replaying rewards.
 
-## 20. Performance budget **(core)**
+## 20. Performance budget **(core)** ✓
 
 **Goal:** know how fast the game runs, and keep it that way as the worlds grow.
 Code: new `src/ui/perfOverlay.js`, `src/config/settings.js` (density settings), `src/config/render.js`,
@@ -757,14 +757,19 @@ Promoted from the suggested additions. **Size:** M. **Needs:** 18.
 **Why now:** the planets keep growing (11 noted "watch the performance budget"), and both the new worlds (26) and Mobile
 support (40) need numbers to stay under.
 
-- [ ] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
-- [ ] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
+- [x] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
+- [x] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
       record it as the ceiling. The target is a steady 60 fps at 1080p on integrated graphics (Iris Xe class) at the
       default quality. Write the numbers down in `docs/performance.md`.
-- [ ] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
+- [x] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
       quality preset from 2a, so lower presets draw less, not only at a lower resolution.
-- [ ] Batching, culling and level of detail where the overlay shows the need (scenery first).
-- [ ] The sims (18) or the screenshot script record draw calls per planet, so regressions show up in a diff.
+- [x] Batching, culling and level of detail where the overlay shows the need (scenery first).
+- [x] The sims (18) or the screenshot script record draw calls per planet, so regressions show up in a diff.
+
+Implemented: F3 / Graphics overlay, five live density sliders, spatial scenery/grass batches, resource and static
+prop batching, distant actor culling, and a real-WebGL per-planet regression script. See [measurements, ceilings and
+reproduction steps](docs/performance.md). **Target status:** the available Intel UHD test machine remains below
+60 FPS; Iris Xe default-quality validation and further frame-time optimization remain performance work.
 
 ---
 

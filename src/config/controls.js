@@ -30,6 +30,7 @@ export const KEYBINDS = [
   { group: 'Game', id: 'pause', label: 'Pause menu (Esc always works too)', keys: ['KeyP'] },
   { group: 'Game', id: 'journal', label: 'Journal: achievements, bestiary and collection', keys: ['KeyJ'] },
   { group: 'Game', id: 'toggleHint', label: 'Show / hide the controls panel', keys: ['KeyH'] },
+  { group: 'Game', id: 'togglePerformance', label: 'Show / hide performance statistics', keys: ['F3'] },
   { group: 'Game', id: 'mute', label: 'Mute / unmute', keys: ['KeyM'] },
   { group: 'Game', id: 'heroSelect', label: 'Back to character select (press twice)', keys: ['KeyC'] },
 ];

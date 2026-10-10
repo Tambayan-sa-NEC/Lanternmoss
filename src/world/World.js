@@ -4,8 +4,10 @@
    earlier ones placed. Reordering steps changes the whole layout. */
 import * as THREE from 'three';
 import { WORLD } from '../config/game.js';
+import { densityFor } from '../config/settings.js';
+import { settings } from '../core/settings.js';
 import { clearStaticColliders } from '../physics/colliders.js';
-import { Batcher } from '../render/Batcher.js';
+import { Batcher, setSceneryDensity } from '../render/Batcher.js';
 import { releasePointsMaterial } from '../render/materials.js';
 import { disposeTree, G, part } from '../render/meshes.js';
 import { scene, setFogColor } from '../render/scene.js';
@@ -13,7 +15,7 @@ import { rand, rr, seedWorld } from '../utils/random.js';
 import { arcDist, frameQuat, offsetDir, projectTangent, randomDir, tangentFrame } from '../utils/sphere.js';
 import { buildPlanet } from './planet.js';
 import { isFree, placed } from './placement.js';
-import { decoratePonds, createGrass, createMeadowFlowers, createTallGrass, scatterFlora, WIND } from './scatter.js';
+import { chunkInstances, decoratePonds, createGrass, createMeadowFlowers, createTallGrass, scatterFlora, WIND } from './scatter.js';
 import { CLOUD_AXIS, createClouds, createFireflies, createSky } from './sky.js';
 import { addFlat, addPond, bakeTerrain, computeWaterLevel, groundHeight, ponds, setTerrain } from './terrain.js';
 import { buildVillage } from './village.js';
@@ -72,15 +74,15 @@ export class World {
 
     this.add(buildPlanet(palette));                                   // (the height field is baked: placement may sample it now)
 
-    const B = new Batcher();
+    const B = new Batcher({ cellSize: 48 });
     Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses));   // houses, houseA, cottage
-    decoratePonds(B);
+    B.decorative = true; decoratePonds(B); B.decorative = false;
     this.spots = { trees: [], rocks: [] };                            // every tree and rock, to chop and mine (gameplay/Gathering.js)
     this.trees = scatterFlora(B, planet.flora, this.spots);           // { kind: count }
-    this.add(B.build());
+    this.scenery = B.build(); this.add(this.scenery);
     const fl = planet.flora ?? {}, grass = createGrass(palette.grass, fl.grass ?? 1), tall = createTallGrass(fl.tallGrass ?? palette.grass, spawnDir, fl.tallCount ?? 1);
     const [stems, heads] = createMeadowFlowers(fl.flowers ?? [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff], fl.meadow ?? 1);
-    this.add(grass, tall, stems, heads);
+    this.grass = [grass, tall, stems, heads].map(mesh => chunkInstances(mesh)); this.add(...this.grass);
 
     const water = createWater(palette.water); this.waterMat = water.material; this.add(...water.meshes);
 
@@ -96,11 +98,31 @@ export class World {
     this.weather = new Weather(planet.weather, palette, o => this.add(o));
     this.ownMaterials.push(...this.weather.materials, this.sky.material, this.waterMat, grass.material, tall.material, stems.material, heads.material, this.fireflies.material);   // the rest are shared caches
 
-    this.resetSun();
+    this.fireflyCount = this.fireflies.geometry.attributes.position.count;
+    this.viewerPos = this.spawnDir.clone().multiplyScalar(groundHeight(this.spawnDir));
+    this.applyDensity(); this.resetSun();
   }
 
   /** Adds generated objects to the scene and remembers them for dispose(). */
   add(...objects) { scene.add(...objects); this.objects.push(...objects); }
+
+  /** Changes only render counts; never regenerates a planet or consumes its seeded placement stream. */
+  applyDensity() {
+    setSceneryDensity(this.scenery, densityFor('scenery', settings));
+    for (const group of this.grass) group.traverse(mesh => {
+      if (!mesh.isInstancedMesh) return;
+      mesh.count = Math.floor(mesh.userData.fullCount * densityFor('grass', settings)); mesh.visible = mesh.count > 0;
+    });
+    const count = Math.floor(this.fireflyCount * densityFor('particle', settings));
+    this.fireflies.geometry.setDrawRange(0, count); this.fireflies.visible = count > 0;
+    this.weather.applyDensity(densityFor('weather', settings));
+    this.updateGrassVisibility();
+  }
+  updateGrassVisibility() {
+    for (const group of this.grass) for (const mesh of group.children) {
+      mesh.visible = mesh.count > 0 && mesh.boundingSphere.center.distanceTo(this.viewerPos) - mesh.boundingSphere.radius <= 24 + 26 * densityFor('grass', settings);
+    }
+  }
 
   /** Removes everything generate() created and forgets the terrain, placement and scenery colliders. */
   dispose() {
@@ -135,6 +157,7 @@ export class World {
     this.fireflies.material.uniforms.uTime.value = time; this.waterMat.uniforms.uTime.value = time; WIND.uTime.value = time;
     this.clouds.rotateOnWorldAxis(CLOUD_AXIS, dt * 0.008 * (1 + (this.weather?.now.wind ?? 0) * 2));
     this.weather.update(dt, time, player, this.sky);
+    this.viewerPos.copy(player.pos); this.updateGrassVisibility();
     this.crystal.position.copy(this.crystalBase).addScaledVector(this.stoneCenter, Math.sin(time * 1.4) * 0.25); this.crystal.rotateY(dt * 0.9);
   }
 }

@@ -1,5 +1,9 @@
 // Boss fight scenarios: a bot kites / brawls each planet's boss while we log moves, states, damage and phases.
 import { boot, imp } from './lib/boot.mjs';
+import { SIM_SEED } from './lib/setup.mjs';
+import { mulberry32 } from '../../src/utils/random.js';
+// Rendering creates UUIDs using Math.random: mesh optimizations must not change the bot's steering.
+const botRandom = mulberry32((SIM_SEED ^ 0xb055) >>> 0);
 const THREE = await import('three');
 const { arcDist, tangentToward, offsetDir } = await imp('utils/sphere.js');
 const { tryCast } = await imp('combat/casting.js');
@@ -23,7 +27,7 @@ function fight(planet, { secs = 90, dists = [4, 8, 14], godmode = true, forceHp 
     t += 1 / 60;
     // ---- bot steering: keep a distance that cycles through `dists`, circle the boss, attack it
     const D = dists[Math.floor(t / 7) % dists.length], d = arcDist(P.up, B.up);
-    if (!P.dead && B.alive && !ENGAGED.has(B.state) && t - (log.reengaged ?? -9) > 3) { log.reengaged = t; P.placeAt(offsetDir(B.home, Math.random() * 6.28, 6)); }   // a player walks back in
+    if (!P.dead && B.alive && !ENGAGED.has(B.state) && t - (log.reengaged ?? -9) > 3) { log.reengaged = t; P.placeAt(offsetDir(B.home, botRandom() * 6.28, 6)); }   // a player walks back in
     H.cam.fwd.copy(tangentToward(P.up, arcDist(P.up, B.home) > 10 ? B.home : B.up));                                          // and doesn't drag the fight off its arena
     for (const k of ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'Space']) keys[k] = false;
     if (d > D + 1) keys.KeyW = true; else if (d < D - 1) keys.KeyS = true;

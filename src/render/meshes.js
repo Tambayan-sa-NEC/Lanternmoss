@@ -27,7 +27,12 @@ export function addTo(parent, mesh, p = [0, 0, 0], r = [0, 0, 0], s = [1, 1, 1])
   parent.add(mesh); return mesh;
 }
 /** Frees the geometries of a model built from part() (materials are shared and cached, so they are kept). */
-export function disposeTree(obj) { obj.traverse(o => o.geometry && o.geometry.dispose()); }
+export function disposeTree(obj) {
+  const disposed = new Set(); obj.traverse(o => {
+    if (o.geometry && !disposed.has(o.geometry)) { o.geometry.dispose(); disposed.add(o.geometry); }
+    if (o.isInstancedMesh) o.dispose();
+  });
+}
 
 const _e = new THREE.Euler(), _qq = new THREE.Quaternion(), _ss = new V3(), _tt = new V3();
 /** Local transform helper for building props (Euler order YXZ). */

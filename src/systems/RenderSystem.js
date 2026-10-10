@@ -9,6 +9,9 @@ import { RENDER } from '../config/render.js';
 import { QUALITY_PIXEL_RATIO } from '../config/settings.js';
 import { outlineMat, setPointScale } from '../render/materials.js';
 import { camera, PIXEL_RATIO, scene } from '../render/scene.js';
+import { FrameStats } from '../core/performance.js';
+import { PerfOverlay } from '../ui/perfOverlay.js';
+import { cullActors } from '../render/actorCulling.js';
 
 export class RenderSystem {
   constructor() {
@@ -19,6 +22,9 @@ export class RenderSystem {
     renderer.toneMapping = THREE.NoToneMapping;           // keep flat, saturated anime fills
     document.body.prepend(renderer.domElement);
     this.canvas = renderer.domElement;
+    renderer.info.autoReset = false; // count the entire composer, including bloom and output passes
+    this.stats = new FrameStats(); this.overlay = new PerfOverlay();
+    document.addEventListener('visibilitychange', () => this.stats.reset());
 
     const dbs = renderer.getDrawingBufferSize(new THREE.Vector2());
     const composer = this.composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(dbs.x, dbs.y, { type: THREE.HalfFloatType, samples: 4 }));
@@ -52,11 +58,16 @@ export class RenderSystem {
   /** Graphics settings: quality (render resolution), bloom on / off, outline width (CSS pixels). */
   applyGraphics({ quality, bloom, outlineWidth }) {
     const pr = Math.min(QUALITY_PIXEL_RATIO[quality] ?? PIXEL_RATIO, window.devicePixelRatio || 1, RENDER.maxPixelRatio);
-    if (pr !== this.renderer.getPixelRatio()) { this.renderer.setPixelRatio(pr); this.composer.setPixelRatio(pr); }
+    if (pr !== this.renderer.getPixelRatio()) { this.renderer.setPixelRatio(pr); this.composer.setPixelRatio(pr); this.resize(); }
     this.bloomPass.enabled = bloom;
     outlineMat.uniforms.uWidth.value = outlineWidth * pr; outlineMat.visible = outlineWidth > 0;
-    this.resize();
   }
 
-  render(time) { this.paperPass.uniforms.uTime.value = time; this.composer.render(); }
+  render(time) {
+    const start = performance.now(); this.renderer.info.reset();
+    cullActors(camera);
+    this.paperPass.uniforms.uTime.value = time; this.composer.render();
+    this.stats.record(start, performance.now() - start, this.renderer.info.render);
+    this.overlay.update(this.stats, start);
+  }
 }

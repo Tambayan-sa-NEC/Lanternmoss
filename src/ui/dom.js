@@ -2,6 +2,7 @@
 const $ = id => document.getElementById(id);
 
 export const dom = {
+  perfOverlay: $('perf-overlay'),
   hint: $('hint'), hintKeys: $('hint-keys'), hintHide: document.querySelector('#hint .hide-tip'), hintMini: document.querySelector('#hint .mini'),
   hud: $('hud'), prompt: $('prompt'), toast: $('toast'),
   // combat HUD

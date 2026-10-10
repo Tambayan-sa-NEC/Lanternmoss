@@ -7,7 +7,7 @@ import { mr, rng } from '../utils/random.js';
 
 class Sparkles {
   constructor(max = 700) {
-    this.max = max; this.head = 0;
+    this.max = this.limit = max; this.density = 1; this.head = 0;
     this.pos = new Float32Array(max * 3); this.col = new Float32Array(max * 3); this.size = new Float32Array(max); this.alpha = new Float32Array(max);
     this.vel = new Float32Array(max * 3); this.life = new Float32Array(max); this.maxLife = new Float32Array(max).fill(1); this.base = new Float32Array(max);
     const g = new THREE.BufferGeometry();
@@ -28,19 +28,28 @@ class Sparkles {
   emit(p, o = {}) {
     const { count = 10, color = 0xfff0a0, speed = 2, up = null, upBias = 0.6, life = 1, size = 0.3, spread = 1 } = o; const c = new THREE.Color(color);
     for (let n = 0; n < count; n++) {
-      const i = this.head; this.head = (this.head + 1) % this.max;
       const rx = rng() * 2 - 1, ry = rng() * 2 - 1, rz = rng() * 2 - 1;
+      const l = life * mr(0.7, 1.2), base = size * mr(0.6, 1.3);
+      // Consume the same random draws at every density: cosmetics must not change combat/loot rolls.
+      if (n >= Math.ceil(count * this.density) || this.limit === 0) continue;
+      const i = this.head; this.head = (this.head + 1) % this.limit;
       this.pos[i * 3] = p.x + rx * 0.15 * spread; this.pos[i * 3 + 1] = p.y + ry * 0.15 * spread; this.pos[i * 3 + 2] = p.z + rz * 0.15 * spread;
       let vx = rx * speed * spread, vy = ry * speed * spread, vz = rz * speed * spread;
       if (up) { vx += up.x * speed * upBias; vy += up.y * speed * upBias; vz += up.z * speed * upBias; }
       this.vel[i * 3] = vx; this.vel[i * 3 + 1] = vy; this.vel[i * 3 + 2] = vz;
-      const l = life * mr(0.7, 1.2); this.life[i] = l; this.maxLife[i] = l; this.base[i] = size * mr(0.6, 1.3);
+      this.life[i] = l; this.maxLife[i] = l; this.base[i] = base;
       this.col[i * 3] = c.r; this.col[i * 3 + 1] = c.g; this.col[i * 3 + 2] = c.b;
     }
   }
+  applyDensity(density) {
+    this.density = density; this.limit = Math.floor(this.max * density);
+    this.head %= Math.max(1, this.limit);
+    this.life.fill(0, this.limit); this.alpha.fill(0, this.limit);
+    this.points.geometry.setDrawRange(0, this.limit); this.points.visible = this.limit > 0;
+  }
   update(dt) {
     const drag = Math.exp(-1.8 * dt);
-    for (let i = 0; i < this.max; i++) {
+    for (let i = 0; i < this.limit; i++) {
       if (this.life[i] <= 0) { this.alpha[i] = 0; continue; }
       this.life[i] -= dt; const k = Math.max(0, this.life[i] / this.maxLife[i]);
       for (let a = 0; a < 3; a++) { this.pos[i * 3 + a] += this.vel[i * 3 + a] * dt; this.vel[i * 3 + a] *= drag; }

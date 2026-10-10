@@ -76,6 +76,7 @@ export function scatterFlora(B, flora = {}, spots = { trees: [], rocks: [] }) {
     propRock(B, surfM(d, rr(0, 6.28), s, -0.05)); spots.rocks.push({ dir: d, kind: 'rock', s, r: 1.05 * s });
     addCollider(d, 1.05 * s, s > 1.1 ? { r: 1.1 * s, top: 1.0 * s } : null, 1.0 * s);
   }
+  B.decorative = true; // flowers and mushrooms have no gameplay identity or collider
   for (let c = 0; c < n(26); c++) {
     const center = flatSpot(1.0, 0.9); if (!center) continue; const col = rpick(flowerColors);
     for (let i = 0; i < 7; i++) {
@@ -87,11 +88,33 @@ export function scatterFlora(B, flora = {}, spots = { trees: [], rocks: [] }) {
     const center = flatSpot(0.8, 0.9); if (!center) continue;
     for (let i = 0; i < 4; i++) { const d = offsetDir(center, rr(0, 6.28), rr(0.1, 0.9)); if (freeOfColliders(d, 0.2)) propSmallMushroom(B, surfM(d, 0, rr(0.7, 1.5), -0.02)); }
   }
+  B.decorative = false;
   return grown;
 }
 
 /** The wind the grass and wildflowers sway in (set by the weather, src/world/weather.js; time by World.update). */
 export const WIND = { uTime: { value: 0 }, uWind: { value: 0.35 } };
+
+/** Partition the already seeded layout. Bounds include wind sway and stay full-size when density changes. */
+export function chunkInstances(source, cellSize = 24) {
+  const cells = new Map(), matrix = new THREE.Matrix4(), color = new THREE.Color();
+  for (let i = 0; i < source.count; i++) {
+    source.getMatrixAt(i, matrix);
+    const key = matrix.elements.slice(12, 15).map(x => Math.floor(x / cellSize)).join(',');
+    if (!cells.has(key)) cells.set(key, []); cells.get(key).push(i);
+  }
+  const group = new THREE.Group();
+  for (const indices of cells.values()) {
+    const mesh = new THREE.InstancedMesh(source.geometry, source.material, indices.length);
+    indices.forEach((index, i) => {
+      source.getMatrixAt(index, matrix); mesh.setMatrixAt(i, matrix);
+      if (source.instanceColor) { source.getColorAt(index, color); mesh.setColorAt(i, color); }
+    });
+    mesh.computeBoundingSphere(); mesh.boundingSphere.radius += 2;
+    mesh.userData.fullCount = indices.length; group.add(mesh);
+  }
+  source.dispose(); return group;
+}
 /** A toon material whose instances lean with the wind, more the higher a vertex sits (y in the instance's frame). */
 function swayMaterial(color = 0xffffff) {
   const m = new THREE.MeshToonMaterial({ color, gradientMap });
