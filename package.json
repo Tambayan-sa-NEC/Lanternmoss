@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/serve.mjs",
+    "stop": "node scripts/stop.mjs",
     "test": "node --test",
     "sim": "node tests/sim/run.mjs"
   },
