@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { gradientMap } from '../render/materials.js';
 import { addTo, G, part } from '../render/meshes.js';
+import { batchParts } from '../render/staticParts.js';
 
 const lighter = (c, k = 0.4) => new THREE.Color(c).lerp(new THREE.Color(0xffffff), k).getHex();
 const darker = (c, k = 0.3) => new THREE.Color(c).multiplyScalar(1 - k).getHex();
@@ -69,7 +70,8 @@ export function buildNode(def, seed = 1) {
   let s = seed * 9301 % 233280; const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
   const root = new THREE.Group(), fruit = new THREE.Group(); root.add(fruit);
   (NODES[def.look] ?? NODES.pebbles)(root, fruit, def, rnd);
-  return { root, fruit };
+  const body = batchParts(root, fruit); batchParts(fruit);
+  return { root, fruit, body };
 }
 export const NODE_LOOKS = Object.keys(NODES);
 
@@ -85,6 +87,7 @@ export function buildPlot() {
   const weeds = new THREE.Group(); root.add(weeds);
   for (let i = 0; i < 6; i++) addTo(weeds, part(G.cone(0.05, 0.3, 3), i % 2 ? 0x7fc574 : 0x9adb7e, { outline: false }), [Math.cos(i * 2.2) * 0.45, 0.24, Math.sin(i * 2.2) * 0.45], [0.2, i, 0.2]);
   addTo(weeds, part(G.dodec(0.09), ROCK), [0.3, 0.14, -0.35]);
+  batchParts(weeds);
   const crop = new THREE.Group(); crop.position.y = 0.12; root.add(crop);
   return { root, soil, weeds, furrows, crop };
 }
@@ -112,6 +115,7 @@ export function buildFarmFrame(w, d) {
   addTo(sc, part(G.cyl(0.4, 0.4, 0.04, 10), 0xf0d080), [0, 1.93, 0]);
   addTo(sc, part(G.cyl(0.18, 0.2, 0.18, 8), 0xf0d080), [0, 2.02, 0]);
   for (const sx of [-1, 1]) addTo(sc, part(G.box(0.05, 0.05, 0.02), 0x3a2340, { outline: false }), [sx * 0.08, 1.78, 0.23]);
+  batchParts(root);
   return root;
 }
 
@@ -136,7 +140,7 @@ export function buildCrop(look, stage) {
       }
     }
   });
-  return g;
+  batchParts(g); return g;
 }
 
 /** The fishing float: a red-and-white bobber. */

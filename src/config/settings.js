@@ -22,7 +22,12 @@ export const SETTINGS_SCHEMA = [
   ] },
   { group: 'Graphics', items: [
     { key: 'quality', label: 'Quality', type: 'choice', default: 'high',
-      options: [['low', 'Low'], ['medium', 'Medium'], ['high', 'High']] },     // render resolution (pixel ratio)
+      options: [['low', 'Low'], ['medium', 'Medium'], ['high', 'High']] },
+    ...[['sceneryDensity', 'Scenery decoration'], ['grassDensity', 'Grass & wildflowers'],
+      ['resourceDensity', 'Distant resource detail'], ['particleDensity', 'Sparkles & fireflies'],
+      ['weatherDensity', 'Weather particles']].map(([key, label]) =>
+      ({ key, label, type: 'range', min: 0, max: 100, step: 5, unit: '%', default: 100 })),
+    { key: 'perfOverlay', label: 'Performance overlay', type: 'toggle', default: false },
     { key: 'bloom', label: 'Glow (bloom)', type: 'toggle', default: true },
     { key: 'outlineWidth', label: 'Outline width', type: 'range', min: 0, max: 5, step: 0.2, unit: 'px', default: 3.2 },
   ] },
@@ -40,3 +45,15 @@ export const SETTINGS_SCHEMA = [
 
 /** Graphics quality -> render pixel ratio (capped by the screen's own ratio; see config/render.js maxPixelRatio). */
 export const QUALITY_PIXEL_RATIO = { low: 0.7, medium: 1, high: 1.5 };
+
+/** Sliders multiply these presets. Logical world placement and resource availability never change. */
+export const QUALITY_DENSITY = {
+  low: { scenery: 0.35, grass: 0.3, resource: 0.3, particle: 0.35, weather: 0.35 },
+  medium: { scenery: 0.65, grass: 0.65, resource: 0.65, particle: 0.65, weather: 0.65 },
+  high: { scenery: 1, grass: 1, resource: 1, particle: 1, weather: 1 },
+};
+export function densityFor(feature, settings) {
+  const preset = QUALITY_DENSITY[settings.quality] ?? QUALITY_DENSITY.high;
+  const value = settings[`${feature}Density`];
+  return preset[feature] * (Number.isFinite(value) ? Math.max(0, Math.min(100, value)) / 100 : 1);
+}

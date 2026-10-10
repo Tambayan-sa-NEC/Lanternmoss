@@ -2,6 +2,9 @@
    branches, an ore vein. Holds its own state and draws itself; what working it does is src/gameplay/Gathering.js.
    Once worked it regrows: its fruit (berries, caps, crystals) disappears for a while, or the whole thing does. */
 import { NODE_KINDS } from '../config/resources.js';
+import { densityFor } from '../config/settings.js';
+import { settings } from '../core/settings.js';
+import { ctx } from '../core/context.js';
 import { sparkles } from '../fx/sparkles.js';
 import { buildNode } from '../models/resources.js';
 import { addCollider, removeCollider } from '../physics/colliders.js';
@@ -33,7 +36,15 @@ export class ResourceNode {
   }
   /** A point over it (prompts, sparkles). */
   top(h = 0.6) { return this.pos.clone().addScaledVector(this.up, h); }
+  applyDensity() {
+    // Render gates preserve root/fruit visibility owned by depletion and save restoration.
+    const distance = ctx.player ? this.pos.distanceTo(ctx.player.pos) : 0;
+    const visible = distance <= 18 + 42 * densityFor('resource', settings);
+    this.body.visible = visible;
+    for (const child of this.fruit.children) child.visible = visible;
+  }
   update(dt) {
+    this.applyDensity();
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - dt * 4); const s = Math.sin(this.shake * 30) * this.shake;
       this.root.scale.set(1 + s * 0.06, 1 - s * 0.08, 1 + s * 0.06);

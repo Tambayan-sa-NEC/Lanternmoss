@@ -80,6 +80,12 @@ export class Weather {
     this.fogCol = new THREE.Color(); this.update(0, 0, null, null);
   }
   get kind() { return this.k < 0.5 ? this.from : this.to; }
+  applyDensity(density) {
+    for (const [id, layer] of Object.entries(this.layers)) {
+      layer.geometry.setDrawRange(0, Math.floor(WEATHER.counts[id] * density) * (id === 'rain' ? 2 : 1));
+      layer.visible = layer.geometry.drawRange.count > 0 && layer.material.uniforms.uIntensity.value > 0.005;
+    }
+  }
   get label() { const w = WEATHER_KINDS[this.kind]; return `${w.icon} ${w.label}`; }
   /** Starts a new spell (debug, or the next roll): kind = a WEATHER_KINDS key, or random from the planet's mix. */
   set(kind = null, instant = false) {
@@ -118,7 +124,7 @@ export class Weather {
     // particles: a box around the hero, upright to the local ground
     for (const [id, l] of Object.entries(this.layers)) {
       const u = l.material.uniforms; u.uTime.value = time; u.uIntensity.value = Math.min(1, (n[id] ?? 0) / 2.2 * 1.6);
-      u.uDrift.value.set(n.wind * 3.2, n.wind * 1.1); l.visible = u.uIntensity.value > 0.005;
+      u.uDrift.value.set(n.wind * 3.2, n.wind * 1.1); l.visible = u.uIntensity.value > 0.005 && l.geometry.drawRange.count > 0;
     }
     if (player) { this.group.position.copy(player.pos); frameQuat(player.up, tangentFrame(player.up)[0], this.group.quaternion); }
     audio.ambience?.(((a.sound?.rain ?? 0) * (1 - k) + (b.sound?.rain ?? 0) * k), ((a.sound?.wind ?? 0) * (1 - k) + (b.sound?.wind ?? 0) * k));

@@ -10,6 +10,7 @@ import { sparkles } from '../fx/sparkles.js';
 import { STATION_BUILDERS } from '../models/stations.js';
 import { addCollider, freeOfColliders, removeCollider } from '../physics/colliders.js';
 import { disposeTree } from '../render/meshes.js';
+import { batchParts } from '../render/staticParts.js';
 import { scene } from '../render/scene.js';
 import { audio } from '../systems/AudioSystem.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
@@ -50,7 +51,7 @@ export const Stations = {
     const fwd = tangentToward(c, world.spawnDir), side = new V3().crossVectors(fwd, c).normalize();
     ids.forEach((id, i) => {
       const dir = dirAlong(c, side, (i - (ids.length - 1) / 2) * C.spacing), f = tangentToward(dir, world.spawnDir);
-      const parts = STATION_BUILDERS[id](); parts.root.matrixAutoUpdate = false;
+      const parts = STATION_BUILDERS[id](); batchParts(parts.root, new Set(parts.glow)); parts.root.matrixAutoUpdate = false;
       parts.root.matrix.copy(matrixAt(dir.clone().multiplyScalar(groundHeight(dir) - 0.04), dir, f)); scene.add(parts.root);
       this.list.push({ id, def: STATIONS[id], dir, fwd: f, parts, collider: addCollider(dir, 0.6, { r: 0.8, base: 0, top: 1.4 }), puffT: rng() });
     });

@@ -3,6 +3,7 @@
    The pause menu's Controls page lists them from the same tables. */
 import { HOTBAR_KEYS } from '../config/controls.js';
 import { ctx } from './context.js';
+import { settings, setSetting } from './settings.js';
 import { boundCodes, is } from './keybinds.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
 import { cancelAim, isAiming, nudgeAim } from '../combat/aiming.js';
@@ -30,6 +31,7 @@ import { toast } from '../ui/toast.js';
 const GAME_KEYS = { has: code => code === 'Escape' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
 
 function onKey(code) {
+  if (is('togglePerformance', code) && !PauseMenu.capture) { setSetting('perfOverlay', !settings.perfOverlay); return; }
   const player = ctx.player;
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens

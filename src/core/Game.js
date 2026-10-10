@@ -62,6 +62,7 @@ import { ponds } from '../world/terrain.js';
 import { World } from '../world/World.js';
 import { ctx } from './context.js';
 import { onSettingsChange, settings } from './settings.js';
+import { densityFor } from '../config/settings.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
 import { PetMenu } from '../ui/PetMenu.js';
@@ -131,6 +132,8 @@ export class Game {
   applySettings() {
     audio.setVolumes(settings.masterVolume / 100, settings.musicVolume / 100, settings.sfxVolume / 100);
     this.renderSystem.applyGraphics(settings);
+    this.world.applyDensity(); sparkles.applyDensity(densityFor('particle', settings));
+    for (const node of Gathering.nodes) node.applyDensity();
     applyUiScale();
   }
 
