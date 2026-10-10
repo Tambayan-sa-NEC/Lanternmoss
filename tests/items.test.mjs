@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CHARACTERS } from '../src/config/characters.js';
 import { FUEL, RECIPES } from '../src/config/crafting.js';
+import { RUNES } from '../src/config/magic.js';
 import { HOTBAR_KEYS } from '../src/config/controls.js';
 import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, ITEM_ART_KINDS, ITEM_DEFINITIONS, RARITIES, STATS } from '../src/config/items.js';
 import { LOOT_TABLES, MINI_BOSS_LOOT } from '../src/config/chests.js';
@@ -84,7 +85,7 @@ test('recipes only use real items, and every material crafts something', () => {
     assert.ok(!r.rarity || RARITIES[r.rarity], `${r.id}: rarity`);
     assert.ok(!r.rarity || get(r.result).equip, `${r.id}: only gear gets a rarity`);
   }
-  for (const d of ITEM_DEFINITIONS.filter(d => d.category === 'material')) assert.ok(RECIPES.some(r => r.needs.some(([i]) => i === d.id)) || FUEL[d.id], `${d.id} is used by a recipe (or burned as fuel)`);
+  for (const d of ITEM_DEFINITIONS.filter(d => d.category === 'material')) assert.ok(RECIPES.some(r => r.needs.some(([i]) => i === d.id)) || FUEL[d.id] || RUNES[d.id], `${d.id} is used by a recipe, fuel or enchantment`);
   const gifts = new Set(Object.values(CRITTER_DEFS).filter(c => c.rare).map(c => c.rare.gift));   // rare creatures' charms are gifts, not recipes
   const given = new Set([...Object.values(QUESTS).flatMap(q => (q.reward?.items ?? []).map(([i]) => i)),                // quest rewards, loot keepsakes
     ...Object.values(MINI_BOSS_LOOT.extra ?? {}).flat().map(([i]) => i), ...Object.values(LOOT_TABLES).flatMap(t => [...(t.pool ?? []), ...(t.guaranteed ?? [])].map(e => e.item))]);

@@ -18,6 +18,8 @@ import { ctx } from '../core/context.js';
 import { bindKbd, is } from '../core/keybinds.js';
 import { describeSummon } from '../gameplay/BossGate.js';
 import { Journal } from '../gameplay/Journal.js';
+import { RecipeBook } from '../gameplay/RecipeBook.js';
+import { RECIPES } from '../config/crafting.js';
 import { BESTIARY_ORDER, isBoss, pageName, progress, statValue } from '../gameplay/journalRules.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -59,10 +61,11 @@ export const JournalUI = {
     document.body.appendChild(root);
     this.body = root.querySelector('.jbody'); this.foot = root.querySelector('.jfoot'); this.tabsEl = root.querySelector('.jtabs');
     root.addEventListener('click', e => {
-      const t = e.target.closest('[data-tab]'), p = e.target.closest('[data-page]');
+      const t = e.target.closest('button[data-tab]'), p = e.target.closest('[data-page]');
       if (e.target.closest('.jclose')) this.close();
       else if (t) this.setTab(t.dataset.tab);
       else if (p) { this.page = p.dataset.page; audio.blip(); this.render(); }
+      else if (e.target.closest('[data-learn-recipe]')) { RecipeBook.readBestiary(this.page); this.render(); }
       else if (e.target.closest('[data-clear]')) this.clearJournal();
     });
   },
@@ -147,7 +150,9 @@ export const JournalUI = {
       ${list('How to beat it', (e.counters ?? []).map(t => `<li>${t}</li>`))}
       ${beaten ? `<h4>Stats</h4><table class="bst-stats"><tr><th>Planet</th><th>Health</th><th>Damage</th><th>Speed</th><th>XP</th></tr>${stats}</table>
         <h4>Drops</h4><p>${isBoss(type) ? BESTIARY_DROPS.boss : base.miniBoss ? BESTIARY_DROPS.miniBoss : BESTIARY_DROPS.monster}${type === 'slime' ? ' And two slimelings.' : ''}</p>`
-      : '<p class="dim">Defeat one to note its stats and what it drops.</p>'}`;
+      : '<p class="dim">Defeat one to note its stats and what it drops.</p>'}` +
+      RECIPES.filter(r => r.discovery?.kind === 'bestiary' && r.discovery.enemy === type).map(r => `<h4>Recipe notes</h4><p>${itemRegistry.get(r.result).name}: ${RecipeBook.knows(r.id) ? 'learned for this adventure' : r.discovery.text}</p>` +
+        (RecipeBook.knows(r.id) ? '' : `<button type="button" data-learn-recipe ${beaten && ctx.started && !ctx.player.dead ? '' : 'disabled'}>Learn recipe</button>`)).join('');
   },
 
   collectionHtml() {

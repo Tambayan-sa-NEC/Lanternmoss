@@ -28,6 +28,7 @@ const torus = (r, t, arc = Math.PI * 2) => new THREE.TorusGeometry(r, t, 5, 14, 
 
 /** One builder per art kind: (group, colour). Sized to sit in a ~0.45 unit box like the shapes above. */
 const ART = {
+  scroll: (g, c) => { addTo(g, part(G.box(0.27, 0.34, 0.025), c), [0, 0, 0]); for (const y of [-0.17, 0.17]) addTo(g, part(G.cyl(0.045, 0.045, 0.34, 8), CREAM), [0, y, 0], [0, 0, Math.PI / 2]); addTo(g, part(G.box(0.16, 0.02, 0.01), WOOD), [0, 0.03, 0.02]); },
   bun: (g, c) => { addTo(g, part(G.hemi(0.22, 8, 3), c), [0, -0.04, 0], [0, 0, 0], [1, 0.8, 1]); addTo(g, part(G.cyl(0.22, 0.2, 0.08, 8), CREAM), [0, -0.06, 0]); },
   tart: (g, c) => {
     addTo(g, part(G.cyl(0.24, 0.19, 0.1, 9), 0xe8b878), [0, -0.06, 0]); addTo(g, part(G.cyl(0.21, 0.21, 0.03, 9), c), [0, 0, 0]);

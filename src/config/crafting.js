@@ -16,6 +16,21 @@
 
 export const FUEL = { wood: 1, charcoal: 3, emberShard: 2 };
 
+export const DISCOVERY_RECIPES = [
+  { id: 'perchChowder', group: 'Cooking', station: 'pot', result: 'perchChowder', needs: [['pondPerch', 2], ['moonCarrot', 2], ['sunWheat', 1]], discovery: { kind: 'book', planet: 'lanternmoss', text: 'Read a bookshelf in a Lanternmoss house.' } },
+  { id: 'emberPepperBroth', group: 'Cooking', station: 'pot', result: 'emberPepperBroth', needs: [['cinderEel', 2], ['firePepper', 2], ['pumpkin', 1]], discovery: { kind: 'book', planet: 'emberfall', text: 'Read a bookshelf in an Emberfall house.' } },
+  { id: 'glacialPlumSoup', group: 'Cooking', station: 'pot', result: 'glacialPlumSoup', needs: [['iceTrout', 2], ['snowPlum', 2], ['sunWheat', 1]], discovery: { kind: 'book', planet: 'frostveil', text: 'Read a bookshelf in a Frostveil house.' } },
+  { id: 'goldenBanquet', group: 'Cooking', station: 'pot', result: 'goldenBanquet', needs: [['goldenKoi', 1], ['pumpkin', 2], ['sunWheat', 3], ['sweetleaf', 3]], discovery: { kind: 'scroll', planet: 'lanternmoss', text: 'Find and use its recipe scroll in a Lanternmoss chest.' } },
+  { id: 'restorativeElixir', group: 'Potions', station: 'brew', result: 'restorativeElixir', needs: [['sweetleaf', 3], ['springWater', 2], ['amethyst', 1]], discovery: { kind: 'scroll', planet: 'lanternmoss', text: 'Find and use its recipe scroll in a Lanternmoss chest.' } },
+  { id: 'emberTonic', group: 'Potions', station: 'brew', result: 'emberTonic', needs: [['sweetleaf', 3], ['springWater', 1], ['emberShard', 2], ['fireOpal', 1]], discovery: { kind: 'scroll', planet: 'emberfall', text: 'Find and use its recipe scroll in an Emberfall chest.' } },
+  { id: 'glacialTonic', group: 'Potions', station: 'brew', result: 'glacialTonic', needs: [['sweetleaf', 3], ['springWater', 1], ['frostPetal', 2], ['frostDiamond', 1]], discovery: { kind: 'scroll', planet: 'frostveil', text: 'Find and use its recipe scroll in a Frostveil chest.' } },
+  { id: 'infusedMoonCharm', group: 'Magic', station: 'brew', result: 'infusedMoonCharm', needs: [['moonHopCharm', 1], ['mossRune', 1], ['springWater', 1]], discovery: { kind: 'book', planet: 'lanternmoss', text: 'Read a bookshelf in a Lanternmoss house.' } },
+  { id: 'infusedLeafCharm', group: 'Magic', station: 'brew', result: 'infusedLeafCharm', needs: [['featherCharm', 1], ['frostRune', 1], ['springWater', 1]], discovery: { kind: 'book', planet: 'frostveil', text: 'Read a bookshelf in a Frostveil house.' } },
+  { id: 'mossRune', group: 'Runes', station: 'forge', result: 'mossRune', needs: [['glowcap', 3], ['amethyst', 1]], discovery: { kind: 'bestiary', enemy: 'ogre', text: 'Defeat an Ogre, then learn from its bestiary page.' } },
+  { id: 'emberRune', group: 'Runes', station: 'forge', result: 'emberRune', needs: [['emberShard', 3], ['fireOpal', 1]], discovery: { kind: 'bestiary', enemy: 'ramhorn', text: 'Defeat a Ramhorn, then learn from its bestiary page.' } },
+  { id: 'frostRune', group: 'Runes', station: 'forge', result: 'frostRune', needs: [['frostPetal', 3], ['frostDiamond', 1]], discovery: { kind: 'bestiary', enemy: 'hexlantern', text: 'Defeat a Hexlantern, then learn from its bestiary page.' } },
+];
+
 export const RECIPES = [
   // ---- smelting at the forge: ore + fuel -> ingots (and wood burned down into charcoal, a better fuel)
   { id: 'copperIngot', group: 'Smelting', station: 'forge', result: 'copperIngot', needs: [['copperOre', 2]], fuel: 1 },
@@ -78,4 +93,7 @@ export const RECIPES = [
   { id: 'leafCape', group: 'Vanity', result: 'leafCape', needs: [['sweetleaf', 6], ['wood', 2]] },
   // ---- other
   { id: 'lanternKey', group: 'Other', result: 'lanternKey', needs: [['glowcap', 4], ['emberShard', 2]], coins: 15 },
+  // The stand supplies clean water; a wooden flask is included in the ingredient cost.
+  { id: 'springWater', group: 'Brewing supplies', station: 'brew', result: 'springWater', needs: [['wood', 1]] },
+  ...DISCOVERY_RECIPES,
 ];

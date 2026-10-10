@@ -23,6 +23,7 @@ import { SPAWN_DIR } from '../world/World.js';
 import { lootName, rollLoot } from './loot.js';
 import { grantItem, spawnWorldItem } from './pickups.js';
 import { gainCoins } from './wallet.js';
+import { RecipeBook } from './RecipeBook.js';
 
 const MIN_APART = 8;          // chests keep at least this far (arc) from each other
 
@@ -110,6 +111,7 @@ export const Chests = {
     }
     c.open(); this.opened.add(c.id); emit('chestopened', { kind: c.kind, planet: ctx.planet });
     const loot = rollLoot(c.def.loot, ctx.planet, rng, ctx.player.charId), names = [];
+    const scroll = RecipeBook.scrollFor(ctx.planetId); if (scroll) loot.items.push({ item: scroll, qty: 1, props: null });
     if (loot.coins) { gainCoins(loot.coins, c.top(0.6)); names.push(`${loot.coins} coins`); }
     loot.items.forEach(({ item, qty, props }, i) => {
       const heading = (i / Math.max(1, loot.items.length)) * Math.PI * 2 + mr(-0.4, 0.4);

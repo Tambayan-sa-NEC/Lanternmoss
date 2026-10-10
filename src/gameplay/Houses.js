@@ -23,6 +23,7 @@ import { arcDist, projectTangent, turnToward } from '../utils/sphere.js';
 import { buildRoom, ROOM_UP } from '../world/interiors.js';
 import { groundHeight } from '../world/terrain.js';
 import { buff } from './buffs.js';
+import { RecipeBook } from './RecipeBook.js';
 import { Challenges } from './challenges/Challenges.js';
 import { Chests } from './Chests.js';
 import { Farm } from './Farm.js';
@@ -208,7 +209,9 @@ export const Houses = {
       }
       case 'bookshelf': {
         const lore = def.lore?.length ? def.lore : ["Cookbooks, mostly. One is titled 'Moss: A Love Story'. Another is just a very flat sandwich."];
-        const i = this.lore[key] = ((this.lore[key] ?? -1) + 1) % lore.length; this.read('Bookshelf', lore[i]); return;
+        const i = this.lore[key] = ((this.lore[key] ?? -1) + 1) % lore.length;
+        const learned = RecipeBook.readBook(ctx.planetId);
+        this.read('Bookshelf', lore[i] + (learned ? `\nRecipe learned: ${learned}.` : '')); return;
       }
       case 'kettle':
         if (ctx.time - this.teaAt < 60) { this.read('Kettle', 'Still warm, but empty. Granny will brew more soon.'); return; }

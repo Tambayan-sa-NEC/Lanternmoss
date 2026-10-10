@@ -475,6 +475,12 @@ body.menu #inventory { display:none; }
 .need.ok { background:#dff5e3; color:#2f7a45; } .need.coin { padding-left:7px; }
 .recipe button { font:inherit; font-weight:800; font-size:12px; padding:3px 12px; border:3px solid var(--ink); border-radius:999px; background:var(--pink); color:#fff; cursor:pointer; }
 .recipe button:disabled { opacity:.35; cursor:default; }
+.rc-buttons { display:flex; flex-direction:column; gap:4px; flex:none; }
+.rc-discovery { display:block; width:100%; font-size:11px; line-height:1.35; color:var(--ink); }
+.recipe .rc-favourite { padding:2px 5px; background:#fff8ee; color:var(--ink); border-width:2px; font-size:19px; }
+.recipe.locked { border-style:dashed; }
+.enchant-target { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-weight:800; }
+.enchant-target select { font:inherit; max-width:100%; padding:6px; border:2px solid var(--ink); border-radius:8px; background:#fff8ee; }
 .rc-msg { margin-top:8px; min-height:16px; text-align:center; }
 /* procedural item icons: one shape per ITEM_ICON_SHAPES entry, coloured by --c */
 .item-icon { display:inline-block; width:28px; height:28px; box-sizing:border-box; background:var(--c); border:2px solid var(--ink); }

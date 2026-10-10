@@ -166,6 +166,17 @@ Walk up to one and press `E`: the Craft tab opens on what it makes. Those recipe
 Your first tools, a few snacks and the vanity pieces are made by hand, anywhere. Chips along the Craft tab filter by
 station, and a star marks the one you're at.
 
+**More crafting.** Learn advanced meals, potions and infused charms from house bookshelves, chest scrolls and
+defeated monsters' bestiary pages. Each world contributes its fish, crops and rare materials. Fill wooden flasks at
+the brewing stand for advanced brews. One meal buff runs at a time; potion and pet effects stay independent.
+Craft x5, Smelt all and starred favourites make repeated recipes quicker. The **Enchant** tab applies one Moss,
+Ember or Frost rune to a weapon, armour piece or trinket at the forge, preserving its rarity. Discoveries,
+favourites and enchantments are saved with the adventure. [Recipes and rules](docs/crafting.md).
+
+<p>
+  <img src="docs/screenshots/enchanting.jpg" width="49%" alt="The Enchant tab with a worn weapon and three rune choices">
+</p>
+
 **Smelting.** At the forge, ore and fuel become ingots: copper ore makes copper ingots, and iron ore makes iron ingots.
 Fuel is wood, charcoal or ember shards; charcoal is wood burned down at the forge, and lasts three times as long. Ingots
 make the metal tools, weapons, armour and trinket settings. That includes the Iron Axe and Iron Pickaxe: a tool better
@@ -289,6 +300,7 @@ headless Chrome (a few minutes with software rendering):
 npm i --no-save puppeteer-core     # once; not a project dependency
 node scripts/screenshots.mjs       # all shots, or e.g. `node scripts/screenshots.mjs bag,pets` for some
 node scripts/save-smoke.mjs        # real reload/export/import check; retake title and save menus
+node scripts/crafting-smoke.mjs    # bulk crafting, discovery, enchanting and reload persistence
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 ```
 
@@ -311,7 +323,7 @@ over). The defaults:
 | `1` – `9` | hold the item in that hotbar slot (or click it); press the number again, or right click, to use it (a tool works what's in front of you) |
 | `E` / `X` | talk, use, advance, accept / decline (and `E` beside your pet, standing still, pets them); pick, chop, mine, fish, till, plant, water and harvest (tools come from the hotbar) |
 | `E` or click while fishing | reel in when the float dips, then stop the needle in the green |
-| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag and Craft tabs) |
+| `I` or `Tab` (`Esc` closes) | open / close the bag (Bag, Craft and Enchant tabs) |
 | `B` (or click the pet card) | the pet menu: see, swap, rename and command your pets (the world pauses) |
 | `N` | swap to your next pet right away |
 | `T` | pet command: follow → stay → attack my target → passive |
