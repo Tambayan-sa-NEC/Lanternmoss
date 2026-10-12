@@ -909,7 +909,7 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 **Risk:** the structures stage (walls, floors, roofs on a round, hilly planet) is a game of its own (risk 7).
 **Recommendation:** ship 25a and 25b, play with them, then decide on 25c.
 
-- [ ] **25a. A home to start with (suggested):** before full building, claim an empty cottage in the village, decorate it with
+- [x] **25a. A home to start with (suggested):** before full building, claim an empty cottage in the village, decorate it with
       furniture you craft, and sleep in your own bed. This gives a smaller first step toward the pieces below.
 - [ ] **25b. Placeables:** furniture, lights, fences, paths, walls, floors and roofs, chests for storage, crafting stations
       (17) and farm plots (16).
@@ -923,6 +923,11 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 - [ ] **25c. Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
       village houses.
   - Go / no-go after 25b: only if placement on slopes, collisions and the camera already feel solid.
+
+**25a implemented (2026-10-12):** a separate claimable cottage on each planet, five craftable furnishings in fixed
+indoor spots, bag/hotbar placement and safe furniture removal, and an own bed with naps/night sleep and energy
+recovery. Homes persist through portal visits, indoor Continue and version-1 saves; existing villagers keep their
+houses. 25b/25c remain open. See [cottage controls, recipes, screenshots and saves](docs/home.md).
 
 ---
 

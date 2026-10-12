@@ -19,6 +19,7 @@ import { equipProblem } from '../items/gear.js';
 import { RECIPES } from '../config/crafting.js';
 import { RUNES } from '../config/magic.js';
 import { xpToNext } from '../progression/leveling.js';
+import { cleanHomeState } from '../gameplay/homeRules.js';
 
 export const SAVE_KEY = 'lanternmoss.adventure';
 export const SAVE_VERSION = 1;
@@ -33,7 +34,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
-  farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
+  home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
@@ -56,6 +57,7 @@ export const SAVE_OWNERS = {
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
   'gameplay/Portals.js:Portals': 'portals',
+  'gameplay/Home.js:Home': 'home',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
 export const STATELESS_EXPORTS = new Set(['BUFF_NAMES', 'REWARDS', 'TOOL_USES', 'ACTION_HANDLERS', 'PET_ABILITIES']);
@@ -93,7 +95,7 @@ const chestId = id => typeof id === 'string' && PLANETS.some(p => {
   return suffix === 'boss' || /^\d+$/.test(suffix) && +suffix < p.chests.reduce((n, c) => n + c.count, 0);
 });
 const houseId = id => typeof id === 'string' && PLANETS.some(p => id.startsWith(`${p.id}:`) &&
-  /^\d+$/.test(id.slice(p.id.length + 1)) && +id.slice(p.id.length + 1) < HOUSES.length);
+  /^(0|[1-9]\d*)$/.test(id.slice(p.id.length + 1)) && Object.hasOwn(HOUSES, id.slice(p.id.length + 1)));
 const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.entries(record(v)).slice(0, 1024)
   .filter(([key]) => allow(key)).map(([key, n]) => [key, number(n, 0, min, max)]));
 
@@ -101,6 +103,7 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
 export function cleanState(key, value, hero = 'witch') {
   const s = record(value);
   switch (key) {
+    case 'home': return cleanHomeState(value);
     case 'crafting': {
       const learned = stringIds(s.learned, id => RECIPES.some(r => r.id === id && r.discovery));
       return { learned, favourites: stringIds(s.favourites, id => RECIPES.some(r => r.id === id && (!r.discovery || learned.includes(id)))) };

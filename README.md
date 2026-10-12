@@ -5,7 +5,7 @@
 A tiny cozy planet of lanterns, moss and friendly critters: a third-person browser game built with
 [Three.js](https://threejs.org/) (r160) and plain ES modules, with no asset files (every model, icon and sound is made in
 code). Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore hilly little planets, help the villagers, open
-treasure chests, gear up, raise a pet, and fight the monsters beyond the village lanterns.
+treasure chests, gear up, raise a pet, claim and furnish a cottage, and fight the monsters beyond the village lanterns.
 
 ![The village of Lanternmoss](docs/screenshots/village.jpg)
 
@@ -545,6 +545,11 @@ dialogue through `Dialog.lineProvider` instead of the dialogue importing them. L
 
 **Shared state** lives in `core/context.js` (`ctx.player`, `ctx.enemies`, `ctx.time`...), filled in by `Game`. That
 is the one place to look for "what is alive right now", instead of dozens of loose globals.
+
+**Your cottage:** each village has a separate vacant cottage on the compass. Enter it and use the sign to claim
+it, then furnish fixed spots with five crafted pieces (bed, table, rug, lantern and plant). Your own bed restores
+health, energy and ability resources, sleeping to morning at night. Ownership and furnishings persist separately
+on each planet, including indoor Continue. See [cottage controls, recipes and saves](docs/home.md).
 
 **Planets:** `World.generate(planet)` builds a planet from its PLANETS entry (seed + palette) and `World.dispose()`
 tears it down. `PlanetProgression` listens for `'bossdefeated'`: monsters vanish without XP, challenges end and

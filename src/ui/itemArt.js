@@ -15,6 +15,11 @@ const GOLD = '#ffd36b', WOOD = '#b0703a', STEEL = '#dfe6f0';
 
 /** kind -> (main colour hex, light, dark) -> SVG body (viewBox 0 0 32 32). */
 const ART = {
+  homeBed: (c) => `<path ${S} fill="${WOOD}" d="M4 12h24v12H4z"/><path ${S} fill="${c}" d="M5 12h22v8H5z"/><path ${S} fill="#fff6ee" d="M6 9h7v6H6z"/><path ${S} fill="none" d="M4 8v20M28 12v16"/>`,
+  homeTable: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="12" rx="12" ry="5"/><path ${S} fill="${WOOD}" d="M13 17h6v11h-6z"/><path ${S} fill="none" d="M7 17v9M25 17v9"/>`,
+  homeRug: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="17" rx="13" ry="8"/><ellipse fill="${GOLD}" cx="16" cy="17" rx="8" ry="4"/><path ${S} fill="none" d="M3 14l-1 2M3 20l-1 2M29 14l1 2M29 20l1 2"/>`,
+  homeLamp: (c) => `<path ${S} fill="${WOOD}" d="M14 13h4v15h-4z"/><path ${S} fill="${c}" d="M7 14l5-10h8l5 10z"/><path ${S} fill="none" d="M11 28h10"/>`,
+  homePlant: (c) => `<path ${S} fill="#d27a5a" d="M9 18h14l-2 11H11z"/><path ${S} fill="${c}" d="M16 19C4 19 3 6 12 8c6 2 4 7 4 11zM16 19c0-12 12-16 12-7 0 5-7 7-12 7zM16 14c-6-6-1-13 3-10 4 3 0 8-3 10z"/>`,
   scroll: () => `<path ${S} fill="#efdc9f" d="M8 5h17v21H8z"/><path ${S} fill="#fff1c5" d="M6 5h20v5H6zM6 23h20v5H6z"/><path ${S} fill="none" d="M11 14h10M11 18h7"/>`,
   bun: (c, l) => `<path ${S} fill="${c}" d="M4 20c0-7 5.5-11 12-11s12 4 12 11z"/><path ${S} fill="#f6e0c0" d="M4 20h24v3a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/>
     <path fill="none" stroke="${l}" stroke-width="2" stroke-linecap="round" d="M10 14q3-2 6 0M16 12q3-2 6 1"/>`,

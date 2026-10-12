@@ -29,6 +29,7 @@
 
 import { DISCOVERY_RECIPES } from './crafting.js';
 import { RUNES } from './magic.js';
+import { FURNISHINGS } from './home.js';
 
 export const ITEM_CATEGORIES = {
   consumable: 'Consumable',
@@ -39,6 +40,7 @@ export const ITEM_CATEGORIES = {
   weapon: 'Weapon',
   quest: 'Quest item',
   misc: 'Miscellaneous',
+  furniture: 'Furniture',
 };
 
 /** statMult: how much stronger gear of this rarity is than its Common stats. */
@@ -101,7 +103,7 @@ export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', '
 export const ITEM_ART_KINDS = ['scroll', 'bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
   'staff', 'axe', 'bow', 'cloak', 'mail', 'mantle', 'pendant', 'ring', 'locket', 'key', 'crown',
   'log', 'stone', 'ore', 'gemstone', 'herb', 'pepper', 'plum', 'carrot', 'wheat', 'pumpkin', 'seeds', 'fish', 'bread', 'skewer',
-  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal'];
+  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal', ...Object.keys(FURNISHINGS)];
 
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width
@@ -113,6 +115,8 @@ export const INVENTORY = {
 };
 
 export const ITEM_DEFINITIONS = [
+  ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'furniture', maxStack: 5, value: 0,
+    icon: { shape: 'charm', color: f.color, art: f.art } })),
   // ---- deeper cooking, brewing and one-slot enchanting (TODO 22) ----
   { id: 'springWater', name: 'Spring Water', description: 'Clean water in a wooden flask. Fill a flask at the brewing stand using one wood.', category: 'material', maxStack: 20, icon: { shape: 'orb', color: 0x91d8f4, art: 'bottle' } },
   { id: 'perchChowder', name: 'Perch Chowder', description: 'Pond perch, moon carrots and wheat. A hearty meal for a long walk.', category: 'consumable', tags: ['food', 'meal'], rarity: 'uncommon', maxStack: 10, value: 22,

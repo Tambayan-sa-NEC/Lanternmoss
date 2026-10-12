@@ -3,6 +3,8 @@
    without one falls back to its plain icon.shape. An item with icon.src would need a sprite or model here. */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { buildFurniture } from '../world/interiors.js';
+import { FURNISHINGS } from '../config/home.js';
 
 const SHAPES = {
   orb: (g, c) => { addTo(g, part(G.ico(0.17, 1), c, { glow: true, intensity: 1.8 }), [0, 0, 0]); addTo(g, part(G.cone(0.05, 0.12, 4), 0x5fb35e), [0, 0.18, 0]); },
@@ -28,6 +30,11 @@ const torus = (r, t, arc = Math.PI * 2) => new THREE.TorusGeometry(r, t, 5, 14, 
 
 /** One builder per art kind: (group, colour). Sized to sit in a ~0.45 unit box like the shapes above. */
 const ART = {
+  homeBed: (g) => { const m = buildFurniture(FURNISHINGS.homeBed.kind); m.scale.setScalar(0.25); g.add(m); },
+  homeTable: (g) => { const m = buildFurniture(FURNISHINGS.homeTable.kind); m.scale.setScalar(0.25); g.add(m); },
+  homeRug: (g) => { const m = buildFurniture(FURNISHINGS.homeRug.kind); m.scale.setScalar(0.18); g.add(m); },
+  homeLamp: (g) => { const m = buildFurniture(FURNISHINGS.homeLamp.kind); m.scale.setScalar(0.25); g.add(m); },
+  homePlant: (g) => { const m = buildFurniture(FURNISHINGS.homePlant.kind); m.scale.setScalar(0.4); g.add(m); },
   scroll: (g, c) => { addTo(g, part(G.box(0.27, 0.34, 0.025), c), [0, 0, 0]); for (const y of [-0.17, 0.17]) addTo(g, part(G.cyl(0.045, 0.045, 0.34, 8), CREAM), [0, y, 0], [0, 0, Math.PI / 2]); addTo(g, part(G.box(0.16, 0.02, 0.01), WOOD), [0, 0.03, 0.02]); },
   bun: (g, c) => { addTo(g, part(G.hemi(0.22, 8, 3), c), [0, -0.04, 0], [0, 0, 0], [1, 0.8, 1]); addTo(g, part(G.cyl(0.22, 0.2, 0.08, 8), CREAM), [0, -0.06, 0]); },
   tart: (g, c) => {

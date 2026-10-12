@@ -32,6 +32,8 @@ import { Portals } from './Portals.js';
 import { PortalUI } from '../ui/PortalUI.js';
 import { cancelAim } from '../combat/aiming.js';
 import { ShopUI } from '../ui/ShopUI.js';
+import { Home } from './Home.js';
+import { HomeUI } from '../ui/HomeUI.js';
 
 export class PlanetProgression {
   constructor(world) {
@@ -60,6 +62,7 @@ export class PlanetProgression {
     this.spawnResources();
     for (const e of ctx.enemies) if (this.miniDefeated.has(e.portalId)) e.vanish();
     Portals.setup(this.world, [Farm.center && [Farm.center, 8], Stations.center && [Stations.center, 5]].filter(Boolean));
+    Home.setup(this.world, [[Portals.gate.dir, 3], Farm.center && [Farm.center, 8], Stations.center && [Stations.center, 5]].filter(Boolean));
   }
 
   /** The village farm and crafting corner, then the planet's resource nodes (they keep clear of both). */
@@ -140,7 +143,7 @@ export class PlanetProgression {
     }
     if (typeof index === 'string') index = PLANETS.findIndex(p => p.id === index);
     if (!PLANETS[index]) throw new Error('Unknown planet');
-    this.beforeLoad?.(); PortalUI.close(); Portals.clear();
+    this.beforeLoad?.(); HomeUI.close(); Home.clear(); PortalUI.close(); Portals.clear();
     const P = ctx.player, world = this.world;
     ctx.planet = index; ctx.planetId = PLANETS[index].id; this.state = 'playing'; this.pendingClear = false;
     Dialog.close(); Challenges.cancel(); Houses.reset();

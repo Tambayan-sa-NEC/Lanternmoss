@@ -54,7 +54,7 @@ test('registry requires every owner, rejects duplicate keys and round-trips ever
   const registry = new SaveRegistry(); assert.throws(() => registry.assertComplete(), /Missing save system/);
   const data = sanitizeSave(fixture()), states = {};
   for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) {
-    states[key] = structuredClone(scope === 'adventure' ? data.systems[key] : data.planets.emberfall[key]);
+    states[key] = structuredClone(scope === 'adventure' ? data.systems[key] : data.planets.emberfall[key] ?? cleanState(key, null));
     registry.register(key, { toJSON: () => states[key], load: value => { states[key] = value; } });
   }
   assert.throws(() => registry.register('player', { toJSON() {}, load() {} }), /Invalid save registration/);

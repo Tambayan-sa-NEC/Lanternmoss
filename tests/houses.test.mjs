@@ -22,7 +22,7 @@ test('every house on every planet has a name, a known layout and furniture that 
     const h = resolved(i, p), known = anchors(h.layout);
     assert.ok(h.name && ['mushroom', 'cottage'].includes(h.layout), `house ${i} planet ${p}`);
     for (const kind of h.props) assert.ok(known.has(kind), `house ${i} planet ${p}: ${h.layout} can't place '${kind}'`);
-    assert.ok(h.props.includes('bed') || h.resident, `house ${i} planet ${p}: somewhere to rest`);
+    assert.ok(h.props.includes('bed') || h.resident || h.playerHome, `house ${i} planet ${p}: somewhere to rest, or a cottage to furnish`);
   }
 });
 

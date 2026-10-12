@@ -14,6 +14,8 @@
    --------------------------------------------------------------------- */
 
 export const HOUSES = {
+  6: { name: 'An empty cottage', layout: 'cottage', playerHome: true, props: ['homeSign'],
+    note: 'Vacant: claim this cottage at the sign inside, then furnish it with things you craft.' },
   0: { name: "Lio's house", owner: 'Lio', layout: 'mushroom',
     props: ['bed', 'rug', 'table', 'instruments', 'chest', 'lamp', 'plant', 'window'],
     note: "Out busking! Back by nightfall. Please don't tune my lute. -- Lio", gift: { coins: 12, items: [['moonberry', 2]] } },
@@ -64,6 +66,7 @@ export const HOUSES = {
 
 /** What each interactive prop does when you press E next to it (Houses.js runs them). */
 export const INTERACTIONS = {
+  homeSign: { label: 'Read the cottage sign' },
   bed: { label: 'Rest in the bed' },           // at night: sleep till morning, full heal; by day: a nap (heals)
   chest: { label: 'Open the storage chest' },  // the house's gift, once per adventure
   bookshelf: { label: 'Read' },                // the house's lore, in order

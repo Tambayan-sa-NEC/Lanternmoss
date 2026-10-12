@@ -35,7 +35,8 @@ does not roll travel keys. Ordinary Lantern Keys still only open locked chests.
 The existing house/lore/oven state remains keyed by stable planet and house IDs. Local dialogue memory now uses
 planet/name keys, with a fallback for older v1 saves. Quests no longer drop or skip unavailable earlier-world steps;
 local hand-ins outside the current world show the destination to return to and have no misleading compass target.
-Building is added in TODO 25; the per-planet save registry is ready for its future state owner.
+Claimable cottages and crafted indoor furnishings (TODO 25a) now save their own per-planet home state. Outdoor
+placeables, storage and structures remain TODO 25b/25c; see [cottage rules](home.md).
 
 ## Save contract and checks
 

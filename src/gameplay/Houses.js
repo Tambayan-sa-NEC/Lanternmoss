@@ -38,6 +38,11 @@ import { gainCoins } from './wallet.js';
 import { nearestNPC } from '../entities/npc/NPC.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { Portals } from './Portals.js';
+import { HOME, FURNISHINGS } from '../config/home.js';
+import { NEEDS } from '../config/survival.js';
+import { Home } from './Home.js';
+import { Needs } from './Needs.js';
+import { HomeUI } from '../ui/HomeUI.js';
 
 const V3 = THREE.Vector3;
 const DOOR_REACH = 2.1, USE_REACH = 1.0, TALK_REACH = 2.4, FADE = 0.35;
@@ -48,6 +53,8 @@ const _tv = new V3(), _w = new V3(), _fwd = new V3(), BACK = new V3(0, 0, 1);
 /** This house's settings on the current planet (its `planets` entry merged in), or null for a house without an entry. */
 export function houseDef(index, planet = ctx.planet) {
   const base = HOUSES[index]; if (!base) return null;
+  if (base.playerHome && planet === ctx.planet) return { ...base, name: Home.state.claimed ? 'Your cottage' : base.name,
+    props: ['homeSign', ...Home.state.furniture.map(id => FURNISHINGS[id].kind)] };
   return { ...base, ...(base.planets?.[planet] ?? {}) };
 }
 
@@ -90,12 +97,20 @@ export const Houses = {
       const parts = owner.def.build(), b = room.bedAt;
       parts.root.rotation.set(-Math.PI / 2, b.ry, 0, 'YXZ'); parts.root.position.set(b.x + Math.sin(b.ry) * 0.85, 0.62, b.z + Math.cos(b.ry) * 0.85);
       room.root.add(parts.root); state.sleeper = { parts, zT: 1 };
-    } else if (def.note) state.noteAt = room.tableAt;                // nobody home: a note on the table
+    } else if (def.note && !def.playerHome) state.noteAt = room.tableAt; // home information lives on its sign
     ctx.indoors = def.name;
     const chest = room.spots.find(p => p.kind === 'chest');            // emptied earlier this adventure: lid's still up
     if (chest && this.opened.has(`${ctx.planetId}:${index}`)) chest.obj.userData.lid.rotation.x = -1.9;
     if (ctx.companion) { ctx.companion.root.visible = false; if (ctx.companion.shadow) ctx.companion.shadow.visible = false; }
     setRoomView({ up: ROOM_UP, back: BACK });
+    if (def.playerHome && !Home.state.claimed) toast('An empty cottage! Use the little sign by the door to claim it.');
+  },
+  /** Rebuild only the player cottage's room, preserving the hero's spot and facing. */
+  refreshHome() {
+    if (this.inside?.index !== HOME.houseIndex) return;
+    const { x, z, armed, room } = this.inside, fwd = ctx.player.fwd.clone();
+    room.dispose(); this.inside = null; this.goInside(HOME.houseIndex, houseDef(HOME.houseIndex));
+    Object.assign(this.inside, { x, z, armed }); ctx.player.fwd.copy(fwd); this.placeHero();
   },
   goOutside() {
     const P = ctx.player, { index, room } = this.inside, house = this.world.houses[index];
@@ -134,7 +149,11 @@ export const Houses = {
     s.x += s.vx * dt; s.z += s.vz * dt;
     for (const o of s.room.obstacles) {                              // slide around furniture
       const dx = s.x - o.x, dz = s.z - o.z, d = Math.hypot(dx, dz), min = o.r + 0.35;
-      if (d < min && d > 1e-4) { s.x = o.x + dx / d * min; s.z = o.z + dz / d * min; }
+      if (d < min) {
+        if (d > 1e-4) { s.x = o.x + dx / d * min; s.z = o.z + dz / d * min; }
+        else { const towardCentre = Math.hypot(o.x, o.z); s.x = o.x - (towardCentre ? o.x / towardCentre : 1) * min;
+          s.z = o.z - (towardCentre ? o.z / towardCentre : 0) * min; }
+      }
     }
     const sh = s.room.shape;                                         // and stay inside the walls
     if (sh.kind === 'circle') { const d = Math.hypot(s.x, s.z); if (d > sh.r) { s.x *= sh.r / d; s.z *= sh.r / d; } }
@@ -165,7 +184,8 @@ export const Houses = {
     }
     const s = this.inside, opts = [];
     const near = (x, z, reach, label, run, y = 1.6) => { const d = Math.hypot(s.x - x, s.z - z); if (d < reach) opts.push({ dist: d, label, at: s.room.toWorld(x, z, y), run }); };
-    for (const sp of s.room.spots) near(sp.x, sp.z, USE_REACH + (sp.kind === 'bed' ? 1.1 : 0.8), INTERACTIONS[sp.kind].label, () => this.use(sp));
+    for (const sp of s.room.spots) near(sp.x, sp.z, USE_REACH + (sp.kind === 'bed' ? 1.1 : 0.8),
+      sp.kind === 'homeSign' ? Home.state.claimed ? 'Furnish your cottage' : 'Claim this empty cottage' : INTERACTIONS[sp.kind].label, () => this.use(sp));
     if (s.resident) near(s.resident.x, s.resident.z, TALK_REACH, `Talk to ${s.resident.name}`, () => this.talkResident(), 2.3);
     for (const o of opts) if (/^Talk/.test(o.label)) o.dist -= 0.8;   // people come before furniture when both are in reach
     if (s.sleeper) near(s.room.bedAt.x, s.room.bedAt.z, 2.1, `${s.owner.name} is asleep`, () => this.talkSleeper(), 1.4);
@@ -187,7 +207,9 @@ export const Houses = {
   use(spot) {
     const P = ctx.player, s = this.inside, def = s.def, key = `${ctx.planetId}:${s.index}`;
     switch (spot.kind) {
+      case 'homeSign': HomeUI.open(); return;
       case 'bed': {
+        if (def.playerHome && (P.dead || !Home.state.claimed || !Home.state.furniture.includes('homeBed'))) { toast('Craft and place your bed, then rest here when you are standing.'); return; }
         const night = dayClock.phase === 'night' || dayClock.phase === 'evening' && dayClock.frac > 0.7;
         this.fadeThen(() => {
           if (night) {                                               // sleep through to the morning (watered crops grow overnight)
@@ -196,7 +218,9 @@ export const Houses = {
             dayClock.t = REST.wakeAt * DAY.length; P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
             showBanner(`Day ${dayClock.day}`, 'You wake up rested and ready.');
           } else { dayClock.update(20); Farm.growBy(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
+          if (def.playerHome) { Needs.eat(night ? NEEDS.max : NEEDS.max * REST.napHeal); if (!night) P.mana = Math.min(P.stats.maxMana, P.mana + P.stats.maxMana * REST.napHeal); }
         });
+        this.fade.saveHome = !!def.playerHome;
         return;
       }
       case 'chest': {
@@ -233,14 +257,14 @@ export const Houses = {
     if (this.fade) {
       if ((this.fade.t -= dt) <= 0) {
         if (this.fade.phase === 'out') { this.fade.then?.(); this.fade.phase = 'in'; this.fade.t = FADE; setFade(false, FADE); }
-        else { this.fade = null; ctx.transitioning = false; }
+        else { const saveHome = this.fade.saveHome; this.fade = null; ctx.transitioning = false; if (saveHome) Home.save(); }
       }
     }
     const s = this.inside; if (!s) return;
     const t = ctx.time;
     if (s.lidOpen && s.lidOpen.t < 1) { const k = s.lidOpen.t = Math.min(1, s.lidOpen.t + dt / 0.45); s.lidOpen.lid.rotation.x = -1.9 * (1 + 2.4 * (k - 1) ** 3 + 1.4 * (k - 1) ** 2); }
     for (const fire of s.room.fires) fire.scale.setScalar(1 + Math.sin(t * 9) * 0.08 + Math.sin(t * 23) * 0.04);
-    s.room.light.intensity = 18 + Math.sin(t * 7) * 0.8;
+    s.room.light.intensity = s.room.baseLight + Math.sin(t * 7) * 0.8;
     if (s.resident) {                                                // turns to look at you when you come over
       const r = s.resident, p = r.parts, dx = s.x - r.x, dz = s.z - r.z;
       p.head.rotation.z = Math.sin(t * 1.4) * 0.05; p.body.position.y = Math.sin(t * 2) * 0.02;

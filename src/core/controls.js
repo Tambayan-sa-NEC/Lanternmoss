@@ -27,13 +27,15 @@ import { JournalUI } from '../ui/JournalUI.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
 import { PortalUI } from '../ui/PortalUI.js';
+import { HomeUI } from '../ui/HomeUI.js';
 
 /** Keys whose browser default (page scroll, quick-find, focus moves...) would get in the way. */
-const GAME_KEYS = { has: code => PortalUI.isOpen ? code === 'Escape' : code === 'Escape' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
+const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen ? code === 'Escape' : code === 'Escape' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
 
 function onKey(code) {
   if (is('togglePerformance', code) && !PauseMenu.capture) { setSetting('perfOverlay', !settings.perfOverlay); return; }
   const player = ctx.player;
+  if (HomeUI.isOpen) { HomeUI.key(code); return; }
   if (PortalUI.isOpen) { PortalUI.key(code); return; }
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens

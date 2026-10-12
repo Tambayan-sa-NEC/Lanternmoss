@@ -41,7 +41,7 @@ export const Hotbar = {
     if (!stack) { toast('Your hands are empty: put food or gear on the hotbar from the bag (I).'); return null; }
     if (P.dead || this.cd > 0) return null;
     const def = itemRegistry.get(stack.itemId), action = actionFor(def);
-    if (action === 'use' || action === 'equip' || action === 'tool' || action === 'plant') {
+    if (action === 'use' || action === 'equip' || action === 'tool' || action === 'plant' || action === 'furnish') {
       const r = useItemInSlot(P.inventory, this.selected);
       if (r.message) toast(r.message); if (r.ok) { this.cd = action === 'tool' ? 0.3 : HOTBAR.useCooldown; this.changedAt = ctx.time; }
       return r;
