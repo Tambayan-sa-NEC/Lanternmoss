@@ -6,7 +6,7 @@
      tools                  used on what's in front: chop, mine, fish, till, water (./Gathering.js, Fishing.js, Farm.js)
      seeds                  planted in the farm plot you stand at (./Farm.js)
      materials, keys, trophies   nothing to do in your hands: a hint says where they're used
-   Placeable things (TODO 25) will be put down from here. */
+   Placeables and outdoor furniture start the building preview from here. */
 import { HOTBAR } from '../config/items.js';
 import { ctx } from '../core/context.js';
 import { emit } from '../core/events.js';
@@ -41,7 +41,7 @@ export const Hotbar = {
     if (!stack) { toast('Your hands are empty: put food or gear on the hotbar from the bag (I).'); return null; }
     if (P.dead || this.cd > 0) return null;
     const def = itemRegistry.get(stack.itemId), action = actionFor(def);
-    if (action === 'use' || action === 'equip' || action === 'tool' || action === 'plant' || action === 'furnish') {
+    if (action === 'use' || action === 'equip' || action === 'tool' || action === 'plant' || action === 'furnish' || action === 'place') {
       const r = useItemInSlot(P.inventory, this.selected);
       if (r.message) toast(r.message); if (r.ok) { this.cd = action === 'tool' ? 0.3 : HOTBAR.useCooldown; this.changedAt = ctx.time; }
       return r;

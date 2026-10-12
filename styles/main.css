@@ -824,3 +824,25 @@ body.paused #tutorial, body.menu #tutorial, body.menu #faint-screen, body.cutsce
 .home-panel button:disabled { opacity: .5; cursor: default; }
 .home-message { min-height: 24px; font-size: 14px; font-weight: 600; }
 @media (max-width: 560px) { .home-row { grid-template-columns: 30px 1fr; } .home-row button { grid-column: 2; justify-self: start; } }
+
+/* Outdoor building previews and paused storage (TODO 25b). */
+#building-preview { display:none; position:fixed; top:105px; left:50%; transform:translateX(-50%); z-index:26; width:min(570px,calc(100vw - 32px)); box-sizing:border-box; padding:10px 14px; background:#fff4dfed; border:2px solid #389567; border-radius:14px; box-shadow:0 4px 16px #271a3438; text-align:center; color:#3a2340 }
+#building-preview.show { display:block }
+#building-preview.invalid { border-color:#bd4560 }
+#building-preview strong,#building-preview span { display:block; margin-bottom:6px }
+#building-preview span { font-size:12px }
+#building-preview button,.building-panel button,.inv-tidy button { border:1px solid #b9a387; border-radius:8px; background:#fff5e6; color:#3a2340; padding:7px 10px; cursor:pointer; font:inherit }
+#building-preview button:disabled { opacity:.5; cursor:default }
+#building-menu { display:none; position:fixed; inset:0; z-index:71; background:#271a3488; align-items:center; justify-content:center; padding:18px; box-sizing:border-box }
+#building-menu.show { display:flex }
+.building-panel { width:min(780px,100%); max-height:calc(100vh - 36px); box-sizing:border-box; overflow:auto }
+.storage-actions,.inv-tidy { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 }
+.inv-tidy button { font-size:11px; padding:4px 8px }
+.storage-columns { display:grid; grid-template-columns:1fr 1fr; gap:16px }
+.storage-columns h3 { font-size:14px; margin:8px 0 }
+.storage-list { height:min(310px,42vh); overflow:auto; border:1px solid #d1bfa6; border-radius:10px; padding:6px; background:#f0e0c8 }
+.storage-list button { width:100%; display:flex; align-items:center; gap:9px; text-align:left; margin-bottom:4px; font-size:12px }
+.storage-list button .item-icon { width:32px; height:32px; flex-shrink:0 }
+.storage-list small { display:block; opacity:.75; margin-top:2px }
+.building-panel button:focus-visible,#building-preview button:focus-visible { outline:3px solid #7d68a3; outline-offset:2px }
+@media(max-width:560px) { .storage-columns { gap:8px } .storage-list { height:34vh } #building-preview { top:88px } }

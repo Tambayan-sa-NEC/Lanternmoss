@@ -20,7 +20,7 @@ const leave = () => { H.HomeUI.close(); H.InventoryUI.close(); Houses.leave(); s
 const travel = id => { P.placeAt(H.Portals.gate.dir); assert.ok(H.Portals.travel(id)); step(2); assert.equal(ctx.planetId, id); };
 assert.equal(game.world.houses.length, 7); assert.equal(home.cottage.kind, 'cottage');
 assert.equal(home.claim().ok, false); inv.add('homeBed', 1);
-const bedQty = inv.count('homeBed'); assert.equal(useItemInSlot(inv, inv.find('homeBed')).ok, false); assert.equal(inv.count('homeBed'), bedQty); inv.remove('homeBed', 1);
+const bedQty = inv.count('homeBed'); assert.equal(useItemInSlot(inv, inv.find('homeBed')).ok, true); H.Building.cancel(); assert.equal(inv.count('homeBed'), bedQty); inv.remove('homeBed', 1);
 enter(); assert.equal(Houses.inside.room.spots.some(s => s.kind === 'bed'), false);
 assert.match(currentInteraction().label, /Claim/); currentInteraction().run(); assert.ok(H.HomeUI.isOpen && ctx.paused);
 const clock = ctx.time; step(4); assert.equal(ctx.time, clock);

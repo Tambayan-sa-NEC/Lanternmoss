@@ -1,4 +1,6 @@
 /* What the bag window (ui/InventoryUI.js) can ask the game to do. Kept here so the UI never reaches into gameplay. */
+import { HOTBAR } from '../config/items.js';
+import { Building } from './Building.js';
 import { STATIONS } from '../config/stations.js';
 import { RECIPES } from '../config/crafting.js';
 import { RUNES } from '../config/magic.js';
@@ -21,6 +23,8 @@ const PROBLEM = { quantity: 'Choose a whole crafting quantity from 1 to 10000.',
 
 export function bagCommands(bag) {
   return {
+    sort: () => { if (ctx.player.dead) return { ok: false, message: 'Sort the bag when you are standing.' }; bag.sort(HOTBAR.size); Building.callbacks.save?.(); return { ok: true, message: 'Sorted the bag; hotbar kept in place.' }; },
+    quickStack: () => { const n = Building.quickStack(); return { ok: !!n, message: n ? `Quick-stacked ${n} items into nearby matching chests.` : 'No matching items fit in a nearby storage chest.' }; },
     use: slot => useItemInSlot(bag, slot),
     drop: slot => dropFromSlot(slot),
     unequip: where => unequip(bag, where),

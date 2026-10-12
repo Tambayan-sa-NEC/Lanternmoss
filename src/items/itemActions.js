@@ -8,10 +8,11 @@ export const ITEM_ACTIONS = {
   inspect: { label: 'Inspect', supported: true },    // only shows details; never consumes
   tool:    { label: 'Use', supported: true },        // work the tree / rock / pond / plot in front of you (gameplay/Gathering.js)
   plant:   { label: 'Plant', supported: true },      // sow in the farm plot you stand at (gameplay/Farm.js)
-  furnish: { label: 'Place in home', supported: true },
+  place: { label: 'Place outside', supported: true },
+  furnish: { label: 'Place furniture', supported: true },
 };
 
-const CATEGORY_ACTIONS = { consumable: 'use', equipment: 'equip', weapon: 'equip', quest: 'inspect', tool: 'tool', seed: 'plant', furniture: 'furnish', material: null, misc: null };
+const CATEGORY_ACTIONS = { consumable: 'use', equipment: 'equip', weapon: 'equip', quest: 'inspect', tool: 'tool', seed: 'plant', furniture: 'furnish', placeable: 'place', material: null, misc: null };
 
 /** The action id for an item definition, or null when it can only be stored. */
 export function actionFor(def) {

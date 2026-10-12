@@ -76,7 +76,7 @@ export const Farm = {
   toJSON() { return { day: this.day, plots: structuredClone(this.state[ctx.planetId] ?? []) }; },
   load(data) {
     this.day = data.day; this.state[ctx.planetId] = structuredClone(data.plots);
-    this.plots.forEach((p, i) => { p.s = this.state[ctx.planetId][i]; p.stage = -1; this.look(p); });
+    this.plots.filter(p => !p.building).forEach((p, i) => { p.s = this.state[ctx.planetId][i]; p.stage = -1; this.look(p); });
   },
 
   /** Soil colour, weeds, furrows and the crop model for a plot's state. */
@@ -106,9 +106,9 @@ export const Farm = {
   },
 
   /** The E prompt for the plot in reach. */
-  target() {
+  target(plot = null) {
     if (Gathering.job) return null;
-    const h = this.plotHere(); if (!h) return null;
+    const h = plot ? { plot, dist: arcDist(ctx.player.up, plot.dir) } : this.plotHere(); if (!h) return null;
     const { plot: p, dist } = h, s = p.s, at = p.dir.clone().multiplyScalar(groundHeight(p.dir) + 1.2);
     const need = (what, tag) => `${what} <span class="ctag">(${tag})</span>`;
     let label, run;

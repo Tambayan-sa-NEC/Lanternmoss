@@ -19,6 +19,7 @@ import { equipProblem } from '../items/gear.js';
 import { RECIPES } from '../config/crafting.js';
 import { RUNES } from '../config/magic.js';
 import { xpToNext } from '../progression/leveling.js';
+import { cleanBuildings } from '../gameplay/buildingRules.js';
 import { cleanHomeState } from '../gameplay/homeRules.js';
 
 export const SAVE_KEY = 'lanternmoss.adventure';
@@ -34,7 +35,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
-  home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
+  building: 'planet', home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
@@ -58,6 +59,7 @@ export const SAVE_OWNERS = {
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
   'gameplay/Portals.js:Portals': 'portals',
   'gameplay/Home.js:Home': 'home',
+  'gameplay/Building.js:Building': 'building',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
 export const STATELESS_EXPORTS = new Set(['BUFF_NAMES', 'REWARDS', 'TOOL_USES', 'ACTION_HANDLERS', 'PET_ABILITIES']);
@@ -103,6 +105,7 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
 export function cleanState(key, value, hero = 'witch') {
   const s = record(value);
   switch (key) {
+    case 'building': return cleanBuildings(value, cleanStack);
     case 'home': return cleanHomeState(value);
     case 'crafting': {
       const learned = stringIds(s.learned, id => RECIPES.some(r => r.id === id && r.discovery));

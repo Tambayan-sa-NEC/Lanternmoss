@@ -15,6 +15,15 @@ const GOLD = '#ffd36b', WOOD = '#b0703a', STEEL = '#dfe6f0';
 
 /** kind -> (main colour hex, light, dark) -> SVG body (viewBox 0 0 32 32). */
 const ART = {
+  fence: (c) => `<path ${S} fill="${c}" d="M4 7h5v22H4zM23 7h5v22h-5zM2 12h28v4H2zM2 21h28v4H2z"/>`,
+  path: (c) => `<path ${S} fill="${c}" d="M3 15l7-7 13 1 6 10-6 7-15-1z"/>`,
+  storage: (c) => `<path ${S} fill="${c}" d="M3 13q0-9 13-9t13 9v15H3z"/><path ${S} fill="${GOLD}" d="M7 7h4v21H7zM21 7h4v21h-4z"/><path ${S} fill="${GOLD}" d="M13 16h6v6h-6z"/>`,
+  workbench: (c) => `<path ${S} fill="${c}" d="M2 12h28v6H2zM6 18h4v11H6zM23 18h4v11h-4z"/><path ${S} fill="${STEEL}" d="M13 4h11v5H13z"/><path ${S} fill="${WOOD}" d="M16 8h4v6h-4z"/>`,
+  forge: (c) => `<path ${S} fill="#8a7c8e" d="M4 10h24v18H4zM19 3h7v10h-7z"/><path ${S} fill="#3a2340" d="M9 15h14v11H9z"/><path fill="${c}" d="M11 25l2-9 3 5 4-7 2 11z"/>`,
+  pot: (c) => `<path ${S} fill="#5a5a66" d="M5 11h22v7q0 9-11 9T5 18z"/><path ${S} fill="${c}" d="M3 11h26v4H3z"/><path ${S} fill="none" d="M9 4q-3 3 0 5M18 2q-3 4 0 7"/>`,
+  brew: (c) => `<path ${S} fill="${WOOD}" d="M3 23h26v6H3z"/><path ${S} fill="${c}" d="M12 4h8v8l7 10H5l7-10z"/><path ${S} fill="none" d="M10 18h12"/>`,
+  plot: (c) => `<path ${S} fill="${c}" d="M3 10h26v19H3z"/><path ${S} fill="none" d="M7 14h18M7 19h18M7 24h18"/><path ${S} fill="#6fbf6a" d="M16 18C5 17 6 7 12 9l4 9c0-8 8-13 10-8 1 5-5 8-10 8z"/>`,
+
   homeBed: (c) => `<path ${S} fill="${WOOD}" d="M4 12h24v12H4z"/><path ${S} fill="${c}" d="M5 12h22v8H5z"/><path ${S} fill="#fff6ee" d="M6 9h7v6H6z"/><path ${S} fill="none" d="M4 8v20M28 12v16"/>`,
   homeTable: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="12" rx="12" ry="5"/><path ${S} fill="${WOOD}" d="M13 17h6v11h-6z"/><path ${S} fill="none" d="M7 17v9M25 17v9"/>`,
   homeRug: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="17" rx="13" ry="8"/><ellipse fill="${GOLD}" cx="16" cy="17" rx="8" ry="4"/><path ${S} fill="none" d="M3 14l-1 2M3 20l-1 2M29 14l1 2M29 20l1 2"/>`,

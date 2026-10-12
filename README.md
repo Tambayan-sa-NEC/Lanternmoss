@@ -307,6 +307,7 @@ npm i --no-save puppeteer-core     # once; not a project dependency
 node scripts/screenshots.mjs       # all shots, or e.g. `node scripts/screenshots.mjs bag,pets` for some
 node scripts/save-smoke.mjs        # real reload/export/import check; retake title and save menus
 node scripts/crafting-smoke.mjs    # bulk crafting, discovery, enchanting and reload persistence
+node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 ```
 
@@ -545,6 +546,12 @@ dialogue through `Dialog.lineProvider` instead of the dialogue importing them. L
 
 **Shared state** lives in `core/context.js` (`ctx.player`, `ctx.enemies`, `ctx.time`...), filled in by `Game`. That
 is the one place to look for "what is alive right now", instead of dozens of loose globals.
+
+**Build a garden:** craft and place furniture, lights, fences, stepping stones, storage chests, all four crafting
+stations and farm plots outdoors. Use a piece from your bag/hotbar to start a ground preview; Y rotates, U toggles
+grid/free ground, and click/Enter/E places. E beside a piece opens management and safe pickup. Storage and the bag
+have quick-stack and sorting buttons that keep your hotbar in place. Builds, chest contents and crops persist
+separately on every planet. See [building controls, recipes and saves](docs/building.md).
 
 **Your cottage:** each village has a separate vacant cottage on the compass. Enter it and use the sign to claim
 it, then furnish fixed spots with five crafted pieces (bed, table, rug, lantern and plant). Your own bed restores

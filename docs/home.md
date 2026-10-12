@@ -6,7 +6,7 @@ Claiming does not take anyone else’s home. Cinder, Tuva and the other resident
 
 Craft furniture in the bag’s **Craft** tab, bring it to your cottage, and choose **Place** at the sign. Furniture
 can also be used from its bag slot or hotbar while inside a claimed cottage. Each piece fits one fixed spot;
-free placement, rotation and outdoor building belong to TODO 25b.
+outdoor placement and rotation are available through [building previews](building.md).
 
 | Furniture | Materials | Made at |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ free placement, rotation and outdoor building belong to TODO 25b.
 
 The recipes are known from the start for all three heroes and have no coin cost. Placing consumes one crafted
 item. **Take to bag** returns it; if there is no room, the furniture stays put. An occupied slot, an unclaimed
-cottage, another villager’s house, outside placement or a hero standing in the solid piece’s spot cannot consume
+cottage, another villager’s house, a hero standing in the solid piece’s spot cannot consume
 an item. Beds, tables, lamps and plants block indoor movement; rugs are walk-through.
 
 Press **E** by your placed bed to rest. A night’s sleep reaches the next morning and fills health, mana/stamina/focus
@@ -48,7 +48,7 @@ nonexistent `length` discarded those snapshots. Only canonical IDs that exist in
 Indoor collision resolution also handles a hero exactly at an object’s centre. Rugs are raised above the floor
 surface so their colours remain visible.
 
-The broader storage, fences, paths, stations, farm plots, placement ghosts and structures remain TODO 25b/25c.
+Outdoor storage, fences, paths, stations, farm plots and placement previews are implemented in [TODO 25b](building.md). Walls, floors and roofs remain TODO 25c.
 
 ## Verification
 

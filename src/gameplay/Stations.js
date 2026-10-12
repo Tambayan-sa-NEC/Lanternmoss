@@ -24,6 +24,7 @@ const PUFF = { workbench: null, forge: { color: 0xffa040, speed: 1.6, upBias: 1.
   brew: { color: 0xc8a8ff, speed: 0.5, upBias: 1.5 } };
 
 export const Stations = {
+  definitions: STATIONS,
   list: [],             // { id, def, dir, fwd, parts, collider, puffT }
   last: null,           // the station the hero stood at last frame
   center: null,
@@ -91,10 +92,10 @@ export const Stations = {
     if (!this.list.length) return;
     const h = this.here();                                             // walked up to (or away from) one with the Craft tab open
     if (h !== this.last) { this.last = h; if (InventoryUI.isOpen && ['craft', 'enchant'].includes(InventoryUI.tab)) InventoryUI.render(); }
-    const P = ctx.player, near = arcDist(P.up, this.center) < 26, t = ctx.time;
+    const P = ctx.player, t = ctx.time;
     for (const s of this.list) {
       s.parts.glow.forEach((g, i) => g.scale.setScalar(1 + Math.sin(t * (7 + i * 2.3) + i) * 0.08));
-      const puff = PUFF[s.id]; if (!near || !puff || (s.puffT -= dt) > 0) continue;
+      const puff = PUFF[s.id]; if (arcDist(P.up, s.dir) > 26 || !puff || (s.puffT -= dt) > 0) continue;
       s.puffT = 0.35 + rng() * 0.4;
       _p.set(0, 0, 0).copy(s.parts.smoke).applyMatrix4(s.parts.root.matrix);
       sparkles.emit(_p, { count: 2, color: puff.color, speed: puff.speed, up: s.dir, upBias: puff.upBias, life: 1, size: 0.26 });
