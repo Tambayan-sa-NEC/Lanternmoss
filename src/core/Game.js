@@ -39,6 +39,8 @@ import { Stations } from '../gameplay/Stations.js';
 import { Houses } from '../gameplay/Houses.js';
 import { Portals } from '../gameplay/Portals.js';
 import { PortalUI } from '../ui/PortalUI.js';
+import { Home } from '../gameplay/Home.js';
+import { HomeUI } from '../ui/HomeUI.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
 import { PlanetProgression } from '../gameplay/PlanetProgression.js';
@@ -109,12 +111,13 @@ export class Game {
       || shopLineFor(npc, n => chat(n) || n.nextLine()) || chat(npc);
     Quests.init(); ShopUI.init();
     Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
+    Home.callbacks = { inside: () => Houses.inside, refresh: () => Houses.refreshHome(), save: () => this.saves?.save({ quiet: true }) };
     installLevelFeedback();
     const bag = ctx.player.inventory;
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
     buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init();
-    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
+    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -193,7 +196,7 @@ export class Game {
     if (this.saves) { this.saves.suspended = true; this.saves.reset(); }
     try {
       const P = ctx.player, world = this.world;
-      PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close();
+      HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); Home.reset();
       Tutorial.reset(); RecipeBook.reset(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
@@ -219,7 +222,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

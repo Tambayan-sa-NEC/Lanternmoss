@@ -23,6 +23,7 @@ import { StoryMemory } from '../gameplay/storyState.js';
 import { Tutorial } from '../gameplay/Tutorial.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
 import { Portals } from '../gameplay/Portals.js';
+import { Home } from '../gameplay/Home.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -47,7 +48,7 @@ export class AdventureSave {
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook,
-      farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups })) this.registry.register(key, system);
+      home: Home, farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.planets.beforeLoad = () => { if (!this.restoring && !this.suspended && ctx.started) { StoryMemory.toJSON(); this.registry.capturePlanet(ctx.planetId); } };
     game.planets.afterLoad = () => { if (!this.suspended) { this.registry.restorePlanet(ctx.planetId); StoryMemory.restore(); } };

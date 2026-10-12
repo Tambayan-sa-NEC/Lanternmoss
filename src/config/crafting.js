@@ -14,6 +14,7 @@
    Weapons only show up for the hero who can wield them.
    --------------------------------------------------------------------- */
 
+import { FURNISHINGS } from './home.js';
 export const FUEL = { wood: 1, charcoal: 4, emberShard: 2 };
 
 export const DISCOVERY_RECIPES = [
@@ -32,6 +33,7 @@ export const DISCOVERY_RECIPES = [
 ];
 
 export const RECIPES = [
+  ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, group: 'Furniture', result: id, needs: f.needs, station: f.station })),
   // ---- smelting at the forge: ore + fuel -> ingots (and wood burned down into charcoal, a better fuel)
   { id: 'copperIngot', group: 'Smelting', station: 'forge', result: 'copperIngot', needs: [['copperOre', 2]], fuel: 1 },
   { id: 'ironIngot', group: 'Smelting', station: 'forge', result: 'ironIngot', needs: [['ironOre', 2]], fuel: 2 },

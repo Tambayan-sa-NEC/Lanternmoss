@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { addTo, disposeTree, G, part } from '../render/meshes.js';
 import { scene } from '../render/scene.js';
+import { HOME } from '../config/home.js';
 
 const V3 = THREE.Vector3;
 /** Where rooms are built: thousands of units from the planet (whose camera far plane is 1500). */
@@ -22,6 +23,7 @@ const ANCHORS = {
     yarn: [-1.3, 1.5, 0], window: [-0.6, -4.45, 0], fireplace: [0.4, -4.1, 0], anvil: [2.5, -1.7, -0.4],
   },
   cottage: {
+    homeSign: [HOME.sign.x, HOME.sign.z, 0],
     oven: [-3.0, -2.5, 0], counter: [-0.7, -1.3, 0], bed: [3.0, -2.2, 0], table: [2.1, 0.7, 0], rug: [0, 0.9, 0], chest: [-3.4, 1.1, 1.57],
     shelf: [1.1, -3.05, 0], bookshelf: [[-1.4, -3.05, 0], [1.3, -3.05, 0]], lamp: [3.5, 1.7, 0], plant: [-3.5, -0.3, 0],
     window: [-2.2, -3.35, 0], fireplace: [0.1, -3.05, 0], anvil: [-2.0, -0.9, 0], kettle: [-3.0, -2.5, 0],
@@ -31,10 +33,16 @@ const ANCHORS = {
 const SOLID = { bed: 1.0, table: 0.85, chest: 0.55, lamp: 0.3, plant: 0.4, bookshelf: 0.75, telescope: 0.45, instruments: 0.55, kettle: 0.5,
   fireplace: 0.8, anvil: 0.55, oven: 1.0, counter: 1.1, shelf: 0.5 };
 /** Furniture you can use (an "E ..." prompt within reach). */
-const INTERACTIVE = new Set(['bed', 'chest', 'bookshelf', 'kettle', 'oven', 'instruments', 'telescope', 'fireplace', 'anvil']);
+const INTERACTIVE = new Set(['bed', 'chest', 'bookshelf', 'kettle', 'oven', 'instruments', 'telescope', 'fireplace', 'anvil', 'homeSign']);
 
 // ---------------------------------------------------------------- furniture
 const F = {
+  homeSign(g) {
+    addTo(g, part(G.cyl(0.06, 0.09, 1.0, 6), WOOD_DK), [0, 0.5, 0]);
+    addTo(g, part(G.box(0.8, 0.55, 0.08), WOOD), [0, 1.12, 0]);
+    addTo(g, part(G.cone(0.2, 0.22, 4), 0xffd36b), [0, 1.27, 0.07], [0, Math.PI / 4, 0]);
+    addTo(g, part(G.box(0.27, 0.22, 0.06), CREAM), [0, 1.12, 0.08]);
+  },
   bed(g) {
     addTo(g, part(G.box(1.3, 0.4, 2.1), WOOD), [0, 0.2, 0]);
     addTo(g, part(G.box(1.2, 0.2, 2.0), 0xfff6ee), [0, 0.5, 0]);
@@ -48,7 +56,7 @@ const F = {
     for (const a of [1, -1.8]) addTo(g, part(G.cyl(0.26, 0.26, 0.45, 7), WOOD), [Math.sin(a) * 1.05, 0.22, Math.cos(a) * 1.05]);
     addTo(g, part(G.cyl(0.11, 0.09, 0.16, 7), 0xffffff), [0.25, 0.91, 0.1]);
   },
-  rug(g) { addTo(g, part(G.cyl(1.6, 1.6, 0.03, 16), 0xe07a8a), [0, 0.02, 0]); addTo(g, part(G.cyl(1.2, 1.2, 0.035, 16), 0xffd36b), [0, 0.025, 0]); },
+  rug(g) { addTo(g, part(G.cyl(1.6, 1.6, 0.03, 16), 0xe07a8a), [0, 0.08, 0]); addTo(g, part(G.cyl(1.2, 1.2, 0.035, 16), 0xffd36b), [0, 0.09, 0]); },
   chest(g) {                                                       // lid hinged at the back (g.userData.lid; opens with rotation.x < 0)
     addTo(g, part(G.box(1.0, 0.55, 0.65), 0xb0703a), [0, 0.28, 0]);
     for (const x of [-0.35, 0.35]) addTo(g, part(G.box(0.08, 0.57, 0.68), 0xffd36b), [x, 0.29, 0]);
@@ -153,13 +161,17 @@ function shell(root, layout) {
   return { shape: { kind: 'circle', r: R - 0.45 }, entrance: { x: 0, z: R - 0.6 } };
 }
 
+/** Furniture model without a scene owner (also used for crafted furniture pickups). */
+export function buildFurniture(kind) { const root = new THREE.Group(); F[kind]?.(root); return root; }
+
 export function buildRoom(def, layout) {
   const root = new THREE.Group(); root.position.copy(ROOM_ORIGIN); scene.add(root);
   const { shape, entrance } = shell(root, layout);
   addTo(root, part(G.cyl(0.65, 0.75, 0.04, 8), 0xd9c7b8), [entrance.x, 0.06, entrance.z]);              // doormat
   const back = new THREE.Mesh(new THREE.SphereGeometry(46, 16, 10), new THREE.MeshBasicMaterial({ color: 0x2a1e2e, side: THREE.BackSide, fog: false }));
   back.renderOrder = -5; root.add(back);
-  const light = new THREE.PointLight(0xffc88a, 18, 16, 1.6); light.position.set(0, 2.6, 0); root.add(light);
+  const baseLight = def.playerHome ? def.props.includes('lamp') ? 7 : 5 : 18;
+  const light = new THREE.PointLight(0xffc88a, baseLight, 16, 1.6); light.position.set(0, 2.6, 0); root.add(light);
   const obstacles = [], spots = [], used = {}, A = ANCHORS[layout];
   const fires = [];
   for (const kind of def.props) {
@@ -174,7 +186,7 @@ export function buildRoom(def, layout) {
   const tableAt = A.table, bedAt = A.bed;
   return {
     root, shape, obstacles, spots, entrance, tableAt: { x: tableAt[0], z: tableAt[1] }, bedAt: { x: bedAt[0], z: bedAt[1], ry: bedAt[2] },
-    residentAt: { x: tableAt[0] - 1.3, z: tableAt[1] - 0.6 }, light, fires,
+    residentAt: { x: tableAt[0] - 1.3, z: tableAt[1] - 0.6 }, light, baseLight, fires,
     /** Local room coordinates -> world point (y = height over the floor). */
     toWorld(x, z, y = 0, out = new V3()) { return out.set(x, y, z).add(ROOM_ORIGIN); },
     dispose() { scene.remove(root); disposeTree(root); back.material.dispose(); },

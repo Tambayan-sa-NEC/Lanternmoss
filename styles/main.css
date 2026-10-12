@@ -807,3 +807,20 @@ body.paused #tutorial, body.menu #tutorial, body.menu #faint-screen, body.cutsce
 .portal-warning { padding: 12px; border-radius: 12px; background: #f8dfbb; }
 .portal-foot { font-size: 13px; line-height: 1.6; margin-bottom: 0; }
 @media (max-height: 600px) { .portal-panel { padding: 16px; } .portal-destinations button { padding: 10px 14px; } }
+
+/* Claiming and furnishing a cottage */
+#home-menu { position: fixed; inset: 0; z-index: 95; display: none; align-items: center; justify-content: center; background: #20192cc9; padding: 20px; }
+#home-menu.show { display: flex; }
+.home-panel { box-sizing: border-box; width: min(760px, 100%); padding: 18px; }
+.home-panel p { margin: 8px 0; }
+.home-furniture { display: grid; gap: 8px; margin-bottom: 12px; }
+.home-row { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid #c7b3cd; border-radius: 12px; background: #fffbf2; }
+.home-row .item-art { width: 36px; height: 36px; }
+.home-row strong, .home-row small { display: block; }
+.home-row strong { font-size: 16px; line-height: 1.2; }
+.home-row small { margin-top: 4px; font-size: 12px; line-height: 1.3; }
+.home-panel button { cursor: pointer; padding: 8px 12px; border: 1px solid #a38bab; border-radius: 8px; background: #e2f2d9; color: inherit; font: inherit; }
+.home-panel header button { border: 0; padding: 0 8px; background: transparent; }
+.home-panel button:disabled { opacity: .5; cursor: default; }
+.home-message { min-height: 24px; font-size: 14px; font-weight: 600; }
+@media (max-width: 560px) { .home-row { grid-template-columns: 30px 1fr; } .home-row button { grid-column: 2; justify-self: start; } }
