@@ -2,6 +2,7 @@
    Device preferences and the lifetime journal remain outside the adventure. */
 import { CHARACTERS } from '../config/characters.js';
 import { PLANETS } from '../config/planets.js';
+import { storyKeyAllowed } from '../config/npcs.js';
 import { LEVELING } from '../config/leveling.js';
 import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { PETS, PET_COMMANDS, PET_CARE } from '../config/pets.js';
@@ -10,7 +11,7 @@ import { CHALLENGES } from '../config/challenges.js';
 import { CROPS, FARM, NODE_KINDS, SCENERY } from '../config/resources.js';
 import { NEEDS } from '../config/survival.js';
 import { DAY } from '../config/day.js';
-import { HOUSES } from '../config/houses.js';
+import { HOUSES, resolveHouse } from '../config/houses.js';
 import { COMBAT } from '../config/combat.js';
 import { TUTORIAL_STEPS, HELP_TOPICS, GATHERING_TIPS } from '../config/tutorial.js';
 import { CRITTER_DEFS } from '../config/critters.js';
@@ -97,7 +98,7 @@ const chestId = id => typeof id === 'string' && PLANETS.some(p => {
   return suffix === 'boss' || /^\d+$/.test(suffix) && +suffix < p.chests.reduce((n, c) => n + c.count, 0);
 });
 const houseId = id => typeof id === 'string' && PLANETS.some(p => id.startsWith(`${p.id}:`) &&
-  /^(0|[1-9]\d*)$/.test(id.slice(p.id.length + 1)) && Object.hasOwn(HOUSES, id.slice(p.id.length + 1)));
+  /^(0|[1-9]\d*)$/.test(id.slice(p.id.length + 1)) && !!resolveHouse(id.slice(p.id.length + 1), p.id));
 const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.entries(record(v)).slice(0, 1024)
   .filter(([key]) => allow(key)).map(([key, n]) => [key, number(n, 0, min, max)]));
 
@@ -173,8 +174,7 @@ export function cleanState(key, value, hero = 'witch') {
       if (run && def.kind === 'race') run.idx = Math.min(run.idx, run.items.length);
       return { progress, run };
     }
-    case 'story': return Object.fromEntries(Object.entries(s).filter(([name]) => ['Old Bramble', 'Pim', 'Lio', 'Fern', 'Cinder', 'Tuva'].includes(name)
-      || PLANETS.some(p => ['Cinder', 'Tuva'].some(n => name === `${p.id}:${n}`)))
+    case 'story': return Object.fromEntries(Object.entries(s).filter(([name]) => storyKeyAllowed(PLANETS, name))
       .map(([name, raw]) => [name, { seen: stringIds(raw?.seen, n => Number.isInteger(n) && n >= 0 && n < 1000), last: integer(raw?.last, -1, -1, 999) }]));
     case 'houses': return { opened: stringIds(s.opened, houseId), lore: numericMap(s.lore, houseId, 100, -1), ovenDay: numericMap(s.ovenDay, houseId), teaAt: number(s.teaAt, -99, -99) };
     case 'rareGifts': return stringIds(value, id => Object.values(CRITTER_DEFS).some(c => c.rare?.gift === id));
@@ -226,9 +226,11 @@ export function sanitizeSave(data) {
     const state = {}; for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'planet' && Object.hasOwn(record(raw), key)) state[key] = cleanState(key, raw[key], player.charId);
     planets[id] = state;
   }
+  const planetId = ids.has(s.planetId) ? s.planetId : PLANETS[0].id;
+  if (!resolveHouse(player.indoors, planetId)) systems.player.indoors = null;
   return { game: 'lanternmoss', version: SAVE_VERSION, slot: SAVE_SLOT,
     savedAt: typeof s.savedAt === 'string' && Number.isFinite(Date.parse(s.savedAt)) ? new Date(s.savedAt).toISOString() : null,
-    planetId: ids.has(s.planetId) ? s.planetId : PLANETS[0].id, systems, planets };
+    planetId, systems, planets };
 }
 
 export function parseSave(text) {

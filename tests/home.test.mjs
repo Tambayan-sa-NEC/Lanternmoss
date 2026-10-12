@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HOME, FURNISHINGS } from '../src/config/home.js';
-import { HOUSES } from '../src/config/houses.js';
+import { HOUSES, resolveHouse } from '../src/config/houses.js';
 import { RECIPES } from '../src/config/crafting.js';
 import { itemRegistry } from '../src/items/ItemRegistry.js';
 import { cleanState, sanitizeSave } from '../src/core/save.js';
@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 
 test('a separate empty cottage preserves the six existing houses and their villagers', () => {
   assert.equal(HOME.houseIndex, 6); assert.equal(HOUSES[0].owner, 'Lio'); assert.equal(HOUSES[1].owner, 'Pim');
-  assert.equal(HOUSES[2].owner, 'Old Bramble'); assert.equal(HOUSES[4].planets[1].owner, 'Cinder'); assert.equal(HOUSES[5].planets[2].owner, 'Tuva');
+  assert.equal(HOUSES[2].owner, 'Old Bramble'); assert.equal(resolveHouse(4, 'emberfall').owner, 'Cinder'); assert.equal(resolveHouse(5, 'frostveil').owner, 'Tuva');
   const home = HOUSES[HOME.houseIndex]; assert.equal(home.layout, 'cottage'); assert.equal(home.playerHome, true);
   assert.equal(home.owner, undefined); assert.equal(home.resident, undefined); assert.deepEqual(home.props, ['homeSign']);
 });

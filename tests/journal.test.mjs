@@ -20,6 +20,7 @@ test('achievements are complete and reachable', () => {
     assert.ok(['Firsts', 'Counts', 'Challenges'].includes(a.group) && a.name && a.text, `${a.id}: group, name, text`);
     assert.match(icons, new RegExp(`\\n  ${a.icon}: \`|GLYPHS\\.${a.icon} =`), `${a.id}: ui/icons.js has no glyph ${a.icon}`);
     if (a.goal.flag) assert.ok(['flawless', 'petless', 'underdog'].includes(a.goal.flag), `${a.id}: a flag the journal sets`);
+    else if (a.goal.bosses) assert.ok(a.goal.bosses.length && a.goal.bosses.every(isBoss), `${a.id}: known campaign bosses`);
     else assert.ok(a.goal.stat in JOURNAL_STATS && goalTarget(a.goal) >= 1, `${a.id}: counter ${a.goal.stat} and a target`);
     if (a.goal.stat === 'items') assert.ok(goalTarget(a.goal) <= ITEM_DEFINITIONS.length, `${a.id}: there are enough items to find`);
     assert.ok(!a.reward || a.reward.coins > 0, `${a.id}: reward`);

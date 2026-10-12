@@ -9,6 +9,8 @@ import { Challenges } from './challenges/Challenges.js';
 import { grantItem } from './pickups.js';
 import { portalDestinations } from './portalRules.js';
 import { Journal } from './Journal.js';
+import { dayClock } from './dayClock.js';
+import { RareGifts } from '../entities/wildlife/wildlife.js';
 
 export const Portals = {
   gate: null, progression: null, stranded: null, rewarded: new Set(),
@@ -24,7 +26,8 @@ export const Portals = {
   reset() { PortalUI.close(); this.stranded = null; this.rewarded.clear(); this.savedFight = null; this.clear(); },
   clear() { this.gate?.dispose(); this.gate = null; },
   setup(world, avoid) { this.clear(); this.gate = buildPortal(world, avoid); this.update(); },
-  destinations() { return portalDestinations(ctx.planetId, this.progression.defeated, this.stranded, this.keys); },
+  destinations() { return portalDestinations(ctx.planetId, this.progression.defeated, this.stranded, this.keys,
+    { night: dayClock.phase === 'night', rareGifts: RareGifts.toJSON() }); },
   canUse() {
     return !!this.gate && ctx.started && !ctx.paused && !ctx.inventoryOpen && !ctx.player.dead && !ctx.indoors && !ctx.transitioning && !ctx.cutscene
       && !this.progression.pendingClear && this.progression.state !== 'victory' && arcDist(ctx.player.up, this.gate.dir) < 3;
@@ -39,7 +42,7 @@ export const Portals = {
   },
   travel(id) {
     const destination = this.destinations().find(d => d.id === id);
-    if (!this.canUse() || Challenges.run || !destination?.enabled) return false;
+    if (!this.canUse() || Challenges.run || !destination?.enabled || !this.progression.canTravelTo(id)) return false;
     if (destination.cost && !ctx.player.inventory.remove('wayfarerKey', 1)) return false;
     this.stranded = destination.home || destination.free ? null : { at: id, from: ctx.planetId };
     this.progression.travelTo(id); return true;

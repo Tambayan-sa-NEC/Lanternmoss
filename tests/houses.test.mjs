@@ -3,19 +3,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { HOUSES, INTERACTIONS } from '../src/config/houses.js';
+import { HOUSES, INTERACTIONS, resolveHouse } from '../src/config/houses.js';
+import { TRAVELER_NAMES } from '../src/config/npcs.js';
 import { ITEM_DEFINITIONS } from '../src/config/items.js';
 import { PLANETS } from '../src/config/planets.js';
 
 const ITEMS = new Set(ITEM_DEFINITIONS.map(d => d.id));
 const src = p => readFileSync(new URL(p, import.meta.url), 'utf8');
-const VILLAGERS = [...src('../src/entities/npc/npcDefs.js').matchAll(/\{ name: '([^']+)'/g)].map(m => m[1]);
+const VILLAGERS = [...TRAVELER_NAMES, ...PLANETS.flatMap(p => p.npcs.locals.map(n => n.name))];
 /** Furniture kinds the room builder can place, per layout (read from its ANCHORS table). */
 const interiors = src('../src/world/interiors.js'), anchors = layout => {
   const block = interiors.split(`${layout}: {`)[1].split('\n  },')[0];
   return new Set([...block.matchAll(/(\w+): \[/g)].map(m => m[1]));
 };
-const resolved = (i, planet) => ({ ...HOUSES[i], ...(HOUSES[i].planets?.[planet] ?? {}) });
+const resolved = resolveHouse;
 
 test('every house on every planet has a name, a known layout and furniture that layout can place', () => {
   for (const i of Object.keys(HOUSES)) for (let p = 0; p < PLANETS.length; p++) {
@@ -37,6 +38,6 @@ test('owners are real villagers; someone lives in each house, or a note says whe
 });
 
 test('chest gifts are real items; interactive furniture has a prompt', () => {
-  for (const h of Object.values(HOUSES)) for (const g of [h.gift, ...Object.values(h.planets ?? {}).map(x => x.gift)]) for (const [id] of g?.items ?? []) assert.ok(ITEMS.has(id), id);
+  for (const i of Object.keys(HOUSES)) for (const p of PLANETS) for (const [id] of resolveHouse(i, p.id)?.gift?.items ?? []) assert.ok(ITEMS.has(id), id);
   for (const [kind, it] of Object.entries(INTERACTIONS)) assert.ok(it.label, kind);
 });

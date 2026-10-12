@@ -369,7 +369,9 @@ src/
 │   ├── render.js          pixel ratio, fog, bloom, outline width
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, pet marks
 │   ├── pets.js            every pet: body, attack, ability, unlock; pet growth, care, commands, keys, motion
-│   ├── planets.js         the campaign: each planet's seed, colours, difficulty scale, roster, boss, forage
+│   ├── planets.js         ordered catalog, released campaign views and transition timings
+│   ├── planets/           one config per world: seeds, content, NPCs, house overrides and release metadata
+│   ├── planetRules.js     release, secret-unlock, completion and population rules
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
 │   │                      stats, the hotbar, effects, bag size and pickup settings
 │   ├── crafting.js        crafting recipes in groups (tools, food, potions, weapons, armour, trinkets, vanity), and
@@ -574,6 +576,10 @@ beaten; ordinary monsters respawn. Chest lids, ground items, farms and local que
 elapsed unpaused adventure time; crop growth still needs presence and watering. Travelling villagers follow;
 Cinder and Tuva stay home and remember their progress. See [portal travel and saves](docs/portals.md).
 
+Each world owns its config in `src/config/planets/<id>.js`; the ordered catalog also contains unfinished Act II
+metadata. Only released worlds enter generation, travel and save validation. Secret gates require their configured
+conditions, and main-campaign completion excludes secret worlds. See [catalog and release rules](docs/planets.md).
+
 **Enemy behaviours:** `def.behavior ?? def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
 `entities/enemies/behaviors/` (`think`, plus optional `init / reset / update / animate / onDie / dispose` hooks).
 A new enemy type = stats in `COMBAT.enemies`, a model in `models/monsters.js`, and (for new behaviour) a module there.
@@ -607,11 +613,12 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Spells, enemy stats, XP per enemy | `src/config/combat.js` |
 | Boss health, attacks (damage, warning times, cooldowns, reuse), phases | `src/config/combat.js` → `enemies.gloomcap / pyrrhax / malgrath` |
 | Ultimates (Meteor, Leap Slam, Arrow Rain) and evasion cooldowns | `src/config/combat.js` (witch) and `src/config/characters.js` |
-| Planets: order, rosters / spawn counts, difficulty scale, boss, colours | `src/config/planets.js` |
+| Planet catalog and release order | `src/config/planets.js` |
+| World content, NPCs, house overrides, act/release/secret flags | `src/config/planets/<id>.js` |
 | Victory / fade timings, heal on arrival | `src/config/planets.js` → `TRANSITION` |
 | Items (stats, stack sizes, effects, icons), bag size, keys, pickup radius | `src/config/items.js` |
-| What lies around each planet | `src/config/planets.js` → `forage` |
-| Each planet's shape: hills, ridges, plateaus / cliffs, lakes | `src/config/planets.js` → `terrain` (cliff / peak colours: `palette`) |
+| What lies around each planet | `src/config/planets/<id>.js` → `forage` |
+| Each planet's shape: hills, ridges, plateaus / cliffs, lakes | `src/config/planets/<id>.js` → `terrain` (cliff / peak colours: `palette`) |
 | Planet size, scenery density, flattened areas, steepest walkable slope, swimming | `src/config/game.js` → `PLANET_RADIUS`, `WORLD` |
 | Hero stats and abilities | `src/config/characters.js` |
 | XP curve, level cap, stat / damage growth | `src/config/leveling.js` |
@@ -625,15 +632,15 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Tools and what they do | `src/config/items.js` → `tool`, `TOOL_KINDS` |
 | The energy meter: drain, hungry effects | `src/config/survival.js` → `NEEDS` |
 | What can be gathered, tools needed, drops, regrow times; trees and rocks | `src/config/resources.js` → `NODE_KINDS`, `SCENERY`; trees: `src/config/flora.js` (`wood`) |
-| Each planet's nodes and rare veins | `src/config/planets.js` → `resources` |
+| Each planet's nodes and rare veins | `src/config/planets/<id>.js` → `resources` |
 | Fishing: bite timing, the meter, catches per planet | `src/config/resources.js` → `FISHING` |
 | Crops, growing time, the farm plot | `src/config/resources.js` → `CROPS`, `FARM` |
 | Crafting stations, the corner's layout; which recipe needs which station | `src/config/stations.js`; `src/config/crafting.js` → `station` |
 | Smelting: ore and fuel per ingot, what burns and for how long | `src/config/crafting.js` → `fuel`, `FUEL` (the Smelting group) |
 | Buff strengths (Mighty, Stoneskin, Quickstep, Mending) | `src/config/game.js` → `BUFFS` |
 | Monster drop chance and table, gear rarity odds per source | `src/config/chests.js` → `MONSTER_DROPS`, `GEAR_RARITY` |
-| What wakes each boss, its arena wall | `src/config/planets.js` → `boss.summon`, `boss.arena` |
-| Each planet's trees, flowers, tall grass, weather mix, animals and mini bosses | `src/config/planets.js` → `flora`, `weather`, `wildlife`, `miniBosses` |
+| What wakes each boss, its arena wall | `src/config/planets/<id>.js` → `boss.summon`, `boss.arena` |
+| Each planet's trees, flowers, tall grass, weather mix, animals and mini bosses | `src/config/planets/<id>.js` → `flora`, `weather`, `wildlife`, `miniBosses` |
 | Tree kinds and their colliders | `src/config/flora.js` (looks: `src/world/props.js`) |
 | Weather kinds (wind, fog, light, rain / snow / ash, lightning, sound), spell length | `src/config/weather.js` |
 | Animals: looks and behaviour kinds, rare creatures and their gifts, how shy they are | `src/config/critters.js` |
@@ -649,7 +656,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Default keys, hotbar keys | `src/config/controls.js` → `KEYBINDS`, `HOTBAR_KEYS` |
 | Hotbar size, use cooldown, which items land on it first | `src/config/items.js` → `HOTBAR` |
 | Fonts | `styles/main.css` → `--font-display`, `--font-body` (and the font link in `index.html`; see `docs/typography.md`) |
-| How many chests each planet has, its loot material | `src/config/planets.js` → `chests`, `material` |
+| How many chests each planet has, its loot material | `src/config/planets/<id>.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |
@@ -780,8 +787,10 @@ Once the conditions hold, walking into the lair plays the waking sequence. Durin
 While the boss fights, the ring around the arena keeps the hero inside (it drops if you faint). The boss's moves are
 kept inside the ring too (`keepInArena`). In the console, `LANTERNMOSS.wakeBoss()` skips straight to the fight.
 
-**Adding a planet:** append an entry to `PLANETS` in `src/config/planets.js` (new seed, palette, a higher `scale`,
-roster, boss). Nothing else needs to change. `npm test` checks that every planet is complete and harder than the one before.
+**Adding a planet:** create `src/config/planets/<id>.js` and import it into `PLANET_CATALOG` in campaign order.
+Start with `released: false`; fill in the content and register its models/behaviors before completing the world-release
+checks. `PLANETS` includes only released entries. Tests retain increasing difficulty and roster counts, with an explicit
+population minimum allowed for small secret worlds. See [the metadata, NPC and compatibility rules](docs/planets.md).
 
 **Quick test from the console** (after starting a game): `LANTERNMOSS.wakeBoss()`, then `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
 victory, open the treasure chest that falls, and choose a destination at the village lantern gate; or `LANTERNMOSS.goToPlanet(2)` to jump straight to

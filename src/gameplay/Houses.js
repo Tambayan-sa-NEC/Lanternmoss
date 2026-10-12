@@ -5,7 +5,9 @@
    owner to talk to, a note when nobody's home. Step back onto the doormat (or press E at the door) to leave.
    currentInteraction() is the single "what does E do here" answer the prompt and the E key share. */
 import * as THREE from 'three';
-import { HOUSES, INTERACTIONS, REST } from '../config/houses.js';
+import { resolveHouse, INTERACTIONS, REST } from '../config/houses.js';
+import { PLANET_CATALOG, PLANETS } from '../config/planets.js';
+import { nextCampaignPlanet } from '../config/planetRules.js';
 import { DAY } from '../config/day.js';
 import { ctx } from '../core/context.js';
 import { held } from '../core/keybinds.js';
@@ -51,12 +53,13 @@ const WALK = 3.4, RUN = 5.2;
 const RESIDENT_LOOKS = { granny: buildGranny, librarian: buildLibrarian };
 const _tv = new V3(), _w = new V3(), _fwd = new V3(), BACK = new V3(0, 0, 1);
 
-/** This house's settings on the current planet (its `planets` entry merged in), or null for a house without an entry. */
+/** This house's shared settings plus its planet-owned overrides, or null for an unavailable house. */
 export function houseDef(index, planet = ctx.planet) {
-  const base = HOUSES[index]; if (!base) return null;
-  if (base.playerHome && planet === ctx.planet) return { ...base, name: Home.state.claimed ? 'Your cottage' : base.name,
+  const base = resolveHouse(index, planet); if (!base) return null;
+  const id = typeof planet === 'string' ? planet : PLANETS[planet]?.id;
+  if (base.playerHome && id === ctx.planetId) return { ...base, name: Home.state.claimed ? 'Your cottage' : base.name,
     props: ['homeSign', ...Home.state.furniture.map(id => FURNISHINGS[id].kind)] };
-  return { ...base, ...(base.planets?.[planet] ?? {}) };
+  return base;
 }
 
 /** A speaker that isn't a walking villager: furniture, notes, a sleeping owner, an indoor resident. */
@@ -253,7 +256,7 @@ export const Houses = {
         if (this.ovenDay[key] === dayClock.day) { this.read('Oven', "Something's rising in there. Come back tomorrow for the next batch."); return; }
         this.ovenDay[key] = dayClock.day; grantItem('honeyBun', 1); this.read('Oven', 'A tray of honey-moss buns, still warm. Pim would want you to have one.'); return;
       case 'instruments': audio.melody(); for (let i = 0; i < 3; i++) setTimeout(() => emote(P, '♪', '#7a6cff'), i * 450); return;
-      case 'telescope': this.read('Telescope', ctx.planet < 2 ? 'Through the lens: a speck of light in the dark. The next world, waiting.' : 'Through the lens: Lanternmoss, small and green and glowing. Home.'); return;
+      case 'telescope': this.read('Telescope', nextCampaignPlanet(PLANET_CATALOG, ctx.planetId) ? 'Through the lens: a speck of light in the dark. The next world, waiting.' : 'Through the lens: Lanternmoss, small and green and glowing. Home.'); return;
       case 'fireplace': P.mana = P.stats.maxMana; toast('You warm your hands by the fire. Feeling cosy.'); emote(P, 'heart', '#ffb03d'); return;
       case 'anvil': this.read('Anvil', 'Still warm. A half-finished horseshoe the size of a dinner plate. Whatever wears it must be enormous.'); return;
     }

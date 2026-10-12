@@ -1,7 +1,10 @@
 /* Boss wins leave the hero on their current world with its treasure. The village portal is the only campaign
    travel trigger: playing/loot/complete -> fadeOut -> load chosen world -> fadeIn -> playing/complete.
    Saved planet deltas restore over deterministic generation; beaten bosses and mini bosses stay beaten. */
-import { PLANETS, TRANSITION } from '../config/planets.js';
+import { PLANETS, PLANET_CATALOG, TRANSITION } from '../config/planets.js';
+import { campaignComplete, nextCampaignPlanet, secretUnlocked } from '../config/planetRules.js';
+import { dayClock } from './dayClock.js';
+import { RareGifts } from '../entities/wildlife/wildlife.js';
 import { ctx } from '../core/context.js';
 import { encounterEvents } from '../combat/events.js';
 import { clearHazards } from '../combat/hazards.js';
@@ -38,6 +41,7 @@ import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
 
 export class PlanetProgression {
+  #authorizedDestination = null;   // transient: gate conditions are checked at departure, not again after a fade
   constructor(world) {
     this.world = world;
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
@@ -48,8 +52,14 @@ export class PlanetProgression {
   }
 
   get planet() { return PLANETS[ctx.planet]; }
-  get nextPlanet() { return PLANETS[ctx.planet + 1] || null; }
-  get complete() { return PLANETS.every(p => this.defeated.has(p.id)); }
+  get nextPlanet() { return nextCampaignPlanet(PLANET_CATALOG, ctx.planetId); }
+  get complete() { return campaignComplete(PLANET_CATALOG, this.defeated); }
+
+  canTravelTo(id) {
+    const planet = PLANETS.find(p => p.id === id);
+    return planet?.released === true && secretUnlocked(planet, this.defeated,
+      { night: dayClock.phase === 'night', rareGifts: RareGifts.toJSON() });
+  }
 
   /** Spawns the current planet's monsters and boss (right after the planet is generated: seeded order), then its
       forage and chests. */
@@ -116,10 +126,13 @@ export class PlanetProgression {
 
   /** Explicit portal travel; keys and reachability are checked by Portals before the fade starts. */
   travelTo(id) {
+    if (!this.canTravelTo(id)) return false;
+    this.#authorizedDestination = id;
     this.destination = id; this.state = 'fadeOut'; this.timer = TRANSITION.fadeTime; ctx.transitioning = true;
     Building.cancel(); InventoryUI.close(); ShopUI.close(); Dialog.close(); cancelAim(); Gathering.stop(); Fishing.end(); releaseAllKeys();
     ctx.player.invuln = Math.max(ctx.player.invuln, TRANSITION.fadeTime * 2 + 1);
     ctx.player.vel.set(0, 0, 0); setFade(true, TRANSITION.fadeTime); audio.warp();
+    return true;
   }
 
   /** The boss has fallen: any active challenge is called off, the remaining monsters and stray shots vanish. */
@@ -145,7 +158,10 @@ export class PlanetProgression {
       return;
     }
     if (typeof index === 'string') index = PLANETS.findIndex(p => p.id === index);
-    if (!PLANETS[index]) throw new Error('Unknown planet');
+    if (PLANETS[index]?.released !== true) throw new Error('Unknown or unreleased planet');
+    const arriving = this.state === 'fadeOut' && this.#authorizedDestination === PLANETS[index].id;
+    if (!restoring && !arriving && !this.canTravelTo(PLANETS[index].id)) throw new Error('The secret planet is locked');
+    this.#authorizedDestination = null;
     this.beforeLoad?.(); BuildingUI.close(); Building.clear(); HomeUI.close(); Home.clear(); PortalUI.close(); Portals.clear();
     const P = ctx.player, world = this.world;
     ctx.planet = index; ctx.planetId = PLANETS[index].id; this.state = 'playing'; this.pendingClear = false;
@@ -180,6 +196,7 @@ export class PlanetProgression {
   /** A fresh adventure (back at character select): cancel any travel and return to the first planet with its boss.
       Expects the caller to have reset the enemies already (which removes bosses). */
   reset() {
+    this.#authorizedDestination = null;
     Portals.reset(); this.miniDefeated.clear(); this.lairs = {};
     this.state = 'playing'; this.timer = 0; this.pendingClear = false; this.introAt = null; this.introShown = false;
     ctx.transitioning = false; setFade(false, 0); ctx.bossesDefeated = 0; this.defeated.clear();

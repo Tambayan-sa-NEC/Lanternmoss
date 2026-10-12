@@ -9,11 +9,12 @@ import { PLANETS } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 import { SHOP } from '../src/config/shop.js';
 import { planetSources } from '../src/gameplay/resourceRules.js';
+import { TRAVELER_NAMES } from '../src/config/npcs.js';
 
 const ITEMS = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d]));
-// villager names, read from the defs (they build 3D models, so the module itself needs a browser)
+// Traveler schedules are runtime definitions; local schedules and names are pure planet data.
 const defsSource = readFileSync(new URL('../src/entities/npc/npcDefs.js', import.meta.url), 'utf8');
-const VILLAGERS = [...defsSource.matchAll(/\{ name: '([^']+)'/g)].map(m => m[1]);
+const VILLAGERS = [...TRAVELER_NAMES, ...PLANETS.flatMap(p => p.npcs?.locals?.map(n => n.name) ?? [])];
 const PHASES = DAY.phases.map(p => p.id);
 
 test('the day starts at 0 and its phases run in order, each with a light setting', () => {
@@ -25,7 +26,11 @@ test('the day starts at 0 and its phases run in order, each with a light setting
 
 test('villager schedules only name real phases and places', () => {
   for (const m of defsSource.matchAll(/schedule: \{([^}]+)\}/g)) for (const [, phase] of m[1].matchAll(/(\w+):/g)) assert.ok(PHASES.includes(phase), `schedule phase ${phase}`);
-  assert.ok(VILLAGERS.length >= 6, 'four travellers + a local on each later planet');
+  assert.deepEqual([...defsSource.matchAll(/\{ name: '([^']+)'/g)].map(m => m[1]), TRAVELER_NAMES);
+  for (const p of PLANETS) for (const n of p.npcs?.locals ?? []) for (const [phase, place] of Object.entries(n.schedule)) {
+    assert.ok(PHASES.includes(phase), `${p.id}/${n.name}: phase ${phase}`);
+    assert.ok(place === 'home' || n.places[place], `${p.id}/${n.name}: place ${place}`);
+  }
 });
 
 test('the shop: a known keeper, real phases, stock that can be bought, prices from item value', () => {

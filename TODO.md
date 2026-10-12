@@ -985,7 +985,7 @@ counts across planets, which conflicts with a deliberately small Moon. These are
 | 32 Lantern Moon | 18-30 h | No: small terrain still needs gravity, three behaviors and a five-boss crossover | 32a-32g |
 
 **How stages land:** each letter is an independently tested feature branch following `AGENTS.md`, like 25a-25c.
-All stages below are unimplemented. Keep the original checklists as the parent acceptance criteria; finishing a letter
+Stage completion is tracked below. Keep the original checklists as the parent acceptance criteria; finishing a letter
 does not finish its parent. Partial worlds and encounters can be exercised through a development harness, but stay out
 of normal campaign travel until their release stage passes the full checklist. Groundwork must distinguish the content
 catalog from released destinations; a Wayfarer's Key must not bypass release or secret-world gates. Existing saves,
@@ -1019,12 +1019,21 @@ world stages, rather than requiring all future encounters before Tidewhisper. Pr
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **26a. Planet catalog and release rules** | 19, 24 | 1.5-3 h | Extract the original planet configs without changing seeds or generated ids; add act/release/secret metadata and assemble the released campaign. Remove remaining three-world assumptions in travel, save validation, NPC data and completion rules. Tests accept a smaller secret-world roster by explicit config, preserve the original campaign and reject travel/key access to unreleased worlds. |
+| [x] **26a. Planet catalog and release rules** | 19, 24 | 1.5-3 h | Extract the original planet configs without changing seeds or generated ids; add act/release/secret metadata and assemble the released campaign. Remove remaining three-world assumptions in travel, save validation, NPC data and completion rules. Tests accept a smaller secret-world roster by explicit config, preserve the original campaign and reject travel/key access to unreleased worlds. |
 | [ ] **26b. Mechanic lifecycle and saves** | 26a | 2-4 h | Add enter/update/exit and per-planet save hooks, including pause, sleep/time skips, travel, Continue and disposal. Use a development-only mechanic fixture to prove ordering, isolation and old-save defaults; weather stays separate. |
 | [ ] **26c. Gravity and moving-water support** | 26b | 3-4.5 h | Add shared gravity/water queries consumed by Walkers, swimming, water rendering, spawning, resource placement, farms and building safety. Test moving levels and gravity changes in a harness, including existing ponds, Moon-Hop composition and portal restoration; no Tidewhisper content yet. |
 | [ ] **26d. Act II progression and content gate** | 26a-26c, 23 | 2-4 h | Extend cap/XP to 16, expose expected-level/scaling metadata, update title/arrival wording and achievement definitions while retaining the original three-boss award. Test the mandatory release checklist and Moon exceptions, behavior/boss registrations and unknown content references. Future-world achievements and travel activate only with those worlds. |
 
-- [ ] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
+**26a implemented (2026-10-13):** one config file per world and explicit act/release/secret metadata; the full catalog
+includes unreleased Act II entries while the playable campaign remains the original three worlds. Planet-owned local
+NPCs, arrival dialogue and house overrides replace world-specific dispatch; original numeric dialogue slots, seeds and
+saved object positions are preserved. Keys/direct transitions cannot reach unfinished worlds or bypass secret gates;
+night-authorized trips survive dawn during their fade. Main completion excludes secrets, the Act I award requires its
+original bosses, and small secret rosters may declare a tested population minimum. All 174 unit tests, 29 simulations
+and the 720p/1080p browser checks passed, including v1 Continue and pre-extraction layout/arrival fixtures.
+See [catalog, release and compatibility rules](docs/planets.md). 26b-26d remain pending.
+
+- [x] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
       its `act`.
 - [ ] **Planet mechanics:** `mechanic: 'tides'` loads `src/world/mechanics/tides.js` with `enter`, `update(dt)`, `exit`
       and save hooks (19). Weather stays mood only; a mechanic may read the weather.

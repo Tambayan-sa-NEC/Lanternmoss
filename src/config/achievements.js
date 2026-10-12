@@ -5,13 +5,14 @@
      icon     a glyph id from src/ui/icons.js
      goal     { stat, at }   done when the journal's counter `stat` reaches `at` (see JOURNAL_STATS);
               { flag }       done when the journal records that flag (the boss challenges below)
+              { bosses }     done when each named campaign boss has been defeated, independent of later worlds
      reward   { coins } paid out when it unlocks during an adventure
      secret   the text stays hidden until it's done
    Boss challenges: a fight starts when the boss engages; it counts as `flawless` if no hit lands on the hero,
    `petless` if your pet never strikes the boss, and `underdog` if you win at or under BOSS_CHALLENGES.lowLevel.
    --------------------------------------------------------------------- */
 
-import { PLANETS } from './planets.js';
+import { PLANETS, FIRST_ACT_PLANETS } from './planets.js';
 
 /** Counters the journal keeps (all lifetime totals). */
 export const JOURNAL_STATS = {
@@ -25,7 +26,7 @@ export const ACHIEVEMENTS = [
   // ---- firsts
   { id: 'firstBlood', group: 'Firsts', icon: 'slash', name: 'First Steps', text: 'Defeat your first monster.', goal: { stat: 'monsters', at: 1 }, reward: { coins: 5 } },
   { id: 'firstBoss', group: 'Firsts', icon: 'boss', name: 'Crown Breaker', text: 'Defeat a planet boss.', goal: { stat: 'bosses', at: 1 }, reward: { coins: 40 } },
-  { id: 'allBosses', group: 'Firsts', icon: 'trophy', name: 'Lantern of Three Worlds', text: 'Defeat Gloomcap, Pyrrhax and Malgrath.', goal: { stat: 'bossKinds', at: PLANETS.length }, reward: { coins: 150 } },
+  { id: 'allBosses', group: 'Firsts', icon: 'trophy', name: 'Lantern of Three Worlds', text: 'Defeat Gloomcap, Pyrrhax and Malgrath.', goal: { bosses: FIRST_ACT_PLANETS.map(p => p.boss.type) }, reward: { coins: 150 } },
   { id: 'firstChest', group: 'Firsts', icon: 'chest', name: 'Finders Keepers', text: 'Open a treasure chest.', goal: { stat: 'chests', at: 1 }, reward: { coins: 5 } },
   { id: 'firstCraft', group: 'Firsts', icon: 'craft', name: 'Handmade', text: 'Craft an item.', goal: { stat: 'crafted', at: 1 }, reward: { coins: 10 } },
   { id: 'firstLegendary', group: 'Firsts', icon: 'gem', name: 'The Real Treasure', text: 'Find a Legendary piece of gear.', goal: { stat: 'legendary', at: 1 }, reward: { coins: 50 } },
