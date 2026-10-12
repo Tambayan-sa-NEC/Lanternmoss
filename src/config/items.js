@@ -105,7 +105,7 @@ export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', '
 export const ITEM_ART_KINDS = ['scroll', 'bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
   'staff', 'axe', 'bow', 'cloak', 'mail', 'mantle', 'pendant', 'ring', 'locket', 'key', 'crown',
   'log', 'stone', 'ore', 'gemstone', 'herb', 'pepper', 'plum', 'carrot', 'wheat', 'pumpkin', 'seeds', 'fish', 'bread', 'skewer',
-  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal', ...Object.keys(FURNISHINGS), 'fence', 'path', 'storage', 'workbench', 'forge', 'pot', 'brew', 'plot'];
+  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal', ...Object.keys(FURNISHINGS), 'fence', 'path', 'storage', 'workbench', 'forge', 'pot', 'brew', 'plot', 'floor', 'wall', 'doorway', 'windowWall', 'roof'];
 
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width

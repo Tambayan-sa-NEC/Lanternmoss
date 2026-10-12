@@ -35,9 +35,9 @@ for(const id of Object.keys(PLACEABLES)) {
   assert.ok(cmd.craft(r).ok,`craft ${id}`); assert.equal(inv.count(id),1);
 }
 inv.clear();
-console.log('PASS all 13 placeables can be crafted from real materials, with station requirements');
+console.log('PASS all 18 placeables can be crafted from real materials, with station requirements');
 
-const entries = Object.keys(PLACEABLES).map((id,i)=>put(id,i%4));
+const entries = Object.keys(PLACEABLES).filter(id=>!PLACEABLES[id].structure).map((id,i)=>put(id,i%4));
 const chest=entries.find(e=>e.store), plot=entries.find(e=>e.plot), fence=entries.find(e=>e.record.itemId==='gardenFence');
 assert.equal(B.list.length,13); assert.equal(H.Farm.plots.filter(p=>p.building).length,1); assert.equal(H.Stations.list.filter(s=>s.building).length,4);
 for (let a=0;a<6.28;a+=0.1) { P.placeAt(offsetDir(chest.dir,a,1.3)); if (currentInteraction()?.label.includes('Storage Chest')) break; } assert.match(currentInteraction().label,/Storage Chest/); currentInteraction().run(); assert.equal(ctx.paused,true); H.BuildingUI.close(); assert.equal(ctx.paused,false);

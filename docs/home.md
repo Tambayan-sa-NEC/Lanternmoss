@@ -48,7 +48,7 @@ nonexistent `length` discarded those snapshots. Only canonical IDs that exist in
 Indoor collision resolution also handles a hero exactly at an object’s centre. Rugs are raised above the floor
 surface so their colours remain visible.
 
-Outdoor storage, fences, paths, stations, farm plots and placement previews are implemented in [TODO 25b](building.md). Walls, floors and roofs remain TODO 25c.
+Outdoor storage, fences, paths, stations, farm plots and placement previews are implemented in [TODO 25b](building.md). You can also build [modular outdoor shelters](structures.md).
 
 ## Verification
 

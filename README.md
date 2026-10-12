@@ -307,6 +307,7 @@ npm i --no-save puppeteer-core     # once; not a project dependency
 node scripts/screenshots.mjs       # all shots, or e.g. `node scripts/screenshots.mjs bag,pets` for some
 node scripts/save-smoke.mjs        # real reload/export/import check; retake title and save menus
 node scripts/crafting-smoke.mjs    # bulk crafting, discovery, enchanting and reload persistence
+node scripts/structures-smoke.mjs  # structure controls, support/pickup, door movement and reload Continue
 node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 ```
@@ -546,6 +547,11 @@ dialogue through `Dialog.lineProvider` instead of the dialogue importing them. L
 
 **Shared state** lives in `core/context.js` (`ctx.player`, `ctx.enemies`, `ctx.time`...), filled in by `Game`. That
 is the one place to look for "what is alive right now", instead of dozens of loose globals.
+
+**Build a shelter:** craft Timber Floors, walls, open doorways, window panels and Shingled Roofs. Connected tiles
+share a foundation grid; opposite walls support roofs, and furniture/storage/stations can sit on the floors.
+Walk through the doorway to see roof and near-wall cutaways. Floor support, roof ceilings and safe dismantling
+keep the pieces usable, and shelters persist on each planet. See [structure controls and recipes](docs/structures.md).
 
 **Build a garden:** craft and place furniture, lights, fences, stepping stones, storage chests, all four crafting
 stations and farm plots outdoors. Use a piece from your bag/hotbar to start a ground preview; Y rotates, U toggles

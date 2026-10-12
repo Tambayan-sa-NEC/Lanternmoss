@@ -31,6 +31,12 @@ const torus = (r, t, arc = Math.PI * 2) => new THREE.TorusGeometry(r, t, 5, 14, 
 
 /** One builder per art kind: (group, colour). Sized to sit in a ~0.45 unit box like the shapes above. */
 const ART = {
+  floor: (g) => { const m=buildPlaceable('timberFloor'); m.root.scale.setScalar(0.1); g.add(m.root); },
+  wall: (g) => { const m=buildPlaceable('timberWall'); m.root.scale.setScalar(0.1); g.add(m.root); },
+  doorway: (g) => { const m=buildPlaceable('timberDoorway'); m.root.scale.setScalar(0.1); g.add(m.root); },
+  windowWall: (g) => { const m=buildPlaceable('timberWindow'); m.root.scale.setScalar(0.1); g.add(m.root); },
+  roof: (g) => { const m=buildPlaceable('timberRoof'); m.root.scale.setScalar(0.1); g.add(m.root); },
+
   fence: (g) => { const m = buildPlaceable('gardenFence'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
   path: (g) => { const m = buildPlaceable('stonePath'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
   storage: (g) => { const m = buildPlaceable('storageChest'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },

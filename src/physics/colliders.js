@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { PLANET_RADIUS as R, WORLD } from '../config/game.js';
 import { arcDist, projectTangent } from '../utils/sphere.js';
+import { boxPoint, boxSupport, pointInBox, pushBox } from './boxCollision.js';
 import { groundHeight, waterAt } from '../world/terrain.js';
 
 const V3 = THREE.Vector3;
@@ -21,6 +22,12 @@ export function addCollider(dir, r, cam = null, top = null) {
       camCull: Math.cos(Math.min(Math.PI, (cam.r + 2) / R)) }); camColliders.push(c);
   }
   colliders.push(c); return c;
+}
+/** A box in a foundation's shared local frame; optional floor support and camera blocking. */
+export function addBoxCollider(origin, up, fwd, width, depth, base, top, { movement = true, support: floor = false, camera = true, ceiling = false } = {}) {
+  const r = Math.hypot(width, depth) / 2, c = addCollider(origin.clone().normalize(), r, camera ? { r, top } : null);
+  c.box = { origin: origin.clone(), up: up.clone(), fwd: fwd.clone(), right: new THREE.Vector3().crossVectors(up, fwd).normalize(), width, depth, base, top, movement, support: floor, ceiling };
+  c.cameraActive = true; if (floor) solids.push(c); return c;
 }
 /** Removes one static collider (a chest that's taken away). */
 export function removeCollider(c) {
@@ -39,6 +46,7 @@ function pushOut(list, p, len, radius, self) {
   let hit = false;
   for (let i = 0; i < list.length; i++) {
     const c = list[i]; if (c === self || !c.active) continue;
+    if (c.box) { const normal = pushBox(c.box, p, radius); if (normal) { _cn.add(normal); hit = true; } continue; }
     if (_cu.dot(c.dir) < c.cull) continue;                       // cheap broadphase
     if (c.top !== undefined && len - c.baseH >= c.top - WORLD.stepHeight) continue;   // on top of (or stepping onto) a solid
     _cv.copy(c.dir).multiplyScalar(len).sub(p);                  // vector to collider axis at same altitude
@@ -71,6 +79,7 @@ export function viewBlocked(q, pad = 0.3, height = 2.8) {
   if (cameraBlocked(q)) return true;
   const len = q.length(); _cu2.copy(q).divideScalar(len);
   for (const c of colliders) {
+    if (c.box) { if (c.active && c.cameraActive !== false && pointInBox(c.box, q, pad)) return true; continue; }
     if (!c.active || c.water || _cu2.dot(c.dir) < c.cull) continue;
     const along = q.dot(c.dir), h = along - c.baseH; if (h < -0.5 || h > (c.camTop ?? c.top ?? height)) continue;
     if (len * len - along * along < (c.r + pad) ** 2) return true;
@@ -81,6 +90,8 @@ export function cameraBlocked(q) {
   const len = q.length(); _cu2.copy(q).divideScalar(len);
   if (len < groundHeight(_cu2) + 0.35) return true;
   for (const c of camColliders) {
+    if (!c.active || c.cameraActive === false) continue;
+    if (c.box) { if (pointInBox(c.box, q, 0.08)) return true; continue; }
     if (_cu2.dot(c.dir) < c.camCull) continue;
     const along = q.dot(c.dir), h = along - c.baseH; if (h < c.camBase || h > c.camTop) continue;
     if (len * len - along * along < c.camR * c.camR) return true;
@@ -95,12 +106,24 @@ export function support(dir) {
   let h = groundHeight(dir);
   for (const s of solids) {
     if (!s.active || dir.dot(s.dir) < s.cull) continue;
+    if (s.box) { const floor = boxSupport(s.box, dir); if (floor !== null) h = Math.max(h, floor); continue; }
     _su.copy(dir).sub(_cv.copy(s.dir).multiplyScalar(dir.dot(s.dir)));        // tangential offset from the solid's axis
     if (_su.length() * R < s.r * 0.92) h = Math.max(h, s.baseH + s.top);
   }
   const water = waterAt(dir);
   if (water && water.depth > WORLD.water.deep) h = Math.max(h, water.level - WORLD.water.swimDepth);
   return { h, water };
+}
+/** Underside of a structure roof over a walker; cutaway visibility never removes the ceiling. */
+export function ceilingHeight(dir, feet) {
+  let ceiling = Infinity;
+  for (const c of colliders) {
+    const b=c.box;if(!c.active||!b?.ceiling||dir.dot(b.up)<.5)continue;
+    const h=(b.origin.dot(b.up)+b.base)/dir.dot(b.up);if(feet>=h)continue;
+    const q=boxPoint(b,dir.clone().multiplyScalar(h));
+    if(Math.abs(q.x)<=b.width/2&&Math.abs(q.z)<=b.depth/2)ceiling=Math.min(ceiling,h);
+  }
+  return ceiling;
 }
 /** Just the height of support(dir). */
 export function supportHeight(dir) { return support(dir).h; }
@@ -112,6 +135,7 @@ const _hs = new V3();
 export function hitsStatic(p, radius) {
   const len = p.length(); _hs.copy(p).divideScalar(len);
   for (const c of colliders) {
+    if (c.box) { if (c.active && pointInBox(c.box, p, radius)) return true; continue; }
     if (c.water || !c.active || _hs.dot(c.dir) < c.cull) continue;
     _cv.copy(c.dir).multiplyScalar(len).sub(p); _cv.addScaledVector(_hs, -_cv.dot(_hs)); if (_cv.length() < c.r + radius) return true;
   }

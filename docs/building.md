@@ -1,6 +1,6 @@
 # Building your garden (TODO 25b)
 
-Craft a piece in the bag?s **Craft** tab, then use it from the bag or hotbar while outside. Cottage furniture
+Craft a piece in the bag's **Craft** tab, then use it from the bag or hotbar while outside. Cottage furniture
 also works outdoors; inside your claimed cottage it still fits the five established furnishing spots.
 
 A translucent model shows the ground position and facing. **Green** means ready; **red** explains what prevents
@@ -11,11 +11,11 @@ Walk or drag the camera to adjust your view. Building keeps combat input off unt
 | --- | --- |
 | Click, Enter or E | Place the preview; consumes one piece only after checks pass |
 | Y | Rotate 90 degrees |
-| U | Toggle the planet?s fixed grid and free ground placement |
+| U | Toggle the planet's fixed grid and free ground placement |
 | Esc or right click | Cancel without spending the item |
 | E beside a placed piece | Open its paused management menu |
 
-Y, U and E can be remapped in Settings ? Keys. The preview lists the current bindings. Use **Place**, **Rotate**,
+Y, U and E can be remapped in Settings > Keys. The preview lists the current bindings. Use **Place**, **Rotate**,
 **Grid** and **Cancel** buttons for mouse controls. If another piece remains, the preview stays open for the next
 placement. Its current position becomes invalid while occupied, so move the cursor before placing again.
 
@@ -24,7 +24,7 @@ corner, water and boss/mini-boss lairs clear. Placement also rejects steep/uneve
 creatures. Move within eight metres and step out of the footprint. Solid furniture, fences, chests and stations
 block walking and the follow camera; rugs, stepping stones and plots are walk-through. Pieces sit on sampled
 ground, reserving enough space for their model; fences reserve a thin rotated rail footprint. Each planet allows
-up to 256 pieces. Walls, floors and roofs remain TODO 25c.
+up to 256 pieces. Modular floors, wall/door/window panels and roofs are implemented in [TODO 25c](structures.md).
 
 ## Pieces and acquisition
 

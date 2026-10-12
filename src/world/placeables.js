@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { buildStructure } from './structures.js';
 import { PLACEABLES } from '../config/placeables.js';
 import { buildFurniture } from './interiors.js';
 import { STATION_BUILDERS } from '../models/stations.js';
@@ -8,6 +9,7 @@ import { batchParts } from '../render/staticParts.js';
 
 export function buildPlaceable(id) {
   const def = PLACEABLES[id];
+  if (def.structure) return buildStructure(def.structure);
   if (def.crafting) { const parts = STATION_BUILDERS[def.crafting](); batchParts(parts.root, new Set(parts.glow)); return parts; }
   if (def.farm) return buildPlot();
   if (def.furniture || def.storage) {

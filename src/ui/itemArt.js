@@ -15,6 +15,12 @@ const GOLD = '#ffd36b', WOOD = '#b0703a', STEEL = '#dfe6f0';
 
 /** kind -> (main colour hex, light, dark) -> SVG body (viewBox 0 0 32 32). */
 const ART = {
+  floor: (c) => `<path ${S} fill="${c}" d="M3 9h26v19H3z"/><path ${S} fill="none" d="M3 14h26M3 19h26M3 24h26"/>`,
+  wall: (c) => `<path ${S} fill="${c}" d="M3 4h26v25H3z"/><path ${S} fill="none" d="M6 4v25M26 4v25M3 25h26"/>`,
+  doorway: (c) => `<path ${S} fill="${c}" d="M3 4h26v25h-7V12H10v17H3z"/>`,
+  windowWall: (c) => `<path ${S} fill="#eacb9c" d="M3 4h26v25H3z"/><path ${S} fill="${c}" d="M9 9h14v12H9z"/><path ${S} fill="none" d="M16 9v12M9 15h14"/>`,
+  roof: (c) => `<path ${S} fill="${c}" d="M2 20L16 5l14 15v6H2z"/><path ${S} fill="none" d="M16 5v21M7 16h6M4 21h9M19 16h6M19 21h9"/>`,
+
   fence: (c) => `<path ${S} fill="${c}" d="M4 7h5v22H4zM23 7h5v22h-5zM2 12h28v4H2zM2 21h28v4H2z"/>`,
   path: (c) => `<path ${S} fill="${c}" d="M3 15l7-7 13 1 6 10-6 7-15-1z"/>`,
   storage: (c) => `<path ${S} fill="${c}" d="M3 13q0-9 13-9t13 9v15H3z"/><path ${S} fill="${GOLD}" d="M7 7h4v21H7zM21 7h4v21h-4z"/><path ${S} fill="${GOLD}" d="M13 16h6v6h-6z"/>`,

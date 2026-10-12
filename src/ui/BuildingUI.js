@@ -23,6 +23,7 @@ export const BuildingUI = {
     this.root.setAttribute('aria-modal', 'true'); this.root.setAttribute('aria-labelledby', 'building-title'); document.body.appendChild(this.root);
     this.root.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b || b.disabled) return;
+      if (b.hasAttribute('data-build-piece')) { const entry=Building.list.find(x=>x.record.id===Number(b.dataset.buildPiece)); if (entry && Building.canEdit(entry)) { this.entry=entry; this.message=''; this.render(); this.root.querySelector('[data-build-close]').focus(); } return; }
       if (b.hasAttribute('data-build-close')) { this.close(); return; }
       if (b.hasAttribute('data-build-quantity')) { this.quantity = this.quantity === 1 ? Infinity : 1; this.render(); return; }
       if (b.hasAttribute('data-build-transfer')) {
@@ -53,8 +54,9 @@ export const BuildingUI = {
   },
   showPreview(a) {
     this.preview?.classList.toggle('show', !!a); if (!a) return;
-    this.preview.querySelector('strong').textContent = `${PLACEABLES[a.id].name} · ${ctx.player.inventory.count(a.id)} in bag · ${a.turn * 90}° · ${a.grid ? 'Grid' : 'Free ground'}`;
-    this.preview.querySelector('span').textContent = a.problem || `Ready · Click / Enter / ${bindLabel('interact')} to place · ${bindLabel('buildRotate')} rotate · ${bindLabel('buildGrid')} grid · Esc / right click cancel`;
+    this.preview.querySelector('strong').textContent = `${PLACEABLES[a.id].name} · ${ctx.player.inventory.count(a.id)} in bag · ${(a.candidate?.turn ?? a.turn) * 90}° · ${a.candidate?.structure?.floor || a.candidate?.structure?.root ? 'Foundation grid' : a.grid ? 'Grid' : 'Free ground'}`;
+    const kind=PLACEABLES[a.id].structure, hint=kind==='floor'?'Point beside a floor to extend it, or at clear ground for a new foundation. ':kind==='roof'?'Point at a floor with opposite wall supports. ':kind?'Point at a floor; rotate to choose an edge. ':'';
+    this.preview.querySelector('span').textContent = a.problem || `${hint}Ready · Click / Enter / ${bindLabel('interact')} to place · ${bindLabel('buildRotate')} rotate · ${bindLabel('buildGrid')} grid · Esc / right click cancel`;
     this.preview.classList.toggle('invalid', !!a.problem); this.preview.querySelector('[data-build-preview="place"]').disabled = !!a.problem;
   },
   open(entry) {
@@ -69,10 +71,14 @@ export const BuildingUI = {
   key(code) { if (code === 'Escape') this.close(); },
   render() {
     const e = this.entry; if (!e) return; const def = PLACEABLES[e.record.itemId], bag = ctx.player.inventory;
+    const attached=Building.list.filter(x=>x.record.structure?.floor===e.record.id);
+    const support=e.record.structure?.floor&&Building.list.find(x=>x.record.id===e.record.structure.floor);
+    const pieceButton=x=>`<button type="button" data-build-piece="${x.record.id}" ${Building.canEdit(x)?'':'disabled'}>${PLACEABLES[x.record.itemId].name} #${x.record.id}</button>`;
     const stacks = (inv, action) => inv.getSlots().map((s, i) => s ? `<button type="button" data-build-transfer="${action}" data-slot="${i}" title="${action === 'deposit' ? 'Store' : 'Take'} ${inv.registry.get(s.itemId).name}">${itemIconHtml(inv.registry.get(s.itemId))}<span>${inv.registry.get(s.itemId).name}<small>×${s.quantity}${s.props?.rarity ? ` · ${s.props.rarity}` : ''}${s.props?.enchantment ? ' · enchanted' : ''}${action === 'deposit' && i < 9 ? ' · hotbar' : ''}</small></span></button>` : '').join('');
     this.root.innerHTML = `<div class="portal-panel building-panel"><header><h2 id="building-title">${def.name}</h2><button type="button" data-build-close aria-label="Close building menu">×</button></header>
       ${e.store ? `<p>Click bag items to store them; click chest items to take them. Transfers keep rarity and enchantments.</p><div class="storage-actions"><button data-build-quantity>Move: ${this.quantity === 1 ? 'one' : 'stack'}</button><button data-build-stack>Quick-stack nearby</button><button data-build-sort>Sort bag</button></div>
       <div class="storage-columns"><section><h3>Bag</h3><div class="storage-list">${stacks(bag, 'deposit') || '<p>Your bag is empty.</p>'}</div></section><section><h3>Chest · ${e.store.size - e.store.freeSlots()} / ${BUILDING.storageSlots}</h3><div class="storage-list">${stacks(e.store, 'withdraw') || '<p>This chest is empty.</p>'}</div></section></div>` : `<p>${def.description}</p>`}
+      ${attached.length?`<p>Manage pieces on this floor:</p><div class="storage-actions">${attached.map(pieceButton).join('')}</div>`:''}${support?`<p>Support floor:</p><div class="storage-actions">${pieceButton(support)}</div>`:''}
       <div class="storage-actions">${def.crafting || def.farm || def.furniture === 'bed' ? `<button data-build-use>${def.crafting ? 'Open Craft tab' : def.farm ? 'Tend this plot' : 'Rest in bed'}</button>` : ''}<button data-build-pickup>Pick up</button></div>
       <p role="status" class="home-message">${this.message || (e.store ? 'Quick-stack matches nearby chest contents and keeps your hotbar in place. Empty this chest before picking it up.' : e.plot?.s.crop ? 'Harvest the crop before picking up this plot.' : 'Pick up returns the crafted item if there is room in your bag.')}</p><p class="portal-foot">Your builds stay on this planet. Esc closes this menu.</p></div>`;
   },

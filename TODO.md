@@ -915,25 +915,33 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
       (17) and farm plots (16).
   - In 25b: furniture, lights, fences, paths, storage chests, stations and farm plots. Walls, floors and roofs go to 25c.
   - From Quality of life: quick-stacking into storage chests, and sorting the bag.
-- [x] **Acquire 25b placeables** by crafting, buying from villagers, or finding them.
-- [x] **Place:** hold a 25b placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
+- [x] **Acquire building pieces** by crafting, buying from villagers, or finding them.
+- [x] **Place:** hold a placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
       spots (not in the village square, not on paths or in lairs).
 - [x] **Break / pick up:** taking a piece down gives it back (or its materials).
 - [x] Solid placed things block movement and the camera, and all pieces are saved per planet (paths, rugs and plots stay walk-through).
-- [ ] **25c. Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
+- [x] **25c. Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
       village houses.
-  - Go / no-go after 25b: only if placement on slopes, collisions and the camera already feel solid.
+  - Go decision (2026-10-13): slope protection, connected support, collisions, camera cutaways and safe restoration passed gameplay and browser checks.
 
 **25a implemented (2026-10-12):** a separate claimable cottage on each planet, five craftable furnishings in fixed
 indoor spots, bag/hotbar placement and safe furniture removal, and an own bed with naps/night sleep and energy
 recovery. Homes persist through portal visits, indoor Continue and version-1 saves; existing villagers keep their
-houses. 25b is implemented below; 25c remains open. See [cottage controls, recipes, screenshots and saves](docs/home.md).
+houses. 25b and 25c are implemented below. See [cottage controls, recipes, screenshots and saves](docs/home.md).
 
 **25b implemented (2026-10-13):** 13 craftable outdoor placeables, ground/grid ghost previews, quarter-turn rotation,
 protected terrain and occupied-footprint checks, safe pickup, 24-stack storage chests with quick-stacking,
 bag sorting that preserves the hotbar, working crafting stations and farm plots, outdoor bed rest, movement/camera
 colliders, bounded nearby lantern lighting, and separate per-planet saves through portal travel and Continue.
-Walls, floors and roofs remain 25c. See [building controls, recipes, screenshots and saves](docs/building.md).
+Walls, floors and roofs are implemented in 25c below. See [building controls, recipes, screenshots and saves](docs/building.md).
+
+**25c implemented (2026-10-13):** craftable Timber Floors, wall/door/window panels and Shingled Roofs; connected
+4-metre tiles on a shared foundation plane; rotatable floor-edge attachments and opposite-wall roof support;
+walkable square floors, open doorway movement, roof ceilings and camera cutaways; floor-mounted furniture/storage/
+stations; attachment management, safe dependency/connectivity-aware pickup and topological per-planet save restore.
+Shelters are ground level, bounded to five tiles per side where terrain permits; walk physically inside in the
+outdoor world. A separate indoor house instance and upper storeys are not part of this implementation. See
+[structure controls, recipes, screenshots and saves](docs/structures.md).
 
 ---
 
