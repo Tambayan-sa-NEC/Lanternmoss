@@ -957,14 +957,72 @@ Why three: each existing world was built up over items 11–16, and a new one ha
 worlds give a full second act plus a secret ending without doubling the game. A fourth idea (Windward) is parked in
 Suggested additions.
 
+### Phase D session review (2026-10-13)
+
+**Budget:** one implementation session is at most **five hours**, including investigation, implementation,
+documentation/logs, `npm test`, `npm run sim`, required browser checks, synchronization, commit, merge, push and branch
+cleanup. No numerical token allowance was supplied: these are wall-clock planning estimates, not a guarantee about
+token consumption. Aim to finish implementation in roughly three hours and reserve the rest for verification and fixes.
+The ranges below include that completion work, assuming earlier dependencies have passed and no major regression appears.
+Re-estimate a stage after its first investigation; if it no longer fits, split it further before implementation.
+Never skip checks, lower acceptance criteria or mark unfinished work complete to meet the limit.
+
+**Findings:** planet ids, per-planet deltas and enemy behavior modules already exist, but `planets.js` is still a single
+three-world config; `Walker.step` uses a default gravity and water/placement use fixed pond data. Equipment combines
+stats without set effects or saved talents. House interiors move the hero on a separate flat floor and disable combat,
+so caves require an encounter context, not just house decoration. There is no rematch or New Game+ implementation.
+Procedural audio exists, but world-theme switching also needs integration. Tests currently require increasing monster
+counts across planets, which conflicts with a deliberately small Moon. These are reasons to split even the former M items.
+
+| TODO | Whole-item estimate | Fits one five-hour session? | Replacement stages |
+| --- | --- | --- | --- |
+| 26 Groundwork | 9-16 h | No: registry, mechanic lifecycle, physics and progression are separate integration changes | 26a-26d |
+| 27 Tidewhisper | 18-33 h | No: moving water plus a complete ecosystem and two original fights | 27a-27h |
+| 28 Gear sets / hero depth | 12-21 h | No: set procs and three saved ability trees exceed the original M label | 28a-28e |
+| 29 Caves | 18-30 h | No: lighting, flat-space combat, saves, puzzles and five planet configurations | 29a-29g |
+| 30 Duskhollow | 20-37 h | No: lantern rules, four behaviors, accessibility and two light-dependent fights | 30a-30i |
+| 31 After the last boss | 16-29 h | No: rematch infrastructure, ten main/mini encounter versions and a fresh-run lifecycle | 31a-31g |
+| 32 Lantern Moon | 18-30 h | No: small terrain still needs gravity, three behaviors and a five-boss crossover | 32a-32g |
+
+**How stages land:** each letter is an independently tested feature branch following `AGENTS.md`, like 25a-25c.
+All stages below are unimplemented. Keep the original checklists as the parent acceptance criteria; finishing a letter
+does not finish its parent. Partial worlds and encounters can be exercised through a development harness, but stay out
+of normal campaign travel until their release stage passes the full checklist. Groundwork must distinguish the content
+catalog from released destinations; a Wayfarer's Key must not bypass release or secret-world gates. Existing saves,
+seeded object ids and the original three-world campaign must continue to work at every merge.
+
+**Main-world order:** 26a-d -> 27a-h -> 28a-e -> 29a -> 30a-i. Complete 31a-f before 32e/g;
+32a-d can begin after 30i, while 31g is optional for the Moon. The other cave stages (29b-f) and original-world
+rematches (31a-d) can land between worlds after their own dependencies; 31g is independent of the Moon. Expansion cave
+configs (29g) follow the released worlds they use, so Duskhollow only depends on the lighting stage, not its own cave.
+Tide/Dusk/Star set items land with their worlds and use the set system once 28a exists; this avoids 27 depending on 28.
+The 27h go/no-go result may revise later estimates before work starts.
+
+**Verification:** each stage adds focused rules/save/simulation checks for its behavior and runs both complete suites.
+Visible changes also need browser checks at 720p/1080p and the lowest quality preset; major world releases refresh the
+affected tour/screenshots and measure performance against TODO 20. Available-hardware checks do not prove the Iris Xe
+target: record that hardware limitation and keep that target explicitly unvalidated until it can actually be measured.
+Do not label a world fully accepted while a required check is failing or unvalidated. Estimates assume suitable test
+hardware is available; obtaining it is an external dependency, not time hidden inside a stage.
+
 ## 26. New worlds: the groundwork **(core)**
 
 **Goal:** adding a world means filling in a checklist, not surgery, and no world ships as a reskin.
 Code: `src/config/planets.js` → `src/config/planets/` (one file per world), new `src/world/mechanics/`,
 `src/physics/Walker.js`, `src/config/leveling.js`, `src/config/achievements.js`, `src/ui/MainMenu.js` (campaign strip),
-`tests/planets.test.mjs`. New in Round 3. **Size:** L. **Needs:** 19, 23, 24.
+`tests/planets.test.mjs`. New in Round 3. **Size:** L, in four stages. **Needs:** 19, 23, 24.
 **Risk:** players never see this item, so it's tempting to skip. **Recommendation:** don't. Without it, world 4 turns into
 copy-paste in `planets.js`, and the three-planet assumptions break one at a time during 27.
+
+**Five-hour assessment:** split the shared infrastructure; implement the ten actual enemy behaviors in their owning
+world stages, rather than requiring all future encounters before Tidewhisper. Preserve existing behavior hooks.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **26a. Planet catalog and release rules** | 19, 24 | 1.5-3 h | Extract the original planet configs without changing seeds or generated ids; add act/release/secret metadata and assemble the released campaign. Remove remaining three-world assumptions in travel, save validation, NPC data and completion rules. Tests accept a smaller secret-world roster by explicit config, preserve the original campaign and reject travel/key access to unreleased worlds. |
+| [ ] **26b. Mechanic lifecycle and saves** | 26a | 2-4 h | Add enter/update/exit and per-planet save hooks, including pause, sleep/time skips, travel, Continue and disposal. Use a development-only mechanic fixture to prove ordering, isolation and old-save defaults; weather stays separate. |
+| [ ] **26c. Gravity and moving-water support** | 26b | 3-4.5 h | Add shared gravity/water queries consumed by Walkers, swimming, water rendering, spawning, resource placement, farms and building safety. Test moving levels and gravity changes in a harness, including existing ponds, Moon-Hop composition and portal restoration; no Tidewhisper content yet. |
+| [ ] **26d. Act II progression and content gate** | 26a-26c, 23 | 2-4 h | Extend cap/XP to 16, expose expected-level/scaling metadata, update title/arrival wording and achievement definitions while retaining the original three-boss award. Test the mandatory release checklist and Moon exceptions, behavior/boss registrations and unknown content references. Future-world achievements and travel activate only with those worlds. |
 
 - [ ] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
       its `act`.
@@ -972,10 +1030,11 @@ copy-paste in `planets.js`, and the three-planet assumptions break one at a time
       and save hooks (19). Weather stays mood only; a mechanic may read the weather.
 - [ ] **Per-planet physics:** gravity (Moon-Hop already scales it: `moonGravity` in `config/game.js`) and a sea level
       that can move (today ponds and lakes are fixed). The Walker, swimming, spawning and node placement read both.
-- [ ] **New enemy behaviours as building blocks** in `src/entities/enemies/behaviors/` (like `charger`, `burrower`),
-      not buried inside one monster: `armoured`, `drifter`, `amphibian` (27); `lightbound`, `weaver`, `mimic`, `thief`
-      (30); `swarm`, `puller`, `launcher` (32). Ten behaviours, three boss AIs and two mini boss AIs in total, which is
-      where most of the time goes.
+- [ ] **Enemy integration contract:** retain modular behavior dispatch in `src/entities/enemies/behaviors/` (like
+      `charger`, `burrower`) and validate registrations in the content gate. Implement the actual building blocks in
+      their world stages: `armoured`, `drifter`, `amphibian` in 27e; `lightbound`, `mimic` in 30e and `weaver`, `thief`
+      in 30f; `swarm`, `puller`, `launcher` in 32d. The three boss AIs and two mini boss AIs also belong to their world
+      stages below. These remain required expansion work, but do not block completion of groundwork.
 - [ ] **Levels:** cap 10 → 16, with the XP curve extended. Expected levels: Tidewhisper 7–10, Duskhollow 10–13, the
       Lantern Moon 13–16. Starting scale values (tune them to 23's targets): hp 2.9 / 3.4 / 4.0, damage 2.0 / 2.25 /
       2.5. The low-level challenge targets move into each planet's file.
@@ -992,11 +1051,25 @@ copy-paste in `planets.js`, and the three-planet assumptions break one at a time
 
 **Goal:** a planet of islands, tide pools and lighthouses, and the test run for the groundwork (26).
 Code: `src/config/planets/tidewhisper.js`, `src/world/mechanics/tides.js`, new behaviours and models, a boss in
-`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL. **Needs:** 26.
+`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL, in eight stages. **Needs:** 26a-26d.
 Reuses on purpose: swimming (11), fishing (16), fuel (17), facing-based aiming (14).
 **Risk:** the moving sea touches physics, spawning, monster AI (monsters that end up in water), nodes and the farm.
 **Recommendation:** keep the tide range small (about 1.5 m), mark the tidal band in the height field, and only place
 things meant for it there (tide pools, clams, driftwood). The farm sits above the high-tide line.
+
+**Five-hour assessment:** eight stages. The shared moving-water queries must work before the archipelago is built;
+bosses and release balancing each get their own session. The otter remains optional after the release budget is measured.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **27a. Archipelago and tide loop** | 26a-26d | 3-4.5 h | Build islands, shallows, sandbars, protected village/farm sites, the daily 1.5 m tide, clock chip and lagoon/causeway water controls. Prove low/high tide traversal, swimming energy, time skips, node placement and saved tide restoration in the development world. |
+| [ ] **27b. Flora and wildlife** | 27a | 2-4 h | Add every listed plant, crab/turtle/seal builder, birds, fish and Pearl Turtle/charm. Verify schedules, rare-gift saves, gathering interactions and bounded scenery cost; this stage owns wildlife distinct from enemy Shellbacks. |
+| [ ] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
+| [ ] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
+| [ ] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
+| [ ] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
+| [ ] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
+| [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
 
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
@@ -1043,8 +1116,19 @@ things meant for it there (tide pools, clams, driftwood). The farm sits above th
 
 **Goal:** choosing gear and growing a hero have more to them than bigger numbers.
 Code: `src/config/items.js` (sets), `src/items/gear.js`, `src/config/characters.js` (talents), `src/ui/` (a talent
-page). **Size:** M. **Needs:** 26 (the level cap rises to 16).
+page). **Size:** L, in five stages. **Needs:** 26d (the level cap rises to 16).
 **Why here:** after 26, levels 11–16 add only small stat bumps; talents give them something to spend points on.
+
+**Five-hour assessment:** the M label understated combat effects, UI, save validation and three different skill kits.
+Keep trees small: each hero gets a bounded, documented set of ability upgrades/alternatives, not a new class system.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **28a. Set bonuses** | 26d; 27c for Tide acquisition | 3-4.5 h | Count distinct equipped pieces, apply two/three-piece Moss/Ember/Frost effects, show bonuses in equipment UI and attach the Tide set. Test burn/chill/healing, equip/unequip, hero compatibility and load without duplicate procs. Dusk/Star definitions and acquisition belong to 30c/32b and reuse this contract. |
+| [ ] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
+| [ ] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
+| [ ] **28d. Warrior talents** | 28b | 2-4 h | Implement the warrior tree, including wider Cleave or another bounded variant. Test arcs, costs/cooldowns, reset, saves and boss windows; expose the tree only after these pass. |
+| [ ] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
       chilling hits; the Moss set: more healing), shown in the bag's equipment side.
@@ -1057,12 +1141,27 @@ page). **Size:** M. **Needs:** 26 (the level cap rises to 16).
 
 **Goal:** something to explore beyond the open planet surface, where mining and fighting meet.
 Code: new `src/world/caves.js` (interiors like the houses', away from the planet), `src/gameplay/Dungeons.js`,
-`src/config/dungeons.js`, new `src/render/lighting.js`. **Size:** L. **Needs:** 19, 20.
-**Why here:** it builds the darkness and light that Duskhollow (30) needs, in a small space first.
-**Risk:** one hand-made cave per planet means six caves. **Recommendation:** build caves from a kit of room pieces put
-together from a seed, so each planet's cave is config (palette, monsters, veins), not hand-built.
+`src/config/dungeons.js`, new `src/render/lighting.js`. **Size:** XL, in seven stages. **Needs:** 19, 20; stage dependencies below.
+**Why here:** 29a builds the darkness and light that Duskhollow (30) needs, in a small test space first; the full cave
+system need not block that world.
+**Risk:** one hand-made cave per main planet means five caves (the Moon has none). **Recommendation:** build caves
+from a kit of room pieces put together from a seed, so each planet's cave is config (palette, monsters, veins), not hand-built.
 
-- [ ] **A cave or dungeon per planet,** entered from the surface: a few rooms with monsters, chests and ore veins
+**Five-hour assessment:** the former L item needs **XL scope across seven stages**. Houses deliberately disable
+combat, so separate room generation from encounter adaptation. Caves serve the five main planets; the explicit no-cave Moon rule in 32 takes
+precedence over the old six-cave estimate. Expansion cave configs follow their worlds, avoiding a 29/30 dependency cycle.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **29a. Shared local-light rendering** | 19, 20, 26b | 3-4.5 h | Implement hero/lantern shader light radii, emissive glow/bloom and readable minimum ambient/ink outlines in a small harness. Bound real point lights to about four across all active sources, including building lamps. Check lowest-preset readability, material caches, disposal and measured rendering cost. This is the only cave prerequisite for 30a. |
+| [ ] **29b. Seeded cave layout and traversal** | 29a, 26a | 3-4.5 h | Add the reusable room kit, seeded connections, surface entrance, flat-floor collisions/camera, entry/exit and safe death return. Prove deterministic room ids and no stranded player; keep the unfinished dungeon outside normal travel. |
+| [ ] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
+| [ ] **29d. Cave rewards and persistence** | 29c | 2-4 h | Register room/chest/ore/enemy progress, saved indoor pose and death/revisit/Continue behavior. Prove old-save defaults, portal isolation, unique cave ore and no reward duplication after reload or regeneration. |
+| [ ] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
+| [ ] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
+| [ ] **29g. Expansion cave rollout** | 29f, 27h, 30i | 2-4 h | Configure/release Tidewhisper and Duskhollow caves from the proven kit, including tide-safe entrances and lantern readability. Check both complete paths and saved progress. No Moon cave or extra room technology; if either config needs new mechanics, split this rollout before coding. |
+
+- [ ] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
       that are found nowhere else.
 - [ ] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
 - [ ] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
@@ -1076,10 +1175,25 @@ together from a seed, so each planet's cave is config (palette, monsters, veins)
 **Goal:** a twilight planet under a canopy of giant glowing mushrooms, where your lantern decides what you can see and
 fight.
 Code: `src/config/planets/duskhollow.js`, `src/world/mechanics/lantern.js`, the light tech from 29, new behaviours and
-models, a boss in `src/entities/enemies/behaviors/boss/moth.js`. New in Round 3. **Size:** XL. **Needs:** 27 (and its
-go / no-go check), 28, 29.
+models, a boss in `src/entities/enemies/behaviors/boss/moth.js`. New in Round 3. **Size:** XL, in nine stages.
+**Needs:** 27h (including its go/no-go check), 28a-28e, 29a; does not require 29g.
 **Risk:** a dark world can be hard to read, and frustrating on cheap screens. **Recommendation:** keep a minimum light
 level and the outlines, never let an empty lantern hurt you, and test it on the lowest quality preset.
+
+**Five-hour assessment:** light-bound combat and readable darkness are separate from ecology and story. Split the four
+regular behaviors into two pairs; the moth fight gets a dedicated session after its lantern/quest systems are proven.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
+| [ ] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
+| [ ] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
+| [ ] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
+| [ ] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
+| [ ] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
+| [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
+| [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
+| [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
 
 - [ ] **Shape and look:** deep valleys under a canopy of giant lumen caps about 25 m up, with gaps of starlight. An
       endless dusk (the day clock still turns, as brighter and dimmer dusk). Glowmoss carpets light up in your
@@ -1121,25 +1235,54 @@ level and the outlines, never let an empty lantern hurt you, and test it on the 
 ## 31. After the last boss **(suggested)**
 
 **Goal:** the adventure doesn't simply stop after the last boss.
-Code: `src/gameplay/PlanetProgression.js`, `src/config/planets/`, `src/config/combat.js`. **Size:** M. **Needs:** 24.
-Before 32, because the Lantern Moon's boss reuses the rematch versions of the other bosses' moves.
+Code: `src/gameplay/PlanetProgression.js`, `src/config/planets/`, `src/config/combat.js`, `src/core/AdventureSave.js`.
+**Size:** XL across seven stages (was M). **Needs:** 24 for the base; 27h/30i for expansion rematches.
+31b-31f precede Nyxra because she reuses the rematch signatures of the five main bosses. New Game+ (31g) is not a Moon prerequisite.
+
+**Five-hour assessment:** harder stats alone do not meet the requested new attacks. There are five main bosses and
+five mini-boss encounters (four AI kits, including the Frost Hydra variant) across the main worlds, plus a
+reset/preservation lifecycle distinct from encounter retries.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **31a. Rematch lifecycle and rewards** | 24, 26d | 3-4.5 h | Add beaten-lair portal selection, repeatable encounter state, difficulty/loot tables and saved retry/finish state. Keep original campaign defeat and first-win rewards separate; test interruption, travel and Continue without duplicated trophies/keys/achievements. Only expose encounters whose rematch kit is complete. |
+| [ ] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
+| [ ] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
+| [ ] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
+| [ ] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
+| [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
+| [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
 
 - [ ] **Rematches:** harder versions of the planet bosses and mini bosses, with new attacks and better loot.
   - Reached through the portals (24): a beaten boss's lair offers a rematch (this replaces 14's open "harder
     versions").
-- [ ] **A secret fourth planet,** unlocked after the last boss, with its own boss and materials.
-  - Now the sixth world: **32. The Lantern Moon**.
+- [ ] **A secret sixth world,** unlocked after Act II, with its own boss and materials.
+  - Implemented by **32. The Lantern Moon**, not a second secret-world task inside 31. This cross-reference is complete
+    only after 32g; it does not block the rematch infrastructure or New Game+ stages.
 - [ ] **New Game+:** start again with your journal, pets and vanity kept, against tougher rosters with better loot.
 
 ## 32. World 6 (secret): The Lantern Moon **(core)**
 
 **Goal:** a small secret world after the second act: the place where every lantern's light drifts up to.
 Code: `src/config/planets/lanternMoon.js`, `src/world/mechanics/lowGravity.js`, new behaviours and models, a boss in
-`src/entities/enemies/behaviors/boss/eclipse.js`. New in Round 3. **Size:** L (a deliberately small world).
-**Needs:** 30, 31.
+`src/entities/enemies/behaviors/boss/eclipse.js`. New in Round 3. **Size:** L, in seven stages (a deliberately small world).
+**Needs:** 30i and rematch signatures from 31b-31f; 31g is not required.
 **Risk:** this is a reward for completionists, and it could easily grow as big as a main world. **Recommendation:** keep it
 small: radius 40 (the old planet size, so you can see the curve, like a moon), one building, and no farm or cave. Its boss
 reuses moves from the other five.
+
+**Five-hour assessment:** radius 40 reduces scenery, not physics or boss integration. Split the borrowed moves from
+Nyxra's own gravity/eclipse/rekindling rules. Keep one observatory, no farm/cave and no separate mini boss.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **32a. Moon terrain and gravity** | 26a-26d, 30i | 3-4.5 h | Build radius-40 craters, starry visited-world sky, rising lanterns and shared low-gravity jumps/falls/knockbacks for heroes and monsters. Test Moon-Hop composition, airborne recovery, camera and gravity restoration on travel/Continue; leave the secret destination gated. |
+| [ ] **32b. Moon flora and wildlife** | 32a | 2-4 h | Add listed flora (two distinct moonglass tree kinds for the checklist), original mochi-rabbit animation, comet foxes/moths/fish and Jade Rabbit/charm. Verify night flowers, schedules, trails, rare-gift saves and bounded scenery cost. |
+| [ ] **32c. Moon resources and observatory** | 32b, 28a | 3-4.5 h | Add meteor markers/star shards/stardust, a rare deposit and catchable world-gift lanterns. Build the one observatory/Lamplighter with a small local quest, Star gear/trinkets and celesta theme. Check gift/meteor duplication, shop/set acquisition, local/arrival lines and weather/theme disposal. |
+| [ ] **32d. Lunar enemy roster** | 32a | 3-4.5 h | Add Moonmite/swarm, gravity-puff/puller and lunar-golem/launcher modules, models, loot and bestiary. Simulate crowd bounds, pull/pop escape and aerial combat for each hero without throwing actors off the small world. |
+| [ ] **32e. Nyxra's borrowed signatures** | 32d, 31b-31f | 3-4.5 h | Compose the thorn, dragonfire, Doom Blade, false-lure and moth-dive rematch signatures into Nyxra's phase sequence with her model/telegraphs. Test each borrowed move and transitions in a harness; avoid copying five entire boss AIs or exposing an incomplete final fight. |
+| [ ] **32f. Eclipse and rekindling** | 32c, 32e, 29a | 2-4 h | Add Nyxra's own gravity wells/eclipse, level-14/night observatory wake gate and zero-HP rekindling into a persistent lantern-spirit villager. Test light/gravity resets, retry, final reward and Continue after the resolution without killing or duplicating her. |
+| [ ] **32g. Secret unlock and release** | 32a-32f, 30i | 2-4 h | Unlock at night only after Umbra and the five pre-Moon rare friendships in this adventure; Jade Rabbit is not a prerequisite. Test old saves, NG+ if available, keys/portals and post-Nyxra visits. Finish the waived-mini-boss/no-farm/no-cave content gate, three-hero pacing, browser/performance and tour/screenshots before releasing the secret world. |
 
 - [ ] **Unlock** (assumption): beat Umbra and befriend every rare creature in this adventure. Their five lights then
       open the lantern gate to the moon at night.
