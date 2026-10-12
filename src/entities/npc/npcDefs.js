@@ -36,9 +36,18 @@ function starShower() {
 
 const place = (dir, wander = 0) => ({ dir, wander });
 
+// The old two arrival slots must not shift in existing adventure saves.
+function arrivalLines(name, legacy = false) {
+  return PLANETS.flatMap(p => {
+    const line = p.npcs?.arrivals?.[name];
+    if (!line || !!line.legacy !== legacy) return [];
+    return [{ t: line.t, ...(line.e ? { e: line.e } : {}), once: true, when: s => s.planetId === p.id }];
+  });
+}
+
 export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses }) {
   const stones = dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 3.3), square = (a, r = 4.5) => offsetDir(spawnDir, a, r);
-  return [
+  const defs = [
     { name: 'Old Bramble', title: 'Wizard', color: '#8a6ae0', build: buildWizard, height: 2.75, radius: 0.6,
       gesture: 'raise', portrait: 'wizard', headR: 0.34, hat: true, sleepsIndoors: true,
       dir: stones,
@@ -63,8 +72,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { once: true, when: () => Chests.lockedWaiting() && !Chests.hasKey(), e: 'excited',
           t: "Found a Lantern chest out there, have you? Locked, of course. Here, my spare key. I keep it in my hat. Don't ask what else is in the hat.",
           a: n => giftItem(n, 'lanternKey') },
-        { once: true, when: s => s.planetId === 'emberfall', t: "So you toppled Gloomcap AND carried an old wizard across the stars. Emberfall tastes of cinnamon and danger." },
-        { once: true, when: s => s.planetId === 'frostveil', t: 'Frostveil. My beard has opinions about this cold, {hero}. None of them polite.', e: 'sad' },
+        ...arrivalLines('Old Bramble', true),
         { once: true, when: s => s.bosses >= 2, t: 'Two dark kings down. One more, and the lanterns of every world will sing together.', e: 'excited' },
         { when: s => s.night, t: 'Shh... the stars are reading tonight. Out loud, if you listen very carefully.', e: 'thinking' },
       ] },
@@ -84,8 +92,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
         { t: 'Try a moonberry tart! The crows gave it four stars.', a: n => giftItem(n, 'moonberryTart') },
         { once: true, when: s => s.hero === 'knight', t: 'A big strong warrior like you needs two buns. At least. Doctor\'s orders. I am not a doctor.' },
         { once: true, when: s => s.level >= 3, t: "You look stronger, {hero}! It's the buns. It's always the buns.", e: 'excited' },
-        { once: true, when: s => s.planetId === 'emberfall', t: 'Emberfall ovens heat themselves! I could bake a pie on a pebble here.', e: 'excited' },
-        { once: true, when: s => s.planetId === 'frostveil', t: 'Brr! Even my dough is shivering. A warm bun for the road, {hero}?', e: 'sad' },
+        ...arrivalLines('Pim', true),
       ] },
     { name: 'Lio', title: 'Wandering Bard', color: '#5fae55', build: buildBard, height: 2.15, radius: 0.55,
       portrait: 'bard', headR: 0.36, hat: true, sleepsIndoors: true,
@@ -105,8 +112,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
           sparkles.emit(ctx.player.pos.clone().addScaledVector(ctx.player.up, 1), { count: 30, color: 0xffd6f5, speed: 2.5, up: ctx.player.up, life: 1, size: 0.3 }); } },
         { t: 'A bard without an audience is just someone humming at a tree. Thanks for listening!', a: n => emote(n, 'heart') },
         { once: true, when: s => s.bosses >= 1, t: "I'm writing 'The Ballad of the {hero} and the Moss King'. I rhymed 'Gloomcap' with 'doom nap'. Thoughts?", e: 'excited' },
-        { once: true, when: s => s.planetId === 'emberfall', t: 'New planet, new chords! Everything here sounds a little bit... toasted.' },
-        { once: true, when: s => s.planetId === 'frostveil', t: 'My lute strings keep freezing into icicles. Very crisp notes, though.', e: 'surprised' },
+        ...arrivalLines('Lio', true),
         { once: true, when: s => s.bosses >= 2, t: 'A moss king AND a dragon? The ballad needs a third act... and a much bigger lute.', e: 'excited' },
         { when: s => s.phase === 'evening', t: 'Evening is my favourite. The lanterns hum the harmony for free. ♪' },
       ] },
@@ -130,50 +136,31 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
           sparkles.emit(p, { count: 3, color: mpick(FLOWER_COLORS), speed: 1, up: ctx.player.up, upBias: 1.4, life: 1.3, size: 0.32 }); } audio.sparkle(); } },
         { once: true, when: s => s.hero === 'ranger', t: 'Your hair is the colour of moonlight! Can I braid flowers into it? ...Later! Hee~', e: 'excited' },
         { once: true, when: s => s.level >= 5, t: "You're so strong now! The moss says so. The moss is never wrong~" },
-        { once: true, when: s => s.planetId === 'emberfall', t: "Ooh, it's warm here! My wings feel all toasty~" },
-        { once: true, when: s => s.planetId === 'frostveil', t: 'Snow! It looks like the flowers turned into sugar!', e: 'excited' },
+        ...arrivalLines('Fern', true),
         { when: s => s.night, t: 'At night the mushrooms tell glowing stories. Shh, listen~', e: 'thinking' },
       ] },
   ];
+  // Legacy reactions keep their saved numeric slots; arrivals for later releases append after them.
+  return defs.map(def => ({ ...def, lines: [...def.lines, ...arrivalLines(def.name)] }));
 }
 
-/** The villager who lives only on planet `planet` (none on the first planet): they stay behind when you travel on. */
-export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet) {
-  const home = houses[3 + (planet % 3)]?.door ?? offsetDir(spawnDir, 4.8, 9);
-  if (PLANETS[planet].id === 'emberfall') return [
-    { name: 'Cinder', title: 'Ember Smith', color: '#e0682a', build: buildSmith, height: 2.3, radius: 0.62, gesture: 'raise',
-      portrait: 'smith', headR: 0.36, hat: true, local: true, sleepsIndoors: true,
-      dir: offsetDir(spawnDir, 3.6, 6.5),
-      places: { home: place(home), forge: place(offsetDir(spawnDir, 3.6, 6.5), 1.5), square: place(offsetDir(spawnDir, 5.3, 4.5), 3) },
-      schedule: { morning: 'forge', noon: 'forge', evening: 'square', night: 'home' },
-      anim: n => { n.armR.rotation.x = -0.4 - Math.max(0, Math.sin(ctx.time * 4)) * 0.6 * (n.talking || n.speed > 0.3 ? 0 : 1); },   // hammering
-      lines: [
-        { t: 'Welcome to Emberfall, traveller. Mind the ponds: they bite.' },
-        { t: 'Pyrrhax sleeps on the far side. Big, red, hot temper, worse breath.', e: 'thinking' },
-        { t: "When the dragon lifts its head and its throat glows, get behind it. Fire only goes where it's looking." },
-        { t: 'If it spreads its wings, it means to land on you. Be somewhere else when it does.', e: 'surprised' },
-        { t: 'My hammer and I have an understanding. I swing, it sings.' },
-        { t: 'Ramhorns charge in straight lines. Step aside and let a tree say hello to them.' },
-        { once: true, when: s => s.hero === 'knight', t: 'That axe! Who forged it? Hmph. Decent work. I would have made it heavier.', e: 'thinking' },
-        { when: s => s.night, t: "The forge stays warm all night. So do I, if I'm honest. Smiths run hot.", e: 'sleepy' },
-      ] },
-  ];
-  if (PLANETS[planet].id === 'frostveil') return [
-    { name: 'Tuva', title: 'Snow Keeper', color: '#6fa8dc', build: buildSnowKeeper, height: 2.3, radius: 0.66, gesture: 'wave',
-      portrait: 'snowkeeper', headR: 0.36, hat: true, local: true, sleepsIndoors: true,
-      dir: dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 5.5),
-      places: { home: place(home), lookout: place(dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), 5.5), 2), square: place(offsetDir(spawnDir, 1.9, 4.5), 3) },
-      schedule: { morning: 'lookout', noon: 'square', evening: 'lookout', night: 'home' },
-      anim: n => n.lanternGlow.rotation.z = Math.sin(ctx.time * 2) * 0.15,
-      lines: [
-        { t: "You came all this way? Then you're braver than the wind. And the wind is very brave.", e: 'surprised' },
-        { t: 'Malgrath lifts his great sword before the killing blow. If the ground glows red under you, leave. Do not argue with it.', e: 'thinking' },
-        { t: 'When he takes to the sky, watch the snow. Every circle that appears is a promise he means to keep.' },
-        { t: 'My lantern has never gone out. Not once. I talk to it at night so it stays awake.' },
-        { t: 'Thornmoles tremble the ground before they bite. Feel it in your boots, then jump away.' },
-        { once: true, when: s => s.bosses >= 2, t: 'You beat a dragon? Then perhaps... perhaps the demon lord can fall too.', e: 'excited' },
-        { when: s => s.night, t: 'The aurora is out. It only dances for people who are kind to snow.', e: 'happy' },
-      ] },
-  ];
-  return [];
+/** The local villagers come entirely from planet config; their home index is independent of campaign order. */
+const LOCAL_LOOKS = { smith: buildSmith, snowkeeper: buildSnowKeeper };
+const LOCAL_ANIMATIONS = {
+  hammer: n => { n.armR.rotation.x = -0.4 - Math.max(0, Math.sin(ctx.time * 4)) * 0.6 * (n.talking || n.speed > 0.3 ? 0 : 1); },
+  lantern: n => { n.lanternGlow.rotation.z = Math.sin(ctx.time * 2) * 0.15; },
+};
+export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet, catalog = PLANETS) {
+  const p = typeof planet === 'string' ? catalog.find(p => p.id === planet) : catalog[planet];
+  if (!p || !p.released) return [];
+  const at = def => def.anchor === 'stones' ? dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), def.distance)
+    : offsetDir(spawnDir, def.angle, def.distance);
+  return (p.npcs?.locals ?? []).map(data => {
+    const build = LOCAL_LOOKS[data.look];
+    if (!build) throw new Error(`Unknown local villager look: ${data.look}`);
+    const home = houses[data.home]?.door ?? offsetDir(spawnDir, 4.8, 9);
+    return { ...data, local: true, build, dir: at(data.at), anim: LOCAL_ANIMATIONS[data.animation],
+      places: { home: place(home), ...Object.fromEntries(Object.entries(data.places).map(([key, def]) => [key, place(at(def), def.wander)])) },
+      lines: data.lines.map(line => ({ ...line })) };
+  });
 }

@@ -64,11 +64,14 @@ export function statValue(j, stat) {
 /** What an achievement's `at` means as a number. */
 export function goalTarget(goal) {
   if (goal.flag) return 1;
+  if (goal.bosses) return goal.bosses.length;
   return goal.at === 'allPets' ? Object.keys(PETS).length : goal.at === 'allKinds' ? BESTIARY_ORDER.length : goal.at;
 }
 /** { have, need, done } for one achievement. */
 export function progress(a, j) {
-  const need = goalTarget(a.goal), have = Math.min(need, a.goal.flag ? (j.flags[a.goal.flag] ? 1 : 0) : statValue(j, a.goal.stat));
+  const need = goalTarget(a.goal), have = Math.min(need, a.goal.bosses
+    ? a.goal.bosses.filter(type => j.defeated[type] > 0).length
+    : a.goal.flag ? (j.flags[a.goal.flag] ? 1 : 0) : statValue(j, a.goal.stat));
   return { have, need, done: have >= need };
 }
 /** Achievements that are complete but not yet marked unlocked. */

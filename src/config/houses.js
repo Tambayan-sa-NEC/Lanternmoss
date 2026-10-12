@@ -3,7 +3,7 @@
    Entries are by index in the planet's house list (world.houses, src/world/village.js):
      0 = red mushroom house, 1 = the bakery cottage, 2 = pink mushroom house (these three ring the village square),
      3..5 = houses out on the edge of the village (placed per planet).
-   An entry may differ per planet: `planets: { 1: {...} }` overrides fields there.
+   Per-world overrides live in that planet's `houses` config, keyed by house index.
      name       shown on the door prompt          layout   'mushroom' (round) | 'cottage' (square)
      owner      a villager who lives here (npcDefs.js): asleep in bed at night, away by day (note on the table)
      resident   someone who only lives indoors: { name, title, color, look, portrait, lines: [{ t, e? }] }
@@ -12,6 +12,8 @@
      gift       the storage chest's one-time contents (per adventure): { coins, items: [[id, n]] }
      lore       bookshelf texts, read in order
    --------------------------------------------------------------------- */
+
+import { PLANETS } from './planets.js';
 
 export const HOUSES = {
   6: { name: 'An empty cottage', layout: 'cottage', playerHome: true, props: ['homeSign'],
@@ -38,9 +40,7 @@ export const HOUSES = {
       { t: "Off to fight monsters? Wear a warm scarf. Monsters can't stand a well-dressed hero.", e: 'excited' },
     ] },
     props: ['bed', 'kettle', 'rug', 'table', 'chest', 'plant', 'lamp', 'yarn'],
-    gift: { coins: 8, items: [['moonberryTart', 1]] },
-    planets: { 1: { name: 'An empty house', resident: null, note: 'Gone to watch the dragon from a safe distance. Help yourself to tea! -- the neighbours' },
-               2: { name: 'An empty house', resident: null, note: 'Too cold! Wintering on Lanternmoss. Please water the frost-flowers. -- the neighbours' } } },
+    gift: { coins: 8, items: [['moonberryTart', 1]] } },
   4: { name: "Moth's library", layout: 'cottage',
     resident: { name: 'Moth', title: 'Librarian', color: '#7a8ad0', look: 'librarian', portrait: 'librarian', lines: [
       { t: 'Shh... oh, it is only you. Welcome to the library. Every book here is about a lantern. Some are about two.', e: 'thinking' },
@@ -53,16 +53,19 @@ export const HOUSES = {
       '"A Field Guide to Puffcaps": Chapter 1. Do not hug the puffcap. Chapter 2. See chapter 1.',
       '"Thornmoles and You": the ground trembles before they surface. A small jump is the polite reply.',
       '"Legends of the Three Worlds": the moss king, the red wyrm and the winged lord. Each one sleeps on the far side of its world, under a pillar of light.',
-    ],
-    planets: { 1: { name: "Cinder's house", resident: null, owner: 'Cinder', props: ['bed', 'anvil', 'fireplace', 'rug', 'chest', 'lamp', 'table'],
-                    note: 'At the forge. Do NOT touch the anvil, it is still hot. -- Cinder', gift: { coins: 18, items: [['emberShard', 2]] }, lore: null },
-               2: { name: 'An empty house', resident: null, note: 'Moved somewhere warmer. The fireplace still works!', props: ['fireplace', 'bed', 'rug', 'chest', 'table', 'lamp'], lore: null } } },
+    ] },
   5: { name: 'A cosy little house', layout: 'mushroom',
     props: ['bed', 'rug', 'table', 'chest', 'plant', 'lamp', 'fireplace'],
-    note: 'Out foraging. There is soup on the fire, help yourself!', gift: { items: [['honeyBun', 1], ['moonberry', 2]] },
-    planets: { 2: { name: "Tuva's house", owner: 'Tuva', props: ['bed', 'fireplace', 'rug', 'table', 'chest', 'lamp', 'window'],
-                    note: 'At the lookout. The lantern is on the windowsill if you need light. -- Tuva', gift: { coins: 20, items: [['frostPetal', 2]] } } } },
+    note: 'Out foraging. There is soup on the fire, help yourself!', gift: { items: [['honeyBun', 1], ['moonberry', 2]] } },
+
 };
+
+/** Resolve by stable planet id (numeric runtime indices remain supported). null disables a house on that world. */
+export function resolveHouse(index, planet) {
+  const p = typeof planet === 'string' ? PLANETS.find(p => p.id === planet) : PLANETS[planet], base = HOUSES[index];
+  if (!p || !base || p.houses?.[index] === null) return null;
+  return { ...base, ...(p.houses?.[index] ?? {}) };
+}
 
 /** What each interactive prop does when you press E next to it (Houses.js runs them). */
 export const INTERACTIONS = {

@@ -1,0 +1,26 @@
+// lanternmoss: seeded world content. Keep placement-sensitive lists in their existing order.
+export default {
+  act: 1, released: true, secret: false,
+  id: 'lanternmoss', outfit: null, outfitColors: [], lowLevel: 3, name: 'Lanternmoss', tagline: 'a tiny cozy planet of lanterns and moss', seed: 20260930,
+  terrain: { hills: { amp: 5, freq: 2.2 }, ridges: { amp: 2, freq: 3.4 }, lakes: 2 },
+  palette: { ground: [0x8fd07a, 0x9edb86, 0xb3e393, 0x84c874], meadow: 0xd4eb9c, sand: 0xf3dcaa, bed: 0x5fae9e, cliff: 0xb8ae9c, peak: 0xb6e39a,
+    grass: [0x7fc574, 0x9adb7e, 0xa9e28a, 0x8fd07a], water: { deep: 0x3f9cc4, light: 0x9fe8e4 },
+    sky: { horizon: 0xffd9ae, mid: 0xf6b1c8, zenith: 0x8d9be6 }, fog: 0xffd6b4 },
+  scale: { hp: 1, damage: 1, speed: 1, cooldown: 1, xp: 1 },
+  roster: [
+    { type: 'goblin', groups: 2, size: 3 }, { type: 'ogre', count: 2 }, { type: 'wisp', count: 3 }, { type: 'slime', count: 4, near: 'ponds' },
+  ],
+  boss: { type: 'gloomcap', trophy: 'mossCrown', summon: { level: 2, seals: { count: 3, type: 'thornSeal' } }, arena: { wall: 'thorns' } },
+  flora: { trees: { blossom: 3, oak: 3, pine: 2, shroom: 2, willow: 1.5, birch: 1 }, treeCount: 56,
+    flowers: [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff, 0xffa87a], tallGrass: [0x8fd07a, 0x9adb7e, 0x7fc574] },
+  weather: { clear: 5, breezy: 3, rain: 3, storm: 1, fog: 2 },
+  wildlife: { critters: [['bunny', 6], ['deer', 3, 'far'], ['frog', 7, 'ponds']], rare: 'goldBunny', birds: 8, flocks: 2 },
+  miniBosses: [{ type: 'hydra', near: 'lake' }],
+  material: 'glowcap', chests: [{ kind: 'common', count: 7 }, { kind: 'rare', count: 2 }],
+  forage: [{ item: 'glowcap', count: 18 }, { item: 'moonberry', count: 14 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
+  resources: { nodes: [['branches', 8, 'village'], ['pebbles', 7, 'village'], ['sweetleaf', 7, 'village'], ['branches', 10], ['pebbles', 8],
+    ['sweetleaf', 14], ['moonberryBush', 12], ['glowcaps', 10], ['copperVein', 10]], rare: [['amethystVein', 2]] },
+  arrival: 'A purple light beyond the lanterns marks the lair of Gloomcap, the Moss King. Break the thorn seals around it to wake it, then defeat it to open the village lantern gate!',
+  npcs: { locals: [], arrivals: {} },
+  houses: {},
+};

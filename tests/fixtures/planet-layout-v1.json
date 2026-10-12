@@ -1,0 +1,41 @@
+{
+  "source": "8182b56 (before TODO 26a extraction)",
+  "worlds": {
+    "lanternmoss": {
+      "digest": "e42b041255edd96cbf6570bfa8dad069ced4470d3f8de2bc165cdf587d28226c",
+      "nodes": 88,
+      "chests": 9,
+      "trees": 179
+    },
+    "emberfall": {
+      "digest": "020e032fb4f948b3682b5a13be18de96b53afd797b9cd3bf95336bb9ef565bcf",
+      "nodes": 86,
+      "chests": 9,
+      "trees": 147
+    },
+    "frostveil": {
+      "digest": "4c5867d6e28587437073220da9f69424f324095f6c15fcc5c8d26a4045f62d50",
+      "nodes": 84,
+      "chests": 11,
+      "trees": 173
+    }
+  },
+  "arrivalSlots": {
+    "Old Bramble": [
+      14,
+      15
+    ],
+    "Pim": [
+      10,
+      11
+    ],
+    "Lio": [
+      9,
+      10
+    ],
+    "Fern": [
+      10,
+      11
+    ]
+  }
+}

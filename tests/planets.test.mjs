@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { COMBAT } from '../src/config/combat.js';
 import { PLANETS, TRANSITION } from '../src/config/planets.js';
 import { scaleEnemyDef } from '../src/combat/enemyDefs.js';
+import { populationProblem } from '../src/config/planetRules.js';
 
 const NEW_AIS = ['bomber', 'charger', 'burrower', 'support'];
 const rosterTypes = p => p.roster.map(g => g.type);
@@ -29,8 +30,7 @@ test('each planet is harder than the one before', () => {
     const a = PLANETS[i - 1].scale, b = PLANETS[i].scale, name = PLANETS[i].name;
     assert.ok(b.hp > a.hp && b.damage > a.damage, `${name}: hp and damage must go up`);
     assert.ok(b.speed >= a.speed && b.cooldown <= a.cooldown, `${name}: speed must not drop, cooldowns must not grow`);
-    const count = p => p.roster.reduce((n, g) => n + (g.groups ? g.groups * g.size : g.count), 0);
-    assert.ok(count(PLANETS[i]) >= count(PLANETS[i - 1]), `${name}: at least as many monsters`);
+    assert.equal(populationProblem(PLANETS[i], PLANETS[i - 1]), null, `${name}: valid population budget`);
   }
 });
 
