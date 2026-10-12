@@ -10,14 +10,14 @@ import { transferStack, quickStack } from '../src/inventory/storage.js';
 import { buildingFootprint, footprintsOverlap, snapBuildingDir } from '../src/gameplay/buildingRules.js';
 import { dirAlong, tangentFrame } from '../src/utils/sphere.js';
 
-test('every 25b placeable is obtainable by an ungated craft, with all four stations and no structures', () => {
-  assert.equal(Object.keys(PLACEABLES).length, 13);
+test('every 25b placeable remains craftable, with all four stations alongside the new structures', () => {
+  const garden=Object.entries(PLACEABLES).filter(([,d])=>!d.structure); assert.equal(garden.length,13);
   for (const [id, def] of Object.entries(PLACEABLES)) {
     assert.ok(itemRegistry.has(id)); const recipe = RECIPES.find(r => r.result === id);
     assert.ok(recipe && !recipe.discovery && !recipe.hero); assert.ok(def.radius > 0 && def.height > 0);
   }
   assert.deepEqual(Object.values(PLACEABLES).flatMap(p => p.crafting ? [p.crafting] : []).sort(), ['brew', 'forge', 'pot', 'workbench']);
-  assert.ok(!Object.keys(PLACEABLES).some(id => /wall|roof|floor/i.test(id)));
+  assert.ok(!garden.some(([id]) => /wall|roof|floor/i.test(id)));
 });
 test('grid snapping is normalized, deterministic, idempotent and usable at poles and cube-face edges', () => {
   for (const xyz of [[0,1,0], [1,0,0], [-1,-1,-1], [0.009,1,-0.029], [0.999,1,0.22]]) {

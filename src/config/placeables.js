@@ -1,9 +1,11 @@
-/* Outdoor building (25b). Structures are deliberately separate (25c).
+/* Outdoor placeables (25b) and modular structures (25c).
    radius reserves ground; solid is the movement/camera footprint, zero for ground coverings. */
 import { FURNISHINGS } from './home.js';
+import { STRUCTURE_ITEMS } from './structures.js';
 
 export const BUILDING = { limit: 256, reach: 2.6, range: 8, grid: 1, storageSlots: 24, lightLimit: 4, maxSlope: 0.28, maxRelief: 0.4 };
 export const PLACEABLES = {
+  ...STRUCTURE_ITEMS,
   ...Object.fromEntries(Object.entries(FURNISHINGS).map(([id, f]) => [id, { ...f,
     radius: { bed: 1.25, table: 1.35, rug: 1.6, lamp: 0.35, plant: 0.48 }[f.kind],
     solid: { bed: 1.05, table: 1.15, rug: 0, lamp: 0.3, plant: 0.45 }[f.kind],

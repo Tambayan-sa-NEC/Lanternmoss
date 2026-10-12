@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { WORLD } from '../config/game.js';
 import { frameQuat, projectTangent, tangentFrame } from '../utils/sphere.js';
 import { groundHeight, terrainGradient } from '../world/terrain.js';
-import { resolveCollisions, support } from './colliders.js';
+import { ceilingHeight, resolveCollisions, support } from './colliders.js';
 
 const _p = new THREE.Vector3(), _u = new THREE.Vector3(), _d = new THREE.Vector3(), _g = new THREE.Vector3();
 
@@ -37,6 +37,7 @@ export class Walker {
     this.up.copy(_p).normalize();                               // gravity always points to the planet centre
     projectTangent(this.fwd, this.up).normalize();              // parallel-transport heading (pole-safe)
     this.vy -= gravity * dt; this.r += this.vy * dt;
+    if (this.vy > 0) { const ceiling = ceilingHeight(this.up,this.r), head = this.height ?? 1; if(this.r + head > ceiling) { this.r = ceiling - head; this.vy = 0; } }
     const s = support(this.up), floor = s.h;
     this.waterDepth = s.water ? s.water.depth : 0; this.swimming = !!s.water && s.water.depth > W.deep;
     if (this.r <= floor || (this.grounded && this.vy <= 0 && this.r - floor < 0.35)) { this.r = floor; this.vy = 0; this.grounded = true; }

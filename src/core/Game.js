@@ -169,7 +169,7 @@ export class Game {
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
-    updateCamera(dt); Building.update();
+    Building.updateStructureView(cam.fwd); updateCamera(dt); Building.update();
     updateWaypoints();                                             // after the camera: bearings are relative to the view
     if (ctx.started) dayClock.update(dt);                          // the village clock only runs while you play
     this.world.setDaylight(dayClock.light());

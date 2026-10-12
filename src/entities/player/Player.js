@@ -12,7 +12,7 @@ import { held } from '../../core/keybinds.js';
 import { ctx } from '../../core/context.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
 import { HERO_BUILDERS } from '../../models/heroes.js';
-import { addDyn } from '../../physics/colliders.js';
+import { addDyn, supportHeight } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
 import { disposeTree } from '../../render/meshes.js';
 import { scene } from '../../render/scene.js';
@@ -73,7 +73,7 @@ export class Player extends Walker {
   /** Stands the hero on the ground at dir, at rest, facing the first tangent axis there. */
   placeAt(dir) {
     const [t1] = tangentFrame(dir);
-    this.up.copy(dir); this.r = groundHeight(dir); this.pos.copy(dir).multiplyScalar(this.r); this.vel.set(0, 0, 0); this.knock.set(0, 0, 0);
+    this.up.copy(dir); this.r = supportHeight(dir); this.pos.copy(dir).multiplyScalar(this.r); this.vel.set(0, 0, 0); this.knock.set(0, 0, 0);
     this.fwd.copy(t1);
     return t1;
   }
