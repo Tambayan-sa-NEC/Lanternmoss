@@ -98,6 +98,9 @@ export const InventoryUI = {
     this.craftEl.addEventListener('change', e => { if (e.target.matches('[data-enchant-target]')) { this.enchantTarget = e.target.value; this.message = ''; this.render(); } });
     root.querySelector('.inv-actions').after(this.craftEl);
     this.hintEl = root.querySelector('.inv-hint');
+    const tidy = document.createElement('div'); tidy.className = 'inv-tidy'; tidy.innerHTML = '<button type="button" data-bag-sort>Sort bag</button><button type="button" data-bag-stack>Quick-stack nearby</button>';
+    left.prepend(tidy);
+    tidy.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; this.selected = -1; this.message = (b.hasAttribute('data-bag-sort') ? this.commands.sort() : this.commands.quickStack()).message; this.render(); });
     dom.invUse.addEventListener('click', () => this.use(this.selected));
     dom.invDrop.addEventListener('click', () => this.drop(this.selected));
     dom.invClose.addEventListener('click', () => this.close());
@@ -132,7 +135,7 @@ export const InventoryUI = {
   },
   use(i) {
     if (!this.inventory.getSlot(i)) return;
-    this.message = this.commands.use(i).message;
+    const r = this.commands.use(i); if (!this.isOpen) return; this.message = r.message;
     if (!this.inventory.getSlot(i)) this.selected = -1;
     this.render();
   },

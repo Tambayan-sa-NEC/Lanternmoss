@@ -160,6 +160,28 @@ export class Inventory extends EventTarget {
     this.notify('change', { slots: [slot] }); return true;
   }
 
+  /** Merge and order a region without moving the hotbar or emitting collection rewards. */
+  sort(start = 0) {
+    if (!Number.isInteger(start) || start < 0 || start >= this.size) return false;
+    const groups = [];
+    for (const s of this.#slots.slice(start).filter(Boolean)) {
+      const def = this.#registry.get(s.itemId);
+      const group = def.stackable && groups.find(g => g.itemId === s.itemId && sameProps(g.props, s.props));
+      if (group) group.quantity += s.quantity; else groups.push({ ...s, props: copyProps(s.props) });
+    }
+    groups.sort((a, b) => {
+      const x = this.#registry.get(a.itemId), y = this.#registry.get(b.itemId);
+      return x.category.localeCompare(y.category) || x.name.localeCompare(y.name) || JSON.stringify(a.props).localeCompare(JSON.stringify(b.props));
+    });
+    const sorted = [];
+    for (const g of groups) {
+      const max = this.#registry.get(g.itemId).maxStack;
+      for (let n = g.quantity; n > 0; n -= max) sorted.push({ ...g, quantity: Math.min(n, max), props: copyProps(g.props) });
+    }
+    this.#slots.splice(start, this.size - start, ...sorted, ...Array(this.size - start - sorted.length).fill(null));
+    this.notify('change', { slots: Array.from({ length: this.size - start }, (_, i) => i + start) }); return true;
+  }
+
   /** Empties every slot. */
   clear() {
     const changed = this.#slots.map((s, i) => (s ? i : -1)).filter(i => i >= 0);

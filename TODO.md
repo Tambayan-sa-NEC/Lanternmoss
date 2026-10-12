@@ -206,7 +206,7 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
     placeables are put down (needed by 18).
   - Done: the hotbar is the first 9 slots of the hero's inventory. Food and gear land there first; materials go
     in the bag. Press the held slot's number again, or right click, to use it: food and tonics are eaten, gear is
-    equipped. Materials and keys show a hint about where they're used. Placeables wait for 25, and tools for 16. The held
+    equipped. Materials and keys show a hint about where they're used. Placeables are implemented in 25b, and tools in 16. The held
     item's name shows above the vitals.
 - [x] **10.3 Vitals above the hotbar:** health, mana / stamina / focus, level and XP sit just above the hotbar, centred.
 - [x] **10.4 Skills HUD on the lower right:** skill icons with their names, cooldowns and keys.
@@ -911,15 +911,15 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 
 - [x] **25a. A home to start with (suggested):** before full building, claim an empty cottage in the village, decorate it with
       furniture you craft, and sleep in your own bed. This gives a smaller first step toward the pieces below.
-- [ ] **25b. Placeables:** furniture, lights, fences, paths, walls, floors and roofs, chests for storage, crafting stations
+- [x] **25b. Placeables:** furniture, lights, fences, paths, chests for storage, crafting stations
       (17) and farm plots (16).
   - In 25b: furniture, lights, fences, paths, storage chests, stations and farm plots. Walls, floors and roofs go to 25c.
   - From Quality of life: quick-stacking into storage chests, and sorting the bag.
-- [ ] **Acquire them** by crafting, buying from villagers, or finding them.
-- [ ] **Place:** hold a placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
+- [x] **Acquire 25b placeables** by crafting, buying from villagers, or finding them.
+- [x] **Place:** hold a 25b placeable and a ghost preview snaps to the ground or a grid; turn it, and see valid or invalid
       spots (not in the village square, not on paths or in lairs).
-- [ ] **Break / pick up:** taking a piece down gives it back (or its materials).
-- [ ] Placed things block movement and the camera, and are saved per planet.
+- [x] **Break / pick up:** taking a piece down gives it back (or its materials).
+- [x] Solid placed things block movement and the camera, and all pieces are saved per planet (paths, rugs and plots stay walk-through).
 - [ ] **25c. Build:** structures made of pieces (walls, floors, roofs), maybe a home of your own you can enter like the
       village houses.
   - Go / no-go after 25b: only if placement on slopes, collisions and the camera already feel solid.
@@ -927,7 +927,13 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 **25a implemented (2026-10-12):** a separate claimable cottage on each planet, five craftable furnishings in fixed
 indoor spots, bag/hotbar placement and safe furniture removal, and an own bed with naps/night sleep and energy
 recovery. Homes persist through portal visits, indoor Continue and version-1 saves; existing villagers keep their
-houses. 25b/25c remain open. See [cottage controls, recipes, screenshots and saves](docs/home.md).
+houses. 25b is implemented below; 25c remains open. See [cottage controls, recipes, screenshots and saves](docs/home.md).
+
+**25b implemented (2026-10-13):** 13 craftable outdoor placeables, ground/grid ghost previews, quarter-turn rotation,
+protected terrain and occupied-footprint checks, safe pickup, 24-stack storage chests with quick-stacking,
+bag sorting that preserves the hotbar, working crafting stations and farm plots, outdoor bed rest, movement/camera
+colliders, bounded nearby lantern lighting, and separate per-planet saves through portal travel and Continue.
+Walls, floors and roofs remain 25c. See [building controls, recipes, screenshots and saves](docs/building.md).
 
 ---
 
@@ -1373,9 +1379,9 @@ Smaller ideas, and where the promoted ones went.
       Assumption (Round 3): the audio stays procedural to keep "no asset files"; the themes per world and situation
       are made in code, as part of each world item. Revisit only if that becomes the limit.
 - [~] **Achievements / bestiary (suggested):** promoted to item 13.
-- [~] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
+- [x] **Quality of life (suggested):** a "Craft x5" / "Smelt all" button, sorting the bag, quick-stacking into storage
       chests, and favourite recipes pinned at the top of the Craft tab. Split: crafting ones into 22 (done), bag sorting and
-      storage into 25b.
+      storage into 25b (done).
 - [x] **Gameplay checks in the repo (suggested):** promoted to item 18 (done).
 - [~] **Performance budget (suggested):** promoted to item 20.
 - [ ] **Small fixes (suggested):** add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`). (The `favicon.ico` was done in 18.)

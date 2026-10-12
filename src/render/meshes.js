@@ -29,6 +29,7 @@ export function addTo(parent, mesh, p = [0, 0, 0], r = [0, 0, 0], s = [1, 1, 1])
 /** Frees the geometries of a model built from part() (materials are shared and cached, so they are kept). */
 export function disposeTree(obj) {
   const disposed = new Set(); obj.traverse(o => {
+    for (const m of o.userData?.ownedMaterials ?? []) if (!disposed.has(m)) { m.dispose(); disposed.add(m); }
     if (o.geometry && !disposed.has(o.geometry)) { o.geometry.dispose(); disposed.add(o.geometry); }
     if (o.isInstancedMesh) o.dispose();
   });

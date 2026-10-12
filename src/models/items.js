@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
 import { buildFurniture } from '../world/interiors.js';
 import { FURNISHINGS } from '../config/home.js';
+import { buildPlaceable } from '../world/placeables.js';
 
 const SHAPES = {
   orb: (g, c) => { addTo(g, part(G.ico(0.17, 1), c, { glow: true, intensity: 1.8 }), [0, 0, 0]); addTo(g, part(G.cone(0.05, 0.12, 4), 0x5fb35e), [0, 0.18, 0]); },
@@ -30,6 +31,15 @@ const torus = (r, t, arc = Math.PI * 2) => new THREE.TorusGeometry(r, t, 5, 14, 
 
 /** One builder per art kind: (group, colour). Sized to sit in a ~0.45 unit box like the shapes above. */
 const ART = {
+  fence: (g) => { const m = buildPlaceable('gardenFence'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  path: (g) => { const m = buildPlaceable('stonePath'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  storage: (g) => { const m = buildPlaceable('storageChest'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  workbench: (g) => { const m = buildPlaceable('portableWorkbench'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  forge: (g) => { const m = buildPlaceable('portableForge'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  pot: (g) => { const m = buildPlaceable('portablePot'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  brew: (g) => { const m = buildPlaceable('portableBrew'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+  plot: (g) => { const m = buildPlaceable('farmPlot'); m.root.scale.setScalar(0.23); if (m.soil) g.userData.ownedMaterials = [m.soil]; g.add(m.root); },
+
   homeBed: (g) => { const m = buildFurniture(FURNISHINGS.homeBed.kind); m.scale.setScalar(0.25); g.add(m); },
   homeTable: (g) => { const m = buildFurniture(FURNISHINGS.homeTable.kind); m.scale.setScalar(0.25); g.add(m); },
   homeRug: (g) => { const m = buildFurniture(FURNISHINGS.homeRug.kind); m.scale.setScalar(0.18); g.add(m); },

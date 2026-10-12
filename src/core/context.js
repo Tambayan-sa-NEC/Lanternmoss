@@ -10,6 +10,7 @@ export const ctx = {
   cutscene: false,    // a boss is waking (src/gameplay/BossGate.js): the hero can't act, the camera is on the lair
   indoors: null,      // name of the house the hero is inside (src/gameplay/Houses.js), or null
   inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
+  building: false,    // a placement preview owns combat input; transient, never saved
   showcase: false,    // a menu holds the camera on the hero or pet (CameraSystem.setShowcase): critters keep out of the shot
   player: null,       // Player
   companion: null,    // Owl (witch, ranger) or Wolf (knight), created when a hero is picked

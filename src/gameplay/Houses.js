@@ -42,6 +42,7 @@ import { HOME, FURNISHINGS } from '../config/home.js';
 import { NEEDS } from '../config/survival.js';
 import { Home } from './Home.js';
 import { Needs } from './Needs.js';
+import { Building } from './Building.js';
 import { HomeUI } from '../ui/HomeUI.js';
 
 const V3 = THREE.Vector3;
@@ -72,6 +73,7 @@ export const Houses = {
   // ---------------------------------------------------------------- entering and leaving
   enter(index) {
     if (this.fade || this.inside) return;
+    Building.cancel();
     if (Challenges.run) { toast('Finish your challenge first!'); return; }
     const def = houseDef(index); if (!def) return;
     this.fadeThen(() => this.goInside(index, def));
@@ -203,6 +205,21 @@ export const Houses = {
     const o = this.inside.owner;
     Dialog.show(speaker(o.name, o.def.title, o.def.color, ctx.player.pos, o.def.portrait), { t: '*Zzz...* ...five more minutes... *snore*', e: 'sleepy' });
   },
+  /** Shared indoor/outdoor bed rest. */
+  rest(own = false) {
+    const P = ctx.player; if (P.dead || this.fade || ctx.transitioning) return;
+    const night = dayClock.phase === 'night' || dayClock.phase === 'evening' && dayClock.frac > 0.7;
+    this.fadeThen(() => {
+      if (night) {                                               // sleep through to the morning (watered crops grow overnight)
+        Farm.growBy(((dayClock.frac > REST.wakeAt ? 1 : 0) + REST.wakeAt - dayClock.frac) * DAY.length);
+        if (dayClock.frac > REST.wakeAt) dayClock.day++;
+        dayClock.t = REST.wakeAt * DAY.length; P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
+        showBanner(`Day ${dayClock.day}`, 'You wake up rested and ready.');
+      } else { dayClock.update(20); Farm.growBy(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
+      if (own) { Needs.eat(night ? NEEDS.max : NEEDS.max * REST.napHeal); if (!night) P.mana = Math.min(P.stats.maxMana, P.mana + P.stats.maxMana * REST.napHeal); }
+    });
+    this.fade.saveHome = !!own;
+  },
   /** Furniture. */
   use(spot) {
     const P = ctx.player, s = this.inside, def = s.def, key = `${ctx.planetId}:${s.index}`;
@@ -210,17 +227,7 @@ export const Houses = {
       case 'homeSign': HomeUI.open(); return;
       case 'bed': {
         if (def.playerHome && (P.dead || !Home.state.claimed || !Home.state.furniture.includes('homeBed'))) { toast('Craft and place your bed, then rest here when you are standing.'); return; }
-        const night = dayClock.phase === 'night' || dayClock.phase === 'evening' && dayClock.frac > 0.7;
-        this.fadeThen(() => {
-          if (night) {                                               // sleep through to the morning (watered crops grow overnight)
-            Farm.growBy(((dayClock.frac > REST.wakeAt ? 1 : 0) + REST.wakeAt - dayClock.frac) * DAY.length);
-            if (dayClock.frac > REST.wakeAt) dayClock.day++;
-            dayClock.t = REST.wakeAt * DAY.length; P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
-            showBanner(`Day ${dayClock.day}`, 'You wake up rested and ready.');
-          } else { dayClock.update(20); Farm.growBy(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
-          if (def.playerHome) { Needs.eat(night ? NEEDS.max : NEEDS.max * REST.napHeal); if (!night) P.mana = Math.min(P.stats.maxMana, P.mana + P.stats.maxMana * REST.napHeal); }
-        });
-        this.fade.saveHome = !!def.playerHome;
+        this.rest(!!def.playerHome);
         return;
       }
       case 'chest': {
@@ -280,11 +287,11 @@ export const Houses = {
 /** What E does here: talk to the nearest villager, or the door / furniture / resident Houses offers, or a chest
     (./Chests.js), whichever is closest. */
 export function currentInteraction() {
-  if (!ctx.started || Dialog.open || Houses.fade) return null;
+  if (!ctx.started || Dialog.open || Houses.fade || Building.active) return null;
   if (Fishing.active) return Fishing.target();                      // fishing: E reels in
   let h = Houses.target();
   if (Houses.inside) return h;
-  for (const c of [Portals.target(), Chests.target(), Pets.target(), rareTarget(), Stations.target(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
+  for (const c of [Building.target(), Portals.target(), Chests.target(), Pets.target(), rareTarget(), Stations.target(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
   const P = ctx.player, n = nearestNPC(P, ctx.npcs);
   if (n && (!h || n.pos.distanceTo(P.pos) <= h.dist)) {
     return { label: `Talk to ${n.name}${Challenges.tagFor(n)}`, at: _w.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).clone(), run: () => Dialog.start(n) };

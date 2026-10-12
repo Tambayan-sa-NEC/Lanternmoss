@@ -27,14 +27,17 @@ import { JournalUI } from '../ui/JournalUI.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
 import { PortalUI } from '../ui/PortalUI.js';
+import { Building } from '../gameplay/Building.js';
+import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
 
 /** Keys whose browser default (page scroll, quick-find, focus moves...) would get in the way. */
-const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen ? code === 'Escape' : code === 'Escape' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
+const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen || BuildingUI.isOpen ? code === 'Escape' : code === 'Escape' || Building.active && code === 'Enter' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
 
 function onKey(code) {
   if (is('togglePerformance', code) && !PauseMenu.capture) { setSetting('perfOverlay', !settings.perfOverlay); return; }
   const player = ctx.player;
+  if (BuildingUI.isOpen) { BuildingUI.key(code); return; }
   if (HomeUI.isOpen) { HomeUI.key(code); return; }
   if (PortalUI.isOpen) { PortalUI.key(code); return; }
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
@@ -42,6 +45,12 @@ function onKey(code) {
   if (PetMenu.isOpen) { PetMenu.key(code); return; }      // the pet menu pauses too
   if (ctx.transitioning) return;                       // travelling between planets
   if (ctx.cutscene && code !== 'Escape' && !is('pause', code)) return;   // a boss is waking: only pausing works
+  if (Building.active && code === 'Escape') { Building.cancel(); return; }
+  if (Building.active && !ctx.paused) {
+    if (is('buildRotate', code)) { Building.rotate(); return; }
+    if (is('buildGrid', code)) { Building.toggleGrid(); return; }
+    if (code === 'Enter' || is('interact', code)) { Building.confirm(); return; }
+  }
   if (code === 'Escape' || is('pause', code)) {         // Esc closes what's open first (bag, aiming, dialogue), then pauses
     if (code === 'Escape' && ShopUI.isOpen) ShopUI.close();
     else if (code === 'Escape' && InventoryUI.isOpen) InventoryUI.close();
@@ -53,12 +62,13 @@ function onKey(code) {
   if (is('bag', code)) { if (Dialog.open) Dialog.close(); InventoryUI.toggle(); return; }
   if (is('petMenu', code)) { PetMenu.open(); return; }
   if (is('journal', code)) { JournalUI.open(); return; }
-  const slot = HOTBAR_KEYS.indexOf(code); if (slot >= 0) { Hotbar.select(slot); return; }   // hold / use a hotbar item (bag open or not)
+  const slot = HOTBAR_KEYS.indexOf(code); if (slot >= 0) { Building.cancel(); Hotbar.select(slot); return; }   // hold / use a hotbar item (bag open or not)
   if (is('jump', code) && !player.dead) player.jumpBuf = 0.14;
   if (is('mute', code)) toast(audio.toggle() ? 'Sound off' : 'Sound on');
   if (is('heroSelect', code)) CharacterSelect.requestMenu();
   if (is('toggleHint', code)) toggleHint();
   if (ctx.inventoryOpen) return;                       // bag or shop open: you can still move and jump, but not fight or talk
+  if (Building.active) return;
   for (const id in kit()) if (kit()[id].keys.includes(code)) { if (Dialog.open) Dialog.close(); tryCast(id); }
   if (is('petCommand', code)) Pets.cycleCommand();     // follow -> stay -> attack -> passive
   if (is('petAbility', code)) Pets.useAbility();
@@ -71,6 +81,7 @@ function onKey(code) {
     mouse aims, since the camera doesn't), or the area ability being aimed. */
 function onClick() {
   if (ctx.paused || ctx.transitioning || ctx.inventoryOpen) return;
+  if (Building.active) { Building.confirm(); return; }
   if (Fishing.active) { Fishing.press(); return; }      // fishing: a click reels in
   if (isAiming()) { confirmAim(); return; }
   faceClick();
@@ -83,6 +94,7 @@ function faceClick() {
 /** Right click: cancels aiming, otherwise uses the held hotbar item. */
 function onRightClick() {
   if (ctx.paused || ctx.transitioning) return;
+  if (Building.active) { Building.cancel(); return; }
   if (isAiming()) { cancelAim(); return; }
   if (!ctx.inventoryOpen && !Dialog.open) Hotbar.use();
 }

@@ -33,6 +33,8 @@ import { PortalUI } from '../ui/PortalUI.js';
 import { cancelAim } from '../combat/aiming.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { Home } from './Home.js';
+import { Building } from './Building.js';
+import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
 
 export class PlanetProgression {
@@ -63,6 +65,7 @@ export class PlanetProgression {
     for (const e of ctx.enemies) if (this.miniDefeated.has(e.portalId)) e.vanish();
     Portals.setup(this.world, [Farm.center && [Farm.center, 8], Stations.center && [Stations.center, 5]].filter(Boolean));
     Home.setup(this.world, [[Portals.gate.dir, 3], Farm.center && [Farm.center, 8], Stations.center && [Stations.center, 5]].filter(Boolean));
+    Building.setup(this.world);
   }
 
   /** The village farm and crafting corner, then the planet's resource nodes (they keep clear of both). */
@@ -114,7 +117,7 @@ export class PlanetProgression {
   /** Explicit portal travel; keys and reachability are checked by Portals before the fade starts. */
   travelTo(id) {
     this.destination = id; this.state = 'fadeOut'; this.timer = TRANSITION.fadeTime; ctx.transitioning = true;
-    InventoryUI.close(); ShopUI.close(); Dialog.close(); cancelAim(); Gathering.stop(); Fishing.end(); releaseAllKeys();
+    Building.cancel(); InventoryUI.close(); ShopUI.close(); Dialog.close(); cancelAim(); Gathering.stop(); Fishing.end(); releaseAllKeys();
     ctx.player.invuln = Math.max(ctx.player.invuln, TRANSITION.fadeTime * 2 + 1);
     ctx.player.vel.set(0, 0, 0); setFade(true, TRANSITION.fadeTime); audio.warp();
   }
@@ -143,7 +146,7 @@ export class PlanetProgression {
     }
     if (typeof index === 'string') index = PLANETS.findIndex(p => p.id === index);
     if (!PLANETS[index]) throw new Error('Unknown planet');
-    this.beforeLoad?.(); HomeUI.close(); Home.clear(); PortalUI.close(); Portals.clear();
+    this.beforeLoad?.(); BuildingUI.close(); Building.clear(); HomeUI.close(); Home.clear(); PortalUI.close(); Portals.clear();
     const P = ctx.player, world = this.world;
     ctx.planet = index; ctx.planetId = PLANETS[index].id; this.state = 'playing'; this.pendingClear = false;
     Dialog.close(); Challenges.cancel(); Houses.reset();

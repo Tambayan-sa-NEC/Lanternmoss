@@ -42,8 +42,8 @@ test('sanitizeBinds: drops junk and reserved keys, keeps the first owner of a sh
 });
 
 test('withRebind: a free key just moves; a taken key swaps; reserved keys are refused', () => {
-  let r = withRebind(defaults(), 'skill2', 'KeyY');
-  assert.deepEqual(r.binds.skill2, ['KeyY']); assert.equal(r.swapped, null);
+  let r = withRebind(defaults(), 'skill2', 'KeyL');
+  assert.deepEqual(r.binds.skill2, ['KeyL']); assert.equal(r.swapped, null);
   r = withRebind(defaults(), 'skill2', 'KeyE');                       // E belongs to interact
   assert.deepEqual(r.binds.skill2, ['KeyE']); assert.equal(r.swapped, 'interact'); assert.deepEqual(r.binds.interact, ['KeyQ']);
   r = withRebind(defaults(), 'moveForward', 'KeyI');                 // I is the bag's main key; the bag keeps Tab and gains W

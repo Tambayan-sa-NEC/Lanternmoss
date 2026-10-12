@@ -15,6 +15,7 @@
    --------------------------------------------------------------------- */
 
 import { FURNISHINGS } from './home.js';
+import { BUILDING_ITEMS } from './placeables.js';
 export const FUEL = { wood: 1, charcoal: 4, emberShard: 2 };
 
 export const DISCOVERY_RECIPES = [
@@ -33,6 +34,7 @@ export const DISCOVERY_RECIPES = [
 ];
 
 export const RECIPES = [
+  ...Object.entries(BUILDING_ITEMS).map(([id, f]) => ({ id, group: 'Building', result: id, needs: f.needs, station: f.station })),
   ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, group: 'Furniture', result: id, needs: f.needs, station: f.station })),
   // ---- smelting at the forge: ore + fuel -> ingots (and wood burned down into charcoal, a better fuel)
   { id: 'copperIngot', group: 'Smelting', station: 'forge', result: 'copperIngot', needs: [['copperOre', 2]], fuel: 1 },

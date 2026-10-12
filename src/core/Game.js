@@ -40,6 +40,8 @@ import { Houses } from '../gameplay/Houses.js';
 import { Portals } from '../gameplay/Portals.js';
 import { PortalUI } from '../ui/PortalUI.js';
 import { Home } from '../gameplay/Home.js';
+import { Building } from '../gameplay/Building.js';
+import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
@@ -112,12 +114,13 @@ export class Game {
     Quests.init(); ShopUI.init();
     Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
     Home.callbacks = { inside: () => Houses.inside, refresh: () => Houses.refreshHome(), save: () => this.saves?.save({ quiet: true }) };
+    Building.callbacks = { open: entry => BuildingUI.open(entry), preview: active => BuildingUI.showPreview(active), gate: () => Portals.gate?.dir, save: () => this.saves?.save({ quiet: true }) };
     installLevelFeedback();
     const bag = ctx.player.inventory;
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
     buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init();
-    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
+    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); BuildingUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -149,7 +152,7 @@ export class Game {
 
   /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
   update(dt) {
-    if (ctx.paused) { if (PetMenu.isOpen) PetMenu.update(dt); return; }   // pause / pet menu open: freeze everything (rendering continues)
+    if (ctx.paused) { Building.update(); if (PetMenu.isOpen) PetMenu.update(dt); return; }   // pause / pet menu open: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
@@ -166,7 +169,7 @@ export class Game {
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
-    updateCamera(dt);
+    updateCamera(dt); Building.update();
     updateWaypoints();                                             // after the camera: bearings are relative to the view
     if (ctx.started) dayClock.update(dt);                          // the village clock only runs while you play
     this.world.setDaylight(dayClock.light());
@@ -196,7 +199,7 @@ export class Game {
     if (this.saves) { this.saves.suspended = true; this.saves.reset(); }
     try {
       const P = ctx.player, world = this.world;
-      HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); Home.reset();
+      BuildingUI.close(); Building.clear(); HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); Home.reset();
       Tutorial.reset(); RecipeBook.reset(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
@@ -222,7 +225,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Building, BuildingUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

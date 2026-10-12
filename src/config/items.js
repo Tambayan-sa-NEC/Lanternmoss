@@ -30,6 +30,7 @@
 import { DISCOVERY_RECIPES } from './crafting.js';
 import { RUNES } from './magic.js';
 import { FURNISHINGS } from './home.js';
+import { BUILDING_ITEMS } from './placeables.js';
 
 export const ITEM_CATEGORIES = {
   consumable: 'Consumable',
@@ -41,6 +42,7 @@ export const ITEM_CATEGORIES = {
   quest: 'Quest item',
   misc: 'Miscellaneous',
   furniture: 'Furniture',
+  placeable: 'Placeable',
 };
 
 /** statMult: how much stronger gear of this rarity is than its Common stats. */
@@ -103,7 +105,7 @@ export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', '
 export const ITEM_ART_KINDS = ['scroll', 'bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
   'staff', 'axe', 'bow', 'cloak', 'mail', 'mantle', 'pendant', 'ring', 'locket', 'key', 'crown',
   'log', 'stone', 'ore', 'gemstone', 'herb', 'pepper', 'plum', 'carrot', 'wheat', 'pumpkin', 'seeds', 'fish', 'bread', 'skewer',
-  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal', ...Object.keys(FURNISHINGS)];
+  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal', ...Object.keys(FURNISHINGS), 'fence', 'path', 'storage', 'workbench', 'forge', 'pot', 'brew', 'plot'];
 
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width
@@ -115,6 +117,7 @@ export const INVENTORY = {
 };
 
 export const ITEM_DEFINITIONS = [
+  ...Object.entries(BUILDING_ITEMS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'placeable', maxStack: 20, value: 0, icon: { shape: 'charm', color: f.color, art: f.art } })),
   ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'furniture', maxStack: 5, value: 0,
     icon: { shape: 'charm', color: f.color, art: f.art } })),
   // ---- deeper cooking, brewing and one-slot enchanting (TODO 22) ----
