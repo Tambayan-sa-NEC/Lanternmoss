@@ -4,6 +4,9 @@
     all at scale 1; name = what the chopping prompt calls it, wood: false = an axe can't chop it (src/gameplay/Gathering.js).
     Which kinds grow where: PLANETS[i].flora.trees (config/planets.js). */
 export const TREE_KINDS = {
+  lanternPalm: { name: 'lantern palm', r:.35, cam:{r:2,base:2.8,top:5.2} },
+  kelp: { name: 'kelp tree', r:.2, cam:{r:.65,base:0,top:3}, wood:false },
+  coralFan: { name: 'coral fan', r:.4, cam:{r:1,base:0,top:1.9}, wood:false },
   blossom:  { name: 'blossom tree', r: 0.42, cam: { r: 1.8, base: 2.2, top: 4.9 } },
   pine:     { name: 'pine', r: 0.42, cam: { r: 1.3, base: 1.1, top: 5 } },
   shroom:   { name: 'mushroom tree', r: 0.5, cam: { r: 1.9, base: 2.7, top: 3.9 } },

@@ -46,6 +46,27 @@ export function propCottage(B, M) {
 }
 /** What each tree kind (config/flora.js TREE_KINDS) looks like. */
 export const TREE_BUILDERS = {
+  lanternPalm(A) {
+    A(G.cyl(.17,.3,3.8,7),0x9b7956,LM(0,1.9,0,0,0,.07));
+    for(let i=0;i<6;i++){const a=i/6*6.28;
+      A(G.cone(.5,2.4,4),0x67bc91,LM(Math.cos(a)*.85,3.9,Math.sin(a)*.85,Math.sin(a)*1.05,a,-Math.cos(a)*1.05,1,.85,.3));
+    }
+    for(let i=0;i<3;i++){const a=i/3*6.28;A(G.ico(.2,1),0xffd88a,LM(Math.cos(a)*.45,3.35,Math.sin(a)*.45),{glow:true,intensity:2.3});}
+  },
+  kelp(A) {
+    for(let k=0;k<3;k++){
+      const x=(k-1)*.28,h=2.1+k*.25;
+      A(G.cyl(.035,.065,h,4),0x4b967c,LM(x,h/2,0),{outline:false,sway:true});
+      for(let j=0;j<3;j++)A(G.ico(.3,0),0x69b69b,LM(x+(j%2?-.2:.2),.6+j*.6,0,0,0,(j%2?-.6:.6),.3,1.8,.65),{outline:false,sway:true});
+    }
+  },
+  coralFan(A) {
+    A(G.dodec(.4),0xb7bcae,LM(0,.17,0,0,0,0,1.3,.5,1));
+    for(let i=0;i<5;i++){const x=(i-2)*.23,h=1.25-Math.abs(i-2)*.17;
+      A(G.cyl(.055,.08,h,4),0xef9baf,LM(x,h/2,0,0,0,-x*.55));
+      A(G.ico(.16,0),0xfac0ba,LM(x*1.4,h,.02),{outline:false});
+    }
+  },
   blossom(A) {                // puffy blossom tree
     const [c1, c2] = rpick([[0xffb7d0, 0xff9cc0], [0xb4efc6, 0x96dfae], [0xffd49e, 0xffbf80], [0xd8c2ff, 0xbfa6ff]]);
     A(G.cyl(0.2, 0.34, 2.8, 6), 0x9b6b5a, LM(0, 1.4, 0, 0, 0, 0.05));

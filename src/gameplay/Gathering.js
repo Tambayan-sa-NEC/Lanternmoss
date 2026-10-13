@@ -155,6 +155,7 @@ export const Gathering = {
   /** Starts working: { node } | { scenery, index, spot } | { at, need, verb, onDone } (custom: tilling, watering). */
   work(job) {
     const P = ctx.player; if (P.dead || this.job) return;
+    if(job.scenery==='tree'&&TREE_KINDS[job.spot?.kind]?.wood===false)return;
     if (!dryGround(job.node?.up ?? job.spot?.dir ?? job.at)) { toast('Wait for the water to recede.'); return; }
     const need = job.node?.def ?? (job.scenery ? SCENERY[job.scenery] : job.need);
     const problem = this.toolProblem(need); if (problem) { toast(problem); audio.fizzle?.(); return; }

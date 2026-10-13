@@ -18,6 +18,8 @@ import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist } from '../../utils/sphere.js';
 import { spawnDrySpot } from '../../world/placement.js';
 import { ponds } from '../../world/terrain.js';
+import { coastalSpot } from '../../world/coastPlacement.js';
+import { SeaShoal } from './SeaShoal.js';
 import { Bird, Flock } from './Bird.js';
 import { Critter } from './Critter.js';
 import { Fish } from './Fish.js';
@@ -31,23 +33,32 @@ function wildSpot(village, min = COMBAT.player.safeRadius + 6) {
 export function spawnWildlife(world, planet = {}) {
   const { spawnDir, stoneCenter, houseA, cottage } = world, w = planet.wildlife ?? {};
   const critter = (key, dir) => { if (dir) ctx.critters.push(new Critter(key, dir)); };
+  if(w.villagePets!==false){
   critter('catOrange', spawnDrySpot(houseA.door, 1, 4));
   critter('catGrey', spawnDrySpot(cottage.door, 2, 5));
   critter('catBlack', spawnDrySpot(null)); critter('dogShiba', spawnDrySpot(spawnDir, 4, 7));
   critter('dogGold', spawnDrySpot(null)); critter('fox', spawnDrySpot(stoneCenter, 8, 14)); critter('fox', spawnDrySpot(null));
+  }
   for (const [key, count, where] of w.critters ?? []) for (let i = 0; i < count; i++) {
-    if (where === 'ponds') { const p = ponds[i % Math.max(1, ponds.length)]; if (p) critter(key, spawnDrySpot(p.dir, p.r + 0.6, p.r + 2.6, 0.4)); }
+    if(where==='rocks'&&world.spots?.rocks?.length)critter(key,world.spots.rocks[i%world.spots.rocks.length].dir);
+    else if(where==='beach'||where==='rocks')critter(key,coastalSpot());
+    else if (where === 'ponds') { const p = ponds[i % Math.max(1, ponds.length)]; if (p) critter(key, spawnDrySpot(p.dir, p.r + 0.6, p.r + 2.6, 0.4)); }
     else critter(key, wildSpot(spawnDir, where === 'far' ? 40 : undefined));
   }
-  if (w.rare) critter(w.rare, wildSpot(spawnDir, 45));
+  if (w.rare) critter(w.rare, w.coastal?coastalSpot():wildSpot(spawnDir, 45));
   const plumage = w.plumage ?? null;
-  const bird = dir => { if (dir) ctx.birds.push(new Bird(dir, plumage)); };
-  for (let i = 0; i < 4; i++) bird(spawnDrySpot(spawnDir, 5, 16, 0.5));
-  for (let i = 0; i < (w.birds ?? 5); i++) bird(spawnDrySpot(null, 0, 0, 0.5));
+  const bird = (dir,looks=plumage) => { if (dir) ctx.birds.push(new Bird(dir, looks)); };
+  if(!w.coastal)for (let i = 0; i < 4; i++) bird(spawnDrySpot(spawnDir, 5, 16, 0.5));
+  for (let i = 0; i < Math.min(24,w.birds ?? 5); i++) bird(w.coastal?coastalSpot():spawnDrySpot(null, 0, 0, 0.5),w.coastal&&plumage?.length?[plumage[i%plumage.length]]:plumage);
   for (let i = 0; i < (w.flocks ?? 0); i++) { const dir = wildSpot(spawnDir, 10); if (dir) ctx.birds.push(new Flock(dir, plumage)); }
   for (const p of ponds) {
     for (let i = 0; i < 3 + Math.floor(p.r / 2); i++) p.fish.push(new Fish(p, w.fish));
     if (p.r >= 8) p.fish.push(new Fish(p, [{ body: 0xffd36b, spot: 0xffffff, fin: 0xfff0a0 }], 1.9));   // a big golden koi in each lake
+  }
+  world.seaLife??=[];
+  if(w.coastal){
+    for(let i=0;i<Math.min(6,w.shoals??0);i++){const d=coastalSpot('water');if(d)world.seaLife.push(new SeaShoal(d,w.fishPerShoal));}
+    if(w.lanternfish){const d=coastalSpot('water');if(d)world.seaLife.push(new SeaShoal(d,w.lanternfish,true));}
   }
 }
 
@@ -59,7 +70,8 @@ export function despawnWildlife() {
 }
 
 /** Fish leap more often while the hero stands by their pond. */
-export function updatePonds(dt) {
+export function updatePonds(dt,world=null) {
+  for(const shoal of world?.seaLife??[])shoal.update(dt);
   for (const p of ponds) {
     p.jumpCool -= dt;
     const near = arcDist(ctx.player.up, p.dir) < p.r + 3;

@@ -13,7 +13,7 @@ import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
 import { mpick, mr, rng } from '../../utils/random.js';
 import { dirAlong, frameQuat, projectTangent, tangentFrame, tangentTo } from '../../utils/sphere.js';
-import { groundHeight } from '../../world/terrain.js';
+import { groundHeight, waterAt } from '../../world/terrain.js';
 
 const V3 = THREE.Vector3;
 const _toP = new V3(), _tv = new V3(), _tv2 = new V3(), _p = new V3();
@@ -23,6 +23,7 @@ export class Bird extends Walker {
   constructor(dir, plumage = null) {
     super(dir, 0.18); const c = mpick(plumage ?? PLUMAGE);
     Object.assign(this, buildBird(c)); scene.add(this.root); this.shadow = makeShadow(0.25); this.height = 0.45;
+    this.species=c.species??null;
     this.state = 'ground'; this.timer = mr(0.5, 2); this.flyTime = 0; this.hopVel = 0; this.peck = 0; this.flap = 0; this.cruise = mr(7.5, 10);
     this.fwd.applyAxisAngle(this.up, rng() * 6.28);
   }
@@ -35,7 +36,7 @@ export class Bird extends Walker {
     const time = ctx.time, dist = tangentTo(this.pos, this.up, ctx.player.pos, _toP);
     if (this.state === 'ground') {
       this.timer -= dt;
-      if (dist < 4.8) this.takeoff();
+      if (dist < 4.8||this.species&&waterAt(this.up)) this.takeoff();
       else if (this.grounded && this.timer < 0) {
         if (rng() < 0.3) { this.peck = 0.35; } else { this.vy = 3.2; this.grounded = false; this.hopVel = 1.6; this.fwd.applyAxisAngle(this.up, mr(-0.9, 0.9)); }
         if (dist < 16 && rng() < 0.12) { emote(this, '♪', '#7a6cff'); audio.chirp(); }
@@ -52,7 +53,9 @@ export class Bird extends Walker {
       _p.copy(this.up).multiplyScalar(this.r).addScaledVector(this.fwd, speed * dt);
       if (this.r - gh < 2.5) resolveCollisions(_p, this.radius, null);
       this.up.copy(_p).normalize(); projectTangent(this.fwd, this.up).normalize();
-      const gh2 = groundHeight(this.up), tgt = gh2 + (this.flyTime > 0 ? this.cruise : 0);
+      const wet=this.species?waterAt(this.up):null;
+      if(wet&&this.flyTime<=0)this.flyTime=2;
+      const gh2 = Math.max(groundHeight(this.up),wet?.level??0), tgt = gh2 + (this.flyTime > 0 ? this.cruise : 0);
       this.r += (tgt - this.r) * damp(this.flyTime > 0 ? 1.1 : 1.7, dt);
       if (this.flyTime <= 0 && this.r - gh2 < 0.2) { this.state = 'ground'; this.grounded = true; this.r = gh2; this.vy = 0; this.timer = mr(1, 3); }
       this.pos.copy(this.up).multiplyScalar(this.r);
