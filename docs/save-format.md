@@ -26,6 +26,10 @@ with a fresh combat body. Gathering uses elapsed unpaused adventure time when re
 and watering, with bed rests advancing watered crops. General ecosystem simulation while away remains deferred.
 Settings, key bindings, the lifetime journal and remembered pet selections stay separate, per device.
 
+TODO 26d extends the cap to 16 without changing v1 or old XP thresholds. Old level-10 saves can earn XP again;
+new levels 11–16 round-trip through Continue with computed stats, and level 16 keeps no surplus XP. Future worlds
+remain invalid destinations until released. The original three-boss award and original save fixture remain intact.
+
 TODO 21 adds an optional adventure-owned `systems.tutorial` record to version 1: guide status and completed step
 IDs, seen help IDs, movement practice distance, time since the last waking, the last fainting recap and its remaining
 respawn seconds. Existing v1 files remain readable and default to a skipped guide; the pause menu can restart it.

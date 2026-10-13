@@ -90,6 +90,10 @@ kbd { display:inline-block; min-width:14px; padding:0 5px; margin:0 1px; border:
 #title .planet small { font-size:10.5px; font-weight:800; opacity:.65; }
 #title .arrow { font-style:normal; font-weight:800; opacity:.45; }
 #title .keys { margin-top:10px; font-size:12px; font-weight:800; opacity:.75; }
+#title .campaign { flex-direction:column; gap:8px; max-width:calc(100vw - 24px); }
+#title .campaign-act { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:10px; }
+#title .act-label { font-size:12px; font-weight:900; min-width:38px; }
+#title .planet.planned { opacity:.65; }
 #title.enter .logo { animation:dropin .8s cubic-bezier(.2,1.4,.4,1) backwards; }
 #title.enter .tmenu button { animation:risein .5s cubic-bezier(.2,1.3,.4,1) backwards; }
 #title.enter .tmenu button:nth-child(1) { animation-delay:.25s; } #title.enter .tmenu button:nth-child(2) { animation-delay:.32s; }

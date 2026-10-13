@@ -10,8 +10,8 @@ exports three views:
 | `CAMPAIGN_PLANETS` | Released non-secret worlds | Main-adventure completion |
 
 Each entry has a stable `id`, `name`, positive `act`, and explicit boolean `released` and `secret` fields. The starting
-world must be released and non-secret. Released entries also need generation data; full content acceptance is the next
-groundwork stage, TODO 26d. Keep a new world unreleased until its own release stage passes that checklist. Tidewhisper,
+world must be released and non-secret. Released entries also need generation data and pass the mandatory
+[content release gate](content-release.md). Keep a new world unreleased until its own release stage passes that checklist. Tidewhisper,
 Duskhollow and the Lantern Moon currently contain only unfinished metadata and cannot be selected or generated.
 
 The original runtime order remains Lanternmoss, Emberfall, Frostveil. Their seeds, placement lists and generated
@@ -21,8 +21,9 @@ use ids. Version-1 saves retain their format; unreleased/unknown destination ids
 current destination falls back to Lanternmoss.
 
 Normal boss wins open the immediate next main world. A Wayfarer's Key can still open the next locked released world
-one way, or the route home; it cannot skip an unreleased main-world entry. Unfinished worlds are absent from the title
-and destination picker. Direct transition/load calls also refuse unreleased entries before changing world state.
+one way, or the route home; it cannot skip an unreleased main-world entry. The title previews unfinished Act II worlds
+as planned entries and masks the secret as `?`; the destination picker contains only released worlds.
+Direct transition/load calls also refuse unreleased entries before changing world state.
 
 A released entry may declare a registered `mechanic` id. Unknown modules disable that destination and direct
 loads refuse it before replacing the current world. Mechanic state loads before entry and population, is saved
@@ -47,8 +48,9 @@ the hero midway; that authorization is consumed on arrival. The Moon remains unr
 discovery behavior belong to TODO 32. Secrets do not block main-campaign completion or become the next ordinary key trip.
 
 The original `allBosses` achievement keeps its id and rewards and requires the three named Act I bosses, so adding a
-world cannot raise its goal or substitute a different boss. The level cap, Act II title treatment and new achievements
-remain TODO 26d work.
+world cannot raise its goal or substitute a different boss. The cap is 16; new boss awards and the five-world award
+activate only as their worlds release. Expected levels/scaling/challenge targets live in each config. See the
+[Act II progression and acceptance rules](content-release.md).
 
 Planet-specific villagers and interiors are also config:
 

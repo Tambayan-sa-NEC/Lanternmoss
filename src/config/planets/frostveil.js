@@ -1,7 +1,8 @@
 // frostveil: seeded world content. Keep placement-sensitive lists in their existing order.
 export default {
   act: 1, released: true, secret: false,
-  id: 'frostveil', outfit: 'scarf', outfitColors: [0xe0605a, 0x4a7ae0, 0xffc83a, 0xff8fc0], lowLevel: 7, name: 'Frostveil', tagline: 'the last, coldest and fiercest planet', seed: 31415,
+  expectedLevel: [5, 7], music: 'cozy',
+  id: 'frostveil', outfit: 'scarf', outfitColors: [0xe0605a, 0x4a7ae0, 0xffc83a, 0xff8fc0], lowLevel: 7, name: 'Frostveil', tagline: 'the cold, fierce finale of Act I', seed: 31415,
   terrain: { hills: { amp: 3, freq: 2.0 }, ridges: { amp: 11, freq: 1.7 }, lakes: 2 },
   palette: { ground: [0xcfe3f0, 0xdbeaf5, 0xe8f2fa, 0xc4dbea], meadow: 0xffffff, sand: 0xe6eef6, bed: 0x7fb6d6, cliff: 0x9aa6c4, peak: 0xffffff,
     grass: [0xa8d8c8, 0xb8e0d8, 0xc8eae0, 0x98ccc0], water: { deep: 0x6fb6e0, light: 0xd8f6ff },
@@ -24,7 +25,7 @@ export default {
   forage: [{ item: 'frostPetal', count: 18 }, { item: 'moonberry', count: 12 }, { item: 'featherCharm', count: 1 }, { item: 'moonHopCharm', count: 1 }],
   resources: { nodes: [['branches', 7, 'village'], ['pebbles', 6, 'village'], ['sweetleaf', 6, 'village'], ['branches', 8], ['pebbles', 8],
     ['sweetleaf', 10], ['plumBush', 12], ['frostFlowers', 10], ['ironVein', 10], ['copperVein', 5]], rare: [['diamondVein', 2]] },
-  arrival: 'Frostveil, the final planet. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, only rises at night for a hero Tuva trusts.',
+  arrival: 'Frostveil, the finale of Act I. Thornmoles tunnel under the snow and hexlanterns shield their friends. Malgrath, the Winged Demon Lord, only rises at night for a hero Tuva trusts.',
   npcs: {
     arrivals: {
       'Old Bramble': { legacy: true, t: 'Frostveil. My beard has opinions about this cold, {hero}. None of them polite.', e: 'sad' },

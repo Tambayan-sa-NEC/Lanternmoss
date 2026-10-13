@@ -6,7 +6,8 @@
    The campaign strip lists the planets in order with their bosses (config/planets.js). Music starts on the first
    click or key press (browsers only allow audio after a gesture). Screens: title / select / null (playing). */
 import { COMBAT } from '../config/combat.js';
-import { PLANETS } from '../config/planets.js';
+import { PLANET_CATALOG } from '../config/planets.js';
+import { campaignRows } from '../config/campaignPresentation.js';
 import { ctx } from '../core/context.js';
 import { audio } from '../systems/AudioSystem.js';
 import { orbitCamera } from '../systems/CameraSystem.js';
@@ -26,11 +27,10 @@ export const MainMenu = {
   /** The title receives reset, Continue and save-summary callbacks from Game. */
   init(handlers) {
     this.handlers = handlers;
-    dom.campaign.innerHTML = PLANETS.map((p, i) => {
-      const boss = { ...COMBAT.enemies[p.boss.type], ...p.boss }.name.split(',')[0];
-      return `${i ? '<i class="arrow">➜</i>' : ''}<div class="planet"><b style="--c:${hex(p.palette.ground[0])};--s:${hex(p.palette.sky.mid)}"></b>` +
-        `<span><strong>${p.name}</strong><small>${boss}</small></span></div>`;
-    }).join('');
+    dom.campaign.innerHTML = campaignRows(PLANET_CATALOG, COMBAT.enemies).map(row =>
+      `<div class="campaign-act"><span class="act-label">Act ${row.act === 1 ? 'I' : row.act === 2 ? 'II' : row.act}</span>` + row.planets.map((p, i) =>
+        `${i ? '<i class="arrow">➜</i>' : ''}<div class="planet${p.released ? '' : ' planned'}" data-released="${p.released}"><b style="--c:${hex(p.color)};--s:${hex(p.sky)}"></b>` +
+        `<span><strong>${p.name}</strong><small>${p.detail}${p.levels ? ` · ${p.levels}` : ''}</small></span></div>`).join('') + '</div>').join('');
     dom.titleMenu.addEventListener('click', e => { const b = e.target.closest('button'); if (b) this.act(b.dataset.act); });
     dom.titleMenu.addEventListener('mousemove', e => { const i = this.buttons.indexOf(e.target.closest('button')); if (i >= 0) this.setFocus(i); });
     dom.selBack.addEventListener('click', () => this.back());

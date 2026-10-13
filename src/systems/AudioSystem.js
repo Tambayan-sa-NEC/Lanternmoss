@@ -2,10 +2,17 @@
    PLACEHOLDERS: to use real samples, swap the body of the matching method. Nothing plays until init() runs
    from a user gesture (browsers block audio before that); every method is a no-op until then. */
 import { mpick, rng } from '../utils/random.js';
+import { MUSIC_THEMES } from '../config/music.js';
 
 export const audio = {
   ctx: null, master: null, fx: null, music: null, muted: false, ducked: false, pad: null, battleOn: false, battleTimer: null,
   vol: { master: 1, music: 1, sfx: 1 },      // player volume settings (0..1), see setVolumes
+  theme: 'cozy', voices: [],
+  setTheme(id = 'cozy') {
+    if (!MUSIC_THEMES[id]) throw new Error(`Unknown music theme: ${id}`);
+    this.theme = id;
+    this.voices.forEach((o, i) => o.frequency.setTargetAtTime(MUSIC_THEMES[id].pad[i % MUSIC_THEMES[id].pad.length], this.ctx.currentTime, 0.5));
+  },
   init() {
     if (this.ctx) return; const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
     const ctx = this.ctx = new C(); this.master = ctx.createGain(); this.master.gain.value = this.level(); this.master.connect(ctx.destination);
@@ -15,11 +22,11 @@ export const audio = {
     this.music = ctx.createGain(); this.music.gain.value = this.vol.music; this.music.connect(this.master); this.music.connect(delay);
     const pad = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850;
     pad.gain.setValueAtTime(0, ctx.currentTime); pad.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 5); lp.connect(pad); pad.connect(this.music); this.pad = pad;
-    [130.81, 196.0, 261.63, 329.63, 392.0].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+    MUSIC_THEMES[this.theme].pad.forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain(); this.voices.push(o);
       o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (rng() - 0.5) * 10; g.gain.value = 0.22;
       lfo.frequency.value = 0.05 + i * 0.031; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(g.gain); o.connect(g); g.connect(lp); o.start(); lfo.start(); });
-    const chime = () => { setTimeout(() => { if (this.battleOn) { chime(); return; } const s = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; const f = mpick(s);
-      this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (rng() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, 2500 + rng() * 5000); };
+    const chime = () => { const theme = MUSIC_THEMES[this.theme]; setTimeout(() => { if (this.battleOn) { chime(); return; } const f = mpick(MUSIC_THEMES[this.theme].notes);
+      this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (rng() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, theme.interval[0] + rng() * (theme.interval[1] - theme.interval[0])); };
     chime();
   },
   tone(freq, dur = 0.5, type = 'sine', vol = 0.08, when = 0, slide = 0, out = this.fx) {

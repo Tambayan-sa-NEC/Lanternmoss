@@ -80,7 +80,7 @@ export class PlanetProgression {
 
   /** The village farm and crafting corner, then the planet's resource nodes (they keep clear of both). */
   spawnResources() {
-    const farm = Farm.setup(this.world, ctx.planet), corner = Stations.setup(this.world, ctx.planet, farm ? [farm] : []);
+    const farm = this.planet.farm === false ? (Farm.clear(), null) : Farm.setup(this.world, ctx.planet), corner = Stations.setup(this.world, ctx.planet, farm ? [farm] : []);
     Gathering.spawnFor(this.world, ctx.planet, [farm, corner].filter(Boolean));
   }
 
@@ -142,7 +142,7 @@ export class PlanetProgression {
     for (const e of ctx.enemies) if (e !== boss) e.vanish();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
-    showBanner(`${boss.def.name.split(',')[0]} defeated!`, this.complete ? 'Every planet shines again. Thank you, hero!'
+    showBanner(`${boss.def.name.split(',')[0]} defeated!`, this.complete ? 'The released worlds shine again. Thank you, hero!'
       : next ? `The village lantern gate now reaches ${next.name}. Travel when you choose.` : 'The village lantern gate is open. Travel when you choose.');
     audio.melody();
     Chests.spawnBossChest(boss.up);                                     // the trophy and the boss's treasure
@@ -171,6 +171,7 @@ export class PlanetProgression {
     clearHazards();
     clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear(); Stations.clear();
     world.dispose(); world.generate(this.planet);
+    audio.setTheme(this.planet.music);
     Object.assign(P, { dead: false, deadT: 0, vy: 0 }); P.clearTimers();
     const fwd = P.placeAt(world.spawnDir); P.root.visible = true; P.shadow.visible = true;
     if (TRANSITION.healOnArrival) { P.hp = P.stats.maxHp; P.mana = P.stats.maxMana; }
@@ -192,7 +193,7 @@ export class PlanetProgression {
     this.onSave?.();
   }
 
-  announceArrival() { showBanner(`Planet ${ctx.planet + 1} · ${this.planet.name}`, this.planet.tagline); toast(this.planet.arrival); }
+  announceArrival() { showBanner(`Act ${this.planet.act} · ${this.planet.name}`, this.planet.tagline); toast(this.planet.arrival); }
 
   /** A fresh adventure (back at character select): cancel any travel and return to the first planet with its boss.
       Expects the caller to have reset the enemies already (which removes bosses). */

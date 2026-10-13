@@ -34,7 +34,7 @@ test('load clamps numbers and drops unknown items, heroes, pets, directions and 
   raw.systems.challenges.run = { id: 'fireflyCatch', anchor: [0, 1, 0], items: [] };
   const clean = sanitizeSave(raw);
   assert.equal(clean.planetId, PLANETS[0].id); assert.ok(!clean.planets.missing);
-  assert.equal(clean.systems.player.charId, 'witch'); assert.equal(clean.systems.player.level, 10);
+  assert.equal(clean.systems.player.charId, 'witch'); assert.equal(clean.systems.player.level, 16);
   assert.equal(clean.systems.player.coins, 0); assert.equal(clean.systems.player.up, null);
   assert.ok(Number.isFinite(clean.systems.player.hp)); assert.equal(clean.systems.inventory[1], null);
   assert.equal(clean.systems.inventory[0].props, null); assert.ok(clean.systems.inventory[0].quantity < 1e9);

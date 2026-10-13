@@ -98,6 +98,7 @@ export class Game {
         get indoors() { return ctx.indoors; }, get transitioning() { return ctx.transitioning; } } });
     ctx.planet = 0; ctx.planetId = PLANETS[0].id;
     this.world.generate(PLANETS[0]);
+    audio.setTheme(PLANETS[0].music);
     createSparkles(); setOverlayWorld(this.world);
 
     ctx.player = new Player(this.world.spawnDir);

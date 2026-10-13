@@ -1,6 +1,7 @@
 // emberfall: seeded world content. Keep placement-sensitive lists in their existing order.
 export default {
   act: 1, released: true, secret: false,
+  expectedLevel: [3, 5], music: 'cozy',
   id: 'emberfall', outfit: 'neckerchief', outfitColors: [0xe0482a, 0x3a8ad0, 0xffd36b, 0x2f9a5a], lowLevel: 5, name: 'Emberfall', tagline: 'warm winds, ember ponds and quicker foes', seed: 77412,
   terrain: { hills: { amp: 3, freq: 1.9 }, plateaus: { amp: 11, freq: 1.6, step: 3.2, sharp: 0.85 }, lakes: 1 },
   palette: { ground: [0xd99a6c, 0xe0a878, 0xe8b88a, 0xcf8f62], meadow: 0xf0c890, sand: 0xf6d8a8, bed: 0xc9603c, cliff: 0xb0644a, peak: 0xf2c18e,

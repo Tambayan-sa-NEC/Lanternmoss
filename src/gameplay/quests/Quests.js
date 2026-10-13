@@ -34,7 +34,8 @@ export const Quests = {
   /** A quest this villager can offer right now, or null. */
   offerable(npc) {
     return Object.keys(QUESTS).find(id => { const q = QUESTS[id], s = this.st(id);
-      return q.giver === npc.name && s.status === 'new' && ctx.planet >= (q.planet ?? 0) && ctx.time >= s.readyAt; }) ?? null;
+      const from = typeof q.planet === 'string' ? PLANETS.findIndex(p => p.id === q.planet) : q.planet ?? 0;
+      return q.giver === npc.name && s.status === 'new' && from >= 0 && ctx.planet >= from && ctx.time >= s.readyAt; }) ?? null;
   },
   /** Dialog line: a quest step that needs this villager right now (hand-ins come before anything else), or null. */
   stepLineFor(npc) {

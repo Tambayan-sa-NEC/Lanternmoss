@@ -45,7 +45,7 @@ export function propCottage(B, M) {
   A(G.cyl(0.6, 0.7, 0.14, 7), 0xd9c7b8, LM(0, 0.05, 1.9));
 }
 /** What each tree kind (config/flora.js TREE_KINDS) looks like. */
-const TREE_BUILDERS = {
+export const TREE_BUILDERS = {
   blossom(A) {                // puffy blossom tree
     const [c1, c2] = rpick([[0xffb7d0, 0xff9cc0], [0xb4efc6, 0x96dfae], [0xffd49e, 0xffbf80], [0xd8c2ff, 0xbfa6ff]]);
     A(G.cyl(0.2, 0.34, 2.8, 6), 0x9b6b5a, LM(0, 1.4, 0, 0, 0, 0.05));

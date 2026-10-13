@@ -53,7 +53,20 @@ export const ACHIEVEMENTS = [
   { id: 'flawless', group: 'Challenges', icon: 'guard', name: 'Not a Scratch', text: 'Defeat a boss without being hit once.', goal: { flag: 'flawless' }, reward: { coins: 100 } },
   { id: 'underdog', group: 'Challenges', icon: 'sprout', name: 'Underdog', text: 'Defeat a boss at a low level (Gloomcap at 3 or lower, Pyrrhax at 5, Malgrath at 7).', goal: { flag: 'underdog' }, reward: { coins: 80 } },
   { id: 'petless', group: 'Challenges', icon: 'leap', name: 'Lone Hero', text: 'Defeat a boss without your pet landing a single strike on it.', goal: { flag: 'petless' }, reward: { coins: 60 } },
+  ...expansionAchievements(PLANETS),
 ];
+
+/** Definitions activate only when their worlds release. Unfinished bosses never change journal goals or rewards. */
+export function expansionAchievements(catalog) {
+  const names = { tidewhisper: ['tideBoss', 'Light of the Tides'], duskhollow: ['duskBoss', 'Light in the Hollow'], lanternMoon: ['moonBoss', 'Light of the Moon'] };
+  const active = catalog.filter(p => p.released && names[p.id]);
+  const awards = active.map(p => ({ id: names[p.id][0], group: 'Firsts', icon: 'boss', name: names[p.id][1],
+    text: `Defeat the boss of ${p.secret ? 'the secret world' : p.name}.`, secret: p.secret, goal: { bosses: [p.boss.type] }, reward: { coins: 120 } }));
+  const five = ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper', 'duskhollow'].map(id => catalog.find(p => p.id === id && p.released));
+  if (five.every(Boolean)) awards.push({ id: 'fiveWorlds', group: 'Firsts', icon: 'trophy', name: 'Lantern of Five Worlds',
+    text: 'Defeat the bosses of the five main worlds.', goal: { bosses: five.map(p => p.boss.type) }, reward: { coins: 250 } });
+  return awards;
+}
 
 /** Boss challenges: the highest hero level that still counts as "low", per planet (index into PLANETS). */
 export const BOSS_CHALLENGES = { lowLevel: PLANETS.map(p => p.lowLevel), byPlanet: Object.fromEntries(PLANETS.map(p => [p.id, p.lowLevel])) };
