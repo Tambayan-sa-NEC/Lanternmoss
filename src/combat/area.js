@@ -7,7 +7,7 @@ import { ctx } from '../core/context.js';
 import { colliders } from '../physics/colliders.js';
 import { camera } from '../render/scene.js';
 import { arcDist, dirAlong, tangentToward } from '../utils/sphere.js';
-import { groundHeight, maxRelief, ponds } from '../world/terrain.js';
+import { dryGround, groundHeight, maxRelief, ponds } from '../world/terrain.js';
 
 const V3 = THREE.Vector3;
 const _ray = new THREE.Ray(), _ndc = new V3(), _sphere = new THREE.Sphere(new V3(), R), _hit = new V3(), _u = new V3();
@@ -38,6 +38,7 @@ export function edgeFraction(up, center, radius) { return Math.min(1, arcDist(up
 /** A spot the hero can stand on: not in a pond and not inside a tree, rock, house or pond edge. */
 export function landable(dir, radius) {
   if (ponds.some(p => arcDist(dir, p.dir) < p.r + 0.4)) return false;
+  if (!dryGround(dir, radius)) return false;
   for (const c of colliders) if (c.active && arcDist(dir, c.dir) < c.r + radius) return false;
   return true;
 }

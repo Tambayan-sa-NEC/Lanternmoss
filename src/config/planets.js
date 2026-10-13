@@ -18,6 +18,7 @@
      flora    what grows there: trees ({ kind: weight }, src/world/props.js TREE_KINDS), treeCount, giants (share of
               giant trees), flowers (colours), tallGrass (colours), grass / tallCount / meadow (density multipliers)
      weather  { kind: weight } from config/weather.js WEATHER_KINDS: what blows over it
+     physics  optional gravity multiplier, seaLevel/seaMaxLevel and waterOffset/waterMaxOffset; rules in world/physics.js
      miniBosses optional big fights out in the wilds: [{ type (COMBAT.enemies, miniBoss), near: 'lake' | 'far', overrides }]
      wildlife its animals: critters [[CRITTER_DEFS key, count, 'ponds' | 'far']], rare (one rare creature), birds,
               flocks, plumage (bird colours), fish (fish colours)

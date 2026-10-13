@@ -74,6 +74,7 @@ export class Player extends Walker {
   placeAt(dir) {
     const [t1] = tangentFrame(dir);
     this.up.copy(dir); this.r = supportHeight(dir); this.pos.copy(dir).multiplyScalar(this.r); this.vel.set(0, 0, 0); this.knock.set(0, 0, 0);
+    this.refreshWater();
     this.fwd.copy(t1);
     return t1;
   }

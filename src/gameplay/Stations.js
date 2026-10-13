@@ -16,7 +16,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { arcDist, dirAlong, matrixAt, offsetDir, tangentToward } from '../utils/sphere.js';
 import { isFree } from '../world/placement.js';
-import { groundHeight, slopeAt } from '../world/terrain.js';
+import { dryGround, groundHeight, slopeAt } from '../world/terrain.js';
 import { rng } from '../utils/random.js';
 
 const V3 = THREE.Vector3, _p = new V3();
@@ -66,13 +66,13 @@ export const Stations = {
   /** The station the hero stands at (config/stations.js id), or null. */
   here() {
     const P = ctx.player; let best = null, bd = STATION_CORNER.reach;
-    for (const s of this.list) { const d = arcDist(P.up, s.dir); if (d < bd) { bd = d; best = s; } }
+    for (const s of this.list) { if (!dryGround(s.dir)) continue; const d = arcDist(P.up, s.dir); if (d < bd) { bd = d; best = s; } }
     return best?.id ?? null;
   },
   /** The E prompt by a station. */
   target() {
     const P = ctx.player; let best = null, bd = STATION_CORNER.reach;
-    for (const s of this.list) { const d = arcDist(P.up, s.dir); if (d < bd) { bd = d; best = s; } }
+    for (const s of this.list) { if (!dryGround(s.dir)) continue; const d = arcDist(P.up, s.dir); if (d < bd) { bd = d; best = s; } }
     if (!best) return null;
     return { dist: bd, label: `Use the ${best.def.name}`, at: this.top(best, 1.9), run: () => this.open(best.id) };
   },

@@ -22,6 +22,7 @@ import { buildVillage } from './village.js';
 import { createWater } from './water.js';
 import { Weather } from './weather.js';
 import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
+import { configurePhysics, physicsQueries } from './physics.js';
 
 const V3 = THREE.Vector3;
 
@@ -34,6 +35,7 @@ export class World {
   constructor(mechanicOptions) {
     this.spawnDir = SPAWN_DIR;
     this.mechanics = new PlanetMechanics(this, mechanicOptions);
+    this.physics = physicsQueries;
     this.sunTan = new V3();           // tangent heading of the golden-hour sun; transported along with the player
   }
 
@@ -41,6 +43,7 @@ export class World {
   generate(planet) {
     if (!this.mechanics.accepts(planet)) throw new Error(`Unknown planet mechanic: ${planet.mechanic}`);
     this.mechanics.exit();
+    configurePhysics(planet.physics);
     this.planet = planet; this.objects = []; this.ownMaterials = [];
     const { palette } = planet;
     seedWorld(planet.seed); setFogColor(palette.fog);
@@ -88,7 +91,8 @@ export class World {
     const [stems, heads] = createMeadowFlowers(fl.flowers ?? [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff], fl.meadow ?? 1);
     this.grass = [grass, tall, stems, heads].map(mesh => chunkInstances(mesh)); this.add(...this.grass);
 
-    const water = createWater(palette.water); this.waterMat = water.material; this.add(...water.meshes);
+    this.water = createWater(palette.water, o => { this.add(o); this.ownMaterials.push(o.material); });
+    this.waterMat = this.water.material; this.add(...this.water.meshes);
 
     // floating crystal above the stone circle
     this.crystal = part(G.oct(0.45), 0x9ff3ff, { glow: true, intensity: 1.9 });
@@ -106,10 +110,13 @@ export class World {
     this.viewerPos = this.spawnDir.clone().multiplyScalar(groundHeight(this.spawnDir));
     this.applyDensity(); this.resetSun();
     this.mechanics.enter(planet);
+    this.syncPhysics();
   }
 
   /** Adds generated objects to the scene and remembers them for dispose(). */
   add(...objects) { scene.add(...objects); this.objects.push(...objects); }
+  /** Called after mechanic rules change, before actors/fish update. Does not consume placement randomness. */
+  syncPhysics() { this.water?.sync(); }
 
   /** Changes only render counts; never regenerates a planet or consumes its seeded placement stream. */
   applyDensity() {
@@ -137,6 +144,7 @@ export class World {
     for (const m of this.ownMaterials) { releasePointsMaterial(m); m.dispose(); }
     this.objects = []; this.ownMaterials = [];
     ponds.length = 0; placed.length = 0; clearStaticColliders();
+    this.water = null; configurePhysics();
   }
 
   /** Time-of-day light (gameplay/dayClock.js light()): sun colour and strength, ambient strength. */

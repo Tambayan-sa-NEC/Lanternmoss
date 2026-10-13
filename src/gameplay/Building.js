@@ -18,7 +18,7 @@ import { InventoryUI } from '../ui/InventoryUI.js';
 import { toast } from '../ui/toast.js';
 import { arcDist, dirAlong, matrixAt, offsetDir } from '../utils/sphere.js';
 import { placed } from '../world/placement.js';
-import { groundHeight, ponds, slopeAt } from '../world/terrain.js';
+import { dryGround, groundHeight, ponds, slopeAt } from '../world/terrain.js';
 import { buildPlaceable } from '../world/placeables.js';
 import { buildingFootprint, buildingForward, footprintsOverlap, snapBuildingDir } from './buildingRules.js';
 import { ACTION_HANDLERS } from './itemUse.js';
@@ -42,7 +42,7 @@ export const Building = {
       progress=false;
       for(let i=0;i<pending.length;) {
         const record=pending[i],dir=new THREE.Vector3(...record.dir),candidate=restoredStructureCandidate(this.list,record);
-        if(!candidate.problem&&candidate.dir.distanceTo(dir)<.00001&&!this.siteProblem(record.itemId,dir,record.turn,{actors:false,candidate})) {
+        if(!candidate.problem&&candidate.dir.distanceTo(dir)<.00001&&!this.siteProblem(record.itemId,dir,record.turn,{actors:false,candidate,restoring:true})) {
           this.install(record);pending.splice(i,1);progress=true;
         } else i++;
       }
@@ -50,14 +50,14 @@ export const Building = {
   },
   clear() { this.cancel(); for (const e of [...this.list]) this.uninstall(e); this.list = []; for (const light of this.lights) { scene.remove(light); light.dispose(); } this.lights = []; },
   available() { return ctx.started && !ctx.player.dead && !ctx.indoors && !ctx.transitioning && !ctx.cutscene && !Challenges.run && !Gathering.job && !Fishing.active; },
-  canEdit(e) { return this.available() && this.list.includes(e) && arcDist(ctx.player.up, e.dir) < BUILDING.reach; },
+  canEdit(e) { return this.available() && dryGround(e.dir) && this.list.includes(e) && arcDist(ctx.player.up, e.dir) < BUILDING.reach; },
   changed() { audio.plip(); this.callbacks.save?.(); },
   samples(id, dir, turn) {
     const r = PLACEABLES[id].radius;
     return [dir, ...Array.from({ length: 8 }, (_, i) => offsetDir(dir, i * Math.PI / 4 + turn * Math.PI / 2, r))];
   },
   baseHeight(id, dir, turn) { return Math.max(...this.samples(id, dir, turn).map(d => groundHeight(d) / d.dot(dir))) + 0.025; },
-  siteProblem(id, dir, turn = 0, { actors = true, candidate = null } = {}) {
+  siteProblem(id, dir, turn = 0, { actors = true, candidate = null, restoring = false } = {}) {
     const def = Object.hasOwn(PLACEABLES, id) ? PLACEABLES[id] : null;
     if (!def || !dir?.isVector3 || !dir.toArray().every(Number.isFinite) || Math.abs(dir.length() - 1) > 0.001) return 'Choose a spot on the ground.';
     if (!this.world) return 'Start an adventure first.';
@@ -75,6 +75,7 @@ export const Building = {
     if (this.callbacks.gate?.() && overlap(this.callbacks.gate(), 3)) return 'Keep the lantern gate clear.';
     if (ponds.some(p => overlap(p.dir, p.r + 1))) return 'Choose dry ground away from water.';
     const samples = this.samples(id, dir, turn), heights = samples.map(d => groundHeight(d));
+    if (!restoring && samples.some(d => !dryGround(d, 0, { high: true }))) return 'Choose ground above the high-water mark.';
     if (!attachment?.floor && !attachment?.root && (samples.some(d => slopeAt(d) > BUILDING.maxSlope) || Math.max(...heights) - Math.min(...heights) > BUILDING.maxRelief)) return 'Choose flatter ground for this piece.';
     if (colliders.some(c => c.active && !c.building && overlap(c.dir, c.r + 0.08))) return 'That spot is occupied by scenery.';
     if (this.list.some(e => { const conflict=pieceConflict(this.list,record,e.record); return conflict ?? footprintsOverlap(fp,pieceFootprint(this.list,e.record)); })) return 'A placed piece already occupies that spot.';

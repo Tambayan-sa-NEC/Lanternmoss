@@ -19,7 +19,7 @@ import { audio } from '../../systems/AudioSystem.js';
 import { clamp, damp } from '../../utils/math.js';
 import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist, projectTangent, tangentTo, tangentToward, turnToward } from '../../utils/sphere.js';
-import { spawnSpot } from '../../world/placement.js';
+import { spawnDrySpot } from '../../world/placement.js';
 import { toast } from '../../ui/toast.js';
 import { groundHeight } from '../../world/terrain.js';
 
@@ -75,8 +75,9 @@ export class Critter extends Walker {
     this.away = RARE_CRITTERS.away; this.root.visible = this.shadow.visible = false; this.selfCollider.active = false;
   }
   reappear() {
-    const P = ctx.player; let d = spawnSpot(null);
-    for (let i = 0; i < 20 && arcDist(d, P.up) < 60; i++) d = spawnSpot(null);
+    const P = ctx.player; let d = spawnDrySpot(null);
+    for (let i = 0; i < 20 && (!d || arcDist(d, P.up) < 60); i++) d = spawnDrySpot(null);
+    if (!d) { this.away = 1; return; }
     this.up.copy(d); this.r = groundHeight(d); this.pos.copy(d).multiplyScalar(this.r); this.home.copy(d);
     this.root.visible = this.shadow.visible = true; this.selfCollider.active = true; this.state = 'idle'; this.timer = 1;
   }

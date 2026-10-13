@@ -1021,7 +1021,7 @@ world stages, rather than requiring all future encounters before Tidewhisper. Pr
 | --- | --- | --- | --- |
 | [x] **26a. Planet catalog and release rules** | 19, 24 | 1.5-3 h | Extract the original planet configs without changing seeds or generated ids; add act/release/secret metadata and assemble the released campaign. Remove remaining three-world assumptions in travel, save validation, NPC data and completion rules. Tests accept a smaller secret-world roster by explicit config, preserve the original campaign and reject travel/key access to unreleased worlds. |
 | [x] **26b. Mechanic lifecycle and saves** | 26a | 2-4 h | Add enter/update/exit and per-planet save hooks, including pause, sleep/time skips, travel, Continue and disposal. Use a development-only mechanic fixture to prove ordering, isolation and old-save defaults; weather stays separate. |
-| [ ] **26c. Gravity and moving-water support** | 26b | 3-4.5 h | Add shared gravity/water queries consumed by Walkers, swimming, water rendering, spawning, resource placement, farms and building safety. Test moving levels and gravity changes in a harness, including existing ponds, Moon-Hop composition and portal restoration; no Tidewhisper content yet. |
+| [x] **26c. Gravity and moving-water support** | 26b | 3-4.5 h | Add shared gravity/water queries consumed by Walkers, swimming, water rendering, spawning, resource placement, farms and building safety. Test moving levels and gravity changes in a harness, including existing ponds, Moon-Hop composition and portal restoration; no Tidewhisper content yet. |
 | [ ] **26d. Act II progression and content gate** | 26a-26c, 23 | 2-4 h | Extend cap/XP to 16, expose expected-level/scaling metadata, update title/arrival wording and achievement definitions while retaining the original three-boss award. Test the mandatory release checklist and Moon exceptions, behavior/boss registrations and unknown content references. Future-world achievements and travel activate only with those worlds. |
 
 **26a implemented (2026-10-13):** one config file per world and explicit act/release/secret metadata; the full catalog
@@ -1040,7 +1040,18 @@ retain one active instance, with exit/listener cleanup before world disposal. Op
 for old saves and reject unknown/mismatched modules; the original fixture is unchanged. A development-only module
 proves ordering and independent state through real keyed travel and reload Continue. All 181 unit tests, 30 simulations
 and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/mechanics.md).
-Actual tides, lantern darkness and lunar gravity remain their owning world stages; 26c-26d remain pending.
+Actual tides, lantern darkness and lunar gravity remain their owning world stages; 26d remains pending.
+
+**26c implemented (2026-10-13):** shared planet gravity composes with actor acceleration and Moon-Hop. Live pond
+offsets and an optional sea feed the same swimming, rendering, fishing, landing and dry-placement queries. Config
+reserves maximum water before generation, keeping resource ids and new builds independent of tide phase; submerged
+crops/builds retain state, growth/actions pause, and restoration preserves existing pieces. Rules rebuild from
+config and mechanic saves on Continue/travel and reset on disposal. Sea meshes/materials are lazy and disposed
+once; the sea shader uses world-space ripples/glints. Development-only fixtures prove moving water, real hero
+gravity, high-water safety, crop/build preservation, keyed travel, Continue and old-v1 compatibility. All 186 unit
+tests, 31 simulations and 720p/1080p low-preset browser checks passed, including original layout digests and visible
+pond/sea captures with zero page/shader errors. See [shared gravity and moving water](docs/world-physics.md).
+No Tidewhisper content or timed tide cycle is enabled; the next groundwork stage is 26d.
 
 - [x] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
       its `act`.
@@ -1048,8 +1059,9 @@ Actual tides, lantern darkness and lunar gravity remain their owning world stage
       with `enter`, `update(dt)`, `advance`, `exit` and per-planet save hooks (19). Weather stays mood only;
       a mechanic may read the weather. The actual `mechanic: 'tides'` module in `src/world/mechanics/tides.js`
       belongs to 27a.
-- [ ] **Per-planet physics:** gravity (Moon-Hop already scales it: `moonGravity` in `config/game.js`) and a sea level
-      that can move (today ponds and lakes are fixed). The Walker, swimming, spawning and node placement read both.
+- [x] **Per-planet physics:** gravity composes with Moon-Hop (`moonGravity` in `config/game.js`), and live pond/sea
+      levels feed Walkers, swimming, rendering, spawning, node/farm placement and building safety. Original pond
+      baselines remain unchanged; declared high-water envelopes keep saved placement ids stable as water moves.
 - [ ] **Enemy integration contract:** retain modular behavior dispatch in `src/entities/enemies/behaviors/` (like
       `charger`, `burrower`) and validate registrations in the content gate. Implement the actual building blocks in
       their world stages: `armoured`, `drifter`, `amphibian` in 27e; `lightbound`, `mimic` in 30e and `weaver`, `thief`

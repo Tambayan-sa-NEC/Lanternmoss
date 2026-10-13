@@ -29,6 +29,10 @@ loads refuse it before replacing the current world. Mechanic state loads before 
 independently per planet, and receives separate frame/skip/away hooks. See [the mechanic contract](mechanics.md).
 The original worlds declare no mechanic; actual expansion modules remain later-stage work.
 
+Optional `physics` config supplies a gravity multiplier, sea level and pond offset with their maximum-water
+envelope. Generation and resource placement reserve that maximum; runtime mechanics change only live values
+within it. Defaults retain the original layouts and movement. See [physics config and queries](world-physics.md).
+
 A released secret world needs an explicit `unlock` gate, for example:
 
 ```js

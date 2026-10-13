@@ -23,7 +23,7 @@ import { toast } from '../ui/toast.js';
 import { mulberry32, rng } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir, tangentToward, turnToward } from '../utils/sphere.js';
 import { damp } from '../utils/math.js';
-import { groundHeight, ponds, slopeAt } from '../world/terrain.js';
+import { dryGround, groundHeight, ponds, slopeAt } from '../world/terrain.js';
 import { holdTool, releaseTool } from './heldTool.js';
 import { Hotbar } from './hotbar.js';
 import { ACTION_HANDLERS } from './itemUse.js';
@@ -47,7 +47,7 @@ export const Gathering = {
           : near === 'boss' && boss ? offsetDir(boss.home ?? boss.up, rng() * 6.28, 6 + rng() * 9) : randomDir(rng);
         if (near !== 'village' && arcDist(d, world.spawnDir) < 16) continue;
         if (arcDist(d, world.lairDir) < 30 || slopeAt(d) > 0.6 || !freeOfColliders(d, def.r + 0.5)) continue;
-        if (ponds.some(p => arcDist(d, p.dir) < p.r + 1.2) || avoid.some(([a, r]) => arcDist(d, a) < r)) continue;
+        if (ponds.some(p => arcDist(d, p.dir) < p.r + 1.2) || !dryGround(d, def.r, { high: true }) || avoid.some(([a, r]) => arcDist(d, a) < r)) continue;
         if (this.nodes.some(n => arcDist(d, n.up) < n.def.r + def.r + 1.5)) continue;
         const node = new ResourceNode(kind, d, this.nodes.length + 1);
         node.id = `${P.id}:node:${this.nodes.length}`; this.nodes.push(node); return;
@@ -155,6 +155,7 @@ export const Gathering = {
   /** Starts working: { node } | { scenery, index, spot } | { at, need, verb, onDone } (custom: tilling, watering). */
   work(job) {
     const P = ctx.player; if (P.dead || this.job) return;
+    if (!dryGround(job.node?.up ?? job.spot?.dir ?? job.at)) { toast('Wait for the water to recede.'); return; }
     const need = job.node?.def ?? (job.scenery ? SCENERY[job.scenery] : job.need);
     const problem = this.toolProblem(need); if (problem) { toast(problem); audio.fizzle?.(); return; }
     const tool = need.tool ? this.hotbarTool(need.tool) : null;
@@ -173,7 +174,7 @@ export const Gathering = {
     for (const [k, t] of this.rest) { if (t - dt <= 0) this.rest.delete(k); else this.rest.set(k, t - dt); }
     const j = this.job; if (!j) return;
     const P = ctx.player;
-    if (P.dead || P.hurtT > 0 || ctx.transitioning || arcDist(P.up, j.from) > GATHER.cancelMove || (j.node && !j.node.ready)) { this.stop(); return; }
+    if (P.dead || P.hurtT > 0 || ctx.transitioning || !dryGround(j.at) || arcDist(P.up, j.from) > GATHER.cancelMove || (j.node && !j.node.ready)) { this.stop(); return; }
     // face it, and swing (or reach down)
     if (arcDist(P.up, j.at) > 0.3) turnToward(P.fwd, tangentToward(P.up, j.at), P.up, damp(14, dt));
     j.t += dt; const k = (j.t % j.swing) / j.swing;

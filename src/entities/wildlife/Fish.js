@@ -9,6 +9,7 @@ import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
 import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist, frameQuat } from '../../utils/sphere.js';
+import { groundHeight } from '../../world/terrain.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3();
@@ -34,6 +35,7 @@ export class Fish {
     }
     const c = Math.cos(this.theta), s = Math.sin(this.theta);
     this.pos.copy(p.center).addScaledVector(p.t1, c * this.rad).addScaledVector(p.t2, s * this.rad).addScaledVector(p.dir, -0.38 + jh);
+    this.root.visible = this.pos.length() > groundHeight(this.pos.clone().normalize()) + 0.05;
     _tv.copy(p.t1).multiplyScalar(-s).addScaledVector(p.t2, c).multiplyScalar(Math.sign(this.w));
     this.root.position.copy(this.pos); frameQuat(p.dir, _tv, this.root.quaternion); this.root.rotateX(-pitch);
     this.tail.rotation.y = Math.sin(ctx.time * (8 + this.boost * 10) + this.theta * 3) * 0.55;

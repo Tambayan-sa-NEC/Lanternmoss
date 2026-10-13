@@ -417,6 +417,7 @@ src/
 ├── world/                 the planet (generated once, in a fixed order, from a seeded RNG)
 │   ├── World.js           generation order, landmarks, per-frame sun / sky / ambient animation
 │   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
+│   ├── physics.js         planet gravity, live pond/sea levels and declared maximum-water queries
 │   ├── terrain.js         each planet's shape (seeded hills / ridges / plateaus), flats, the baked height field, ponds,
 │   │                      slopes, water depth, ground-placement matrices
 │   ├── placement.js       free-spot searches for scenery and spawns
@@ -586,6 +587,11 @@ conditions, and main-campaign completion excludes secret worlds. See [catalog an
 on the title and while paused; naps, sleep and away time use a separate bounded advancement hook. Exit removes rules
 and listeners before world disposal. Weather stays separate, and the original three worlds have no mechanic module.
 See [the lifecycle, module contract and save format](docs/mechanics.md).
+
+Planet physics composes with each Walker's acceleration and Moon-Hop. Pond and optional sea surfaces feed the
+same swimming, rendering, fishing and dry-placement queries. High-water limits keep resources and new builds
+safe without shifting saved ids as water moves; submerged crops/builds retain their state. See
+[shared gravity and moving-water rules](docs/world-physics.md).
 
 **Enemy behaviours:** `def.behavior ?? def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
 `entities/enemies/behaviors/` (`think`, plus optional `init / reset / update / animate / onDie / dispose` hooks).
