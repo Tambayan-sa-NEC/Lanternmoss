@@ -545,6 +545,9 @@ Written on 2026-10-08 after a review of the whole list. Items 1–17 are done an
 Everything still open is renumbered **18–41** in the order I suggest building it, in six phases. The plan adds three
 new worlds (**27**, **30**, **32**) and the groundwork they need (**26**).
 
+Later additions keep those numbers: **42** is the independent wiki project, and **43** adds a conditional
+Phase G preservation checkpoint before a future visual overhaul; it can follow any explicitly accepted milestone.
+
 **Sizes**, measured against items already built: **S** is smaller than smelting; **M** is about pet selection (12);
 **L** is about resources and survival (16); **XL** is bigger than anything built so far. Coding has been fast, but
 playtesting and balancing don't speed up the same way, so read L and XL as optimistic.
@@ -557,6 +560,7 @@ playtesting and balancing don't speed up the same way, so read L and XL as optim
 | **D. New worlds** | 26 Groundwork · 27 Tidewhisper · 28 Hero depth · 29 Caves · 30 Duskhollow · 31 After the last boss · 32 The Lantern Moon | The expansion, one world at a time. |
 | **E. Cozy depth** | 33 Friendship · 34 Bounties · 35 Pet care · 36 Living village · 37 Museum · 38 Festivals · 39 Photo mode | Independent: pull any forward as a break between worlds. |
 | **F. Reach** | 40 Mobile · 41 Multiplayer | Biggest rewrites; they need a stable game under them. |
+| **G. Preserve an accepted edition** | 43 Classic release checkpoint | After the chosen current-track milestone, preserve the version you like before a separately approved visual update or engine change. Not a prerequisite for finishing every optional feature. |
 
 **Why the big moves** (so you can disagree with them):
 - **Save / load jumps from 20 to 19,** behind only the sims (18). Every item since 13 added state that a refresh throws
@@ -1563,6 +1567,56 @@ from the game's configuration, keep explanatory guides alongside them, and disti
       internal links when content changes.
 - [ ] **Publish and maintain:** document how to build, preview, update and deploy the wiki; host the website and link
       it from the game's menus and README.
+
+---
+
+# Phase G: Preserve an accepted edition
+
+This is a milestone checkpoint, not a new gameplay feature. Its number follows 42 to keep all existing TODO
+numbers stable. **When to do it:** once the chosen current-track scope is complete and the output is worth keeping,
+before a separately approved visual overhaul or engine change. It may also preserve an earlier accepted milestone;
+it does not require every suggested feature, multiplayer or the wiki to be finished.
+
+## 43. Preserve the classic version before a visual upgrade **(core checkpoint)**
+
+**Goal:** keep a recoverable, playable copy of the version you like while allowing future visual experiments.
+Code/docs: release packaging under `scripts/` if needed, `docs/releases/`, launch/dependency instructions,
+Git release tags and an optional maintenance branch/worktree. **Size:** M–L, in four stages.
+**Needs:** 18–20 for verification, save export and performance evidence; an explicitly chosen, accepted release
+scope from the current track. No dependency on implementing the [visual upgrade plan](docs/plans/visual-upgrade.md).
+**Risk:** a Git snapshot restores source but not browser saves or remote dependencies; a ZIP that still loads
+Three.js/fonts from CDNs is not a self-contained backup. **Recommendation:** use the same repository, an immutable
+named release tag and a verified runnable archive. Use a second working folder when both editions are needed.
+
+**Execution status:** this entry schedules future preservation work only. Adding it does not create a tag,
+release archive, maintenance branch, worktree or new project, and does not activate the visual plan.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **43a. Choose and verify the classic milestone** | Accepted current-track scope, 18–20 | 1–3 h | Record included features/worlds, deferred TODOs, known limitations and intended devices. Commit all intended release files; run full project suites plus applicable browser/save/performance checks. Identify the exact accepted candidate commit and retain honest hardware-validation status. Do not claim unfinished worlds or unvalidated targets are released. |
+| [ ] **43b. Build and restore-test a runnable archive** | 43a | 2–4.5 h | Package the game, static server, runtime exports, package/lockfiles and documented compatible Node version/launch steps. Pin and include every required runtime library/addon/font and applicable notices; resolve current CDN imports in the preserved edition or a reproducible packaged variant. Exclude credentials, private saves and unrelated work. Restore into a fresh folder/profile with cache empty and external network blocked; verify title, play, travel and representative systems over local HTTP. Record candidate commit, archive SHA-256, contents and runtime requirements; store in an agreed durable backup location. |
+| [ ] **43c. Back up saves and separate edition storage** | 43a, 43b | 1–2 h | Document and exercise adventure Export/Import using a test save; back up the player's chosen saves separately from the repository/release archive. Document device-local settings/journal/pet data separately because adventure export does not contain everything. Use distinct localhost ports/origins or browser profiles for classic/upgraded editions so they cannot overwrite each other's storage. Verify Continue/import in the classic copy without replacing a real save. |
+| [ ] **43d. Tag the accepted edition and document future development** | 43a–43c | 1–2 h | After all preservation/packaging changes pass, create an annotated versioned tag such as `classic-v1.0` at the final accepted release commit and push it. Bind the archive/checksum to that snapshot, rebuilding/rechecking if candidate content changed. Document checkout/restore commands and optional independent worktree launch on a distinct port. Start an ordinary feature branch for a later authorized visual update; create a `classic` maintenance branch only if classic fixes are wanted. Verify remote tag and restoration; do not move an existing release tag to publish fixes. |
+
+Estimates include each stage's checks/documentation/publication under `AGENTS.md`, assume the relevant dependencies
+and test environment are available, and must be split further if investigation shows a stage will exceed five hours.
+The archive must actually pass its restoration check; a successful `git archive` or ZIP creation alone is not acceptance.
+
+- [ ] **Keep the accepted snapshot:** a named release tag pushed to the remote, exact commit and release notes.
+      Tags preserve committed files, not uncommitted work. Classic fixes get a new version/tag; retain the original.
+- [ ] **Keep a playable backup:** a verified archive with required dependencies, local-HTTP launch instructions,
+      checksum and a separate durable backup. Do not rely on an installed `node_modules`, warm browser cache or live CDN.
+- [ ] **Keep chosen adventures:** export/import verified; personal save backups stay private and outside Git.
+      Document other device-local data and protect the two editions from sharing a storage origin.
+- [ ] **Keep development convenient:** optional side-by-side worktree within the same repository, independent
+      ports/profiles and instructions to run both editions. A worktree is a working copy, not an independent backup.
+- [ ] **Choose a new project only when justified:** use the same repository for an art update. A separately
+      maintained game or engine port may justify a new project, with the classic tag/archive retained in the original.
+
+**Acceptance:** the exact accepted version is remotely recoverable, its archive runs from a fresh folder without
+external runtime downloads, selected saves can be restored independently, and a future upgraded edition cannot
+silently overwrite classic data. Record test/restore results, tag and archive evidence, limitations and the normal
+branch completion workflow in `docs/logs/`. The detailed visual plan remains **not for execution yet** until activated.
 
 ---
 
