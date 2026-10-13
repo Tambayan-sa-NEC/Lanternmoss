@@ -14,15 +14,16 @@ are stable IDs (`lanternmoss`, `emberfall`, `frostveil`), independent of their p
 `ctx.planet` remains the runtime array index. Additional slots are deferred; the explicit field reserves room for them.
 
 `src/core/save.js` owns cleaning and the registry. `src/core/AdventureSave.js` registers systems and restores them
-in dependency order: globals, regenerated world, planet snapshots, hero position/vitals, pet, active challenge and
+in dependency order: globals, regenerated world with mechanic restoration/entry, other planet snapshots, hero position/vitals, pet, active challenge and
 house interior. Bag, gear, coins, XP, health/mana, pets and commands, quest/challenge progress, dialogue memory,
 day/time, energy, buffs, house gifts, rare gifts and cooldowns belong to the adventure. Farm plots, gathering nodes
-and rest timers, chests, boss gates and uncollected pickups belong to each planet snapshot.
+and rest timers, chests, boss gates, uncollected pickups, cottages, outdoor buildings and mechanic state belong to each planet snapshot.
 
 Restoration emits no reward events, does not re-run quest grants, and skips travel-only quest checks. Beaten bosses
 stay beaten; unopened boss treasure and uncollected rewards survive. Ordinary enemies, weather, projectile effects
 and momentary movement/attack animations rebuild; an unfinished fishing cast ends. An awake boss resumes awake
-with a fresh combat body. Planet ecosystem simulation while away and building state remain future TODOs 24/25.
+with a fresh combat body. Gathering uses elapsed unpaused adventure time when revisited; crops still need presence
+and watering, with bed rests advancing watered crops. General ecosystem simulation while away remains deferred.
 Settings, key bindings, the lifetime journal and remembered pet selections stay separate, per device.
 
 TODO 21 adds an optional adventure-owned `systems.tutorial` record to version 1: guide status and completed step
@@ -37,6 +38,12 @@ favourites belong to the adventure; essential recipes remain available even when
 Potion/pet timers and the one meal timer save independently. Old v1 files default to no meal and empty discoveries
 and favourites; their existing buff timers remain intact. Unknown runes and enchantments on vanity or materials
 are discarded. The original v1 fixture remains unchanged.
+
+TODO 26b adds optional per-planet `mechanics: { id, state, at } | null`. The module validates its state, and `at`
+records adventure-calendar seconds rather than wall-clock time. Missing old-v1 state uses defaults; unknown or
+mismatched modules are discarded. Continue loads this state and applies away time before mechanic entry and
+actor/resource population. Later planet restoration skips it to avoid undoing that advancement. Weather stays
+transient. See [mechanic lifecycle and save hooks](mechanics.md); the original v1 fixture is unchanged.
 
 Foreign, damaged and future-version files are rejected before writing. Supported snapshots drop unknown IDs,
 clamp finite numbers, normalize valid directions and fill safe defaults. Files are limited to 2 MiB. A future format

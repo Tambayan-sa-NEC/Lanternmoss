@@ -1,6 +1,7 @@
 /* The village clock (config/day.js): which phase of the day it is, which day, and the light for this moment. */
 import * as THREE from 'three';
 import { DAY } from '../config/day.js';
+import { emit } from '../core/events.js';
 
 const PH = DAY.phases;
 /** Middle of each phase as a fraction of the day (light keyframes). */
@@ -14,6 +15,11 @@ export const dayClock = {
   load(data) { this.t = data.t; this.day = data.day; },
   reset() { this.t = DAY.startAt * DAY.length; this.day = 1; },
   update(dt) { this.t += dt; while (this.t >= DAY.length) { this.t -= DAY.length; this.day++; } },
+  /** Intentional skips notify world mechanics once; ordinary frames and save restoration do not. */
+  skip(seconds, reason = 'skip') {
+    if (!Number.isFinite(seconds) || seconds <= 0) return;
+    this.update(seconds); emit('timeskip', { seconds, reason });
+  },
   /** 0..1 through the current day. */
   get frac() { return this.t / DAY.length; },
   get phaseIndex() { let i = 0; PH.forEach((p, k) => { if (this.frac >= p.from) i = k; }); return i; },

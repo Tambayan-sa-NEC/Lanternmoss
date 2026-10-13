@@ -3,6 +3,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { PLANETS } from '../config/planets.js';
 import { storyKeyAllowed } from '../config/npcs.js';
+import { cleanMechanicSnapshot } from '../world/mechanics/index.js';
 import { LEVELING } from '../config/leveling.js';
 import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
 import { PETS, PET_COMMANDS, PET_CARE } from '../config/pets.js';
@@ -36,7 +37,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
-  building: 'planet', home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet',
+  building: 'planet', home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
@@ -61,6 +62,7 @@ export const SAVE_OWNERS = {
   'gameplay/Portals.js:Portals': 'portals',
   'gameplay/Home.js:Home': 'home',
   'gameplay/Building.js:Building': 'building',
+  'gameplay/PlanetMechanics.js:PlanetMechanics': 'mechanics',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
 export const STATELESS_EXPORTS = new Set(['BUFF_NAMES', 'REWARDS', 'TOOL_USES', 'ACTION_HANDLERS', 'PET_ABILITIES']);
@@ -106,6 +108,7 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
 export function cleanState(key, value, hero = 'witch') {
   const s = record(value);
   switch (key) {
+    case 'mechanics': return cleanMechanicSnapshot(value);
     case 'building': return cleanBuildings(value, cleanStack);
     case 'home': return cleanHomeState(value);
     case 'crafting': {
@@ -223,7 +226,8 @@ export function sanitizeSave(data) {
   for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'adventure') systems[key] = cleanState(key, s.systems[key], player.charId);
   for (const [id, raw] of Object.entries(record(s.planets))) {
     if (!ids.has(id)) continue;
-    const state = {}; for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'planet' && Object.hasOwn(record(raw), key)) state[key] = cleanState(key, raw[key], player.charId);
+    const state = {}; for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'planet' && Object.hasOwn(record(raw), key))
+      state[key] = key === 'mechanics' ? cleanMechanicSnapshot(raw[key], PLANETS.find(p => p.id === id).mechanic ?? null) : cleanState(key, raw[key], player.charId);
     planets[id] = state;
   }
   const planetId = ids.has(s.planetId) ? s.planetId : PLANETS[0].id;
@@ -251,7 +255,8 @@ export class SaveRegistry {
     const state = {}; for (const [key, system] of this.entries) if (SAVE_SYSTEMS[key] === 'planet') state[key] = clone(system.toJSON());
     this.planets[id] = state;
   }
-  restorePlanet(id) { const state = this.planets[id]; if (!state) return; for (const [key, system] of this.entries) if (SAVE_SYSTEMS[key] === 'planet' && Object.hasOwn(state, key)) system.load(clone(state[key])); }
+  restorePlanet(id, { skip = [] } = {}) { const state = this.planets[id]; if (!state) return; for (const [key, system] of this.entries)
+    if (SAVE_SYSTEMS[key] === 'planet' && !skip.includes(key) && Object.hasOwn(state, key)) system.load(clone(state[key])); }
   snapshot(id, savedAt = new Date().toISOString()) {
     this.assertComplete(); this.capturePlanet(id);
     const systems = {}; for (const [key, system] of this.entries) if (SAVE_SYSTEMS[key] === 'adventure') systems[key] = clone(system.toJSON());

@@ -57,7 +57,7 @@ export class PlanetProgression {
 
   canTravelTo(id) {
     const planet = PLANETS.find(p => p.id === id);
-    return planet?.released === true && secretUnlocked(planet, this.defeated,
+    return planet?.released === true && this.world.mechanics.accepts(planet) && secretUnlocked(planet, this.defeated,
       { night: dayClock.phase === 'night', rareGifts: RareGifts.toJSON() });
   }
 
@@ -159,6 +159,7 @@ export class PlanetProgression {
     }
     if (typeof index === 'string') index = PLANETS.findIndex(p => p.id === index);
     if (PLANETS[index]?.released !== true) throw new Error('Unknown or unreleased planet');
+    if (!this.world.mechanics.accepts(PLANETS[index])) throw new Error('Unknown planet mechanic');
     const arriving = this.state === 'fadeOut' && this.#authorizedDestination === PLANETS[index].id;
     if (!restoring && !arriving && !this.canTravelTo(PLANETS[index].id)) throw new Error('The secret planet is locked');
     this.#authorizedDestination = null;

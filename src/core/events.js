@@ -7,6 +7,7 @@
      'cameradrag', 'talked', 'bagopened', 'hotbarselected', 'abilitycast', 'aimstarted'
                       successful actions observed by the guided walk
      'gatheringtip'   detail { key }               a first-find tip kept in Journal Help
+     'timeskip'       detail { seconds, reason }   sleep/nap calendar advances, separate from real-time frames
    Combat has its own bus (src/combat/events.js), levelling too (src/progression/experience.js). */
 export const gameEvents = new EventTarget();
 export const emit = (type, detail) => gameEvents.dispatchEvent(new CustomEvent(type, { detail }));

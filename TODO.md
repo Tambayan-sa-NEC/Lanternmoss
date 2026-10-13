@@ -1020,7 +1020,7 @@ world stages, rather than requiring all future encounters before Tidewhisper. Pr
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
 | [x] **26a. Planet catalog and release rules** | 19, 24 | 1.5-3 h | Extract the original planet configs without changing seeds or generated ids; add act/release/secret metadata and assemble the released campaign. Remove remaining three-world assumptions in travel, save validation, NPC data and completion rules. Tests accept a smaller secret-world roster by explicit config, preserve the original campaign and reject travel/key access to unreleased worlds. |
-| [ ] **26b. Mechanic lifecycle and saves** | 26a | 2-4 h | Add enter/update/exit and per-planet save hooks, including pause, sleep/time skips, travel, Continue and disposal. Use a development-only mechanic fixture to prove ordering, isolation and old-save defaults; weather stays separate. |
+| [x] **26b. Mechanic lifecycle and saves** | 26a | 2-4 h | Add enter/update/exit and per-planet save hooks, including pause, sleep/time skips, travel, Continue and disposal. Use a development-only mechanic fixture to prove ordering, isolation and old-save defaults; weather stays separate. |
 | [ ] **26c. Gravity and moving-water support** | 26b | 3-4.5 h | Add shared gravity/water queries consumed by Walkers, swimming, water rendering, spawning, resource placement, farms and building safety. Test moving levels and gravity changes in a harness, including existing ponds, Moon-Hop composition and portal restoration; no Tidewhisper content yet. |
 | [ ] **26d. Act II progression and content gate** | 26a-26c, 23 | 2-4 h | Extend cap/XP to 16, expose expected-level/scaling metadata, update title/arrival wording and achievement definitions while retaining the original three-boss award. Test the mandatory release checklist and Moon exceptions, behavior/boss registrations and unknown content references. Future-world achievements and travel activate only with those worlds. |
 
@@ -1031,12 +1031,23 @@ saved object positions are preserved. Keys/direct transitions cannot reach unfin
 night-authorized trips survive dawn during their fade. Main completion excludes secrets, the Act I award requires its
 original bosses, and small secret rosters may declare a tested population minimum. All 174 unit tests, 29 simulations
 and the 720p/1080p browser checks passed, including v1 Continue and pre-extraction layout/arrival fixtures.
-See [catalog, release and compatibility rules](docs/planets.md). 26b-26d remain pending.
+See [catalog, release and compatibility rules](docs/planets.md).
+
+**26b implemented (2026-10-13):** a pure mechanic registry and world-owned controller restore cleaned per-planet
+state and apply away time before entry and actor/resource population. Frame updates precede physics and freeze on
+the title and pause; naps/sleep notify a separate bounded advancement hook once. Travel, Continue, reset and disposal
+retain one active instance, with exit/listener cleanup before world disposal. Optional v1 snapshots default safely
+for old saves and reject unknown/mismatched modules; the original fixture is unchanged. A development-only module
+proves ordering and independent state through real keyed travel and reload Continue. All 181 unit tests, 30 simulations
+and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/mechanics.md).
+Actual tides, lantern darkness and lunar gravity remain their owning world stages; 26c-26d remain pending.
 
 - [x] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
       its `act`.
-- [ ] **Planet mechanics:** `mechanic: 'tides'` loads `src/world/mechanics/tides.js` with `enter`, `update(dt)`, `exit`
-      and save hooks (19). Weather stays mood only; a mechanic may read the weather.
+- [x] **Planet mechanics:** registered `mechanic: '<id>'` resolves a module descriptor in `src/world/mechanics/`
+      with `enter`, `update(dt)`, `advance`, `exit` and per-planet save hooks (19). Weather stays mood only;
+      a mechanic may read the weather. The actual `mechanic: 'tides'` module in `src/world/mechanics/tides.js`
+      belongs to 27a.
 - [ ] **Per-planet physics:** gravity (Moon-Hop already scales it: `moonGravity` in `config/game.js`) and a sea level
       that can move (today ponds and lakes are fixed). The Walker, swimming, spawning and node placement read both.
 - [ ] **Enemy integration contract:** retain modular behavior dispatch in `src/entities/enemies/behaviors/` (like

@@ -84,6 +84,7 @@ import { rng } from '../utils/random.js';
 import { AdventureSave } from './AdventureSave.js';
 import { Tutorial } from '../gameplay/Tutorial.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
+import { DAY } from '../config/day.js';
 import { TutorialUI } from '../ui/TutorialUI.js';
 
 export class Game {
@@ -91,7 +92,10 @@ export class Game {
       resolve collisions in creation order (player, critters, villagers, enemies). */
   init() {
     this.renderSystem = new RenderSystem();
-    this.world = new World();
+    this.world = new World({ clock: () => (dayClock.day - 1) * DAY.length + dayClock.t,
+      running: () => ctx.started && !ctx.paused,
+      environment: { get player() { return ctx.player; }, get started() { return ctx.started; },
+        get indoors() { return ctx.indoors; }, get transitioning() { return ctx.transitioning; } } });
     ctx.planet = 0; ctx.planetId = PLANETS[0].id;
     this.world.generate(PLANETS[0]);
     createSparkles(); setOverlayWorld(this.world);
@@ -155,6 +159,7 @@ export class Game {
     if (ctx.paused) { Building.update(); if (PetMenu.isOpen) PetMenu.update(dt); return; }   // pause / pet menu open: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
+    if (ctx.started) { dayClock.update(dt); this.world.mechanics.update(dt); }
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
     for (const c of ctx.critters) c.update(dt);
     for (const b of ctx.birds) b.update(dt);
@@ -171,7 +176,6 @@ export class Game {
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
     Building.updateStructureView(cam.fwd); updateCamera(dt); Building.update();
     updateWaypoints();                                             // after the camera: bearings are relative to the view
-    if (ctx.started) dayClock.update(dt);                          // the village clock only runs while you play
     this.world.setDaylight(dayClock.light());
     this.world.update(dt, ctx.time, ctx.player, cam.up, camera);
     sparkles.update(dt); updateEmotes(dt);
@@ -199,6 +203,7 @@ export class Game {
     if (this.saves) { this.saves.suspended = true; this.saves.reset(); }
     try {
       const P = ctx.player, world = this.world;
+      world.mechanics.exit();                                     // old rules/listeners leave before clocks and adventure state reset
       BuildingUI.close(); Building.clear(); HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); Home.reset();
       Tutorial.reset(); RecipeBook.reset(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
@@ -231,6 +236,7 @@ export class Game {
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,
       spawnItem: (id, qty = 1, arc = 2) => spawnWorldItem(id, qty, offsetDir(ctx.player.up, rng() * 6.28, arc)),
       get planet() { return ctx.planet; }, get boss() { return ctx.boss; }, planets: game.planets, PLANETS,
+      Mechanics: game.world.mechanics,
       goToPlanet: i => { game.planets.load(i); game.planets.announceArrival(); },
       setWeather: kind => game.world.weather.set(kind, true), get weather() { return game.world.weather; },
       saves: game.saves, get planetId() { return ctx.planetId; },
