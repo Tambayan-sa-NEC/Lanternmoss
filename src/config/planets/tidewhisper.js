@@ -1,6 +1,8 @@
-// Terrain/tides: 27a; flora/wildlife: 27b. Remaining content/release acceptance: 27c-27h.
+// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c. Remaining content/release: 27d-27h.
 export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
   expectedLevel: [7, 10], lowLevel: 9, scale: { hp: 2.9, damage: 2, speed: 1.25, cooldown: 0.78, xp: 2.6 },
+  material: 'seaglass', music: 'seaWaltz', weather: { clear: 5, breezy: 3, seaMist: 2, squall: 2 },
+  resources: { coastal: true, catches: [['silverSprat',80],['goldenKoi',3]], nodes: [['driftwood',6],['shells',6],['seaweed',5],['seaglass',6],['saltPan',4],['clamBed',6],['coralReef',5],['shipwreckIron',3],['pebbles',6,'village'],['sweetleaf',5,'village']], rare: [['blackPearlBed',2]] },
   seed: 271828, mechanic: 'tides', physics: { seaLevel: 71, seaMaxLevel: 72.5 },
   tides: { low: 71, high: 72.5, lowAt: 0.4, drainLevel: 68.8, drainSeconds: 40 },
   terrain: { archipelago: { bed: -4, islands: [

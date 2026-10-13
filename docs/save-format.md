@@ -73,3 +73,7 @@ data and verifies complete world reconstruction, challenges, interiors, travel, 
 Checks: `npm test`, `npm run sim -- save menus pause journal`, and optional `node scripts/save-smoke.mjs` (requires
 `puppeteer-core` and Chrome; set `CHROME` to use Edge or another Chromium browser). The browser check verifies real
 reload, exported files and import confirmation, and retakes `continue.jpg` / `save-menu.jpg` for the README.
+
+TODO 27c adds optional `claimedCycle` integers to gathering node deltas for tidal washups. Claims persist after
+cooldowns expire, preventing another gather in the same high-tide batch after Continue. The adventure calendar
+derives the current batch; skips never grant items. Missing claims default to -1, and v1 remains compatible.

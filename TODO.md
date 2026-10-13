@@ -1113,7 +1113,7 @@ bosses and release balancing each get their own session. The otter remains optio
 | --- | --- | --- | --- |
 | [x] **27a. Archipelago and tide loop** | 26a-26d | 3-4.5 h | Build islands, shallows, sandbars, protected village/farm sites, the daily 1.5 m tide, clock chip and lagoon/causeway water controls. Prove low/high tide traversal, swimming energy, time skips, node placement and saved tide restoration in the development world. |
 | [x] **27b. Flora and wildlife** | 27a | 2-4 h | Add every listed plant, crab/turtle/seal builder, birds, fish and Pearl Turtle/charm. Verify schedules, rare-gift saves, gathering interactions and bounded scenery cost; this stage owns wildlife distinct from enemy Shellbacks. |
-| [ ] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
+| [x] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
 | [ ] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
 | [ ] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
 | [ ] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
@@ -1141,7 +1141,7 @@ drained water, gathering, respawn, charm/equipment Continue and disposal are ver
 browser checks. All 201 unit tests, 34 simulations and 720p/1080p low browser checks passed. Tidewhisper remains
 unreleased: resources/weather/music, village, enemies/fights and measured
 release performance remain 27c-27h. See [coastal flora/wildlife](docs/tidewhisper.md#coastal-flora-and-wildlife-27b).
-Next: 27c.
+Next: 27d. Stage 27c adds 54 resource nodes, saved washup claims, shore fishing, coastal recipes/Tide gear, dawn mist, squall whitecaps and a procedural waltz. All 205 unit tests, 35 simulations and 720p/1080p low browser checks pass; the world remains unreleased.
 
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
@@ -1172,14 +1172,14 @@ Next: 27c.
 - [x] **Wildlife:** hermit crabs that hide in their shells, sea turtles on the beaches, seals that loaf on rocks and bark,
       gulls and terns, shoals in the shallows, and lanternfish that glow at night. Rare: the **Pearl Turtle** (gift: the
       Pearl of the Deep charm). New body builders: crab, turtle, seal.
-- [ ] **Weather:** clear and breezy, plus two new kinds: **sea mist** (rolls in at dawn) and **squall** (driving rain,
+- [x] **Weather:** clear and breezy, plus two new kinds: **sea mist** (rolls in at dawn) and **squall** (driving rain,
       wind and whitecaps).
-- [ ] **Resources and items:** driftwood and shells by hand, clam beds at low tide (pearls), coral (pickaxe), salt pans
+- [x] **Resources and items:** driftwood and shells by hand, clam beds at low tide (pearls), coral (pickaxe), salt pans
       (sea salt for cooking), seaweed, and iron in the old shipwrecks. Material: **seaglass**. Rare vein: black pearl
       beds. Food: salted fish, seaweed rolls, chowder. Gear: the Tide set (28).
 - [ ] **People:** Marlo the lighthouse keeper (lines, tips for Mirelure, and the quest "The Dark Lighthouse": seaglass for a
       new lens and fuel to light it); stilt houses with two interiors; beach outfits for the travelling villagers.
-- [ ] **Music:** a slow waltz over a sea-swell pad, made in code.
+- [x] **Music:** a slow waltz over a sea-swell pad, made in code.
 - [ ] Optional, only if the world comes in under budget: an otter pet that dives for pearls.
 - [ ] **Go / no-go check** once it plays end to end: how long it took, what the groundwork (26) got wrong, and whether
       the checklist was too much. Fix 26 before starting 30, or cut Duskhollow down to fit.

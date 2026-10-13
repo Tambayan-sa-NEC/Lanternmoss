@@ -12,8 +12,9 @@ import { audio } from '../systems/AudioSystem.js';
 import { frameQuat, tangentFrame } from '../utils/sphere.js';
 import { WIND } from './scatter.js';
 import { rng } from '../utils/random.js';
+import { dayClock } from '../gameplay/dayClock.js';
 
-const NUM = ['wind', 'fog', 'light', 'overcast', 'rain', 'snow', 'embers', 'petals'];
+const NUM = ['wind', 'fog', 'light', 'overcast', 'rain', 'snow', 'embers', 'petals', 'whitecaps'];
 const mix = (a, b, k) => a + (b - a) * k;
 const rnd = (a, b) => a + rng() * (b - a);
 
@@ -93,13 +94,17 @@ export class Weather {
     this.from = this.kind; this.to = next; this.k = instant ? 1 : 0; this.timer = rnd(...WEATHER.duration);
   }
   roll() {
-    const e = Object.entries(this.mixes).filter(([k]) => k !== this.to || Object.keys(this.mixes).length === 1);
+    const e = Object.entries(this.mixes).filter(([k]) => (k !== 'seaMist' || dayClock.frac < .18) && (k !== this.to || Object.keys(this.mixes).length === 1));
     let r = rng() * e.reduce((t, [, w]) => t + w, 0);
     for (const [k, w] of e) if ((r -= w) <= 0) return k;
     return e[0][0];
   }
   /** Per frame: blends toward the next spell, applies wind, fog, sky and particles. player = where the box goes. */
   update(dt, time, player, sky) {
+    if(this.mixes.seaMist) {
+      if(dayClock.frac<.08&&this.mistDay!==dayClock.day){this.mistDay=dayClock.day;this.set('seaMist');}
+      else if(dayClock.frac>=.18&&this.to==='seaMist')this.set('clear');
+    }
     if ((this.timer -= dt) <= 0) this.set();
     this.k = Math.min(1, this.k + dt / WEATHER.blend);
     const a = WEATHER_KINDS[this.from], b = WEATHER_KINDS[this.to], k = this.k, n = this.now;

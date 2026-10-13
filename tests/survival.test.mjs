@@ -45,7 +45,7 @@ test('nodes: real drops, sane timings, tools that exist; every planet has wood, 
     for (const [item, q] of k.drops) assert.ok(get(item) && (Array.isArray(q) ? q[1] >= q[0] && q[1] > 0 : q > 0), `${id}: drop ${item}`);
     for (const [item, c] of k.extra ?? []) assert.ok(get(item) && c > 0 && c < 1, `${id}: extra ${item}`);
     if (k.tool) assert.ok(TOOL_KINDS[k.tool] && k.hits >= 1, `${id}: tool ${k.tool}`);
-    assert.ok(!k.rare || k.tool === 'pick' && k.tier >= 2, `${id}: a rare vein needs a good pick`);
+    assert.ok(!k.rare || k.tool === 'pick' && k.tier >= 2 || k.coastal && k.lowTide && k.look === 'shells', `${id}: rare veins need a good pick; coastal pearl beds require low tide`);
   }
   for (const s of Object.values(SCENERY)) assert.ok(TOOL_KINDS[s.tool] && s.rest > 0 && s.drops.every(([i]) => get(i)));
   for (const p of PLANETS) {

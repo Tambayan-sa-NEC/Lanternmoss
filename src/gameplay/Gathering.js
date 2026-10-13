@@ -29,6 +29,7 @@ import { Hotbar } from './hotbar.js';
 import { ACTION_HANDLERS } from './itemUse.js';
 import { grantItem } from './pickups.js';
 import { rollDrops, toolCheck, bestTool } from './resourceRules.js';
+import { coastalResources } from '../world/coastalResources.js';
 
 const CHIPS = { tree: 0x9a6a44, rock: 0xb6aec8 };
 
@@ -39,6 +40,7 @@ export const Gathering = {
   spawnFor(world, planet, avoid = []) {
     this.clear(); this.world = world;
     const P = PLANETS[planet], res = P.resources; if (!res) return;
+    if(res.coastal){this.nodes=coastalResources(world,P,avoid);return;}
     const rng = mulberry32((P.seed ^ 0x5eed51) >>> 0), boss = ctx.enemies.find(e => e.def.miniBoss);
     const place = (kind, near) => {
       const def = NODE_KINDS[kind];
@@ -61,17 +63,19 @@ export const Gathering = {
   resetRun() { this.tipsShown.clear(); this.tip = null; },
 
   toJSON() {
-    return { delta: true, at: ctx.time, nodes: this.nodes.filter(n => n.regrowT > 0).map(n => ({ id: n.id, regrowT: n.regrowT })),
+    return { delta: true, at: ctx.time, nodes: this.nodes.filter(n => n.regrowT > 0 || n.claimedCycle >= 0).map(n => ({ id: n.id, regrowT: Math.max(0,n.regrowT), ...(n.def.washup ? {claimedCycle:n.claimedCycle}: {}) })),
       rest: Object.fromEntries(this.rest), tipsShown: [...this.tipsShown] };
   },
   load(data) {
     if (data.delta) {
       const elapsed = Math.max(0, ctx.time - data.at), times = new Map(data.nodes.map(n => [n.id, n.regrowT]));
       for (const n of this.nodes) {
+        if(n.def.washup)n.claimedCycle=data.nodes.find(saved=>saved.id===n.id)?.claimedCycle??-1;
         n.regrowT = Math.max(0, (times.get(n.id) ?? 0) - elapsed);
         n.root.visible = true; if (n.collider) n.collider.active = true;
         if (n.fruit) n.fruit.visible = true;
         if (n.regrowT > 0) { if (n.def.vanish) { n.root.visible = false; if (n.collider) n.collider.active = false; } else n.fruit.visible = false; }
+        n.syncCoastal();
       }
       this.rest = new Map(Object.entries(data.rest).map(([k, t]) => [k, Math.max(0, t - elapsed)]).filter(([, t]) => t > 0));
       this.tipsShown = new Set(data.tipsShown); this.tip = null; this.stop(); return;
@@ -80,7 +84,9 @@ export const Gathering = {
     this.nodes = data.nodes.map((saved, i) => {
       const n = new ResourceNode(saved.kind, ctx.player.up.clone().fromArray(saved.dir), i + 1);
       n.id = saved.id; n.regrowT = saved.regrowT;
+      if(n.def.washup)n.claimedCycle=saved.claimedCycle??-1;
       if (n.regrowT > 0) { if (n.def.vanish) { n.root.visible = false; if (n.collider) n.collider.active = false; } else n.fruit.visible = false; }
+      n.syncCoastal();
       return n;
     });
     this.rest = new Map(Object.entries(data.rest)); this.tipsShown = new Set(data.tipsShown); this.tip = null;
@@ -155,6 +161,7 @@ export const Gathering = {
   /** Starts working: { node } | { scenery, index, spot } | { at, need, verb, onDone } (custom: tilling, watering). */
   work(job) {
     const P = ctx.player; if (P.dead || this.job) return;
+    if(job.node&&!job.node.ready)return;
     if(job.scenery==='tree'&&TREE_KINDS[job.spot?.kind]?.wood===false)return;
     if (!dryGround(job.node?.up ?? job.spot?.dir ?? job.at)) { toast('Wait for the water to recede.'); return; }
     const need = job.node?.def ?? (job.scenery ? SCENERY[job.scenery] : job.need);

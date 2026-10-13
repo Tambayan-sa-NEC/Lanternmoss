@@ -1,6 +1,6 @@
 # Tidewhisper terrain and tides
 
-TODOs 27a/27b implement the archipelago, water controls, plants and ambient wildlife. Tidewhisper remains
+TODOs 27a-27c implement the archipelago, water controls, coastal ecosystem, resources, weather and music. Tidewhisper remains
 `released: false`: resources/weather/music, village and fights belong to 27c–27g, and campaign release requires 27h.
 The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
 gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
@@ -49,7 +49,7 @@ captures in the temporary directory. `tests/sim/lib/tideFixture.mjs` is never im
 
 These checks verify this stage's rules and rendering; they do not certify the Intel Iris Xe 60-fps release
 target. Population, content, balance, complete-world browser traversal and measured performance remain 27h's
-requirements. The next stage is 27c, resources, weather and music.
+requirements. Resources/weather/music are now implemented in 27c below; the next stage is 27d, village and lighthouse.
 
 ## Coastal flora and wildlife (27b)
 
@@ -57,7 +57,7 @@ The actual Tidewhisper config now selects lantern palms, kelp trees, coral fans,
 lavender. Palms carry glowing coconuts and can be chopped for wood through the existing axe/rest/regrowth flow.
 Kelp leaves sway through one shared shader/time uniform; their batch bounds include the bend. Kelp and coral
 are explicitly non-wood and refuse axe gathering, including direct gathering requests. Harvestable coastal
-resources and coral ore drops remain 27c.
+coral is gathered from exposed reef resource nodes with a pickaxe (27c).
 
 Scenery is generated once with fixed upper counts: 18 palms, 12 kelp trees, 10 coral fans, 10 rocks and 120 small
 plant clusters. Beach flora/animals reserve dry high water; kelp/coral and fish use shallow water. The static
@@ -78,7 +78,7 @@ Six ground birds alternate gull/tern plumage and wing/tail silhouettes, with one
 take off when flooded and keep flying until they find dry landing terrain. Three shallow shoals contain eight
 fish each, plus eight emissive lanternfish visible at night: **32 fish in four instanced draws**. Fish follow the
 same live sea/lagoon queries as movement, hide when water drains, freeze on pause, and dispose with their world.
-They are ambient visuals; coastal fishing catches, food and the pier remain later content.
+They are ambient visuals; shore fishing and food are implemented in 27c, while the pier remains 27d.
 
 ![Pearl Turtle development preview](screenshots/tidewhisper-pearl-turtle.jpg)
 
@@ -94,3 +94,40 @@ overrides the executable). The helper owns port 8108 and exercises the actual co
 gathering and **E** friendship, reload Continue, charm uniqueness and night visibility; refreshes the two previews;
 and keeps crab/turtle/seal captures in the temporary directory. Schedules, day/night traversal, drained-water
 hiding, respawn, equipped-charm saves, quality/placement invariance and disposal are also simulated.
+
+## Coastal resources, weather and music (27c)
+
+The actual config generates 54 deterministic nodes: driftwood (6), shells (6), seaweed (5), seaglass (6), salt
+pans (4), clam beds (6), exposed coral reefs (5), shipwreck iron (3), pebbles (6), sweetleaf (5) and black pearl
+beds (2). The far beach has a reserved low-water pearl shelf for the later Ironclaw encounter. Its guard is
+still 27f. Clam/black pearl beds and coral require low tide and exposed ground. Coral needs a Stone Pickaxe;
+shipwreck iron needs a Copper Pickaxe. Shell beds, coral branches, salt crystals and wreck planks have procedural
+models; there are no extra lights. Farm plots remain above declared high water. Squall rain waters crops using
+the existing farming rule; sea mist does not.
+
+Driftwood gives wood. Shell washups give shells and seaglass; seaweed and glass have their own washups. Each
+washup can be claimed once per high-water crest (90% of the adventure day). Its optional `claimedCycle` field
+lives in the existing gathering v1 snapshot, even after the cooldown expires. A calendar skip exposes only the
+latest batch; it never creates accumulated rewards. Continue and revisits preserve claims and requested node
+ids. Earlier saves without the field default to an unclaimed node. World/quality changes do not add save owners.
+
+With a rod on the hotbar, **E** near seawater fishes using the existing bite/reeling meter. Silver sprats are the
+common coastal catch and golden koi remain rare. The float follows the live tide and cancels if its water dries.
+At a cooking pot, make salted fish (sprat + salt), seaweed rolls (seaweed + sprat) and coastal chowder (clams +
+sprat + salt). At a forge, craft the Tide Circlet, Mantle and Boots from glass, pearls, coral and shells; a Tide
+Pendant uses a black pearl, glass and shells. These pieces use the existing equip/save/stat rules and are
+explicitly crafted, so they cannot leak into Act I random gear rewards. Their set identity is recorded; bonuses
+remain TODO 28a.
+
+Sea mist begins at dawn and clears later in the morning. Squalls blend driving rain and strong wind into the
+existing weather layers and add shader whitecaps to the ocean/lagoon, without changing the tide. The sea waltz
+uses a 720 ms beat in three, over a gently modulated procedural pad. Theme changes retune existing pad voices and
+replace the single melody timer; travel and repeated switching do not accumulate loops. Battle music retains
+priority. The original worlds keep their cozy score.
+
+Run both full suites and `node scripts/coastal-resources-smoke.mjs` (Puppeteer Core/Chromium, `CHROME` override).
+The helper owns port 8109 and borrows only test encounters in `coastalResourceFixture.mjs`; it exercises real
+E gathering, reload Continue, the three-beat audio timer, 720p/1080p low squall shaders and dry farms. Captures
+are saved in the temporary directory. The simulation also covers pick tiers, low/high tide, multi-day skips,
+revisits, sea fishing, dawn transitions, crop watering and equipped Tide gear Continue. These checks do not certify
+Iris Xe frame time; that hardware measurement and campaign release remain 27h.

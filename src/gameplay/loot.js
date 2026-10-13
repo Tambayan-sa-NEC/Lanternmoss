@@ -13,7 +13,7 @@ export function resolveLootItem(item, planet) {
   return item;
 }
 
-const GEAR = ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity);   // vanity pieces are found, made or given, not rolled
+const GEAR = ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity && !d.props?.craftedOnly);   // explicit acquisition stays out of random rewards
 const NAMES = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d.name]));
 
 /** "2x Moonberry", "Rare Ember Mail" (for toasts). */

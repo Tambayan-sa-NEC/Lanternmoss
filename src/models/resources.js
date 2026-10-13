@@ -13,6 +13,31 @@ const WOOD = 0xb0703a, ROCK = 0xb6aec8;
 
 /** One builder per node look: (root, fruit, def, rnd) where rnd() is a 0..1 source for small variations. */
 const NODES = {
+  shells: (g,f,d,rnd) => {
+    addTo(g,part(G.cyl(.7,.75,.045,10),0xe2ceac,{outline:false}),[0,.015,0]);
+    for(let i=0;i<4;i++) {
+      const x=Math.cos(i*2.4)*.38,z=Math.sin(i*2.4)*.38;
+      addTo(f,part(G.hemi(.22,8,3),d.color),[x,.08,z],[0,i,0],[1,.45,1.2]);
+      for(let k=0;k<3;k++)addTo(f,part(G.box(.025,.018,.28),lighter(d.color)),[x+(k-1)*.06,.12,z],[0,i*.2,0]);
+    }
+  },
+  salt: (g,f,d,rnd) => {
+    addTo(g,part(G.cyl(.65,.7,.06,10),0xbac2b1),[0,.02,0]);
+    for(let i=0;i<8;i++)addTo(f,part(G.oct(.10+rnd()*.04),d.color),[Math.cos(i*2.4)*.4,.1,Math.sin(i*2.4)*.4],[rnd(),i,0],[1,.4,1]);
+  },
+  coral: (g,f,d,rnd) => {
+    addTo(g,part(G.dodec(.55),0xc6c0af),[0,.08,0],[0,0,0],[1,.3,1]);
+    for(let i=0;i<5;i++) {
+      const x=(i-2)*.18,h=.5+rnd()*.45;
+      addTo(f,part(G.cyl(.055,.09,h,5),d.color),[x,h/2,0]);
+      for(const sign of [-1,1])addTo(f,part(G.cyl(.035,.055,.32,5),lighter(d.color,.15)),[x+sign*.1,h*.75,.05],[0,0,sign*-.65]);
+    }
+  },
+  wreck: (g,f,d,rnd) => {
+    for(let i=0;i<5;i++)addTo(g,part(G.box(1.6,.07,.18),0x978475),[0,.08+(i%2)*.05,(i-2)*.2],[0,.1,0]);
+    for(const sign of [-1,1])addTo(g,part(G.cyl(.06,.08,.9,5),0x807466),[sign*.6,.4,0],[0,0,sign*.3]);
+    for(let i=0;i<3;i++)addTo(f,part(G.box(.35,.13,.2),d.color),[(i-1)*.4,.25,.1],[.2,i*.3,.1]);
+  },
   branches: (g, f, d, rnd) => {
     for (let i = 0; i < 3; i++) addTo(f, part(G.cyl(0.06, 0.08, 1.1 + rnd() * 0.4, 5), i === 2 ? darker(d.color, 0.15) : d.color), [(i - 1) * 0.18, 0.08, 0], [Math.PI / 2, rnd() * 0.8 - 0.4 + i * 0.6, 0]);
     for (let i = 0; i < 3; i++) addTo(f, part(G.oct(0.09), 0x7fbf62), [rnd() * 0.6 - 0.3, 0.14, rnd() * 0.6 - 0.3], [0, rnd() * 6, 0.6], [1, 0.4, 1.4]);

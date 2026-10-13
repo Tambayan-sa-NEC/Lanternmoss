@@ -197,12 +197,12 @@ export function cleanState(key, value, hero = 'witch') {
     }) };
     case 'gathering': return s.delta ? {
       delta: true, at: number(s.at),
-      nodes: list(s.nodes, 1024).map(n => ({ id: typeof n?.id === 'string' ? n.id : '', regrowT: number(n?.regrowT, 0, 0, 3600) }))
+      nodes: list(s.nodes, 1024).map(n => ({ id: typeof n?.id === 'string' ? n.id : '', regrowT: number(n?.regrowT, 0, 0, 3600), ...(n?.claimedCycle !== undefined ? {claimedCycle: integer(n.claimedCycle, -1, -1, 1000000000)} : {}) }))
         .filter(n => PLANETS.some(p => n.id.startsWith(`${p.id}:node:`) && /^\d{1,4}$/.test(n.id.slice(p.id.length + 6)))),
       rest: numericMap(s.rest, key => /^(tree|rock):\d+$/.test(key), Math.max(...Object.values(SCENERY).map(c => c.rest))),
       tipsShown: stringIds(s.tipsShown, k => ['wood', 'stone', 'seed', 'copperOre'].includes(k)) } : {
       nodes: list(s.nodes, 1024).map(n => ({ id: typeof n?.id === 'string' ? n.id.slice(0, 120) : '', kind: known(n?.kind, NODE_KINDS), dir: direction(n?.dir),
-        regrowT: number(n?.regrowT, 0, 0, NODE_KINDS[n?.kind]?.regrow ?? 600) })).filter(n => n.kind && n.dir && n.id),
+        regrowT: number(n?.regrowT, 0, 0, NODE_KINDS[n?.kind]?.regrow ?? 600), ...(n?.claimedCycle !== undefined ? {claimedCycle: integer(n.claimedCycle, -1, -1, 1000000000)} : {}) })).filter(n => n.kind && n.dir && n.id),
       rest: numericMap(s.rest, key => /^(tree|rock):\d+$/.test(key), Math.max(...Object.values(SCENERY).map(c => c.rest))),
       tipsShown: stringIds(s.tipsShown, k => ['wood', 'stone', 'seed', 'copperOre'].includes(k)) };
     case 'chests': return { ...(s.delta ? { delta: true } : {}), opened: stringIds(s.opened, chestId), sinceKey: integer(s.sinceKey, 0, 0, 100),

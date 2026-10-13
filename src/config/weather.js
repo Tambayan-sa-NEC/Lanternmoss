@@ -12,6 +12,8 @@
    --------------------------------------------------------------------- */
 
 export const WEATHER_KINDS = {
+  seaMist: { label:'Sea Mist',icon:'\u224b',wind:.2,fog:.36,light:.92,overcast:.35,tint:0xd8f0e9 },
+  squall: { label:'Squall',icon:'\u2602',wind:1.8,fog:.55,light:.65,overcast:.65,tint:0x85a8b9,rain:1.6,whitecaps:1,sound:{rain:1,wind:1} },
   clear:    { label: 'Clear', icon: '☀', wind: 0.35, fog: 1, light: 1, overcast: 0 },
   breezy:   { label: 'Breezy', icon: '༄', wind: 1.2, fog: 1, light: 1, overcast: 0, petals: 1, sound: { wind: 0.5 } },
   rain:     { label: 'Rain', icon: '☂', wind: 0.6, fog: 0.62, light: 0.72, overcast: 0.55, tint: 0x9aa4bc, rain: 1, sound: { rain: 0.8 } },

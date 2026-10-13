@@ -28,7 +28,7 @@ export function bestTool(kind, candidates) {
 
 /** A fish for this planet: weighted from FISHING.catches (a lake makes the golden koi likelier). */
 export function rollCatch(planet, lake = false, rng = playRng) {
-  const table = (FISHING.catches[planet] ?? FISHING.catches[0]).map(([item, w]) => [item, item === 'goldenKoi' && lake ? w * FISHING.lakeBonus : w]);
+  const table = (PLANETS[planet]?.resources?.catches ?? FISHING.catches[planet] ?? FISHING.catches[0]).map(([item, w]) => [item, item === 'goldenKoi' && lake ? w * FISHING.lakeBonus : w]);
   let x = rng() * table.reduce((s, [, w]) => s + w, 0);
   for (const [item, w] of table) if ((x -= w) < 0) return item;
   return table[table.length - 1][0];
@@ -57,7 +57,7 @@ export function planetSources(planet) {
     for (const [item] of k.drops) out.add(item); for (const [item] of k.extra ?? []) out.add(item);
   }
   for (const s of Object.values(SCENERY)) for (const [item] of s.drops) out.add(item);
-  for (const [item] of FISHING.catches[planet] ?? []) out.add(item);
+  for (const [item] of p?.resources?.catches ?? FISHING.catches[planet] ?? []) out.add(item);
   for (const c of Object.values(CROPS)) for (const [item] of c.harvest) out.add(item);
   return out;
 }
