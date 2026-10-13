@@ -852,3 +852,7 @@ Changes made on the way:
 Tidewhisper's unreleased economy stage adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
 claims, shore fishing, three coastal meals and craftable Tide gear. Dawn sea mist, rain/wind/whitecaps and a
 procedural sea waltz accompany the coast. See [resources, weather and music](docs/tidewhisper.md#coastal-resources-weather-and-music-27c).
+
+The unreleased Tidewhisper village now has stilt buildings, a supported fishing pier, Marlo and two coastal
+interiors. Restore the lighthouse with seaglass and wood; the saved quest joins level 8 and low tide as the
+future boss gate. See [village and lighthouse](docs/tidewhisper.md#stilt-village-and-lighthouse-27d).

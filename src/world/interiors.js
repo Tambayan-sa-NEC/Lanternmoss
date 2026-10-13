@@ -167,6 +167,19 @@ export function buildFurniture(kind) { const root = new THREE.Group(); F[kind]?.
 export function buildRoom(def, layout) {
   const root = new THREE.Group(); root.position.copy(ROOM_ORIGIN); scene.add(root);
   const { shape, entrance } = shell(root, layout);
+  if(def.coastal){
+    // Maritime details distinguish the keeper's chart room from the kitchen without new save state.
+    addTo(root,part(G.box(1.3,.65,.045),0x83b9c2),[2.5,1.5,-3.1]);
+    for(let k=0;k<3;k++)addTo(root,part(G.box(.8,.035,.06),0xffe6ae),[2.5,1.3+k*.15,-3.06],[0,0,(k-1)*.2]);
+    if(def.owner==='Marlo'){
+      addTo(root,part(new THREE.TorusGeometry(.45,.07,5,12),0xb59a73),[-2.5,1.6,-3.15]);
+      for(let k=0;k<6;k++)addTo(root,part(G.box(.08,1,.08),0xb59a73),[-2.5,1.6,-3.1],[0,0,k*Math.PI/3]);
+      addTo(root,part(G.oct(.25),0x70dfd7,{glow:true,intensity:1.3}),[2.1,.97,.7],[0,0,0],[1,.2,1]);
+    }else{
+      addTo(root,part(G.cyl(.32,.25,.15,8),0xc9d9cf),[-.7,1.05,-1.3]);
+      for(let k=0;k<3;k++)addTo(root,part(G.ico(.12,0),0x9cdde3),[-.9+k*.16,1.17,-1.3],[0,0,.4],[1.5,.4,.5]);
+    }
+  }
   addTo(root, part(G.cyl(0.65, 0.75, 0.04, 8), 0xd9c7b8), [entrance.x, 0.06, entrance.z]);              // doormat
   const back = new THREE.Mesh(new THREE.SphereGeometry(46, 16, 10), new THREE.MeshBasicMaterial({ color: 0x2a1e2e, side: THREE.BackSide, fog: false }));
   back.renderOrder = -5; root.add(back);

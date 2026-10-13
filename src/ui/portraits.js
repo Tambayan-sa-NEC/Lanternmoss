@@ -6,6 +6,7 @@ const SKIN = { wizard: '#ffe2cc', baker: '#ffd9c0', bard: '#ffe6d2', sprite: '#f
 
 /** Hair, hats and the like, drawn behind (back) and over (front) the face. */
 const KIT = {
+  keeper:{back:'',front:`<path d="M24 38 L30 23 H70 L76 38 Z" fill="#416b80" stroke="${INK}" stroke-width="3"/><rect x="18" y="35" width="64" height="7" rx="3" fill="#f2dfac" stroke="${INK}" stroke-width="2"/><path d="M35 76 Q50 66 65 76" fill="none" stroke="#f2eadc" stroke-width="6"/>`},
   wizard: {
     back: '',
     front: `<path d="M20 40 L54 -2 L80 40 Z" fill="#6a55c0" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>

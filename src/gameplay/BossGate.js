@@ -38,6 +38,8 @@ import { Quests } from './quests/Quests.js';
 import { spawnWorldItem } from './pickups.js';
 import { fillStory } from './storyState.js';
 import { rng } from '../utils/random.js';
+import { tideAt } from '../world/mechanics/tides.js';
+import { DAY } from '../config/day.js';
 
 const shortName = def => def.name.split(',')[0];
 const epithet = def => def.name.split(', ')[1] ?? '';
@@ -52,6 +54,7 @@ export function describeSummon(summon = {}) {
   if (summon.sigils) out.push(`Bring ${summon.sigils.count} ${itemRegistry.get(summon.sigils.item)?.name ?? 'sigil'}s from the planet's elites`);
   if (summon.quest) out.push(`Help ${QUESTS[summon.quest].giver}: ${QUESTS[summon.quest].title}`);
   if (summon.night) out.push('Come at night');
+  if (summon.lowTide) out.push('Cross the causeway at low tide');
   return out;
 }
 
@@ -113,6 +116,8 @@ export const BossGate = {
     if (s.sigils) { const have = P.inventory.count(s.sigils.item); out.push({ kind: 'sigils', text: `Bring ${itemRegistry.get(s.sigils.item).name}s (elites carry them)`, have: Math.min(have, s.sigils.count), need: s.sigils.count, done: have >= s.sigils.count }); }
     if (s.quest) { const done = Quests.st(s.quest).status === 'done'; out.push({ kind: 'quest', text: `Help ${QUESTS[s.quest].giver}: ${QUESTS[s.quest].title}`, have: +done, need: 1, done }); }
     if (s.night) { const night = dayClock.phase === 'night'; out.push({ kind: 'night', text: 'Wait for night', have: +night, need: 1, done: night }); }
+    if(s.lowTide){const config=PLANETS[ctx.planet]?.tides,low=!!config&&tideAt((dayClock.day-1)*DAY.length+dayClock.t,config).amount<=.25;
+      out.push({kind:'lowTide',text:'Wait for low tide to cross the causeway',have:+low,need:1,done:low});}
     return out;
   },
   get met() { return this.requirements().every(r => r.done); },
