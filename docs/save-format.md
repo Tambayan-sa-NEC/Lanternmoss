@@ -30,6 +30,10 @@ TODO 27a uses the existing optional mechanic snapshot for a bounded lagoon drain
 the saved adventure clock, not a second timer; Continue and away-time advancement restore/reflood it before placement.
 Tidewhisper remains unreleased and the development fixture uses the original Lanternmoss save slot.
 
+TODO 27b's Pearl Turtle charm reuses the adventure `rareGifts` ledger, item inventory and equipment snapshots.
+Its first gift is not duplicated by Continue or revisits. Coastal roaming, bird/fish animation and swimming
+destinations are ambient state rebuilt at generation/respawn; they do not add a persistent save owner.
+
 TODO 26d extends the cap to 16 without changing v1 or old XP thresholds. Old level-10 saves can earn XP again;
 new levels 11–16 round-trip through Continue with computed stats, and level 16 keeps no surplus XP. Future worlds
 remain invalid destinations until released. The original three-boss award and original save fixture remain intact.

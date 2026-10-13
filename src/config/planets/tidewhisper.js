@@ -1,4 +1,4 @@
-// Terrain/tides implemented in 27a. Remaining content and release acceptance belong to 27b-27h.
+// Terrain/tides: 27a; flora/wildlife: 27b. Remaining content/release acceptance: 27c-27h.
 export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
   expectedLevel: [7, 10], lowLevel: 9, scale: { hp: 2.9, damage: 2, speed: 1.25, cooldown: 0.78, xp: 2.6 },
   seed: 271828, mechanic: 'tides', physics: { seaLevel: 71, seaMaxLevel: 72.5 },
@@ -16,5 +16,9 @@ export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false
     grass: [0x70bda0, 0x88ceb0, 0x91d7b7, 0x79c9ab], water: { deep: 0x176997, light: 0x67e0db },
     sky: { horizon: 0xffd4b0, mid: 0xabe3df, zenith: 0x6bbacb }, fog: 0xcce9df },
   tagline: 'islands, lanterns and the turning tide',
+  flora:{trees:{lanternPalm:1,kelp:1,coralFan:1},coastal:{trees:{lanternPalm:18,kelp:12,coralFan:10},plants:{duneGrass:64,seaThrift:28,seaLavender:28}},grass:.35,tallCount:0,meadow:0},
+  wildlife:{coastal:true,villagePets:false,critters:[['hermitCrab',6,'beach'],['seaTurtle',4,'beach'],['harborSeal',3,'rocks']],rare:'pearlTurtle',
+    birds:6,flocks:1,plumage:[{species:'gull',body:0xf4f6ee,belly:0xffffff,wing:0xa5b6bd},{species:'tern',body:0xd7e3e7,belly:0xffffff,wing:0x778f9d}],
+    shoals:3,fishPerShoal:8,lanternfish:8},
   arrival: 'Tidewhisper. Afternoon low tide opens the sandbars; at night the sea takes them back. The village and farm stay above high water.',
   boss: { type: 'mirelure' } };

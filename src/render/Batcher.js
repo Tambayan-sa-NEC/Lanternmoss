@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { rand } from '../utils/random.js';
 import { glowVC, outlineGeo, outlineMat, poolMat, toonVC } from './materials.js';
+import { kelpVC } from './coastalWind.js';
 
 const rankAt = m => { const e = m.elements, n = Math.sin(e[12] * 12.9898 + e[13] * 78.233 + e[14] * 37.719) * 43758.5453; return n - Math.floor(n); };
 export class Batcher {
@@ -23,7 +24,7 @@ export class Batcher {
     }
     g.setAttribute('color', new THREE.BufferAttribute(cols, 3)); g.applyMatrix4(m); g.computeVertexNormals();
     const rank = this.decorative ? (o.densityRank ?? rankAt(m)) : -1;
-    this.store(g, additive ? poolMat : glow ? glowVC : toonVC, m, rank);
+    this.store(g, o.sway ? kelpVC : additive ? poolMat : glow ? glowVC : toonVC, m, rank);
     if (outline) { const og = outlineGeo(geo); og.applyMatrix4(m); og.computeVertexNormals(); this.store(og, outlineMat, m, rank); }
   }
   store(geometry, material, m, rank) {
@@ -39,6 +40,7 @@ export class Batcher {
       items.sort((a, b) => a.rank - b.rank);
       const geometry = mergeGeometries(items.map(i => i.geometry)), mesh = new THREE.Mesh(geometry, material);
       geometry.computeBoundingSphere();
+      if(material===kelpVC)geometry.boundingSphere.radius+=.4;
       if (material === poolMat) mesh.renderOrder = 2;
       if (items[0].rank >= 0) {
         let count = 0;

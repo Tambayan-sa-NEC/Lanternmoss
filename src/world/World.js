@@ -24,6 +24,7 @@ import { Weather } from './weather.js';
 import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
 import { configurePhysics, physicsQueries } from './physics.js';
 import { archipelagoLayout } from './archipelago.js';
+import { coastalWind } from '../render/coastalWind.js';
 
 const V3 = THREE.Vector3;
 
@@ -154,6 +155,7 @@ export class World {
   /** Removes everything generate() created and forgets the terrain, placement and scenery colliders. */
   dispose() {
     this.mechanics.exit();
+    for(const shoal of this.seaLife??[])shoal.dispose();this.seaLife=[];
     this.weather?.dispose();
     for (const o of this.objects) { scene.remove(o); disposeTree(o); }
     for (const m of this.ownMaterials) { releasePointsMaterial(m); m.dispose(); }
@@ -183,7 +185,7 @@ export class World {
     _skySun.copy(viewUp).multiplyScalar(0.2).add(this.sunTan).normalize();
     const su = this.sky.material.uniforms; su.uUp.value.copy(viewUp); su.uSun.value.copy(_skySun); su.uTime.value = time;
     this.sky.position.copy(camera.position);
-    this.fireflies.material.uniforms.uTime.value = time; this.waterMat.uniforms.uTime.value = time; WIND.uTime.value = time;
+    this.fireflies.material.uniforms.uTime.value = time; this.waterMat.uniforms.uTime.value = time; WIND.uTime.value = time; coastalWind.time.value=time;
     this.clouds.rotateOnWorldAxis(CLOUD_AXIS, dt * 0.008 * (1 + (this.weather?.now.wind ?? 0) * 2));
     this.weather.update(dt, time, player, this.sky);
     this.viewerPos.copy(player.pos); this.updateGrassVisibility();

@@ -11,6 +11,9 @@ import { emote } from '../../fx/emotes.js';
 import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buildQuad, buildToad } from '../../models/creatures.js';
+import { COASTAL_BUILDERS } from '../../models/coastalCreatures.js';
+import { updateCoastalCritter } from './coastalBehavior.js';
+import { coastalSpot } from '../../world/coastPlacement.js';
 import { addDyn, removeDyn } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
 import { disposeTree } from '../../render/meshes.js';
@@ -32,7 +35,7 @@ let shyHint = false;
 export class Critter extends Walker {
   constructor(defKey, dir) {
     const def = CRITTER_DEFS[defKey]; super(dir, def.radius ?? (def.kind === 'dog' ? 0.38 : 0.32));
-    this.def = def; this.defKey = defKey; this.kind = def.kind; Object.assign(this, (def.build === 'toad' ? buildToad : buildQuad)(def)); scene.add(this.root);
+    this.def = def; this.defKey = defKey; this.kind = def.kind; Object.assign(this, (COASTAL_BUILDERS[def.build] ?? (def.build === 'toad' ? buildToad : buildQuad))(def)); scene.add(this.root);
     this.shadow = makeShadow(def.kind === 'deer' ? 0.7 : 0.45); this.height = { deer: 1.5, frog: 0.45, lizard: 0.5 }[def.kind] ?? 0.85; this.fwd.applyAxisAngle(this.up, rng() * 6.28);
     this.home = this.up.clone(); this.hopT = 0; this.rare = def.rare ?? null; this.away = 0;
     this.state = 'idle'; this.timer = mr(1, 3); this.speed = 0; this.phase = rng() * 10; this.cool = 0; this.turnRate = 0; this.sit = 0; this.trailT = 0;
@@ -75,14 +78,16 @@ export class Critter extends Walker {
     this.away = RARE_CRITTERS.away; this.root.visible = this.shadow.visible = false; this.selfCollider.active = false;
   }
   reappear() {
-    const P = ctx.player; let d = spawnDrySpot(null);
-    for (let i = 0; i < 20 && (!d || arcDist(d, P.up) < 60); i++) d = spawnDrySpot(null);
+    const P = ctx.player,spot=()=>this.def.coastal?coastalSpot():spawnDrySpot(null); let d = spot();
+    for (let i = 0; i < 20 && (!d || arcDist(d, P.up) < 60); i++) d = spot();
     if (!d) { this.away = 1; return; }
     this.up.copy(d); this.r = groundHeight(d); this.pos.copy(d).multiplyScalar(this.r); this.home.copy(d);
+    if(this.def.coastal)this.waterHome=null;
     this.root.visible = this.shadow.visible = true; this.selfCollider.active = true; this.state = 'idle'; this.timer = 1;
   }
   update(dt) {
     if (this.away > 0) { if ((this.away -= dt) <= 0) this.reappear(); return; }
+    if(this.def.coastal){updateCoastalCritter(this,dt);return;}
     const toP = this.toP, dist = tangentTo(this.pos, this.up, ctx.player.pos, toP);
     this.cool -= dt; this.timer -= dt;
     if (ctx.showcase && dist < 6) { this.state = 'wander'; this.timer = Math.max(this.timer, 1); this.turnRate = 0; this.fwd.copy(toP).negate(); }   // keep out of a menu's shot
