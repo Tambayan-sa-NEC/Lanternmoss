@@ -22,7 +22,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
 import { arcDist, matrixAt, offsetDir, tangentToward } from '../utils/sphere.js';
 import { isFree } from '../world/placement.js';
-import { groundHeight, slopeAt } from '../world/terrain.js';
+import { dryGround, groundHeight, slopeAt } from '../world/terrain.js';
 import { dayClock } from './dayClock.js';
 import { Gathering, TOOL_USES } from './Gathering.js';
 import { Hotbar } from './hotbar.js';
@@ -112,6 +112,7 @@ export const Farm = {
     const { plot: p, dist } = h, s = p.s, at = p.dir.clone().multiplyScalar(groundHeight(p.dir) + 1.2);
     const need = (what, tag) => `${what} <span class="ctag">(${tag})</span>`;
     let label, run;
+    if (!dryGround(p.dir)) return { dist, label: 'Wait for the water to recede', at, run: () => toast('This plot is underwater.') };
     if (!s.tilled) { label = Gathering.hotbarTool('hoe') ? 'Till the soil' : need('Till the soil', 'needs a hoe'); run = () => this.till(p); }
     else if (!s.crop) { const sd = this.seeds(); label = sd ? `Plant ${sd.def.name}` : need('Plant seeds', 'none in the bag'); run = () => this.plant(p, sd); }
     else if (s.growth >= 1) { label = `Harvest the ${CROPS[s.crop].name}`; run = () => this.harvest(p); }
@@ -128,6 +129,7 @@ export const Farm = {
     } });
   },
   plant(p, sd = this.seeds()) {
+    if (!dryGround(p.dir)) { toast('Wait for the water to recede.'); return; }
     if (!p.s.tilled || p.s.crop) return;
     if (!sd) { toast('You have no seeds. Pim sells them, and you sometimes find some picking sweetleaf.'); return; }
     ctx.player.inventory.removeFromSlot(sd.slot, 1);
@@ -145,6 +147,7 @@ export const Farm = {
     } });
   },
   harvest(p) {
+    if (!dryGround(p.dir)) { toast('Wait for the water to recede.'); return; }
     const s = p.s; if (!s.crop || s.growth < 1) return;
     const crop = s.crop, drops = rollDrops(CROPS[crop].harvest);
     for (const [item, n] of drops) grantItem(item, n);
@@ -155,7 +158,7 @@ export const Farm = {
 
   /** Time skipped (sleeping): every watered crop on this planet grows that much. */
   growBy(seconds) {
-    for (const p of this.plots) if (p.s.crop && p.s.watered) { p.s.growth = Math.min(1, p.s.growth + growthFor(p.s.crop, seconds, DAY.length)); this.look(p); }
+    for (const p of this.plots) if (dryGround(p.dir) && p.s.crop && p.s.watered) { p.s.growth = Math.min(1, p.s.growth + growthFor(p.s.crop, seconds, DAY.length)); this.look(p); }
   },
   raining() { const w = this.world?.weather; return !!w && FARM.rainWaters.includes(w.kind) && (w.k ?? 1) > 0.5; },
   update(dt) {
@@ -163,7 +166,7 @@ export const Farm = {
     if (dayClock.day !== this.day) { this.day = dayClock.day; for (const p of this.plots) { p.s.watered = false; this.look(p); } }   // a new day: the soil dries
     const rain = this.raining();
     for (const p of this.plots) {
-      const s = p.s; if (!s.crop) continue;
+      const s = p.s; if (!s.crop || !dryGround(p.dir)) continue;
       if (rain && !s.watered && s.growth < 1) { s.watered = true; this.look(p); }
       if (s.watered && s.growth < 1) {
         s.growth = Math.min(1, s.growth + growthFor(s.crop, dt, DAY.length));

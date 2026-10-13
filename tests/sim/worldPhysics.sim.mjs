@@ -1,0 +1,90 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { boot, imp } from './lib/boot.mjs';
+import { installPhysicsFixture } from './lib/physicsFixture.mjs';
+const { PLANETS } = await imp('config/planets.js'), { ctx } = await imp('core/context.js');
+const { configurePhysics, gravityAt, pondLevel, seaLevel } = await imp('world/physics.js');
+const { dryGround, groundHeight, waterAt } = await imp('world/terrain.js');
+const { arcDist, offsetDir, dirAlong } = await imp('utils/sphere.js');
+const { spawnDrySpot, isFree } = await imp('world/placement.js');
+const { landable } = await imp('combat/area.js'), { spawnRoster } = await imp('combat/spawning.js');
+const { PLAYER, BUFFS } = await imp('config/game.js');
+const { parseSave } = await imp('core/save.js');
+const fixture = installPhysicsFixture(), previous = PLANETS.map(p => ({ mechanic:p.mechanic, physics:p.physics }));
+const rules = { waterMaxOffset:1, seaMaxLevel:70 };
+PLANETS[0].mechanic = fixture.id; PLANETS[0].physics = rules; PLANETS[1].physics = { gravity:0.65 };
+const { game, H, step } = await boot('witch', { wake:false });
+const P=H.player, W=game.world, B=H.Building;
+const instance=()=>H.Mechanics.active.instance;
+const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
+const travel=id=>{ P.placeAt(H.Portals.gate.dir); assert.ok(H.Portals.travel(id)); step(2); assert.equal(ctx.planetId,id); };
+try {
+  H.Tutorial.skip(); P.invuln=10000;
+  instance().set({gravity:0.4,waterOffset:0.6});
+  const pond=H.ponds.find(p=>p.r>=8), base=pond.water;
+  near(pond.center.length(),base+0.6); near(W.water.meshes[H.ponds.indexOf(pond)].position.length(),base+0.6);
+  P.placeAt(pond.dir); P.vy=0; P.grounded=true; step(0.1); assert.ok(P.swimming,JSON.stringify({r:P.r,ground:groundHeight(P.up),water:waterAt(P.up)?.level,depth:P.waterDepth,away:arcDist(P.up,pond.dir),motion:!!P.motion,paused:ctx.paused})); near(P.r,waterAt(P.up).level-1);
+  instance().set({waterOffset:-5}); step(1); assert.equal(P.swimming,false); near(P.r,groundHeight(P.up));
+  instance().set({waterOffset:0.6});
+  H.inventory.add('fishingRod',1); P.placeAt(dirAlong(pond.dir,pond.t1,pond.r+1)); H.Fishing.start(pond);
+  assert.ok(H.Fishing.active); H.Fishing.update(0.6); const float=H.Fishing.s.float.position.length();
+  instance().set({waterOffset:0.8}); H.Fishing.update(0.01); near(H.Fishing.s.surf,waterAt(H.Fishing.s.dir).level);
+  assert.ok(H.Fishing.s.float.position.length()>float+0.15);
+  instance().set({waterOffset:-5}); H.Fishing.update(0.01); assert.equal(H.Fishing.active,false);
+  instance().set({waterOffset:0});
+  console.log('PASS  pond queries, swimmer support, rendering and fishing follow live levels and receding water');
+
+  P.placeAt(W.spawnDir); P.r+=8; P.vy=8; P.grounded=false; P.jumpBuf=0; P.motion=null; H.buffs.moon=5;
+  P.update(1/60,{keys:{Space:true},viewFwd:H.cam.fwd,enabled:true});
+  near(P.vy,8-PLAYER.gravityRise*BUFFS.moonGravity*0.4/60);
+  P.vy=-1; P.update(1/60,{keys:{},viewFwd:H.cam.fwd,enabled:true}); near(P.vy,-1-PLAYER.gravityFall*0.4/60);
+  H.buffs.moon=0; P.placeAt(W.spawnDir);
+  const frozen=H.Mechanics.toJSON(); ctx.paused=true; step(0.2); assert.deepEqual(H.Mechanics.toJSON(),frozen); ctx.paused=false;
+  console.log('PASS  real hero rise/fall compose planet gravity and Moon-Hop; pause freezes the mechanic');
+
+  let site=null;
+  for(let r=18;r<95&&!site;r+=1.5) for(let a=0;a<6.28&&!site;a+=0.09) {
+    const d=offsetDir(W.spawnDir,a,r); if(!B.siteProblem('homeRug',d,0,{actors:false}))site=d;
+  }
+  assert.ok(site); B.install({id:1,itemId:'homeRug',dir:site.toArray(),turn:0}); const builds=B.toJSON();
+  const plot=H.Farm.plots[0]; assert.ok(plot); Object.assign(plot.s,{tilled:true,crop:'carrot',watered:true,growth:0.2}); H.Farm.look(plot);
+  const target=H.Gathering.nodes.find(n=>!n.def.tool); assert.ok(target);
+  const flood=96;
+  configurePhysics({waterMaxOffset:1,seaMaxLevel:flood}); instance().set({seaLevel:flood});
+  assert.equal(dryGround(site),false); assert.equal(landable(site,0.5),false); assert.equal(isFree(site,0.5),false);
+  assert.equal(B.canEdit(B.list[0]),false); B.load(builds); assert.deepEqual(B.toJSON(),builds,'flooding cannot erase restored builds');
+  const crop=structuredClone(plot.s); H.Farm.update(1); H.Farm.growBy(100); assert.deepEqual(plot.s,crop);
+  H.Farm.harvest(plot); assert.deepEqual(plot.s,crop); H.Gathering.work({node:target}); assert.equal(H.Gathering.job,null);
+  P.placeAt(H.Stations.list[0].dir); assert.equal(H.Stations.here(),null); assert.equal(H.Stations.target(),null);
+  const enemies=ctx.enemies.length; spawnRoster(W,[{type:'slime',count:1}]); assert.equal(ctx.enemies.length,enemies);
+  assert.equal(spawnDrySpot(site,0,0,0.5,()=>0.5),null);
+  near(W.water.ocean.scale.x,flood); assert.ok(W.water.ocean.visible);
+  instance().set({seaLevel:null}); assert.equal(W.water.ocean.visible,false); configurePhysics(rules); instance().set({gravity:0.4,waterOffset:0.55});
+  H.Farm.update(1); assert.ok(plot.s.growth>crop.growth,'growth resumes after recession');
+  configurePhysics({waterMaxOffset:1,seaLevel:groundHeight(site)-1,seaMaxLevel:groundHeight(site)+1});
+  B.clear(); assert.match(B.siteProblem('homeRug',site,0,{actors:false}),/high-water/);
+  instance().set({seaLevel:null}); configurePhysics(rules); instance().set({gravity:0.4,waterOffset:0.55,seaLevel:69.5});
+  assert.ok(H.Gathering.nodes.every(n=>dryGround(n.up,n.def.r,{high:true})));
+  assert.ok(H.Farm.plots.every(p=>dryGround(p.dir,0,{high:true})));
+  console.log('PASS  sea rendering, dry actor/landing/resource queries, high-water construction and preserved submerged crop/build state');
+
+  const expected=H.Mechanics.toJSON().state; assert.ok(H.saves.save().ok); assert.ok(H.saves.continue());
+  assert.deepEqual(H.Mechanics.toJSON().state,expected); near(gravityAt(P.up,24),9.6); near(seaLevel(),69.5);
+  const oldSea=W.water.ocean; let disposedGeometry=0,disposedMaterial=0;
+  assert.notEqual(oldSea.material,W.waterMat); assert.equal(oldSea.material.defines.SEA,1);
+  assert.equal(oldSea.material.uniforms.uTime,W.waterMat.uniforms.uTime);
+  oldSea.geometry.addEventListener('dispose',()=>disposedGeometry++); oldSea.material.addEventListener('dispose',()=>disposedMaterial++);
+  H.inventory.add('wayfarerKey',2); travel('emberfall'); assert.equal(H.Mechanics.id,null); near(gravityAt(P.up,24),15.6);
+  assert.equal(disposedGeometry,1); assert.equal(disposedMaterial,1);
+  assert.equal(seaLevel(),null); near(pondLevel(H.ponds[0]),H.ponds[0].water); assert.equal(W.water.ocean,null);
+  travel('lanternmoss'); assert.deepEqual(H.Mechanics.toJSON().state,expected); near(W.water.ocean.scale.x,69.5);
+  assert.notEqual(W.water.ocean,oldSea);
+  near(pondLevel(H.ponds[0]),H.ponds[0].water+0.55); assert.equal(fixture.live.size,1);
+  const old=parseSave(readFileSync(new URL('../fixtures/save-v1.json',import.meta.url),'utf8')); assert.ok(H.saves.restore(old.data));
+  assert.equal(H.Mechanics.id,null); near(gravityAt(P.up,24),15.6); assert.equal(seaLevel(),null);
+  W.dispose(); assert.equal(gravityAt(P.up,24),24); assert.equal(seaLevel(),null); assert.equal(fixture.live.size,0);
+  console.log('PASS  Continue and real keyed travel restore rules once, dispose sea meshes and reset destination defaults; old v1 remains valid');
+  console.log('all passed');
+} finally {
+  H.Mechanics.exit(); configurePhysics(); PLANETS.forEach((p,i)=>Object.assign(p,previous[i])); fixture.unregister();
+}

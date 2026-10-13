@@ -16,7 +16,7 @@ import { showBanner } from '../../ui/banner.js';
 import { toast } from '../../ui/toast.js';
 import { mpick, mr, rng } from '../../utils/random.js';
 import { arcDist } from '../../utils/sphere.js';
-import { spawnSpot } from '../../world/placement.js';
+import { spawnDrySpot } from '../../world/placement.js';
 import { ponds } from '../../world/terrain.js';
 import { Bird, Flock } from './Bird.js';
 import { Critter } from './Critter.js';
@@ -24,26 +24,27 @@ import { Fish } from './Fish.js';
 
 /** A spot out in the wilds, at least `min` metres from the village. */
 function wildSpot(village, min = COMBAT.player.safeRadius + 6) {
-  for (let i = 0; i < 30; i++) { const d = spawnSpot(null); if (arcDist(d, village) > min) return d; }
-  return spawnSpot(null);
+  for (let i = 0; i < 30; i++) { const d = spawnDrySpot(null); if (d && arcDist(d, village) > min) return d; }
+  return spawnDrySpot(null);
 }
 
 export function spawnWildlife(world, planet = {}) {
   const { spawnDir, stoneCenter, houseA, cottage } = world, w = planet.wildlife ?? {};
-  ctx.critters.push(                                                  // the village's own pets come along to every planet
-    new Critter('catOrange', spawnSpot(houseA.door, 1, 4)), new Critter('catGrey', spawnSpot(cottage.door, 2, 5)),
-    new Critter('catBlack', spawnSpot(null)), new Critter('dogShiba', spawnSpot(spawnDir, 4, 7)),
-    new Critter('dogGold', spawnSpot(null)), new Critter('fox', spawnSpot(stoneCenter, 8, 14)), new Critter('fox', spawnSpot(null)),
-  );
+  const critter = (key, dir) => { if (dir) ctx.critters.push(new Critter(key, dir)); };
+  critter('catOrange', spawnDrySpot(houseA.door, 1, 4));
+  critter('catGrey', spawnDrySpot(cottage.door, 2, 5));
+  critter('catBlack', spawnDrySpot(null)); critter('dogShiba', spawnDrySpot(spawnDir, 4, 7));
+  critter('dogGold', spawnDrySpot(null)); critter('fox', spawnDrySpot(stoneCenter, 8, 14)); critter('fox', spawnDrySpot(null));
   for (const [key, count, where] of w.critters ?? []) for (let i = 0; i < count; i++) {
-    if (where === 'ponds') { const p = ponds[i % Math.max(1, ponds.length)]; if (p) ctx.critters.push(new Critter(key, spawnSpot(p.dir, p.r + 0.6, p.r + 2.6, 0.4))); }
-    else ctx.critters.push(new Critter(key, wildSpot(spawnDir, where === 'far' ? 40 : undefined)));
+    if (where === 'ponds') { const p = ponds[i % Math.max(1, ponds.length)]; if (p) critter(key, spawnDrySpot(p.dir, p.r + 0.6, p.r + 2.6, 0.4)); }
+    else critter(key, wildSpot(spawnDir, where === 'far' ? 40 : undefined));
   }
-  if (w.rare) ctx.critters.push(new Critter(w.rare, wildSpot(spawnDir, 45)));
+  if (w.rare) critter(w.rare, wildSpot(spawnDir, 45));
   const plumage = w.plumage ?? null;
-  for (let i = 0; i < 4; i++) ctx.birds.push(new Bird(spawnSpot(spawnDir, 5, 16, 0.5), plumage));
-  for (let i = 0; i < (w.birds ?? 5); i++) ctx.birds.push(new Bird(spawnSpot(null, 0, 0, 0.5), plumage));
-  for (let i = 0; i < (w.flocks ?? 0); i++) ctx.birds.push(new Flock(wildSpot(spawnDir, 10), plumage));
+  const bird = dir => { if (dir) ctx.birds.push(new Bird(dir, plumage)); };
+  for (let i = 0; i < 4; i++) bird(spawnDrySpot(spawnDir, 5, 16, 0.5));
+  for (let i = 0; i < (w.birds ?? 5); i++) bird(spawnDrySpot(null, 0, 0, 0.5));
+  for (let i = 0; i < (w.flocks ?? 0); i++) { const dir = wildSpot(spawnDir, 10); if (dir) ctx.birds.push(new Flock(dir, plumage)); }
   for (const p of ponds) {
     for (let i = 0; i < 3 + Math.floor(p.r / 2); i++) p.fish.push(new Fish(p, w.fish));
     if (p.r >= 8) p.fish.push(new Fish(p, [{ body: 0xffd36b, spot: 0xffffff, fin: 0xfff0a0 }], 1.9));   // a big golden koi in each lake

@@ -160,6 +160,7 @@ export class Game {
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
     if (ctx.started) { dayClock.update(dt); this.world.mechanics.update(dt); }
+    this.world.syncPhysics();
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
     for (const c of ctx.critters) c.update(dt);
     for (const b of ctx.birds) b.update(dt);

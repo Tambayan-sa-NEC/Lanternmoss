@@ -2,7 +2,7 @@
 import { freeOfColliders } from '../physics/colliders.js';
 import { rand, rng, rr } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir } from '../utils/sphere.js';
-import { ponds, slopeAt } from './terrain.js';
+import { dryGround, ponds, slopeAt } from './terrain.js';
 
 /** {dir, r} occupancy discs claimed by generated scenery. */
 export const placed = [];
@@ -10,7 +10,7 @@ export const placed = [];
 export function isFree(dir, r) {
   for (const p of placed) if (arcDist(dir, p.dir) < r + p.r) return false;
   for (const p of ponds) if (arcDist(dir, p.dir) < p.r + r + 0.9) return false;
-  return true;
+  return dryGround(dir, r, { high: true });
 }
 /** Seeded: a random free spot (optionally within [near.min, near.max] of near.dir), claimed in `placed`. */
 export function findSpot(r, near = null, tries = 120) {
@@ -25,7 +25,9 @@ export function findSpot(r, near = null, tries = 120) {
 export function spawnSpot(base, minA, maxA, rad = 0.8, random = rng) {
   for (let i = 0; i < 80; i++) {
     const d = base ? offsetDir(base, random() * 6.28, minA + random() * (maxA - minA)) : randomDir(random);
-    if (freeOfColliders(d, rad) && !ponds.some(p => arcDist(d, p.dir) < p.r + 1) && (i > 60 || slopeAt(d) < 0.8)) return d;
+    if (freeOfColliders(d, rad) && !ponds.some(p => arcDist(d, p.dir) < p.r + 1) && dryGround(d, rad) && (i > 60 || slopeAt(d) < 0.8)) return d;
   }
   return base ? base.clone() : randomDir(random);
 }
+/** Living land actors may be omitted if no dry site exists; loot keeps its fallback so rewards are never lost. */
+export function spawnDrySpot(...args) { const d = spawnSpot(...args); return dryGround(d, args[3] ?? 0.8) ? d : null; }

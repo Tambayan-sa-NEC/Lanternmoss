@@ -14,7 +14,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
 import { arcDist, dirAlong } from '../utils/sphere.js';
 import { spawnSpot } from '../world/placement.js';
-import { groundHeight } from '../world/terrain.js';
+import { dryGround, groundHeight } from '../world/terrain.js';
 
 export function spawnWorldItem(itemId, quantity, dir, options) {
   if (!itemRegistry.has(itemId) || quantity <= 0) return null;
@@ -38,7 +38,7 @@ export const Pickups = {
 
 /** Scatters a planet's forage (PLANETS[i].forage) over free ground. */
 export function spawnForage(forage) {
-  for (const { item, count } of forage) for (let i = 0; i < count; i++) spawnWorldItem(item, 1, spawnSpot(null, 0, 0, 0.6));
+  for (const { item, count } of forage) for (let i = 0; i < count; i++) { const d = spawnSpot(null, 0, 0, 0.6); if (dryGround(d)) spawnWorldItem(item, 1, d); }
 }
 
 /** Gives the hero `quantity` of itemId; anything the bag can't hold is set down in front of them.

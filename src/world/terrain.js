@@ -8,7 +8,8 @@ import * as THREE from 'three';
 import { PLANET_RADIUS as R, WORLD } from '../config/game.js';
 import { clamp, smoothstep } from '../utils/math.js';
 import { mulberry32 } from '../utils/random.js';
-import { dirAlong, matrixAt, tangentFrame } from '../utils/sphere.js';
+import { dirAlong, matrixAt, offsetDir, tangentFrame } from '../utils/sphere.js';
+import { movingWater, pondLevel, seaLevel } from './physics.js';
 
 export const ponds = [];
 const flats = [];
@@ -128,18 +129,29 @@ export function computeWaterLevel(p) {
     const a = i / 24 * Math.PI * 2; const t = t1.clone().multiplyScalar(Math.cos(a)).addScaledVector(t2, Math.sin(a));
     const d = dirAlong(p.dir, t, p.r); lo = Math.min(lo, groundHeight(d) * d.dot(p.dir));
   }
-  p.water = lo - 0.08; p.t1 = t1; p.t2 = t2; p.center = p.dir.clone().multiplyScalar(p.water);
+  p.water = lo - 0.08; p.t1 = t1; p.t2 = t2; p.center = p.dir.clone().multiplyScalar(pondLevel(p));
 }
 /** The water at direction d: { pond, level (distance from the planet centre to the surface along d), depth } or null. */
-export function waterAt(d) {
+export function waterAt(d, { high = false } = {}) {
+  const sea = seaLevel(high);
+  let water = null;
+  if (sea !== null) { const depth = sea - groundHeight(d); if (depth > 0.05) water = { pond: null, level: sea, depth }; }
   for (const p of ponds) {
     if (p.water === undefined) continue;
     const c = d.dot(p.dir); if (c < p.cull) continue;
     if (Math.acos(Math.min(1, c)) * R > p.r + 0.4) continue;
-    const level = p.water / c, depth = level - groundHeight(d);
-    if (depth > 0.05) return { pond: p, level, depth };
+    const level = pondLevel(p, high) / c, depth = level - groundHeight(d);
+    if (depth > 0.05 && (!water || level > water.level)) water = { pond: p, level, depth };
   }
-  return null;
+  return water;
+}
+
+/** Dry footprint, optionally at declared high water. Existing pond-margin exclusions remain with their callers. */
+export function dryGround(d, radius = 0, { high = false } = {}) {
+  if (waterAt(d, { high })) return false;
+  if (radius > 0 && movingWater(high)) for (let i = 0; i < 8; i++)
+    if (waterAt(offsetDir(d, i * Math.PI / 4, radius), { high })) return false;
+  return true;
 }
 
 /** Matrix placing an object on the ground at direction dir, rotated by yaw about the surface normal. */

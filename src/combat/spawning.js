@@ -7,18 +7,19 @@ import { Enemy } from '../entities/enemies/Enemy.js';
 import { freeOfColliders } from '../physics/colliders.js';
 import { rand } from '../utils/random.js';
 import { arcDist, offsetDir, randomDir } from '../utils/sphere.js';
-import { spawnSpot } from '../world/placement.js';
-import { ponds, slopeAt } from '../world/terrain.js';
+import { spawnDrySpot } from '../world/placement.js';
+import { dryGround, ponds, slopeAt } from '../world/terrain.js';
 import { enemyDef } from './enemyDefs.js';
 
 export function addEnemy(type, dir) { const e = new Enemy(type, dir); ctx.enemies.push(e); return e; }
+const addLandEnemy = (type, dir) => dir && dryGround(dir) ? addEnemy(type, dir) : null;
 
 function enemySpot(world) {
   const { spawnDir, stoneCenter, houses } = world;
   for (let i = 0; i < 400; i++) {
     const d = randomDir();
     if (arcDist(d, spawnDir) < COMBAT.player.safeRadius + 11 || arcDist(d, stoneCenter) < 12) continue;
-    if (houses.some(h => arcDist(d, h.dir) < 10) || ponds.some(p => arcDist(d, p.dir) < p.r + 2) || slopeAt(d) > 0.6) continue;
+    if (houses.some(h => arcDist(d, h.dir) < 10) || ponds.some(p => arcDist(d, p.dir) < p.r + 2) || !dryGround(d, 1.2) || slopeAt(d) > 0.6) continue;
     if (world.lairDir && arcDist(d, world.lairDir) < WORLD.flats.lair[0]) continue;      // the boss's arena is its own
     if (!freeOfColliders(d, 1.2) || ctx.enemies.some(e => arcDist(d, e.home) < 6)) continue;
     return d;
@@ -33,13 +34,13 @@ export function spawnRoster(world, roster) {
   const wildPonds = ponds.filter(p => arcDist(p.dir, world.spawnDir) > COMBAT.player.safeRadius + 8);   // pond dwellers gather around far ponds
   for (const g of roster) {
     if (g.groups) {
-      for (let c = 0; c < more(g.groups); c++) { const camp = enemySpot(world); for (let i = 0; i < g.size; i++) addEnemy(g.type, i ? spawnSpot(camp, 1.2, 3, 0.6, rand) : camp); }
+      for (let c = 0; c < more(g.groups); c++) { const camp = enemySpot(world); for (let i = 0; i < g.size; i++) addLandEnemy(g.type, i ? spawnDrySpot(camp, 1.2, 3, 0.6, rand) : camp); }
     } else if (g.near === 'ponds') {
       for (let i = 0; i < more(g.count); i++) {
         const p = wildPonds[i % Math.max(1, wildPonds.length)];
-        addEnemy(g.type, p ? spawnSpot(p.dir, p.r + 2.5, p.r + 6, 0.8) : enemySpot(world));
+        addLandEnemy(g.type, p ? spawnDrySpot(p.dir, p.r + 2.5, p.r + 6, 0.8) : enemySpot(world));
       }
-    } else for (let i = 0; i < more(g.count); i++) addEnemy(g.type, enemySpot(world));
+    } else for (let i = 0; i < more(g.count); i++) addLandEnemy(g.type, enemySpot(world));
   }
 }
 
@@ -49,7 +50,7 @@ function lairSpot(world) {
   const { spawnDir, houses } = world;
   for (let i = 0; i < 600; i++) {
     const d = randomDir();
-    if (arcDist(d, spawnDir) < 70 || houses.some(h => arcDist(d, h.dir) < 12) || ponds.some(p => arcDist(d, p.dir) < p.r + 5)) continue;
+    if (arcDist(d, spawnDir) < 70 || houses.some(h => arcDist(d, h.dir) < 12) || ponds.some(p => arcDist(d, p.dir) < p.r + 5) || !dryGround(d, 3.5)) continue;
     if (!freeOfColliders(d, 3.5) || ctx.enemies.some(e => arcDist(d, e.home) < 10)) continue;
     return d;
   }
@@ -73,12 +74,12 @@ export function spawnMiniBosses(world, list = []) {
     if (m.near === 'lake') {
       const lakes = ponds.filter(p => p.r >= 6).sort((a, b) => arcDist(b.dir, world.spawnDir) - arcDist(a.dir, world.spawnDir));
       const lake = lakes[0];
-      if (lake) for (let i = 0; i < 40 && !dir; i++) { const d = offsetDir(lake.dir, rand() * 6.28, lake.r + 3.5); if (freeOfColliders(d, 2) && slopeAt(d) < 0.5) dir = d; }
+      if (lake) for (let i = 0; i < 40 && !dir; i++) { const d = offsetDir(lake.dir, rand() * 6.28, lake.r + 3.5); if (freeOfColliders(d, 2) && dryGround(d, 2) && slopeAt(d) < 0.5) dir = d; }
     }
     for (let i = 0; i < 300 && !dir; i++) {
       const d = randomDir();
       if (arcDist(d, world.spawnDir) < 60 || (world.lairDir && arcDist(d, world.lairDir) < 45) || slopeAt(d) > 0.4) continue;
-      if (!freeOfColliders(d, 2.5) || ponds.some(p => arcDist(d, p.dir) < p.r + 4) || out.some(e => arcDist(d, e.home) < 40)) continue;
+      if (!freeOfColliders(d, 2.5) || ponds.some(p => arcDist(d, p.dir) < p.r + 4) || !dryGround(d, 2.5) || out.some(e => arcDist(d, e.home) < 40)) continue;
       dir = d;
     }
     if (!dir) continue;

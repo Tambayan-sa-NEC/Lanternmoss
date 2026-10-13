@@ -5,7 +5,8 @@
 import * as THREE from 'three';
 import { WORLD } from '../config/game.js';
 import { frameQuat, projectTangent, tangentFrame } from '../utils/sphere.js';
-import { groundHeight, terrainGradient } from '../world/terrain.js';
+import { groundHeight, terrainGradient, waterAt } from '../world/terrain.js';
+import { gravityAt } from '../world/physics.js';
 import { ceilingHeight, resolveCollisions, support } from './colliders.js';
 
 const _p = new THREE.Vector3(), _u = new THREE.Vector3(), _d = new THREE.Vector3(), _g = new THREE.Vector3();
@@ -25,6 +26,7 @@ export class Walker {
   }
   /** Move by a tangent velocity on the sphere; resolves collisions, re-aligns to gravity and transports the heading. */
   step(vel, dt, gravity = 26) {
+    this.refreshWater();                                         // live levels affect speed on this frame, not the next
     const W = WORLD.water, slow = this.waterDepth > 0.15 ? (this.swimming ? W.swim : W.wade) : 1;
     _d.copy(vel).multiplyScalar(dt * slow);
     if (this.tooSteep(_d)) {                                    // a cliff: slide along it instead (keep the part across the slope)
@@ -36,14 +38,20 @@ export class Walker {
     const normal = n ? n.clone() : null;
     this.up.copy(_p).normalize();                               // gravity always points to the planet centre
     projectTangent(this.fwd, this.up).normalize();              // parallel-transport heading (pole-safe)
-    this.vy -= gravity * dt; this.r += this.vy * dt;
+    this.vy -= gravityAt(this.up, gravity) * dt; this.r += this.vy * dt;
     if (this.vy > 0) { const ceiling = ceilingHeight(this.up,this.r), head = this.height ?? 1; if(this.r + head > ceiling) { this.r = ceiling - head; this.vy = 0; } }
     const s = support(this.up), floor = s.h;
-    this.waterDepth = s.water ? s.water.depth : 0; this.swimming = !!s.water && s.water.depth > W.deep;
     if (this.r <= floor || (this.grounded && this.vy <= 0 && this.r - floor < 0.35)) { this.r = floor; this.vy = 0; this.grounded = true; }
     else this.grounded = false;
+    this.setWater(s.water);
     this.pos.copy(this.up).multiplyScalar(this.r);
     return normal;
   }
+  setWater(water) {
+    // A rock/floor above the water remains dry; jumping over a pond does not slow airborne movement.
+    this.waterDepth = water ? Math.max(0, Math.min(water.depth, water.level - this.r)) : 0;
+    this.swimming = !!water && water.depth > WORLD.water.deep && this.r <= water.level - WORLD.water.swimDepth + 0.35;
+  }
+  refreshWater() { this.setWater(waterAt(this.up)); }
   place(root) { root.position.copy(this.pos).addScaledVector(this.up, this.hover); frameQuat(this.up, this.fwd, root.quaternion); }
 }

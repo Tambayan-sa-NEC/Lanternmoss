@@ -17,7 +17,8 @@ import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
 import { arcDist, dirAlong, frameQuat, tangentToward, turnToward } from '../utils/sphere.js';
 import { damp } from '../utils/math.js';
-import { ponds } from '../world/terrain.js';
+import { ponds, waterAt } from '../world/terrain.js';
+import { pondLevel } from '../world/physics.js';
 import { Gathering, TOOL_USES } from './Gathering.js';
 import { holdTool, releaseTool } from './heldTool.js';
 import { Hotbar } from './hotbar.js';
@@ -35,7 +36,7 @@ export const Fishing = {
   /** The pond whose edge the hero stands at (or wades in), or null. */
   pondHere() {
     const P = ctx.player;
-    for (const p of ponds) { const d = arcDist(P.up, p.dir) - p.r; if (d < FISHING.reach && d > -2.5) return p; }
+    for (const p of ponds) { const d = arcDist(P.up, p.dir) - p.r; if (d < FISHING.reach && d > -2.5 && waterAt(p.dir)) return p; }
     return null;
   },
   /** The E prompt: while fishing, what E does next; otherwise "Fish here" at a pond with a rod on the hotbar. */
@@ -55,6 +56,7 @@ export const Fishing = {
   start(pond) {
     const P = ctx.player, rod = Gathering.hotbarTool('rod');
     if (!rod) { toast(Gathering.toolProblem({ tool: 'rod', tier: 1 })); return; }
+    if (!waterAt(pond.dir)) return;
     Hotbar.selected = rod.slot; Hotbar.changedAt = ctx.time; holdTool(P, rod.def);
     // the float lands a little way into the water, toward the middle
     const toMid = arcDist(P.up, pond.dir), edge = Math.max(0, toMid - pond.r);
@@ -62,7 +64,7 @@ export const Fishing = {
     const float = buildFloat(); scene.add(float);
     const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0x3a2340 }));
     line.frustumCulled = false; scene.add(line);
-    this.s = { stage: 'cast', pond, dir, float, line, t: 0, biteAt: FISHING.bite[0] + rng() * (FISHING.bite[1] - FISHING.bite[0]), from: P.up.clone(), surf: pond.water / dir.dot(pond.dir) };
+    this.s = { stage: 'cast', pond, dir, float, line, t: 0, biteAt: FISHING.bite[0] + rng() * (FISHING.bite[1] - FISHING.bite[0]), from: P.up.clone(), surf: pondLevel(pond) / dir.dot(pond.dir) };
     P.fwd.copy(tangentToward(P.up, dir)); audio.whoosh?.();
   },
   /** E or a click while fishing. */
@@ -93,6 +95,9 @@ export const Fishing = {
   update(dt) {
     const s = this.s; if (!s) return;
     const P = ctx.player;
+    const water = waterAt(s.dir);
+    if (!water) { this.end('The water receded. You pack up the rod.'); return; }
+    s.surf = water.level;
     if (P.dead || P.hurtT > 0 || ctx.transitioning || arcDist(P.up, s.from) > 1.2) { this.end(P.hurtT > 0 ? 'Ouch! The fish got away.' : 'You pack up the rod.'); return; }
     s.t += dt;
     turnToward(P.fwd, tangentToward(P.up, s.dir), P.up, damp(10, dt));

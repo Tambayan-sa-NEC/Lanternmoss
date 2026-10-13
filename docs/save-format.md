@@ -45,6 +45,10 @@ mismatched modules are discarded. Continue loads this state and applies away tim
 actor/resource population. Later planet restoration skips it to avoid undoing that advancement. Weather stays
 transient. See [mechanic lifecycle and save hooks](mechanics.md); the original v1 fixture is unchanged.
 
+TODO 26c derives gravity and moving-water queries from planet config plus that mechanic snapshot, before
+population. They have no separate save owner. Travel/disposal resets the previous world's queries and water
+meshes; existing builds and crop data survive flooding. See [shared world physics](world-physics.md).
+
 Foreign, damaged and future-version files are rejected before writing. Supported snapshots drop unknown IDs,
 clamp finite numbers, normalize valid directions and fill safe defaults. Files are limited to 2 MiB. A future format
 change must migrate version 1 explicitly and retain `tests/fixtures/save-v1.json` as a compatibility check.

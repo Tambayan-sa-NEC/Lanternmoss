@@ -5,6 +5,11 @@ mechanic. Production currently registers no modules, so the original three world
 Actual tides, lantern darkness and lunar gravity belong to their later roadmap stages. Weather remains a separate
 visual system; a mechanic may read it through its environment.
 
+Mechanics can apply derived gravity/water rules through `environment.world.physics.set(...)`. Declare maximum
+water in planet config before generation, keep live values within it, and derive them from the mechanic's saved
+state before entry/population. Water meshes synchronize before actors; world disposal resets physics queries.
+See [shared physics and water](world-physics.md).
+
 Add a pure descriptor in `src/world/mechanics/<id>.js`, import it in `src/world/mechanics/index.js`, and call
 `registerMechanic(id, descriptor)` after the registry is initialized. A descriptor provides:
 
