@@ -593,6 +593,11 @@ daily 1.5 m tide with a clock chip. Local lagoon drainage shares physics and ren
 expires through skips/away time. The remaining content and campaign release are later stages. See
 [terrain, controls and development previews](docs/tidewhisper.md).
 
+The Tidewhisper development config now includes lantern palms, swaying kelp, coral fans and coastal plants;
+ambient crabs, turtles, seals, gulls/terns, shoals and night lanternfish; and the rare Pearl Turtle's saved charm.
+Scenery is batched and counts are capped. The world remains unreleased pending its later content/release stages.
+See [coastal flora, wildlife and previews](docs/tidewhisper.md#coastal-flora-and-wildlife-27b).
+
 `PlanetMechanics` loads optional per-planet state before entry and actor/resource population. Frame updates freeze
 on the title and while paused; naps, sleep and away time use a separate bounded advancement hook. Exit removes rules
 and listeners before world disposal. Weather stays separate, and the original three worlds have no mechanic module.

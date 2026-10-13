@@ -1,8 +1,8 @@
 # Tidewhisper terrain and tides
 
-TODO 27a implements the archipelago and water controls. Tidewhisper remains `released: false`: its plants,
-wildlife, resources, village, music and fights belong to 27b–27g, and campaign release requires 27h.
-The development fixture borrows existing actors/items in the original Lanternmoss save slot to exercise real
+TODOs 27a/27b implement the archipelago, water controls, plants and ambient wildlife. Tidewhisper remains
+`released: false`: resources/weather/music, village and fights belong to 27c–27g, and campaign release requires 27h.
+The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
 gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
 
 The config in `src/config/planets/tidewhisper.js` describes six islands, two connecting sandbars, a lagoon,
@@ -49,4 +49,48 @@ captures in the temporary directory. `tests/sim/lib/tideFixture.mjs` is never im
 
 These checks verify this stage's rules and rendering; they do not certify the Intel Iris Xe 60-fps release
 target. Population, content, balance, complete-world browser traversal and measured performance remain 27h's
-requirements. The next stage is 27b, flora and wildlife.
+requirements. The next stage is 27c, resources, weather and music.
+
+## Coastal flora and wildlife (27b)
+
+The actual Tidewhisper config now selects lantern palms, kelp trees, coral fans, dune grass, sea thrift and sea
+lavender. Palms carry glowing coconuts and can be chopped for wood through the existing axe/rest/regrowth flow.
+Kelp leaves sway through one shared shader/time uniform; their batch bounds include the bend. Kelp and coral
+are explicitly non-wood and refuse axe gathering, including direct gathering requests. Harvestable coastal
+resources and coral ore drops remain 27c.
+
+Scenery is generated once with fixed upper counts: 18 palms, 12 kelp trees, 10 coral fans, 10 rocks and 120 small
+plant clusters. Beach flora/animals reserve dry high water; kelp/coral and fish use shallow water. The static
+scenery is spatially batched, and decorative quality changes do not change placement, resource ids or colliders.
+The seeded development fixture measured **30,197 static scenery triangles in 65 batches**, including its borrowed
+village. This is a geometry-cost check, not an Iris Xe frame-rate certification.
+
+![Lantern palm development preview](screenshots/tidewhisper-flora.jpg)
+
+Three original ambient body builders cover crabs, turtles and seals. They share the Walker/animation/disposal
+contract but are independent of combat enemies. Six hermit crabs scuttle at afternoon low tide and withdraw
+into their shells when approached; flooded crabs head back to their dry home. Four sea turtles bask on beaches
+by day and swim toward nearby shallows at night, then return to land. Three seals loaf on rocks, nap in the
+morning/afternoon and bark when approached. The rare Pearl Turtle shares the turtle body with its own palette,
+shell scutes and luminous pearl; it follows the existing slow-approach versus sprint-spooking rule.
+
+Six ground birds alternate gull/tern plumage and wing/tail silhouettes, with one flying flock. Coastal birds
+take off when flooded and keep flying until they find dry landing terrain. Three shallow shoals contain eight
+fish each, plus eight emissive lanternfish visible at night: **32 fish in four instanced draws**. Fish follow the
+same live sea/lagoon queries as movement, hide when water drains, freeze on pause, and dispose with their world.
+They are ambient visuals; coastal fishing catches, food and the pier remain later content.
+
+![Pearl Turtle development preview](screenshots/tidewhisper-pearl-turtle.jpg)
+
+Walk up slowly and press **E** to befriend the Pearl Turtle. Its first gift is the legendary **Pearl of the Deep**
+charm, which adds armor and mana regeneration. The existing adventure-wide rare-gift ledger, inventory and
+equipment owners persist it in v1 saves; no new save owner/version is added. Continue/revisits may allow a later
+friendship reward, as with the original rare creatures, but cannot grant a second first-gift charm. Respawning
+rebuilds the turtle's swimming destination at its new shore rather than retaining its old home.
+
+Verify with both full suites and `node scripts/coastal-wildlife-smoke.mjs` (Puppeteer Core/Chromium; `CHROME`
+overrides the executable). The helper owns port 8108 and exercises the actual config through
+`tests/sim/lib/coastalFixture.mjs`, which production never imports. It checks 720p/1080p low rendering, real palm
+gathering and **E** friendship, reload Continue, charm uniqueness and night visibility; refreshes the two previews;
+and keeps crab/turtle/seal captures in the temporary directory. Schedules, day/night traversal, drained-water
+hiding, respawn, equipped-charm saves, quality/placement invariance and disposal are also simulated.

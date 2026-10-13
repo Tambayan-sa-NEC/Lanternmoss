@@ -93,7 +93,8 @@ export function buildBird(c) {
   for (const sx of [-1, 1]) addTo(head, part(G.box(0.03, 0.05, 0.02), 0x2a1830, { outline: false }), [sx * 0.065, 0.02, 0.08], [0, sx * 0.6, 0]);
   const wings = [];
   for (const sx of [-1, 1]) { const g = new THREE.Group(); g.position.set(sx * 0.11, 0.24, 0); body.add(g);
-    addTo(g, part(G.box(0.26, 0.03, 0.16), c.wing || c.body), [sx * 0.13, 0, -0.02]); wings.push(g); }
+    addTo(g, part(G.box(c.species ? .4 : .26, .03, c.species==='tern' ? .09 : .16), c.wing || c.body), [sx * (c.species ? .2 : .13), 0, -.02]); wings.push(g); }
+  if(c.species==='tern')for(const sx of [-1,1])addTo(body,part(G.cone(.045,.2,3),c.wing),[sx*.05,.22,-.29],[Math.PI/2,0,-sx*.2]);
   addTo(body, part(G.box(0.1, 0.03, 0.16), c.wing || c.body), [0, 0.22, -0.2], [-0.35, 0, 0]);
   for (const sx of [-1, 1]) addTo(body, part(G.cyl(0.012, 0.012, 0.1, 3), 0xffa84a, { outline: false }), [sx * 0.05, 0.05, 0]);
   return { root, body, head, wingL: wings[0], wingR: wings[1] };

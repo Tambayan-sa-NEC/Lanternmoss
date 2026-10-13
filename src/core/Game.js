@@ -165,7 +165,7 @@ export class Game {
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
     for (const c of ctx.critters) c.update(dt);
     for (const b of ctx.birds) b.update(dt);
-    updatePonds(dt);
+    updatePonds(dt,this.world);
     for (const n of ctx.npcs) n.update(dt);
     updateWorldItems(dt);
     updateCombat(dt, this.world, keys);

@@ -1112,7 +1112,7 @@ bosses and release balancing each get their own session. The otter remains optio
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
 | [x] **27a. Archipelago and tide loop** | 26a-26d | 3-4.5 h | Build islands, shallows, sandbars, protected village/farm sites, the daily 1.5 m tide, clock chip and lagoon/causeway water controls. Prove low/high tide traversal, swimming energy, time skips, node placement and saved tide restoration in the development world. |
-| [ ] **27b. Flora and wildlife** | 27a | 2-4 h | Add every listed plant, crab/turtle/seal builder, birds, fish and Pearl Turtle/charm. Verify schedules, rare-gift saves, gathering interactions and bounded scenery cost; this stage owns wildlife distinct from enemy Shellbacks. |
+| [x] **27b. Flora and wildlife** | 27a | 2-4 h | Add every listed plant, crab/turtle/seal builder, birds, fish and Pearl Turtle/charm. Verify schedules, rare-gift saves, gathering interactions and bounded scenery cost; this stage owns wildlife distinct from enemy Shellbacks. |
 | [ ] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
 | [ ] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
 | [ ] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
@@ -1129,7 +1129,19 @@ Development-only borrowed actors/resources prove real low/high traversal, swimmi
 stable node positions, pause, sleep, keyed travel, reload Continue and original-v1 compatibility. All 199 unit tests, 33 simulations
 and 720p/1080p low browser checks passed. Tidewhisper remains unreleased; actual stilt-village content,
 flora/wildlife, resources/weather/music, enemies/fights and measured release performance remain 27b-27h.
-See [terrain, controls and development previews](docs/tidewhisper.md). Next: 27b.
+See [terrain, controls and development previews](docs/tidewhisper.md). Flora/wildlife follows in 27b below.
+
+**27b implemented (2026-10-13):** lantern palms with glowing coconuts/wood gathering, shader-swaying kelp,
+non-wood coral fans, dune grass, sea thrift and sea lavender; original ambient crab/turtle/seal bodies;
+shell hiding, beach/rock loafing/barking, day-basking/night-swimming turtles, gull/tern silhouettes and dry
+landing rules; instanced shallow shoals and night lanternfish; and the Pearl Turtle's one-time saved charm.
+Fixed scenery/animal/fish caps and quality-independent placement are tested. The development fixture measured
+30,197 static scenery triangles in 65 batches; 32 ambient fish use four instanced draws. Schedules, pause,
+drained water, gathering, respawn, charm/equipment Continue and disposal are verified in gameplay and low-preset
+browser checks. All 201 unit tests, 34 simulations and 720p/1080p low browser checks passed. Tidewhisper remains
+unreleased: resources/weather/music, village, enemies/fights and measured
+release performance remain 27c-27h. See [coastal flora/wildlife](docs/tidewhisper.md#coastal-flora-and-wildlife-27b).
+Next: 27c.
 
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
@@ -1155,9 +1167,9 @@ See [terrain, controls and development previews](docs/tidewhisper.md). Next: 27b
   - Phase 2, at 50%: she smashes the sluice and the lagoon drains. Beached, she thrashes, rolls and bites, open to
     everything, while the water creeps back on a timer.
   - Arena ring: crashing surf. Trophy: the Tide Crown.
-- [ ] **Flora:** lantern palms (glowing coconuts hang like lanterns), kelp trees swaying at the shore, coral fans (no
+- [x] **Flora:** lantern palms (glowing coconuts hang like lanterns), kelp trees swaying at the shore, coral fans (no
       wood, like crystal spires), dune grass, sea thrift and sea lavender.
-- [ ] **Wildlife:** hermit crabs that hide in their shells, sea turtles on the beaches, seals that loaf on rocks and bark,
+- [x] **Wildlife:** hermit crabs that hide in their shells, sea turtles on the beaches, seals that loaf on rocks and bark,
       gulls and terns, shoals in the shallows, and lanternfish that glow at night. Rare: the **Pearl Turtle** (gift: the
       Pearl of the Deep charm). New body builders: crab, turtle, seal.
 - [ ] **Weather:** clear and breezy, plus two new kinds: **sea mist** (rolls in at dawn) and **squall** (driving rain,
