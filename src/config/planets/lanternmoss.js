@@ -1,6 +1,7 @@
 // lanternmoss: seeded world content. Keep placement-sensitive lists in their existing order.
 export default {
   act: 1, released: true, secret: false,
+  expectedLevel: [1, 3], music: 'cozy',
   id: 'lanternmoss', outfit: null, outfitColors: [], lowLevel: 3, name: 'Lanternmoss', tagline: 'a tiny cozy planet of lanterns and moss', seed: 20260930,
   terrain: { hills: { amp: 5, freq: 2.2 }, ridges: { amp: 2, freq: 3.4 }, lakes: 2 },
   palette: { ground: [0x8fd07a, 0x9edb86, 0xb3e393, 0x84c874], meadow: 0xd4eb9c, sand: 0xf3dcaa, bed: 0x5fae9e, cliff: 0xb8ae9c, peak: 0xb6e39a,

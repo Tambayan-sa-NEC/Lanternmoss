@@ -583,6 +583,11 @@ Each world owns its config in `src/config/planets/<id>.js`; the ordered catalog 
 metadata. Only released worlds enter generation, travel and save validation. Secret gates require their configured
 conditions, and main-campaign completion excludes secret worlds. See [catalog and release rules](docs/planets.md).
 
+The level cap is 16 with the original XP curve continued. The title previews planned Act II worlds and masks the
+secret; their travel and awards activate only after release. The original three-boss award stays unchanged.
+New worlds must pass the content/registration and measured performance gate. See [Act II progression and release
+acceptance](docs/content-release.md).
+
 `PlanetMechanics` loads optional per-planet state before entry and actor/resource population. Frame updates freeze
 on the title and while paused; naps, sleep and away time use a separate bounded advancement hook. Exit removes rules
 and listeners before world disposal. Weather stays separate, and the original three worlds have no mechanic module.
@@ -804,6 +809,7 @@ kept inside the ring too (`keepInArena`). In the console, `LANTERNMOSS.wakeBoss(
 Start with `released: false`; fill in the content and register its models/behaviors before completing the world-release
 checks. `PLANETS` includes only released entries. Tests retain increasing difficulty and roster counts, with an explicit
 population minimum allowed for small secret worlds. See [the metadata, NPC and compatibility rules](docs/planets.md).
+The [release gate](docs/content-release.md) runs against actual registries under `npm test` and `npm run sim`.
 
 **Quick test from the console** (after starting a game): `LANTERNMOSS.wakeBoss()`, then `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
 victory, open the treasure chest that falls, and choose a destination at the village lantern gate; or `LANTERNMOSS.goToPlanet(2)` to jump straight to

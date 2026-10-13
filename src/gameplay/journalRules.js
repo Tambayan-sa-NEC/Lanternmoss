@@ -4,10 +4,13 @@ import { ACHIEVEMENTS } from '../config/achievements.js';
 import { BESTIARY_ENTRIES } from '../config/bestiary.js';
 import { COMBAT } from '../config/combat.js';
 import { PETS } from '../config/pets.js';
+import { PLANETS } from '../config/planets.js';
+import { releasedEnemyTypes } from '../config/releasedEnemies.js';
 
 const rank = t => (COMBAT.enemies[t].miniBoss ? 1 : COMBAT.enemies[t].ai === 'boss' ? 2 : 0);
 /** Every bestiary page, in order: the monsters, the mini bosses, then the planet bosses. */
-export const BESTIARY_ORDER = Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object).sort((a, b) => rank(a) - rank(b));
+const releasedKinds = releasedEnemyTypes(PLANETS, COMBAT.enemies);
+export const BESTIARY_ORDER = Object.keys(COMBAT.enemies).filter(t => releasedKinds.has(t) && !COMBAT.enemies[t].object).sort((a, b) => rank(a) - rank(b));
 /** A planet boss (not a mini boss). */
 export const isBoss = type => COMBAT.enemies[type]?.ai === 'boss' && !COMBAT.enemies[type].miniBoss;
 export const isMiniBoss = type => !!COMBAT.enemies[type]?.miniBoss;
@@ -40,8 +43,8 @@ export function sanitizeJournal(raw, knownItem = () => true) {
   j.flags = pick(src.flags, k => FLAGS.has(k), v => (v === true ? true : null));
   const ids = new Set(ACHIEVEMENTS.map(a => a.id));
   j.unlocked = pick(src.unlocked, k => ids.has(k), v => (Number.isFinite(v) && v > 0 ? v : null));
-  j.seen = pick(src.seen, k => has(COMBAT.enemies, k), v => (v === true ? true : null));
-  j.defeated = pick(src.defeated, k => has(COMBAT.enemies, k), v => count(v) || null);
+  j.seen = pick(src.seen, k => has(COMBAT.enemies, k) && releasedKinds.has(k), v => (v === true ? true : null));
+  j.defeated = pick(src.defeated, k => has(COMBAT.enemies, k) && releasedKinds.has(k), v => count(v) || null);
   for (const k of Object.keys(j.defeated)) j.seen[k] = true;                 // defeated means met
   j.found = pick(src.found, k => knownItem(k), v => (v === true ? true : null));
   j.legendary = pick(src.legendary, k => knownItem(k), v => (v === true ? true : null));
@@ -53,8 +56,8 @@ export function sanitizeJournal(raw, knownItem = () => true) {
 /** The value of a counter, including the ones worked out from the pages (kinds, bossKinds, petsFound, items). */
 export function statValue(j, stat) {
   switch (stat) {
-    case 'kinds': return Object.keys(j.defeated).length;
-    case 'bossKinds': return Object.keys(j.defeated).filter(isBoss).length;
+    case 'kinds': return Object.keys(j.defeated).filter(type => releasedKinds.has(type)).length;
+    case 'bossKinds': return Object.keys(j.defeated).filter(type => releasedKinds.has(type) && isBoss(type)).length;
     case 'petsFound': return Object.keys(j.pets).length;
     case 'items': return Object.keys(j.found).length;
     case 'legendary': return Object.keys(j.legendary).length;

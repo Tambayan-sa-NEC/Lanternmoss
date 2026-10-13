@@ -1022,7 +1022,7 @@ world stages, rather than requiring all future encounters before Tidewhisper. Pr
 | [x] **26a. Planet catalog and release rules** | 19, 24 | 1.5-3 h | Extract the original planet configs without changing seeds or generated ids; add act/release/secret metadata and assemble the released campaign. Remove remaining three-world assumptions in travel, save validation, NPC data and completion rules. Tests accept a smaller secret-world roster by explicit config, preserve the original campaign and reject travel/key access to unreleased worlds. |
 | [x] **26b. Mechanic lifecycle and saves** | 26a | 2-4 h | Add enter/update/exit and per-planet save hooks, including pause, sleep/time skips, travel, Continue and disposal. Use a development-only mechanic fixture to prove ordering, isolation and old-save defaults; weather stays separate. |
 | [x] **26c. Gravity and moving-water support** | 26b | 3-4.5 h | Add shared gravity/water queries consumed by Walkers, swimming, water rendering, spawning, resource placement, farms and building safety. Test moving levels and gravity changes in a harness, including existing ponds, Moon-Hop composition and portal restoration; no Tidewhisper content yet. |
-| [ ] **26d. Act II progression and content gate** | 26a-26c, 23 | 2-4 h | Extend cap/XP to 16, expose expected-level/scaling metadata, update title/arrival wording and achievement definitions while retaining the original three-boss award. Test the mandatory release checklist and Moon exceptions, behavior/boss registrations and unknown content references. Future-world achievements and travel activate only with those worlds. |
+| [x] **26d. Act II progression and content gate** | 26a-26c, 23 | 2-4 h | Extend cap/XP to 16, expose expected-level/scaling metadata, update title/arrival wording and achievement definitions while retaining the original three-boss award. Test the mandatory release checklist and Moon exceptions, behavior/boss registrations and unknown content references. Future-world achievements and travel activate only with those worlds. |
 
 **26a implemented (2026-10-13):** one config file per world and explicit act/release/secret metadata; the full catalog
 includes unreleased Act II entries while the playable campaign remains the original three worlds. Planet-owned local
@@ -1040,7 +1040,7 @@ retain one active instance, with exit/listener cleanup before world disposal. Op
 for old saves and reject unknown/mismatched modules; the original fixture is unchanged. A development-only module
 proves ordering and independent state through real keyed travel and reload Continue. All 181 unit tests, 30 simulations
 and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/mechanics.md).
-Actual tides, lantern darkness and lunar gravity remain their owning world stages; 26d remains pending.
+Actual tides, lantern darkness and lunar gravity remain their owning world stages; shared progression follows in 26d below.
 
 **26c implemented (2026-10-13):** shared planet gravity composes with actor acceleration and Moon-Hop. Live pond
 offsets and an optional sea feed the same swimming, rendering, fishing, landing and dry-placement queries. Config
@@ -1051,7 +1051,20 @@ once; the sea shader uses world-space ripples/glints. Development-only fixtures 
 gravity, high-water safety, crop/build preservation, keyed travel, Continue and old-v1 compatibility. All 186 unit
 tests, 31 simulations and 720p/1080p low-preset browser checks passed, including original layout digests and visible
 pond/sea captures with zero page/shader errors. See [shared gravity and moving water](docs/world-physics.md).
-No Tidewhisper content or timed tide cycle is enabled; the next groundwork stage is 26d.
+No Tidewhisper content or timed tide cycle is enabled; Act II progression follows in 26d below.
+
+**26d implemented (2026-10-13):** cap 16 extends the unchanged XP curve, and old level-10 v1 saves resume gaining
+levels. Planet configs declare expected levels, scales and low-level targets. The title separates Acts I/II,
+labels planned worlds and masks the secret; Frostveil is the Act I finale. The original three-boss achievement
+is preserved; expansion awards and bestiary goals activate with released worlds. A mandatory gate uses actual
+runtime registrations to check references, bodies/behaviors, distinct boss modules, local quests/arrival lines,
+music/mechanics, physics bounds and render budgets. Expansion releases also require full distinct content and
+recorded Iris Xe 720p low performance evidence. Only the secret Moon waives a mini boss and explicitly has no
+farm/cave with a small population floor. Original Act I content is grandfathered through the common checks;
+its outstanding hardware target is not newly certified. All 195 unit tests, 32 simulations and 720p/1080p low
+browser checks passed, including Continue, portal release guards and masked secret text. See
+[progression and release acceptance](docs/content-release.md). Actual expansion content remains in TODOs 27/30/32;
+the next main-world stage is 27a.
 
 - [x] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
       its `act`.
@@ -1062,18 +1075,18 @@ No Tidewhisper content or timed tide cycle is enabled; the next groundwork stage
 - [x] **Per-planet physics:** gravity composes with Moon-Hop (`moonGravity` in `config/game.js`), and live pond/sea
       levels feed Walkers, swimming, rendering, spawning, node/farm placement and building safety. Original pond
       baselines remain unchanged; declared high-water envelopes keep saved placement ids stable as water moves.
-- [ ] **Enemy integration contract:** retain modular behavior dispatch in `src/entities/enemies/behaviors/` (like
+- [x] **Enemy integration contract:** retain modular behavior dispatch in `src/entities/enemies/behaviors/` (like
       `charger`, `burrower`) and validate registrations in the content gate. Implement the actual building blocks in
       their world stages: `armoured`, `drifter`, `amphibian` in 27e; `lightbound`, `mimic` in 30e and `weaver`, `thief`
       in 30f; `swarm`, `puller`, `launcher` in 32d. The three boss AIs and two mini boss AIs also belong to their world
       stages below. These remain required expansion work, but do not block completion of groundwork.
-- [ ] **Levels:** cap 10 → 16, with the XP curve extended. Expected levels: Tidewhisper 7–10, Duskhollow 10–13, the
+- [x] **Levels:** cap 10 → 16, with the XP curve extended. Expected levels: Tidewhisper 7–10, Duskhollow 10–13, the
       Lantern Moon 13–16. Starting scale values (tune them to 23's targets): hp 2.9 / 3.4 / 4.0, damage 2.0 / 2.25 /
       2.5. The low-level challenge targets move into each planet's file.
-- [ ] **A second act:** the title's campaign strip shows Act II (the secret world as "?"), Frostveil's tagline no
+- [x] **A second act:** the title's campaign strip shows Act II (the secret world as "?"), Frostveil's tagline no
       longer says "the last", and there are achievements for the new bosses plus "Lantern of Five Worlds" (the first three keep
       "Lantern of Three Worlds").
-- [ ] **The content checklist, as a test,** for every world: at least 3 monster types found on no other planet (at most 2
+- [x] **The content checklist, as a test,** for every world: at least 3 monster types found on no other planet (at most 2
       returning types); its own boss AI module and a mini boss; at least 2 tree kinds, 2 critters and a rare creature of
       its own; at least 1 weather kind of its own; a material and a rare vein; a local villager with a quest; a bestiary
       page for every monster; a music theme; first-arrival lines for every travelling villager; and the performance

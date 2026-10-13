@@ -20,7 +20,7 @@ try {
   await page.setViewport({ width: 1280, height: 720 });
   await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0' });
   await page.waitForFunction(() => window.LANTERNMOSS);
-  assert.deepEqual(await page.$$eval('#title .campaign strong', nodes => nodes.map(n => n.textContent)), ['Lanternmoss', 'Emberfall', 'Frostveil']);
+  assert.deepEqual(await page.$$eval('#title .campaign .planet[data-released="true"] strong', nodes => nodes.map(n => n.textContent)), ['Lanternmoss', 'Emberfall', 'Frostveil']);
   await page.click('[data-act="play"]');
   await page.evaluate(async () => {
     const { setSetting } = await import('/src/core/settings.js'); setSetting('pauseOnBlur', false); setSetting('quality', 'low');

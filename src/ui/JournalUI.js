@@ -114,7 +114,7 @@ export const JournalUI = {
     const j = Journal.data, done = ACHIEVEMENTS.filter(a => j.unlocked[a.id]).length;
     const card = a => {
       const p = progress(a, j), got = j.unlocked[a.id];
-      return `<div class="ach${got ? ' done' : ''}"><span class="ic">${icon(a.icon)}</span><div class="tx"><b>${a.name}</b><small>${a.text}</small>` +
+      return `<div class="ach${got ? ' done' : ''}"><span class="ic">${icon(a.icon)}</span><div class="tx"><b>${a.secret && !got ? '?' : a.name}</b><small>${a.secret && !got ? 'A secret light waits to be discovered.' : a.text}</small>` +
         (got ? `<span class="got">Earned ${when(got)}</span>` : p.need > 1 ? `<div class="abar"><i style="width:${(p.have / p.need) * 100}%"></i></div><span class="pr">${p.have} / ${p.need}</span>` : '') +
         `</div>${a.reward?.coins ? `<span class="rw">✦ ${a.reward.coins}</span>` : ''}</div>`;
     };

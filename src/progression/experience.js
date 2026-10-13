@@ -1,7 +1,7 @@
 /* Applies XP to the hero and announces it. Anything that wants to react listens on levelEvents:
      'xp'      detail { amount, enemy, level, xp, next }   (next = XP needed for the next level, 0 at the cap)
      'levelup' detail { level, from }
-   Level and XP live on the player like hp / mana and reset with the run (there is no save system). */
+   Level and XP live on the player, save with the adventure, and reset with a new run. */
 import { LEVELING } from '../config/leveling.js';
 import { ctx } from '../core/context.js';
 import { computeStats } from '../gameplay/equipment.js';

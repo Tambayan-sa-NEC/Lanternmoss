@@ -145,7 +145,7 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
 }
 
 /** The local villagers come entirely from planet config; their home index is independent of campaign order. */
-const LOCAL_LOOKS = { smith: buildSmith, snowkeeper: buildSnowKeeper };
+export const LOCAL_LOOKS = { smith: buildSmith, snowkeeper: buildSnowKeeper };
 const LOCAL_ANIMATIONS = {
   hammer: n => { n.armR.rotation.x = -0.4 - Math.max(0, Math.sin(ctx.time * 4)) * 0.6 * (n.talking || n.speed > 0.3 ? 0 : 1); },
   lantern: n => { n.lanternGlow.rotation.z = Math.sin(ctx.time * 2) * 0.15; },
