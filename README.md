@@ -416,6 +416,7 @@ src/
 │   └── Walker.js          surface movement under spherical gravity: cliffs, standing on rocks, wading and swimming
 ├── world/                 the planet (generated once, in a fixed order, from a seeded RNG)
 │   ├── World.js           generation order, landmarks, per-frame sun / sky / ambient animation
+│   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
 │   ├── terrain.js         each planet's shape (seeded hills / ridges / plateaus), flats, the baked height field, ponds,
 │   │                      slopes, water depth, ground-placement matrices
 │   ├── placement.js       free-spot searches for scenery and spawns
@@ -470,6 +471,7 @@ src/
 │   └── levelFeedback.js   float text, burst, jingle and toast on those events
 ├── gameplay/
 │   ├── PlanetProgression.js  boss defeated -> victory; portal choice -> fade -> chosen planet; restart at planet 1
+│   ├── PlanetMechanics.js  world-owned entry/exit, frame and calendar-skip hooks, independent planet saves
 │   ├── BossGate.js        the sealed lair: summon conditions (level, seals, elites' sigils, a quest, night), the waking
 │   │                      sequence, the arena ring, villager hints, the lair chip and compass marks
 │   ├── characters.js      switching heroes (model, stats, abilities, pet)
@@ -536,9 +538,9 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
 2. Moving bodies resolve collisions in the order they were created, so the player, critters, villagers and enemies are
    created in that order.
 
-**Per-frame order** (`Game.update`): player → critters → birds → fish → villagers → world items → combat (vitals, casting +
+**Per-frame order** (`Game.update`): day clock → planet mechanic → player → critters → birds → fish → villagers → world items → combat (vitals, casting +
 area aim, aim, projectiles, enemies, hazards, pet body, pet system, effects, combat HUD) → planet progression → challenges,
-quests, shop, houses, chests, hotbar → knight upkeep → menu orbit → camera → compass → day clock → world → particles and
+quests, shop, houses, chests, hotbar → knight upkeep → menu orbit → camera → compass → world → particles and
 emotes → dialogue → overlay, buffs, toast, pet card. Rendering follows each update.
 
 **Dependencies flow one way:** `config` and `utils` depend on nothing. `render` and `physics` build on them, and
@@ -579,6 +581,11 @@ Cinder and Tuva stay home and remember their progress. See [portal travel and sa
 Each world owns its config in `src/config/planets/<id>.js`; the ordered catalog also contains unfinished Act II
 metadata. Only released worlds enter generation, travel and save validation. Secret gates require their configured
 conditions, and main-campaign completion excludes secret worlds. See [catalog and release rules](docs/planets.md).
+
+`PlanetMechanics` loads optional per-planet state before entry and actor/resource population. Frame updates freeze
+on the title and while paused; naps, sleep and away time use a separate bounded advancement hook. Exit removes rules
+and listeners before world disposal. Weather stays separate, and the original three worlds have no mechanic module.
+See [the lifecycle, module contract and save format](docs/mechanics.md).
 
 **Enemy behaviours:** `def.behavior ?? def.ai` picks the AI. The originals are methods on `Enemy`; newer ones are modules in
 `entities/enemies/behaviors/` (`think`, plus optional `init / reset / update / animate / onDie / dispose` hooks).

@@ -214,11 +214,10 @@ export const Houses = {
     const night = dayClock.phase === 'night' || dayClock.phase === 'evening' && dayClock.frac > 0.7;
     this.fadeThen(() => {
       if (night) {                                               // sleep through to the morning (watered crops grow overnight)
-        Farm.growBy(((dayClock.frac > REST.wakeAt ? 1 : 0) + REST.wakeAt - dayClock.frac) * DAY.length);
-        if (dayClock.frac > REST.wakeAt) dayClock.day++;
-        dayClock.t = REST.wakeAt * DAY.length; P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
+        const seconds = ((dayClock.frac > REST.wakeAt ? 1 : 0) + REST.wakeAt - dayClock.frac) * DAY.length;
+        Farm.growBy(seconds); dayClock.skip(seconds, 'sleep'); P.hp = P.stats.maxHp; P.mana = P.stats.maxMana;
         showBanner(`Day ${dayClock.day}`, 'You wake up rested and ready.');
-      } else { dayClock.update(20); Farm.growBy(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
+      } else { dayClock.skip(20, 'nap'); Farm.growBy(20); P.hp = Math.min(P.stats.maxHp, P.hp + P.stats.maxHp * REST.napHeal); toast('A short nap. You feel better.'); }
       if (own) { Needs.eat(night ? NEEDS.max : NEEDS.max * REST.napHeal); if (!night) P.mana = Math.min(P.stats.maxMana, P.mana + P.stats.maxMana * REST.napHeal); }
     });
     this.fade.saveHome = !!own;

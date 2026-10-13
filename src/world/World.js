@@ -21,6 +21,7 @@ import { addFlat, addPond, bakeTerrain, computeWaterLevel, groundHeight, ponds, 
 import { buildVillage } from './village.js';
 import { createWater } from './water.js';
 import { Weather } from './weather.js';
+import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
 
 const V3 = THREE.Vector3;
 
@@ -30,13 +31,16 @@ export const SPAWN_DIR = new V3(0, 1, 0);
 const _lightDir = new V3(), _skySun = new V3();
 
 export class World {
-  constructor() {
+  constructor(mechanicOptions) {
     this.spawnDir = SPAWN_DIR;
+    this.mechanics = new PlanetMechanics(this, mechanicOptions);
     this.sunTan = new V3();           // tangent heading of the golden-hour sun; transported along with the player
   }
 
   /** planet: an entry of PLANETS (config/planets.js): its seed drives the layout, its palette the colours. */
   generate(planet) {
+    if (!this.mechanics.accepts(planet)) throw new Error(`Unknown planet mechanic: ${planet.mechanic}`);
+    this.mechanics.exit();
     this.planet = planet; this.objects = []; this.ownMaterials = [];
     const { palette } = planet;
     seedWorld(planet.seed); setFogColor(palette.fog);
@@ -101,6 +105,7 @@ export class World {
     this.fireflyCount = this.fireflies.geometry.attributes.position.count;
     this.viewerPos = this.spawnDir.clone().multiplyScalar(groundHeight(this.spawnDir));
     this.applyDensity(); this.resetSun();
+    this.mechanics.enter(planet);
   }
 
   /** Adds generated objects to the scene and remembers them for dispose(). */
@@ -126,6 +131,7 @@ export class World {
 
   /** Removes everything generate() created and forgets the terrain, placement and scenery colliders. */
   dispose() {
+    this.mechanics.exit();
     this.weather?.dispose();
     for (const o of this.objects) { scene.remove(o); disposeTree(o); }
     for (const m of this.ownMaterials) { releasePointsMaterial(m); m.dispose(); }

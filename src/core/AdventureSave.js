@@ -49,10 +49,14 @@ export class AdventureSave {
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook,
-      home: Home, farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups, building: Building })) this.registry.register(key, system);
+      home: Home, farm: Farm, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups, building: Building,
+      mechanics: game.world.mechanics })) this.registry.register(key, system);
     this.registry.assertComplete();
+    game.world.mechanics.snapshotForPlanet = id => this.registry.planets[id]?.mechanics;
     game.planets.beforeLoad = () => { if (!this.restoring && !this.suspended && ctx.started) { StoryMemory.toJSON(); this.registry.capturePlanet(ctx.planetId); } };
-    game.planets.afterLoad = () => { if (!this.suspended) { this.registry.restorePlanet(ctx.planetId); StoryMemory.restore(); } };
+    game.planets.afterLoad = () => { if (!this.suspended) {
+      this.registry.restorePlanet(ctx.planetId, { skip: ['mechanics'] }); StoryMemory.restore();
+    } }; // Mechanic state already loaded before enter/population; loading again would undo away-time advancement.
     game.planets.onSave = () => this.save({ quiet: true, arrival: true });
     addEventListener('pagehide', () => { this.save({ quiet: true, arrival: true }); });
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.save({ quiet: true, arrival: true }); });

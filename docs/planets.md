@@ -24,6 +24,11 @@ Normal boss wins open the immediate next main world. A Wayfarer's Key can still 
 one way, or the route home; it cannot skip an unreleased main-world entry. Unfinished worlds are absent from the title
 and destination picker. Direct transition/load calls also refuse unreleased entries before changing world state.
 
+A released entry may declare a registered `mechanic` id. Unknown modules disable that destination and direct
+loads refuse it before replacing the current world. Mechanic state loads before entry and population, is saved
+independently per planet, and receives separate frame/skip/away hooks. See [the mechanic contract](mechanics.md).
+The original worlds declare no mechanic; actual expansion modules remain later-stage work.
+
 A released secret world needs an explicit `unlock` gate, for example:
 
 ```js
