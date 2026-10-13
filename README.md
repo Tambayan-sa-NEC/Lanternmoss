@@ -588,6 +588,11 @@ secret; their travel and awards activate only after release. The original three-
 New worlds must pass the content/registration and measured performance gate. See [Act II progression and release
 acceptance](docs/content-release.md).
 
+Tidewhisper's unreleased development terrain has six islands, tidal sandbars, protected village/farm sites and a
+daily 1.5 m tide with a clock chip. Local lagoon drainage shares physics and rendering, survives Continue and
+expires through skips/away time. The remaining content and campaign release are later stages. See
+[terrain, controls and development previews](docs/tidewhisper.md).
+
 `PlanetMechanics` loads optional per-planet state before entry and actor/resource population. Frame updates freeze
 on the title and while paused; naps, sleep and away time use a separate bounded advancement hook. Exit removes rules
 and listeners before world disposal. Weather stays separate, and the original three worlds have no mechanic module.

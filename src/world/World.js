@@ -23,6 +23,7 @@ import { createWater } from './water.js';
 import { Weather } from './weather.js';
 import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
 import { configurePhysics, physicsQueries } from './physics.js';
+import { archipelagoLayout } from './archipelago.js';
 
 const V3 = THREE.Vector3;
 
@@ -43,7 +44,9 @@ export class World {
   generate(planet) {
     if (!this.mechanics.accepts(planet)) throw new Error(`Unknown planet mechanic: ${planet.mechanic}`);
     this.mechanics.exit();
-    configurePhysics(planet.physics);
+    this.coast = planet.terrain?.archipelago ? archipelagoLayout(planet.terrain.archipelago, this.spawnDir) : null;
+    configurePhysics(this.coast ? { ...planet.physics, waterRegions: [{ id: 'lagoon', dir: this.coast.lagoon.dir.toArray(), radius: this.coast.lagoon.radius,
+      level: planet.physics.seaLevel, maxLevel: planet.physics.seaMaxLevel }] } : planet.physics);
     this.planet = planet; this.objects = []; this.ownMaterials = [];
     const { palette } = planet;
     seedWorld(planet.seed); setFogColor(palette.fog);
@@ -55,26 +58,37 @@ export class World {
     // lakes) before the height field is baked; ponds carve into it after
     const spawnDir = this.spawnDir, F = WORLD.flats;
     setTerrain(planet.terrain, planet.seed);
-    this.pond1 = addPond(offsetDir(spawnDir, -0.55, 13), 4.3);
-    this.stoneCenter = offsetDir(spawnDir, 2.75, 40);
-    this.lairDir = offsetDir(spawnDir, rand() * Math.PI * 2, rr(...WORLD.lairArc));
-    placed.push({ dir: spawnDir.clone(), r: 3 }, { dir: this.stoneCenter, r: 6.8 });
-    const pondSpot = (pr, minFromVillage) => {
-      for (let i = 0; i < 300; i++) {
-        const d = randomDir();
-        if (arcDist(d, spawnDir) > minFromVillage && arcDist(d, this.lairDir) > F.lair[0] + pr + 4 && isFree(d, pr + 8)
-          && ponds.every(p => arcDist(d, p.dir) > p.r + pr + 16)) return d;
+    this.farmDir = null;
+    if (this.coast) {
+      this.pond1 = { dir: offsetDir(spawnDir, -0.55, 36), r: 4.3 }; // shore anchor for travelling villagers; no inland pond
+      this.stoneCenter = this.coast.stoneCenter; this.lairDir = this.coast.lagoon.dir;
+      this.outerHouses = this.coast.outerHouses; this.farmDir = this.coast.farmDir;
+      placed.push({ dir: spawnDir.clone(), r: 3 }, { dir: this.stoneCenter, r: 6.8 });
+      addFlat(spawnDir, 27, 10, 4.5); addFlat(this.stoneCenter, 9, 5, 4.5);
+      addFlat(this.farmDir, 7, 3, 4.5);
+      this.outerHouses.forEach(dir => addFlat(dir, 5, 5, 4.5));
+    } else {
+      this.pond1 = addPond(offsetDir(spawnDir, -0.55, 13), 4.3);
+      this.stoneCenter = offsetDir(spawnDir, 2.75, 40);
+      this.lairDir = offsetDir(spawnDir, rand() * Math.PI * 2, rr(...WORLD.lairArc));
+      placed.push({ dir: spawnDir.clone(), r: 3 }, { dir: this.stoneCenter, r: 6.8 });
+      const pondSpot = (pr, minFromVillage) => {
+        for (let i = 0; i < 300; i++) {
+          const d = randomDir();
+          if (arcDist(d, spawnDir) > minFromVillage && arcDist(d, this.lairDir) > F.lair[0] + pr + 4 && isFree(d, pr + 8)
+            && ponds.every(p => arcDist(d, p.dir) > p.r + pr + 16)) return d;
+        }
+        return null;
+      };
+      for (const pr of [3.7, 5.0, 4.2, 3.4, 4.6]) { const d = pondSpot(pr, 22); if (d) addPond(d, pr); }
+      for (let i = 0; i < (planet.terrain?.lakes ?? 0); i++) { const pr = rr(8, 11), d = pondSpot(pr, 34); if (d) addPond(d, pr, 3.2); }
+      addFlat(spawnDir, ...F.village); addFlat(this.stoneCenter, ...F.stones); addFlat(this.lairDir, ...F.lair);
+      for (const p of ponds) addFlat(p.dir, p.r + 3, 7);
+      this.outerHouses = [];                                             // a hamlet beyond the square, each house on level ground
+      for (let k = 0; k < 3; k++) for (let i = 0; i < 200; i++) {
+        const d = offsetDir(spawnDir, rand() * Math.PI * 2, rr(30, 58));
+        if (isFree(d, 5) && arcDist(d, this.stoneCenter) > 14 && this.outerHouses.every(o => arcDist(o, d) > 14)) { this.outerHouses.push(d); addFlat(d, 5, 6); break; }
       }
-      return null;
-    };
-    for (const pr of [3.7, 5.0, 4.2, 3.4, 4.6]) { const d = pondSpot(pr, 22); if (d) addPond(d, pr); }
-    for (let i = 0; i < (planet.terrain?.lakes ?? 0); i++) { const pr = rr(8, 11), d = pondSpot(pr, 34); if (d) addPond(d, pr, 3.2); }
-    addFlat(spawnDir, ...F.village); addFlat(this.stoneCenter, ...F.stones); addFlat(this.lairDir, ...F.lair);
-    for (const p of ponds) addFlat(p.dir, p.r + 3, 7);
-    this.outerHouses = [];                                             // a hamlet beyond the square, each house on level ground
-    for (let k = 0; k < 3; k++) for (let i = 0; i < 200; i++) {
-      const d = offsetDir(spawnDir, rand() * Math.PI * 2, rr(30, 58));
-      if (isFree(d, 5) && arcDist(d, this.stoneCenter) > 14 && this.outerHouses.every(o => arcDist(o, d) > 14)) { this.outerHouses.push(d); addFlat(d, 5, 6); break; }
     }
     bakeTerrain();
     ponds.forEach(computeWaterLevel);
@@ -83,6 +97,7 @@ export class World {
 
     const B = new Batcher({ cellSize: 48 });
     Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses));   // houses, houseA, cottage
+    if (this.farmDir) placed.push({ dir: this.farmDir, r: 7 }); // keep scattered solids out of the protected plot site
     B.decorative = true; decoratePonds(B); B.decorative = false;
     this.spots = { trees: [], rocks: [] };                            // every tree and rock, to chop and mine (gameplay/Gathering.js)
     this.trees = scatterFlora(B, planet.flora, this.spots);           // { kind: count }
@@ -114,7 +129,7 @@ export class World {
   }
 
   /** Adds generated objects to the scene and remembers them for dispose(). */
-  add(...objects) { scene.add(...objects); this.objects.push(...objects); }
+  add(...objects) { if (!objects.length) return; scene.add(...objects); this.objects.push(...objects); }
   /** Called after mechanic rules change, before actors/fish update. Does not consume placement randomness. */
   syncPhysics() { this.water?.sync(); }
 

@@ -7,6 +7,7 @@ import { clamp, smoothstep } from '../utils/math.js';
 import { rand } from '../utils/random.js';
 import { arcDist } from '../utils/sphere.js';
 import { groundHeight, maxRelief, ponds } from './terrain.js';
+import { seaLevel } from './physics.js';
 
 /** palette: ground (4 meadow greens), meadow, sand, bed (pond floor), cliff and peak colours. */
 export function buildPlanet(palette) {
@@ -17,6 +18,7 @@ export function buildPlanet(palette) {
   const greens = palette.ground.map(h => new THREE.Color(h));
   const meadow = new THREE.Color(palette.meadow), sand = new THREE.Color(palette.sand), bed = new THREE.Color(palette.bed);
   const cliff = new THREE.Color(palette.cliff ?? 0xb8ae9c), peak = new THREE.Color(palette.peak ?? palette.meadow), top = maxRelief();
+  const highWater = seaLevel(true);
   const cols = new Float32Array(pos.count * 3), cen = new THREE.Vector3(), c = new THREE.Color(), a = new THREE.Vector3(), b = new THREE.Vector3(), n = new THREE.Vector3();
   for (let i = 0; i < pos.count; i += 3) {
     cen.set(0, 0, 0); for (let k = 0; k < 3; k++) cen.add(v.fromBufferAttribute(pos, i + k));
@@ -28,6 +30,7 @@ export function buildPlanet(palette) {
     if (rand() < 0.07) c.copy(meadow);
     c.lerp(peak, smoothstep(top * 0.45, top * 0.85, height) * 0.85);                     // high ground
     c.lerp(cliff, smoothstep(0.78, 0.6, up));                                              // steep faces
+    if (highWater !== null && height + R < highWater + 0.65) c.copy(height + R < highWater - 2 ? bed : sand);
     for (const p of ponds) { const d = arcDist(cen, p.dir); if (d < p.r + 0.2) c.copy(bed); else if (d < p.r + 1.3) c.copy(sand); }
     c.multiplyScalar(1 + (rand() - 0.5) * 0.06);
     for (let k = 0; k < 3; k++) { cols[(i + k) * 3] = c.r; cols[(i + k) * 3 + 1] = c.g; cols[(i + k) * 3 + 2] = c.b; }

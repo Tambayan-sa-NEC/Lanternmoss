@@ -9,7 +9,8 @@ import { PLANET_RADIUS as R, WORLD } from '../config/game.js';
 import { clamp, smoothstep } from '../utils/math.js';
 import { mulberry32 } from '../utils/random.js';
 import { dirAlong, matrixAt, offsetDir, tangentFrame } from '../utils/sphere.js';
-import { movingWater, pondLevel, seaLevel } from './physics.js';
+import { movingWater, pondLevel, seaLevelAt } from './physics.js';
+import { archipelagoHeight, archipelagoLayout } from './archipelago.js';
 
 export const ponds = [];
 const flats = [];
@@ -42,6 +43,7 @@ function fbm(P, d, freq, octaves, off) {
 function shapeAt(d) {
   let h = 0.34 * Math.sin(d.x * 3.1 + 0.7) * Math.sin(d.y * 2.6 + 1.3) + 0.24 * Math.sin(d.z * 4.3 + d.x * 2.1);   // the old gentle wobble
   const s = shape; if (!s) return h;
+  if (s.coast) return archipelagoHeight(d, s.coast);
   if (s.hills) h += s.hills.amp * fbm(s.P, d, s.hills.freq, 4, 11.3);
   if (s.ridges) {                                                   // ridged noise: sharp crests, wide valleys
     let v = 0, a = 1, f = s.ridges.freq, norm = 0;
@@ -81,16 +83,19 @@ function sample(d) {
 
 /** Starts a planet: its shape (PLANETS[i].terrain) and noise seed. Forgets the previous planet's flats and field. */
 export function setTerrain(cfg, seed) {
-  shape = cfg ? { ...cfg, P: permutation(seed ^ 0x7e11a1) } : null; flats.length = 0; field = null; extent = 0;
+  shape = cfg ? { ...cfg, P: permutation(seed ^ 0x7e11a1), coast: cfg.archipelago ? archipelagoLayout(cfg.archipelago, new THREE.Vector3(0, 1, 0)) : null } : null; flats.length = 0; field = null; extent = 0;
 }
 /** Keeps the ground level within r of dir (blending back to the planet's shape over `fade` metres). Before bakeTerrain. */
-export function addFlat(dir, r, fadeM) { flats.push({ dir: dir.clone().normalize(), r, fade: fadeM, cull: Math.cos(Math.min(Math.PI, (r + fadeM + 1) / R)) }); }
+export function addFlat(dir, r, fadeM, height = 0) { flats.push({ dir: dir.clone().normalize(), r, fade: fadeM, height, cull: Math.cos(Math.min(Math.PI, (r + fadeM + 1) / R)) }); }
 /** Samples the shape (with its flats) into the height field. */
 export function bakeTerrain() {
   field = new Float32Array(6 * ROW * ROW); const d = new THREE.Vector3(); extent = 0;
   for (let f = 0; f < 6; f++) for (let j = 0; j <= N; j++) for (let i = 0; i <= N; i++) {
     faceDir(f, i / N * 2 - 1, j / N * 2 - 1, d);
-    const h = shapeAt(d) * flatMask(d); field[f * ROW * ROW + j * ROW + i] = h; extent = Math.max(extent, Math.abs(h));
+    let raised = 0;
+    for (const flat of flats) if (flat.height && d.dot(flat.dir) >= flat.cull)
+      raised = Math.max(raised, flat.height * (1 - smoothstep(flat.r, flat.r + flat.fade, Math.acos(Math.min(1, d.dot(flat.dir))) * R)));
+    const h = shapeAt(d) * flatMask(d) + raised; field[f * ROW * ROW + j * ROW + i] = h; extent = Math.max(extent, Math.abs(h));
   }
 }
 /** The highest the ground rises above (or sinks below) the base radius, in metres. */
@@ -133,7 +138,7 @@ export function computeWaterLevel(p) {
 }
 /** The water at direction d: { pond, level (distance from the planet centre to the surface along d), depth } or null. */
 export function waterAt(d, { high = false } = {}) {
-  const sea = seaLevel(high);
+  const sea = seaLevelAt(d, high);
   let water = null;
   if (sea !== null) { const depth = sea - groundHeight(d); if (depth > 0.05) water = { pond: null, level: sea, depth }; }
   for (const p of ponds) {

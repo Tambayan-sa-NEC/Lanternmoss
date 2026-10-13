@@ -52,6 +52,10 @@ world cannot raise its goal or substitute a different boss. The cap is 16; new b
 activate only as their worlds release. Expected levels/scaling/challenge targets live in each config. See the
 [Act II progression and acceptance rules](content-release.md).
 
+Tidewhisper now declares its archipelago, palette, seed, water envelope and registered `tides` mechanic, but
+remains unreleased. A development-only fixture exercises its terrain/clock/lagoon controls in an original save
+slot without exposing unfinished content. See [Tidewhisper development terrain](tidewhisper.md).
+
 Planet-specific villagers and interiors are also config:
 
 - `npcs.locals` contains each local's name, appearance key, home house index, placement/schedule, animation key and

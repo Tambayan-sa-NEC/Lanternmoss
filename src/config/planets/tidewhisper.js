@@ -1,4 +1,20 @@
-// Planned world: content and release acceptance belong to its own TODO.
+// Terrain/tides implemented in 27a. Remaining content and release acceptance belong to 27b-27h.
 export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
   expectedLevel: [7, 10], lowLevel: 9, scale: { hp: 2.9, damage: 2, speed: 1.25, cooldown: 0.78, xp: 2.6 },
+  seed: 271828, mechanic: 'tides', physics: { seaLevel: 71, seaMaxLevel: 72.5 },
+  tides: { low: 71, high: 72.5, lowAt: 0.4, drainLevel: 68.8, drainSeconds: 40 },
+  terrain: { archipelago: { bed: -4, islands: [
+    { angle: 0, distance: 0, radius: 43, height: 4.5 },
+    { angle: 0, distance: 55, radius: 18, height: 3 },
+    { angle: 0, distance: 110, radius: 26, height: 3 },
+    { angle: 2.2, distance: 90, radius: 22, height: 3.7 },
+    { angle: 4.5, distance: 128, radius: 21, height: 3.2 },
+    { angle: 3.4, distance: 185, radius: 17, height: 2.8 },
+  ], bars: [{ from: 0, to: 1, width: 3, height: -0.65 }, { from: 1, to: 2, width: 2.8, height: -0.65 }],
+  lagoon: { island: 2, radius: 18, bed: -2.5 } } },
+  palette: { ground: [0x79c9ab, 0x8bd6b6, 0x9ae0c2, 0x6fbca5], meadow: 0xa5dfb5, sand: 0xf4dfb2, bed: 0xd0c4a8, cliff: 0xa8bbc0, peak: 0xbce8c3,
+    grass: [0x70bda0, 0x88ceb0, 0x91d7b7, 0x79c9ab], water: { deep: 0x176997, light: 0x67e0db },
+    sky: { horizon: 0xffd4b0, mid: 0xabe3df, zenith: 0x6bbacb }, fog: 0xcce9df },
+  tagline: 'islands, lanterns and the turning tide',
+  arrival: 'Tidewhisper. Afternoon low tide opens the sandbars; at night the sea takes them back. The village and farm stay above high water.',
   boss: { type: 'mirelure' } };

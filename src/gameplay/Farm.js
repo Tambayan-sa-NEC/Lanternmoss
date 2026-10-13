@@ -44,7 +44,7 @@ export const Farm = {
     const spawn = world.spawnDir, [cols, rows] = FARM.grid, sp = FARM.spacing;
     const w = cols * sp + 0.8, d = rows * sp + 0.8, rad = Math.hypot(w, d) / 2 + 0.8;
     // the first level, open spot round the square (deterministic: the same planet always puts it in the same place)
-    let c = null;
+    let c = world.farmDir && dryGround(world.farmDir, rad, { high: true }) && freeOfColliders(world.farmDir, rad + 0.5) && slopeAt(world.farmDir) < 0.3 ? world.farmDir : null;
     for (let ring = FARM.distance[0]; ring <= FARM.distance[1] && !c; ring += 1.5) for (let a = 0; a < 6.28 && !c; a += 0.21) {
       const at = offsetDir(spawn, a + (PLANETS[planet].seed % 7) * 0.9, ring);
       if (!isFree(at, rad) || !freeOfColliders(at, rad + 0.5) || slopeAt(at) > 0.3) continue;
