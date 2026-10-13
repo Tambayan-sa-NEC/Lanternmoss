@@ -1,7 +1,7 @@
 # Tidewhisper terrain and tides
 
-TODOs 27a-27c implement the archipelago, water controls, coastal ecosystem, resources, weather and music. Tidewhisper remains
-`released: false`: resources/weather/music, village and fights belong to 27c–27g, and campaign release requires 27h.
+TODOs 27a-27d implement the coast, ecosystem, economy, weather, music, stilt village and lighthouse quest. Tidewhisper remains
+`released: false`: regular enemies and fights belong to 27e-27g; campaign release requires 27h.
 The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
 gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
 
@@ -9,7 +9,7 @@ The config in `src/config/planets/tidewhisper.js` describes six islands, two con
 sea-green land, sandy shores, turquoise shallows, deep blue water and a peach/aqua sky. Terrain is baked once;
 changing water never changes geometry or object ids. The largest island has raised village/house sites and a
 reserved farm site. Scenery, grass, farm plots and nodes respect the declared high-water envelope. The actual
-stilt houses, pier, interiors and lighthouse are still 27d.
+stilt houses, supported pier, coastal interiors and lighthouse are implemented in 27d below.
 
 | Development preview | Low tide | High tide |
 | --- | --- | --- |
@@ -49,7 +49,7 @@ captures in the temporary directory. `tests/sim/lib/tideFixture.mjs` is never im
 
 These checks verify this stage's rules and rendering; they do not certify the Intel Iris Xe 60-fps release
 target. Population, content, balance, complete-world browser traversal and measured performance remain 27h's
-requirements. Resources/weather/music are now implemented in 27c below; the next stage is 27d, village and lighthouse.
+requirements. Resources/weather/music are now implemented in 27c below; the village/lighthouse are implemented in 27d below; the next stage is 27e, regular enemies.
 
 ## Coastal flora and wildlife (27b)
 
@@ -78,7 +78,7 @@ Six ground birds alternate gull/tern plumage and wing/tail silhouettes, with one
 take off when flooded and keep flying until they find dry landing terrain. Three shallow shoals contain eight
 fish each, plus eight emissive lanternfish visible at night: **32 fish in four instanced draws**. Fish follow the
 same live sea/lagoon queries as movement, hide when water drains, freeze on pause, and dispose with their world.
-They are ambient visuals; shore fishing and food are implemented in 27c, while the pier remains 27d.
+They are ambient visuals; shore fishing and food are implemented in 27c, and the supported pier is implemented in 27d.
 
 ![Pearl Turtle development preview](screenshots/tidewhisper-pearl-turtle.jpg)
 
@@ -131,3 +131,37 @@ E gathering, reload Continue, the three-beat audio timer, 720p/1080p low squall 
 are saved in the temporary directory. The simulation also covers pick tiers, low/high tide, multi-day skips,
 revisits, sea fishing, dawn transitions, crop watering and equipped Tide gear Continue. These checks do not certify
 Iris Xe frame time; that hardware measurement and campaign release remain 27h.
+
+## Stilt village and lighthouse (27d)
+
+Six stilt buildings and plank paths retain the shared house indices used by traveler schedules and saves. The
+fishing pier has a fixed box floor above declared high water; shared Walker physics lets the hero and Marlo walk
+on it without swimming. Tide water remains underneath, and normal sea fishing works from its edge. A personal
+home still uses the existing home system. The two public interiors are the Saltwind Kitchen (house 1, Pim) and
+Marlo's Lighthouse (house 4), with maritime decorations, notes, storage gifts and keeper lore. Other public doors
+are closed in this stage. The original worlds retain their existing village generation path.
+
+Marlo has a new keeper model/portrait and carries a lantern. He checks the lighthouse in morning/evening,
+spends the afternoon at the pier and sleeps indoors at night. Traveling villagers wear beach accessories;
+unhatted travelers also wear straw hats. Each traveler has a Tidewhisper arrival reaction appended after the
+legacy dialogue slots, preserving old story memory.
+
+Accept **The Dark Lighthouse** from Marlo: gather and hand over six Seaglass for the lens, then six Wood for fuel,
+then speak to him to light it. Each delivery consumes its ingredients. Completion gives 80 coins, 120 XP and two
+Coastal Chowders once. The lighthouse's emissive beacon follows the saved quest's completed status; it has no
+extra persistent owner or point light. Partial hand-ins, completion, house gifts/lore and indoor position use the
+existing v1 save systems and survive Continue and revisits. Away from Marlo, the tracker points back to Tidewhisper.
+
+Mirelure's registered summon conditions require level 8, the completed quest and low tide. The shared boss gate
+reports these predicates and seals again if the tide rises before awakening. The development fixture borrows a
+sealed original boss to exercise the live gate; it does not implement Mirelure. That encounter is 27g, and the
+world stays unreleased. Actual low-tide causeway geometry/physics continues to come from 27a.
+
+![Relit lighthouse development preview](screenshots/tidewhisper-village.jpg)
+
+Verify with `npm test`, `npm run sim` and `node scripts/coastal-village-smoke.mjs` (Puppeteer Core/Chromium, `CHROME`
+override). The browser helper owns port 8110 and uses `coastalVillageFixture.mjs`; production never imports the
+borrowed encounter/save-slot fixture. It checks actual E acceptance/hand-ins, partial/completed reload, both
+interior doors, persistent gifts and 720p/1080p low lighthouse/outfit/pier rendering, with temporary interior
+captures. The simulation also checks real deck traversal, all 54 economy nodes, three gate predicates, saved
+lore and Continue from inside Marlo's room. Hardware frame-time certification remains 27h.

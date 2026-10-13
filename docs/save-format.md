@@ -77,3 +77,7 @@ reload, exported files and import confirmation, and retakes `continue.jpg` / `sa
 TODO 27c adds optional `claimedCycle` integers to gathering node deltas for tidal washups. Claims persist after
 cooldowns expire, preventing another gather in the same high-tide batch after Continue. The adventure calendar
 derives the current batch; skips never grant items. Missing claims default to -1, and v1 remains compatible.
+
+TODO 27d uses existing quest state for partial lens/fuel deliveries and lighthouse completion. The beacon
+is derived from that completion, never independently saved. Existing house indices, gift/lore memory and
+indoor coordinates persist the two coastal rooms; no save version or persistent owner was added.

@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { COMBAT } from '../src/config/combat.js';
 import { DAY } from '../src/config/day.js';
 import { ITEM_DEFINITIONS } from '../src/config/items.js';
-import { PLANETS } from '../src/config/planets.js';
+import { PLANETS, PLANET_CATALOG } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 import { SHOP } from '../src/config/shop.js';
 import { planetSources } from '../src/gameplay/resourceRules.js';
@@ -14,7 +14,7 @@ import { TRAVELER_NAMES } from '../src/config/npcs.js';
 const ITEMS = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d]));
 // Traveler schedules are runtime definitions; local schedules and names are pure planet data.
 const defsSource = readFileSync(new URL('../src/entities/npc/npcDefs.js', import.meta.url), 'utf8');
-const VILLAGERS = [...TRAVELER_NAMES, ...PLANETS.flatMap(p => p.npcs?.locals?.map(n => n.name) ?? [])];
+const VILLAGERS = [...TRAVELER_NAMES, ...PLANET_CATALOG.flatMap(p => p.npcs?.locals?.map(n => n.name) ?? [])];
 const PHASES = DAY.phases.map(p => p.id);
 
 test('the day starts at 0 and its phases run in order, each with a light setting', () => {
@@ -44,7 +44,7 @@ test('the shop: a known keeper, real phases, stock that can be bought, prices fr
 test('every quest refers to real villagers, items, monsters and planets', () => {
   for (const [id, q] of Object.entries(QUESTS)) {
     assert.ok(VILLAGERS.includes(q.giver), `${id}: giver ${q.giver}`);
-    assert.ok((q.planet ?? 0) < PLANETS.length, `${id}: planet`);
+    assert.ok(typeof q.planet==='string'?PLANET_CATALOG.some(p=>p.id===q.planet):(q.planet??0)<PLANETS.length, `${id}: planet`);
     for (const k of ['offer', 'accept', 'decline', 'done']) assert.ok(q.text[k], `${id}: text.${k}`);
     q.steps.forEach((s, i) => {
       assert.ok(s.text, `${id} step ${i}: tracker text`);
@@ -61,7 +61,8 @@ test('every quest refers to real villagers, items, monsters and planets', () => 
 
 test('quests are finishable: each planet grows enough of what its quests ask you to collect, and has the monsters', () => {
   const need = {};                          // item -> total asked for across all quests
-  for (const q of Object.values(QUESTS)) for (const s of q.steps) if (s.kind === 'collect') need[s.item] = (need[s.item] ?? 0) + s.count;
+  for (const q of Object.values(QUESTS).filter(q=>typeof q.planet!=='string'||PLANETS.some(p=>p.id===q.planet)))
+    for (const s of q.steps) if (s.kind === 'collect') need[s.item] = (need[s.item] ?? 0) + s.count;
   for (const [item, n] of Object.entries(need)) {
     const grows = PLANETS.reduce((sum, p) => sum + (p.forage.find(f => f.item === item)?.count ?? 0), 0);
     const sold = SHOP.stock.some(s => s.item === item), gathered = PLANETS.some((p, i) => planetSources(i).has(item));   // regrows: never runs out

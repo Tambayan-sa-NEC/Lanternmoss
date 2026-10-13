@@ -17,7 +17,7 @@ import { burstAt, sparkles } from '../../fx/sparkles.js';
 import { buff } from '../../gameplay/buffs.js';
 import { Chests } from '../../gameplay/Chests.js';
 import { giftItem } from '../../gameplay/pickups.js';
-import { buildBaker, buildBard, buildSmith, buildSnowKeeper, buildSprite, buildWizard } from '../../models/villagers.js';
+import { buildBaker, buildBard, buildSmith, buildSnowKeeper, buildSprite, buildWizard, buildKeeper } from '../../models/villagers.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { cam } from '../../systems/CameraSystem.js';
 import { mpick, mr, rng } from '../../utils/random.js';
@@ -145,15 +145,16 @@ export function createNpcDefs({ spawnDir, stoneCenter, cottage, pond1, houses })
 }
 
 /** The local villagers come entirely from planet config; their home index is independent of campaign order. */
-export const LOCAL_LOOKS = { smith: buildSmith, snowkeeper: buildSnowKeeper };
+export const LOCAL_LOOKS = { smith: buildSmith, snowkeeper: buildSnowKeeper, keeper: buildKeeper };
 const LOCAL_ANIMATIONS = {
   hammer: n => { n.armR.rotation.x = -0.4 - Math.max(0, Math.sin(ctx.time * 4)) * 0.6 * (n.talking || n.speed > 0.3 ? 0 : 1); },
   lantern: n => { n.lanternGlow.rotation.z = Math.sin(ctx.time * 2) * 0.15; },
 };
-export function createLocalDefs({ spawnDir, stoneCenter, houses }, planet, catalog = PLANETS) {
+export function createLocalDefs({ spawnDir, stoneCenter, houses, pier }, planet, catalog = PLANETS) {
   const p = typeof planet === 'string' ? catalog.find(p => p.id === planet) : catalog[planet];
   if (!p || !p.released) return [];
-  const at = def => def.anchor === 'stones' ? dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), def.distance)
+  const at = def => def.anchor==='pier'&&pier ? pier.end.clone() : def.anchor==='house' ? dirAlong(houses[def.house].door,houses[def.house].fwd,def.distance??0)
+    :def.anchor === 'stones' ? dirAlong(stoneCenter, tangentToward(stoneCenter, spawnDir), def.distance)
     : offsetDir(spawnDir, def.angle, def.distance);
   return (p.npcs?.locals ?? []).map(data => {
     const build = LOCAL_LOOKS[data.look];

@@ -16,6 +16,19 @@
    --------------------------------------------------------------------- */
 
 export const QUESTS = {
+  darkLighthouse: {
+    giver:'Marlo',title:'The Dark Lighthouse',planet:'tidewhisper',
+    steps:[
+      {kind:'collect',item:'seaglass',count:6,text:'Gather 6 Seaglass for the lens'},
+      {kind:'deliver',to:'Marlo',item:'seaglass',count:6,text:'Bring the lens glass to Marlo',say:'Smooth and clear! I can set this into a new lens. Now we need fuel.'},
+      {kind:'collect',item:'wood',count:6,text:'Gather 6 Wood for lighthouse fuel'},
+      {kind:'deliver',to:'Marlo',item:'wood',count:6,text:'Bring the fuel to Marlo',say:'Dry wood and a clear lens. Ready to bring our light back?'},
+      {kind:'talk',to:'Marlo',text:'Light the lighthouse with Marlo',say:'There! A steady light over Tidewhisper again. The causeway opens at low tide; Mirelure waits beyond it.'},
+    ],
+    reward:{coins:80,xp:120,items:[['coastalChowder',2]]},
+    text:{offer:'The squall cracked our lighthouse lens and soaked the fuel. Bring six seaglass and six wood to relight it?',
+      accept:'Start with the glass. Look for smooth turquoise pieces washed onto the beaches.',decline:'The sea will keep turning. Come back when you have a moment.',done:'Take this chowder for the crossing. And remember: not every light out there is ours.'},
+  },
   humStones: {
     giver: 'Old Bramble', title: 'The Humming Stones',
     steps: [

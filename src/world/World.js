@@ -25,6 +25,7 @@ import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
 import { configurePhysics, physicsQueries } from './physics.js';
 import { archipelagoLayout } from './archipelago.js';
 import { coastalWind } from '../render/coastalWind.js';
+import { Quests } from '../gameplay/quests/Quests.js';
 
 const V3 = THREE.Vector3;
 
@@ -101,7 +102,10 @@ export class World {
     this.add(buildPlanet(palette));                                   // (the height field is baked: placement may sample it now)
 
     const B = new Batcher({ cellSize: 48 });
-    Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses));   // houses, houseA, cottage
+    this.pier=null;this.lighthouseLamp=null;
+    if(planet.village?.coastal)this.coast.highWater=planet.physics.seaMaxLevel;
+    Object.assign(this, buildVillage(B, spawnDir, this.stoneCenter, this.outerHouses,planet.village?.coastal?this.coast:null));
+    if(this.lighthouseLamp)this.add(this.lighthouseLamp);
     if (this.farmDir) placed.push({ dir: this.farmDir, r: 7 }); // keep scattered solids out of the protected plot site
     B.decorative = true; decoratePonds(B); B.decorative = false;
     this.spots = { trees: [], rocks: [] };                            // every tree and rock, to chop and mine (gameplay/Gathering.js)
@@ -182,6 +186,7 @@ export class World {
 
   /** Golden-hour sun that travels with the player so every side of the planet is cozy; sky and ambient animation. */
   update(dt, time, player, viewUp, camera) {
+    if(this.lighthouseLamp)this.lighthouseLamp.visible=Quests.state.darkLighthouse?.status==='done';
     projectTangent(this.sunTan, player.up).normalize();
     _lightDir.copy(player.up).multiplyScalar(0.95).add(this.sunTan).normalize();
     this.sun.position.copy(player.pos).addScaledVector(_lightDir, 50); this.sun.target.position.copy(player.pos);

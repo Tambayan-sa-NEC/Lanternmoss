@@ -105,6 +105,14 @@ export function buildSnowKeeper() {
 }
 
 // ---- outfits: the travelling villagers dress for each new planet ----
+export function buildKeeper(){
+  const h=buildHumanoid({skin:0xe8b991,top:0x5c9daf,hem:0x416b80,pants:0x596b73,shoes:0x493c36,belt:0xe0c691,sleeve:0x5c9daf,face:{big:.9}});
+  addTo(h.head,part(G.cyl(.4,.42,.12,10),0xf2dfac),[0,.3,0]);addTo(h.head,part(G.cyl(.24,.28,.22,10),0x416b80),[0,.42,0]);
+  for(const x of [-.1,.1])addTo(h.head,part(G.box(.14,.06,.06),0xf2eadc),[x,-.12,.32],[0,0,x*2]);
+  const lantern=new THREE.Group();h.armL.add(lantern);lantern.position.set(0,-.55,.1);
+  addTo(lantern,part(G.box(.22,.3,.22),0x736150),[0,-.1,0]);addTo(lantern,part(G.ico(.11,1),0xffdf86,{glow:true,intensity:2}),[0,-.1,.1]);
+  return {...h,lanternGlow:lantern};
+}
 
 /** Outfit colours per planet; each villager gets one that stands out from their own clothes (outfitColor). */
 export const OUTFIT_COLORS = Object.fromEntries(PLANETS.map(p => [p.id, p.outfitColors]));
@@ -120,6 +128,12 @@ export function buildOutfit(planet, { headR = 0.36, color = 0xffffff, hat = fals
   const outfit = PLANETS[planet]?.outfit;
   if (!outfit) return null;
   const g = new THREE.Group(), s = headR / 0.36; g.scale.setScalar(s);
+  if(outfit==='beach'){
+    addTo(g,part(new THREE.TorusGeometry(.26,.035,4,12),color),[0,-.32,0],[Math.PI/2,0,0]);
+    addTo(g,part(G.box(.25,.08,.045),color),[0,-.43,.23]);
+    if(!hat){addTo(g,part(G.cyl(.45,.45,.04,10),0xf4d18a),[0,.3,0]);addTo(g,part(G.cyl(.25,.3,.2,8),0xf4d18a),[0,.42,0]);}
+    return g;
+  }
   if (outfit === 'neckerchief') {                         // Emberfall: a bright neckerchief knotted at the front
     addTo(g, part(new THREE.TorusGeometry(0.27, 0.06, 4, 12), color), [0, -0.36, 0], [Math.PI / 2, 0, 0]);
     addTo(g, part(G.cone(0.14, 0.24, 3), color), [0, -0.48, 0.24], [Math.PI + 0.3, 0, 0], [1, 1, 0.35]);

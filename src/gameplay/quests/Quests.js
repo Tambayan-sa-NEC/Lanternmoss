@@ -116,7 +116,7 @@ export const Quests = {
     const progress = st.kind === 'collect' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}`
       : st.kind === 'defeat' ? `${s.n}/${st.count}` : st.kind === 'deliver' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}` : '';
     const person = st.to ?? QUESTS[id].giver, absent = !ctx.npcs.some(n => n.name === person);
-    const home = person === 'Cinder' ? 'Emberfall' : person === 'Tuva' ? 'Frostveil' : 'their home world';
+    const home = PLANETS.find(p=>p.npcs?.locals?.some(n=>n.name===person))?.name ?? (person === 'Marlo' ? 'Tidewhisper' : 'their home world');
     return { title: QUESTS[id].title, text: absent ? `Return to ${home}: ${st.text}` : st.text, progress };
   },
   /** The villager the tracked quest needs next (deliver / talk), for the compass, or null. */

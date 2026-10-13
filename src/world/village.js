@@ -7,6 +7,7 @@ import { arcDist, dirAlong, offsetDir, slerpDir, tangentToward } from '../utils/
 import { placed } from './placement.js';
 import { propCottage, propLantern, propMushroomHouse } from './props.js';
 import { ponds, surfM, surfMFacing } from './terrain.js';
+import { buildCoastalVillage } from './coastalVillage.js';
 
 const V3 = THREE.Vector3;
 
@@ -74,7 +75,8 @@ function buildPaths(B, spawnDir, stoneCenter, houses) {
 
 /** Builds the whole village into B: three houses round the square, and the outer houses at `outer` (spots the world
     picked and levelled before baking the terrain). Returns the house list plus the named houses villagers live by. */
-export function buildVillage(B, spawnDir, stoneCenter, outer) {
+export function buildVillage(B, spawnDir, stoneCenter, outer, coast = null) {
+  if(coast)return buildCoastalVillage(B,spawnDir,stoneCenter,outer,coast,buildStoneCircle);
   const houses = [], place = (dir, kind) => placeHouse(B, houses, spawnDir, dir, kind);
   const houseA = place(offsetDir(spawnDir, 0.65, 11), 0xf26d6d);
   const cottage = place(offsetDir(spawnDir, 2.35, 11.5), 'cottage');
