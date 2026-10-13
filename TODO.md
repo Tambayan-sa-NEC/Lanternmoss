@@ -1107,7 +1107,7 @@ bosses and release balancing each get their own session. The otter remains optio
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **27a. Archipelago and tide loop** | 26a-26d | 3-4.5 h | Build islands, shallows, sandbars, protected village/farm sites, the daily 1.5 m tide, clock chip and lagoon/causeway water controls. Prove low/high tide traversal, swimming energy, time skips, node placement and saved tide restoration in the development world. |
+| [x] **27a. Archipelago and tide loop** | 26a-26d | 3-4.5 h | Build islands, shallows, sandbars, protected village/farm sites, the daily 1.5 m tide, clock chip and lagoon/causeway water controls. Prove low/high tide traversal, swimming energy, time skips, node placement and saved tide restoration in the development world. |
 | [ ] **27b. Flora and wildlife** | 27a | 2-4 h | Add every listed plant, crab/turtle/seal builder, birds, fish and Pearl Turtle/charm. Verify schedules, rare-gift saves, gathering interactions and bounded scenery cost; this stage owns wildlife distinct from enemy Shellbacks. |
 | [ ] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
 | [ ] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
@@ -1115,6 +1115,17 @@ bosses and release balancing each get their own session. The otter remains optio
 | [ ] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
 | [ ] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
 | [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
+
+**27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
+raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
+1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway
+availability. A bounded local water region keeps lagoon drainage and ocean levels independent in both physics
+and rendering; its saved timer survives Continue and expires through skips/away time without replaying rewards.
+Development-only borrowed actors/resources prove real low/high traversal, swimming energy, protected plots,
+stable node positions, pause, sleep, keyed travel, reload Continue and original-v1 compatibility. All 199 unit tests, 33 simulations
+and 720p/1080p low browser checks passed. Tidewhisper remains unreleased; actual stilt-village content,
+flora/wildlife, resources/weather/music, enemies/fights and measured release performance remain 27b-27h.
+See [terrain, controls and development previews](docs/tidewhisper.md). Next: 27b.
 
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands

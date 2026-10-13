@@ -35,6 +35,10 @@ function updateChips(dt) {
   if ((chipsT -= dt) >= 0) return;
   chipsT = 0.25; let h = `<div class="chip" style="background:#e8eeff">Planet ${ctx.planet + 1}/${PLANETS.length} · ${PLANETS[ctx.planet].name}</div>`;
   const sky = world?.weather; h += `<div class="chip time ${dayClock.phase}">${dayClock.phase === 'night' ? '☾' : '☀'} ${dayClock.label} · Day ${dayClock.day}${sky && sky.kind !== 'clear' ? ` · ${sky.label}` : ''}</div>`;
+  if (world?.mechanics.id === 'tides') {
+    const tide = world.mechanics.active.instance.status;
+    h += `<div class="chip tide">≈ ${tide.label} · Causeway ${tide.causewayOpen ? 'open' : 'flooded'}${tide.lagoonDrained ? ' · Lagoon drained' : ''}</div>`;
+  }
   h += `<div class="chip coins">✦ ${ctx.player.coins} coins</div>`;
   h += BossGate.chipHtml();                                          // the sealed lair: what's still needed
   const q = Quests.trackerInfo();

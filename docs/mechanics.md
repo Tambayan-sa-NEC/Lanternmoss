@@ -1,8 +1,8 @@
 # Planet mechanic lifecycle
 
 `World` owns one `PlanetMechanics` controller. A planet may declare `mechanic: '<id>'`; no declaration means no
-mechanic. Production currently registers no modules, so the original three worlds keep their existing rules.
-Actual tides, lantern darkness and lunar gravity belong to their later roadmap stages. Weather remains a separate
+mechanic. The registry includes `tides` for unreleased Tidewhisper; the original three worlds keep their existing rules.
+See [terrain and tide controls](tidewhisper.md). Lantern darkness and lunar gravity belong to their later roadmap stages. Weather remains a separate
 visual system; a mechanic may read it through its environment.
 
 Mechanics can apply derived gravity/water rules through `environment.world.physics.set(...)`. Declare maximum

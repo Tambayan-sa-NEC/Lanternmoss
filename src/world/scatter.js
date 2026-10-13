@@ -11,7 +11,8 @@ import { rand, rpick, rr } from '../utils/random.js';
 import { arcDist, dirAlong, matrixAt, offsetDir, randomDir } from '../utils/sphere.js';
 import { findSpot } from './placement.js';
 import { propFlower, propRock, propSmallMushroom, propTree, TREE_KINDS } from './props.js';
-import { ponds, slopeAt, surfM } from './terrain.js';
+import { dryGround, ponds, slopeAt, surfM } from './terrain.js';
+import { movingWater } from './physics.js';
 
 const n = base => Math.round(base * WORLD.scatter);
 /** A free spot (findSpot) that isn't on a steep slope. */
@@ -133,6 +134,7 @@ function swayMaterial(color = 0xffffff) {
 }
 /** A spot for low plants: not in water, not inside a big collider (and, with avoid, not near those spots). */
 function plantSpot(d, avoid = []) {
+  if (movingWater(true) && !dryGround(d,0,{high:true})) return false;
   if (ponds.some(p => arcDist(d, p.dir) < p.r + 0.6)) return false;
   if (colliders.some(c => c.r > 0.9 && arcDist(d, c.dir) < c.r)) return false;
   return avoid.every(([a, r]) => arcDist(d, a) > r);
