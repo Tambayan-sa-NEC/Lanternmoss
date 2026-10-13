@@ -1,0 +1,46 @@
+import assert from 'node:assert/strict';
+import {installCoastalResourceFixture} from './lib/coastalResourceFixture.mjs';
+import {boot,imp} from './lib/boot.mjs';
+const fixture=installCoastalResourceFixture(),{game,H,step}=await boot('witch',{wake:false});
+const {dayClock}=await imp('gameplay/dayClock.js'),{DAY}=await imp('config/day.js'),{ctx}=await imp('core/context.js');
+const {offsetDir}=await imp('utils/sphere.js'),{dryGround,waterAt}=await imp('world/terrain.js');
+const {Fishing}=await imp('gameplay/Fishing.js'),{audio}=await imp('systems/AudioSystem.js');
+const phase=f=>dayClock.skip((f*DAY.length-dayClock.t+DAY.length)%DAY.length||DAY.length,'test');
+const G=H.Gathering,P=H.player;
+const node=kind=>G.nodes.find(n=>n.kind===kind);
+const gather=n=>{P.placeAt(offsetDir(n.up,0,n.def.r+1));P.vel.set(0,0,0);G.work({node:n});assert.ok(G.job,`${n.kind} starts`);for(let i=0;i<300&&G.job;i++)step(1/60);assert.equal(G.job,null);};
+try {
+  H.Tutorial.skip();P.invuln=10000;phase(.4);step(.1);
+  const expected=H.Mechanics.active.instance;assert.ok(expected);
+  const kinds=['driftwood','shells','seaweed','seaglass','saltPan','clamBed','coralReef','shipwreckIron','blackPearlBed','pebbles','sweetleaf'];
+  for(const kind of kinds)assert.ok(node(kind),`${kind} spawned`);
+  console.log('counts',JSON.stringify(Object.fromEntries(kinds.map(k=>[k,G.nodes.filter(n=>n.kind===k).length]))));
+  assert.ok(H.Farm.plots.every(p=>dryGround(p.dir,1,{high:true})));
+  const layout=()=>JSON.stringify(G.nodes.map(n=>[n.id,n.kind,n.up.toArray()])),initial=layout();
+  gather(node('clamBed'));assert.equal(H.inventory.count('pearl'),1);gather(node('blackPearlBed'));assert.equal(H.inventory.count('blackPearl'),1);
+  H.inventory.add('stonePick',1);gather(node('coralReef'));assert.ok(H.inventory.count('coral')>0);
+  G.work({node:node('shipwreckIron')});assert.equal(G.job,null);H.inventory.add('copperPick',1);gather(node('shipwreckIron'));assert.ok(H.inventory.count('ironOre')>0);
+  gather(node('saltPan'));gather(node('seaweed'));gather(node('seaglass'));assert.ok(H.inventory.count('seaSalt')>0);
+  const target=node('seaglass'),claimed=target.claimedCycle,quantity=H.inventory.count('seaglass');
+  assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());assert.equal(layout(),initial);assert.equal(node('seaglass').claimedCycle,claimed);assert.ok(!node('seaglass').ready);
+  G.work({node:node('seaglass')});assert.equal(G.job,null);assert.equal(H.inventory.count('seaglass'),quantity);
+  console.log('PASS  actual resource models, low-tide pearl beds, pickaxe tiers and stable saved washup claims');
+  phase(.9);step(.1);assert.ok(!node('clamBed').ready);assert.ok(waterAt(node('clamBed').up));
+  dayClock.skip(8*DAY.length+.5*DAY.length,'test');step(.1);
+  // Existing elapsed cooldown is advanced by the saved snapshot when revisiting; missed cycles grant nothing.
+  assert.equal(H.inventory.count('seaglass'),quantity);assert.ok(H.saves.save().ok);H.goToPlanet('emberfall');H.goToPlanet('lanternmoss');
+  assert.equal(layout(),initial);assert.ok(node('seaglass').ready);gather(node('seaglass'));const after=H.inventory.count('seaglass');assert.ok(after>quantity&&after<=quantity+3);
+  assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());assert.equal(H.inventory.count('seaglass'),after);assert.ok(!node('seaglass').ready);
+  console.log('PASS  high water blocks clam beds; skips/revisit expose one new washup batch, no accumulated or reload rewards');
+  phase(.4);step(.1);H.inventory.add('fishingRod',1);P.placeAt(node('clamBed').up);const sea=Fishing.pondHere();assert.ok(sea?.sea);Fishing.start(sea);assert.ok(Fishing.active);
+  step(.6);Fishing.s.stage='bite';Fishing.press();assert.ok(['silverSprat','goldenKoi'].includes(Fishing.s.fish));Fishing.s.fish='silverSprat';Fishing.caught();assert.equal(H.inventory.count('silverSprat'),1);
+  const W=game.world;phase(.02);step(9);assert.equal(W.weather.kind,'seaMist');phase(.4);step(9);assert.notEqual(W.weather.kind,'seaMist');W.weather.set('squall',true);step(.1);assert.ok(W.weather.now.rain>0&&W.waterMat.uniforms.uSquall.value>0);
+  assert.equal(audio.theme,'seaWaltz');H.goToPlanet('emberfall');assert.equal(audio.theme,'cozy');H.goToPlanet('lanternmoss');assert.equal(audio.theme,'seaWaltz');
+  const farm=H.Farm.plots[0];farm.s.tilled=true;farm.s.crop='carrot';farm.s.watered=false;farm.s.growth=0;
+  game.world.weather.set('squall',true);step(.2);assert.ok(farm.s.watered&&farm.s.growth>0);assert.ok(dryGround(farm.dir,1,{high:true}));
+  H.inventory.add('tideBoots',1);const {bagCommands}=await imp('gameplay/bagCommands.js');assert.ok(bagCommands(H.inventory).equip(H.inventory.find('tideBoots'),'feet').ok);
+  assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());assert.equal(P.equipment.feet.itemId,'tideBoots');
+  ctx.paused=true;const time=dayClock.t;step(1);assert.equal(dayClock.t,time);ctx.paused=false;
+  assert.equal(game.planets.canTravelTo('tidewhisper'),false);
+  console.log('PASS  sea fishing provides cooking fish; dawn mist clears, squall whitecaps render, music follows travel and pause freezes clock');console.log('all passed');
+} finally {H.Mechanics.exit();fixture.restore();}

@@ -7,11 +7,30 @@ import { MUSIC_THEMES } from '../config/music.js';
 export const audio = {
   ctx: null, master: null, fx: null, music: null, muted: false, ducked: false, pad: null, battleOn: false, battleTimer: null,
   vol: { master: 1, music: 1, sfx: 1 },      // player volume settings (0..1), see setVolumes
-  theme: 'cozy', voices: [],
+  theme: 'cozy', voices: [], melodyTimer:null, melodyStep:0,
   setTheme(id = 'cozy') {
     if (!MUSIC_THEMES[id]) throw new Error(`Unknown music theme: ${id}`);
     this.theme = id;
     this.voices.forEach((o, i) => o.frequency.setTargetAtTime(MUSIC_THEMES[id].pad[i % MUSIC_THEMES[id].pad.length], this.ctx.currentTime, 0.5));
+    clearTimeout(this.melodyTimer);this.melodyTimer=null;this.melodyStep=0;
+    if(this.ctx)this.scheduleMelody();
+  },
+  scheduleMelody() {
+    const score=MUSIC_THEMES[this.theme];
+    this.melodyTimer=setTimeout(()=>{
+      this.melodyTimer=null;
+      if(!this.battleOn) {
+        const theme=MUSIC_THEMES[this.theme],step=this.melodyStep++;
+        if(theme.meter===3) {
+          const beat=step%3,f=theme.notes[Math.floor(step/3)%theme.notes.length];
+          this.tone(beat===0?theme.pad[Math.floor(step/3)%theme.pad.length]:f,beat===0?1.9:1.2,'sine',beat===0?.035:.02,0,0,this.music);
+        } else {
+          const f=mpick(theme.notes);this.tone(f,2.4,'sine',.03,0,0,this.music);
+          if(rng()<.5)this.tone(f*1.5,2,'sine',.018,.2,0,this.music);
+        }
+      }
+      this.scheduleMelody();
+    },score.interval[0]+rng()*(score.interval[1]-score.interval[0]));
   },
   init() {
     if (this.ctx) return; const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
@@ -25,9 +44,7 @@ export const audio = {
     MUSIC_THEMES[this.theme].pad.forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain(); this.voices.push(o);
       o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (rng() - 0.5) * 10; g.gain.value = 0.22;
       lfo.frequency.value = 0.05 + i * 0.031; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(g.gain); o.connect(g); g.connect(lp); o.start(); lfo.start(); });
-    const chime = () => { const theme = MUSIC_THEMES[this.theme]; setTimeout(() => { if (this.battleOn) { chime(); return; } const f = mpick(MUSIC_THEMES[this.theme].notes);
-      this.tone(f, 2.4, 'sine', 0.03, 0, 0, this.music); if (rng() < 0.5) this.tone(f * 1.5, 2, 'sine', 0.018, 0.2, 0, this.music); chime(); }, theme.interval[0] + rng() * (theme.interval[1] - theme.interval[0])); };
-    chime();
+    this.scheduleMelody();
   },
   tone(freq, dur = 0.5, type = 'sine', vol = 0.08, when = 0, slide = 0, out = this.fx) {
     if (!this.ctx) return; const t = this.ctx.currentTime + when, o = this.ctx.createOscillator(), g = this.ctx.createGain();

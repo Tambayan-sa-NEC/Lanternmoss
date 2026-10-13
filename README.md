@@ -848,3 +848,7 @@ Changes made on the way:
   to be hard-coded in the HTML).
 - **Tests** import the real modules directly. The XP math takes its config as an optional argument, so tests can use
   a hand-checkable curve.
+
+Tidewhisper's unreleased economy stage adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
+claims, shore fishing, three coastal meals and craftable Tide gear. Dawn sea mist, rain/wind/whitecaps and a
+procedural sea waltz accompany the coast. See [resources, weather and music](docs/tidewhisper.md#coastal-resources-weather-and-music-27c).

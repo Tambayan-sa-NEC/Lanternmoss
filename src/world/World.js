@@ -68,6 +68,10 @@ export class World {
       addFlat(spawnDir, 27, 10, 4.5); addFlat(this.stoneCenter, 9, 5, 4.5);
       addFlat(this.farmDir, 7, 3, 4.5);
       this.outerHouses.forEach(dir => addFlat(dir, 5, 5, 4.5));
+      if(planet.resources?.coastal){
+        this.coast.pearlBeach=offsetDir(this.coast.islands[5].dir,1.8,this.coast.islands[5].radius*.9);
+        addFlat(this.coast.pearlBeach,4,3); // exposed at low water, flooded at high; future Ironclaw site
+      }
     } else {
       this.pond1 = addPond(offsetDir(spawnDir, -0.55, 13), 4.3);
       this.stoneCenter = offsetDir(spawnDir, 2.75, 40);
@@ -188,6 +192,7 @@ export class World {
     this.fireflies.material.uniforms.uTime.value = time; this.waterMat.uniforms.uTime.value = time; WIND.uTime.value = time; coastalWind.time.value=time;
     this.clouds.rotateOnWorldAxis(CLOUD_AXIS, dt * 0.008 * (1 + (this.weather?.now.wind ?? 0) * 2));
     this.weather.update(dt, time, player, this.sky);
+    this.waterMat.uniforms.uSquall.value=this.weather.now.whitecaps??0;
     this.viewerPos.copy(player.pos); this.updateGrassVisibility();
     this.crystal.position.copy(this.crystalBase).addScaledVector(this.stoneCenter, Math.sin(time * 1.4) * 0.25); this.crystal.rotateY(dt * 0.9);
   }

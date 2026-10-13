@@ -25,6 +25,15 @@ export const GATHER = {
 };
 
 export const NODE_KINDS = {
+  driftwood: {name:'Driftwood',verb:'Gather',look:'branches',color:0xb99b77,drops:[['wood',[2,3]]],regrow:120,vanish:true,r:.7,coastal:true,washup:true},
+  shells: {name:'Shell washup',verb:'Gather',look:'shells',color:0xffe7cc,drops:[['shell',[2,3]],['seaglass',1]],regrow:120,vanish:true,r:.6,coastal:true,washup:true},
+  seaweed: {name:'Seaweed washup',verb:'Gather',look:'herb',color:0x4a9d88,drops:[['seaweed',[2,3]]],regrow:120,vanish:true,r:.5,coastal:true,washup:true},
+  clamBed: {name:'Clam bed',verb:'Gather',look:'shells',color:0xf5ceaf,drops:[['clam',2],['pearl',1]],regrow:300,vanish:true,r:.7,coastal:true,lowTide:true},
+  blackPearlBed: {name:'Black pearl bed',verb:'Gather',look:'shells',color:0x5f658a,drops:[['blackPearl',1],['clam',2]],regrow:600,vanish:true,r:.8,coastal:true,lowTide:true,rare:true},
+  coralReef: {name:'Exposed coral reef',verb:'Mine',tool:'pick',tier:1,hits:3,look:'coral',color:0xff958b,drops:[['coral',[1,2]]],regrow:240,r:1,coastal:true,lowTide:true},
+  saltPan: {name:'Salt pan',verb:'Gather',look:'salt',color:0xf4f7ee,drops:[['seaSalt',[2,3]]],regrow:180,vanish:true,r:.7,coastal:true},
+  seaglass: {name:'Seaglass washup',verb:'Gather',look:'pebbles',color:0x70dfd7,drops:[['seaglass',[2,3]]],regrow:120,vanish:true,r:.6,coastal:true,washup:true},
+  shipwreckIron: {name:'Old shipwreck',verb:'Salvage',tool:'pick',tier:2,hits:4,look:'wreck',color:0x8a8fa8,drops:[['ironOre',[1,2]],['wood',1]],regrow:300,r:1,coastal:true},
   // ---- by hand: everywhere (starting materials: wood and stone for your first tools)
   branches: { name: 'Fallen branches', verb: 'Gather', look: 'branches', color: 0xb0703a, drops: [['wood', [2, 3]]], regrow: 150, vanish: true, r: 0.7 },
   pebbles: { name: 'Loose stones', verb: 'Gather', look: 'pebbles', color: 0xb6aec8, drops: [['stone', [2, 3]]], regrow: 150, vanish: true, r: 0.6 },
@@ -80,5 +89,5 @@ export const FARM = {
   spacing: 1.75,              // metres between plot centres
   distance: [15, 24],         // from the village centre
   reach: 1.2,                 // metres from a plot's centre where E works on it
-  rainWaters: ['rain', 'storm', 'snow', 'blizzard'],   // weather that waters every planted plot (config/weather.js)
+  rainWaters: ['rain', 'storm', 'snow', 'blizzard', 'squall'],   // weather that waters every planted plot (config/weather.js)
 };

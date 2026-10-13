@@ -31,6 +31,7 @@ import { DISCOVERY_RECIPES } from './crafting.js';
 import { RUNES } from './magic.js';
 import { FURNISHINGS } from './home.js';
 import { BUILDING_ITEMS } from './placeables.js';
+import { COASTAL_ITEMS } from './coastalResources.js';
 
 export const ITEM_CATEGORIES = {
   consumable: 'Consumable',
@@ -117,6 +118,7 @@ export const INVENTORY = {
 };
 
 export const ITEM_DEFINITIONS = [
+  ...COASTAL_ITEMS,
   ...Object.entries(BUILDING_ITEMS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'placeable', maxStack: 20, value: 0, icon: { shape: 'charm', color: f.color, art: f.art } })),
   ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'furniture', maxStack: 5, value: 0,
     icon: { shape: 'charm', color: f.color, art: f.art } })),

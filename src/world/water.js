@@ -10,7 +10,7 @@ import { pondLevel, seaLevel, waterRegions } from './physics.js';
 export function createWater({ deep, light }, add = () => {}) {
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uDeep: { value: new THREE.Color(deep) }, uLight: { value: new THREE.Color(light) },
+    uniforms: { uTime: { value: 0 }, uSquall: {value:0}, uDeep: { value: new THREE.Color(deep) }, uLight: { value: new THREE.Color(light) },
     uFoam: { value: new THREE.Color(0xf6fffb) }, uFogColor: { value: FOG_COLOR }, uFogNear: FOG_NEAR, uFogFar: FOG_FAR },
     vertexShader: `varying vec2 vUv; varying float vDepth; varying vec3 vWorld;
     #ifdef SEA
@@ -21,7 +21,7 @@ export function createWater({ deep, light }, add = () => {}) {
     vGround = aGround;
     #endif
     vec4 mv = modelViewMatrix * vec4(position,1.0); vDepth = -mv.z; gl_Position = projectionMatrix * mv; }`,
-    fragmentShader: `uniform float uTime, uFogNear, uFogFar; uniform vec3 uDeep, uLight, uFoam, uFogColor; varying vec2 vUv; varying float vDepth; varying vec3 vWorld;
+    fragmentShader: `uniform float uTime, uSquall, uFogNear, uFogFar; uniform vec3 uDeep, uLight, uFoam, uFogColor; varying vec2 vUv; varying float vDepth; varying vec3 vWorld;
     #ifdef SEA
     uniform float uLevel; varying float vGround;
     #endif
@@ -40,6 +40,8 @@ export function createWater({ deep, light }, add = () => {}) {
       col = mix(col, uLight, (1.0-smoothstep(0.1,3.0,uLevel-vGround))*0.75);
       float g = step(0.995, sin(p.x * 3.8 + uTime * 1.3) * sin(p.y * 3.5 - uTime * 1.1));
       col += g * 0.4;
+      float crest = smoothstep(0.65,0.95,sin(p.x*1.3+uTime*1.4)*sin(p.y*.9-uTime*1.1));
+      col = mix(col,uFoam,crest*uSquall*.75);
       #else
       vec2 p = vUv - 0.5; float r = length(p) * 2.0; float a = atan(p.y, p.x);
       col = mix(uDeep, uLight, smoothstep(0.1, 0.95, r) * 0.65);
