@@ -1,5 +1,7 @@
 # Lanternmoss visual upgrade plan
 
+**For AI agents. Product owner:** use [visual-upgrade-guide.md](visual-upgrade-guide.md) for your production walkthrough and decisions.
+
 > **PLANNING ONLY — NOT FOR EXECUTION YET.**
 > This document proposes a future visual update. Creating it does not authorize implementation,
 > asset production or purchases, an engine migration, changes to the active roadmap, or a release.
