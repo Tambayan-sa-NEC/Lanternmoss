@@ -39,6 +39,12 @@ This is a proposed sequencing change, not an edit to TODO.md. If a Tidewhisper r
 priority, finishing 27b–27h before the visual prototype is a valid alternative, with the acknowledged
 cost of replacing more finished art later. Do not interrupt a feature midway to adopt this plan.
 
+**Preserving the version you like:** [TODO 43: Classic release checkpoint](../../TODO.md#43-preserve-the-classic-version-before-a-visual-upgrade-core-checkpoint)
+records a tagged release, restore-tested runnable archive, separate save backups and an optional side-by-side
+worktree. If the chosen route is to finish the current track first, complete that checkpoint before starting the
+visual overhaul. An earlier accepted milestone can also be preserved without finishing every optional TODO.
+The checkpoint preserves the existing edition; adding it does not activate this visual plan or require a new project.
+
 ## 2. Current project and unfinished work
 
 This snapshot is based on TODO.md, implementation notes, project logs and the working tree on 2026-10-13.
