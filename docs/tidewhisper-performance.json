@@ -1,0 +1,46 @@
+{
+  "measuredAt": "2026-10-14T16:24:35.509Z",
+  "candidateCommit": "67a16473aa261380a66b6982951d268e309b2446",
+  "dirty": true,
+  "device": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
+    "viewport": [
+      1280,
+      720
+    ],
+    "devicePixelRatio": 1
+  },
+  "quality": "low",
+  "viewport": [
+    1280,
+    720
+  ],
+  "candidate": true,
+  "rows": [
+    {
+      "scene": "village",
+      "samples": 120,
+      "p95FrameMs": 24.800000071525574,
+      "calls": 447,
+      "triangles": 185864,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "scene": "night",
+      "samples": 120,
+      "p95FrameMs": 27.5,
+      "calls": 445,
+      "triangles": 185848,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "scene": "weather",
+      "samples": 120,
+      "p95FrameMs": 31,
+      "calls": 448,
+      "triangles": 185852,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  ]
+}

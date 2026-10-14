@@ -869,3 +869,6 @@ across the wet sand at low tide to get it stuck. See [Old Ironclaw](docs/tidewhi
 Mirelure, the Lantern Angler, hides in Tidewhisper's lagoon behind false lantern lures. Strike the lure that dims in
 time with her breathing and she surfaces. At half health she smashes the sluice and is beached until the water creeps
 back. Her trophy is the Tide Crown. See [Mirelure](docs/tidewhisper.md#mirelure-the-lantern-angler-27g).
+
+Tidewhisper's release validation is in progress. It remains unreleased while final balance and Iris Xe performance
+acceptance are pending. See the [27h validation checklist and hardware handoff](docs/tidewhisper-release.md).

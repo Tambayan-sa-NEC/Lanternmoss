@@ -58,7 +58,7 @@ test('new worlds cannot waive distinct content or performance readiness',()=>{
     f=>f.p.boss.type='gloomcap',f=>f.r.behaviors[f.r.enemies.gloomcap.behavior]=f.r.behaviors.probeBoss,
     f=>f.p.miniBosses=[],f=>f.p.flora.trees={pine:1},f=>f.p.wildlife.critters=[['bunny',3]],
     f=>f.p.wildlife.rare='goldBunny',f=>f.p.weather={clear:1},f=>f.p.material='glowcap',f=>f.p.resources.rare=[],
-    f=>f.p.npcs.locals=[],f=>f.p.npcs.arrivals={},f=>f.p.music='cozy',f=>delete f.r.releases.newWorld,
+    f=>f.p.npcs.locals=[],f=>f.p.npcs.arrivals={},f=>f.p.music='cozy',f=>delete f.p.forage,f=>delete f.r.releases.newWorld,
     f=>f.r.releases.newWorld.rows[1].p95FrameMs=30,f=>f.r.releases.newWorld.rows.pop(),
     f=>f.r.releases.newWorld.device='Software renderer',f=>f.r.releases.newWorld.rows[0].calls=2000];
   for(const mutate of cases){const f=fixture();mutate(f);assert.ok(f.check().length>0,mutate.toString());}

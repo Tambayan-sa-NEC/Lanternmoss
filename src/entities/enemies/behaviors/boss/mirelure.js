@@ -78,10 +78,18 @@ function lightLures(e) {
   hint('lures', 'Lantern lights on the lagoon... only one is hers. Watch which one dims when her bubbles rise.');
 }
 function putOutLures(e) { for (const l of e.lures ?? []) if (l.alive) l.vanish(); e.lures = []; }
+function cancelMove(e) {
+  if (e.attack) moves[e.attack]?.cancel?.(e);
+  e.hideTele(); e.attack = null; e.gape = 0;
+}
+function dive(e, relightT = 1.2) {
+  cancelMove(e); e.mode = 'deep'; e.state = 'chase'; e.cool = Math.max(e.cool, 0.6); e.relightT = relightT;
+  splash(e, 30);
+}
 
 /** The real lure was struck: she rises under it, open to everything for def.lures.surface seconds. */
 function surface(e, lure) {
-  putOutLures(e); e.hideTele(); e.attack && moves[e.attack]?.cancel?.(e); e.mode = 'surfaced'; e.surfaceT = e.def.lures.surface;
+  putOutLures(e); cancelMove(e); e.mode = 'surfaced'; e.surfaceT = e.def.lures.surface;
   e.up.copy(lure.up); e.pos.copy(e.up).multiplyScalar(e.r); e.fwd.copy(tangentToward(e.up, ctx.player.up));
   e.state = 'chase'; e.cool = Math.max(e.cool, 1.2); e.hidden = false; e.root.visible = true;
   splash(e, 50); audio.roar(); shakeCamera(0.4); emote(e, '!', '#ffd36b');
@@ -196,7 +204,7 @@ export const mirelure = defineBoss({
   },
   reset(e) {
     putOutLures(e); mendSluice(e); activeTides()?.refloodLagoon();
-    Object.assign(e, { mode: 'deep', surfaceT: 0, drainT: 0, reflooded: false, breathT: 0, gape: 0, snapT: 0, thrashT: 0, rolling: false, relightT: 1.5 });
+    Object.assign(e, { mode: 'deep', surfaceT: 0, drainT: 0, reflooded: false, gape: 0, snapT: 0, thrashT: 0, rolling: false, relightT: 1.5 });
   },
   cancel(e) {
     putOutLures(e); e.gape = 0; e.rolling = false;
@@ -205,7 +213,7 @@ export const mirelure = defineBoss({
   intro() { hint('intro', 'Mirelure hides in the deep water. Only her lantern lures show...'); },
   /** 50%: up she comes, to the sluice, and smashes it. */
   onPhase(e) {
-    putOutLures(e); e.state = 'transition'; e.mode = 'surfaced'; e.hidden = false; e.root.visible = true; e.smashT = e.def.sluice.smash; e.atSluice = false;
+    putOutLures(e); cancelMove(e); e.state = 'transition'; e.mode = 'surfaced'; e.hidden = false; e.root.visible = true; e.smashT = e.def.sluice.smash; e.atSluice = false;
     roar(e); return true;
   },
   transition(e, dt) {
@@ -227,18 +235,17 @@ export const mirelure = defineBoss({
   },
   update(e, dt) {
     const L = e.def.lures, fighting = e.fighting && !e.dormant;
-    if (e.mode === 'surfaced' && e.state !== 'transition' && (e.surfaceT -= dt) <= 0) { e.mode = 'deep'; splash(e, 30); e.relightT = 1.2; }
+    if (e.mode === 'surfaced' && e.state !== 'transition' && (e.surfaceT -= dt) <= 0) dive(e);
     if (e.mode === 'beached') {
       const drained = activeTides()?.status.lagoonDrained ?? (e.drainT -= dt) > 0;
-      if (!drained || depthAt(e.up) >= e.def.diveDepth) { e.mode = 'deep'; e.reflooded = true; e.relightT = 1; splash(e, 40); toast('The lagoon fills again: Mirelure slips back under, and lights more lures!'); }
+      if (!drained || depthAt(e.up) >= e.def.diveDepth) { dive(e, 1); e.reflooded = true; toast('The lagoon fills again: Mirelure slips back under, and lights more lures!'); }
     }
     if (e.mode === 'deep' && fighting && !(e.lures?.some(l => l.alive)) && (e.relightT -= dt) <= 0) lightLures(e);
     e.lures = (e.lures ?? []).filter(l => l.alive);
     e.hidden = e.mode === 'deep' && !e.dormant; e.selfCollider.active = !e.hidden && !e.dormant;
     if (!e.dormant) e.root.visible = e.alive && !e.hidden; e.shadow.visible = !e.hidden;
     // breath: a ring of bubbles over her, on the beat the real lure dims to
-    const before = e.breathT ?? 0; e.breathT = before + dt;
-    if (fighting && e.mode === 'deep' && Math.floor(e.breathT / L.breath) > Math.floor(before / L.breath)) {
+    if (fighting && e.mode === 'deep' && Math.floor(ctx.time / L.breath) > Math.floor((ctx.time - dt) / L.breath)) {
       const w = waterAt(e.up); if (w) for (let i = 0; i < 8; i++) sparkles.emit(_c.copy(offsetDir(e.up, i * 0.8, 1.4)).multiplyScalar(w.level + 0.1), { count: 2, color: FOAM, speed: 1.2, up: e.up, upBias: 2, life: 0.8, size: 0.36 });
       audio.squish();
     }

@@ -1,5 +1,12 @@
 # Performance budget
 
+Tidewhisper 27h is currently a development candidate, with separate
+[diagnostic results](tidewhisper-performance.json) and an [Iris Xe handoff](tidewhisper-release.md).
+Its real fourth-world village/night/squall collector uses 1280x720 Low, 30 warmup frames and 120 samples per scene.
+Available Intel UHD results do not certify Iris Xe or the release target. Run `node scripts/tidewhisper-performance.mjs`
+for diagnostics; `--release` requires a clean candidate, an actual Iris Xe renderer and passing frame/draw budgets
+before it writes a release evidence file. Tidewhisper remains unreleased.
+
 The target is steady **60 FPS at a 1920 × 1080 viewport on Iris Xe class integrated graphics**, using the default
 High preset: 16.67 ms per frame. The available test machine reports Intel UHD through Edge/ANGLE/D3D11, not Iris Xe.
 It remains below 60 FPS. These measurements establish a reproducible render budget; they do not certify the target.

@@ -29,6 +29,7 @@ export function contentProblems(p, catalog, r) {
   for (const attack of Object.values(r.enemies[p.boss?.type]?.attacks ?? {})) for (const type of attack.types ?? []) enemy(type, 'regular');
   const item = id => require(r.items.has(id), `unknown item ${id}`);
   item(p.boss?.trophy); item(p.material);
+  require(Array.isArray(p.forage), 'forage must be an explicit array for world generation');
   for (const f of p.forage ?? []) { item(f.item); require(positive(f.count), `invalid forage count ${f.item}`); }
   for (const c of p.chests ?? []) require(!!r.chests[c.kind] && Number.isInteger(c.count) && positive(c.count), `invalid chest ${c.kind}`);
   const trees = Object.entries(p.flora?.trees ?? {}).filter(([,n]) => positive(n)).map(([id]) => id);

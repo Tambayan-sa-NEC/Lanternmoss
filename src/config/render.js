@@ -16,5 +16,6 @@ export const PERFORMANCE_BUDGET = {
     lanternmoss: { calls: 1050, triangles: 310000 },
     emberfall: { calls: 900, triangles: 280000 },
     frostveil: { calls: 850, triangles: 280000 },
+    tidewhisper: { calls: 550, triangles: 230000 }, // 27h 720p-low village/night/squall fixture; hardware timing still gated.
   },
 };
