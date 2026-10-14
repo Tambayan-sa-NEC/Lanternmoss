@@ -1,0 +1,8 @@
+# Branching and log workflow change
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-14T14:59:00+08:00 | DECISION | TODO N/A | Adopt a develop/master branch model | chore/gitflow-workflow | User instruction: `master` is the public, playable game; `develop` integrates and tests new work; each TODO stage or idea gets its own task branch merged into `develop`. `develop` goes to `master` when a group of features is done (confirmed with the user each time); hotfixes branch from `master` and merge back into both. |
+| 2026-10-14T14:59:00+08:00 | CHORE | TODO N/A | Create `develop` from `master` and push it | develop | `develop` created at d34a82f (identical to master) and pushed with upstream origin/develop. GitHub's default branch stays `master`. |
+| 2026-10-14T14:59:00+08:00 | DOCS | TODO N/A | Rewrite AGENTS.md workflow and log task types | chore/gitflow-workflow | Task branches merge into `develop`; release and hotfix workflows added. Task types expanded from TASK/DECISION to PLAN, RESEARCH, DECISION, DESIGN, FEATURE, FIX, REFACTOR, PERF, BALANCE, TEST, REVIEW, DOCS, CHORE, BUILD, MERGE, RELEASE, HOTFIX, SECURITY, BLOCKED. Existing log rows keep `TASK`. |
+| 2026-10-14T14:59:00+08:00 | REVIEW | TODO N/A | Note what `master` already contains | chore/gitflow-workflow | `master` already holds Tidewhisper's 27a-27e code from before this change, behind `released: false` (not playable). It stays there; the world becomes playable with the release that completes TODO 27. |
