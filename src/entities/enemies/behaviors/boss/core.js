@@ -13,7 +13,8 @@
    A move: { ready?, weight?, begin?(e, dist), windup?(e, dt, k, dist), fire(e, dist) -> 'active' | undefined,
              active?(e, dt, dist) -> speed, cancel?(e) }.
    kit:    { moves, fallback?(e, dist) -> id, init?, reset?, intro?, approach, recovering?, transition?, update?(e, dt, n),
-             onPhase?(e, from, to) -> true if it took over the change, animate(e, dt), cancel?(e), onDie?(e), dispose?(e) }
+             onPhase?(e, from, to) -> true if it took over the change, animate(e, dt), cancel?(e), onDie?(e), dispose?(e),
+             refuses?(e, hit), damageScale?(e, hit) -> multiplier (both passed through to damageEnemy: Old Ironclaw's bell) }
    Every boss is immune to stagger and knockback and shrugs off part of a stun (Enemy.stun). */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
@@ -163,6 +164,7 @@ export function defineBoss(kit) {
       kit.onDie?.(e);
       encounterEvents.dispatchEvent(new CustomEvent(e.def.miniBoss ? 'minibossdefeated' : 'bossdefeated', { detail: { boss: e } }));
     },
+    refuses: kit.refuses, damageScale: kit.damageScale,
     dispose(e) {
       clearHazards(e); kit.dispose?.(e); for (const d of e.decals ?? []) { d.geo.dispose(); d.template.dispose(); }   // materials go with fxMeshes
       scene.remove(e.beacon); e.beacon.geometry.dispose(); e.beacon.material.dispose(); },

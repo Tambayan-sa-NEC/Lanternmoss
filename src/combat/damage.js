@@ -52,6 +52,7 @@ export function damageEnemy(e, amount, o = {}) {
   if (!o.source && buffs.howl > 0) amount *= 1 + PETS.wolf.ability.damage;   // a pet's Howl (gameplay/petAbilities.js)
   if (!o.source && buffs.might > 0) amount *= 1 + BUFFS.mightDamage;          // Mighty: a pie, a skewer, a fire pepper
   if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
+  amount *= e.behavior?.damageScale?.(e, o) ?? 1;                    // e.g. Old Ironclaw tucked in its shell, or out of it
   if (e.shieldT > 0) amount *= 1 - e.shieldAmt;                       // hexlantern ward
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
   encounterEvents.dispatchEvent(new CustomEvent('enemyhit', { detail: { enemy: e, amount, source: o.source ?? 'player' } }));

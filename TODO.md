@@ -1116,7 +1116,7 @@ bosses and release balancing each get their own session. The otter remains optio
 | [x] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
 | [x] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
 | [x] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
-| [ ] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
+| [x] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
 | [ ] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
 | [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
 
@@ -1160,6 +1160,15 @@ behaviour hooks; sea-only projectile flight fixes (Act I balance report unchange
 simulations (including a level-8 duel for each hero) and the 720p/1080p low browser checks pass. Tidewhisper remains
 unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper.md#regular-enemy-roster-27e).
 
+**27f implemented (2026-10-14):** Old Ironclaw, a hermit crab in a sunken bronze bell, guards the black pearl beds on
+the far beach (beds refuse gathering while it lives). The bell refuses blows and rings a jumpable, stunning shockwave
+(pets only clang); the face takes a guarded share. It opens up (bonus damage from any side) while swapping shells at
+66%/33% and when a low-tide charge ploughs it into wet sand. Pinch, charge and toll have wind-up warnings. It drops two
+black pearls and stays beaten through Continue and revisits; a faint resets the fight. New optional `damageScale`
+hook. All 210 unit tests, 40 simulations and the 720p/1080p low browser checks pass. A level-8 duel for each hero wins
+on two seeds (mostly 148-195 s against the 90-180 s target; final pacing is 27h). Tidewhisper remains unreleased.
+Next: 27g, Mirelure. See [Old Ironclaw](docs/tidewhisper.md#old-ironclaw-27f).
+
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
       on stilts on the largest island, with a pier for fishing.
@@ -1174,7 +1183,7 @@ unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper
   - **Surf skippers:** mudskipper raiders that ambush from the surf and slip back into deep water where you can't
     follow on foot.
   - Returning: a few wisps, sea-green.
-- [ ] **Mini boss: Old Ironclaw,** a giant hermit crab wearing a sunken bronze bell. The bell takes no damage and rings
+- [x] **Mini boss: Old Ironclaw,** a giant hermit crab wearing a sunken bronze bell. The bell takes no damage and rings
       a stunning shockwave when hit; Ironclaw is open when it pulls out to swap shells (at 66% and 33%) or when a charge
       wedges it in the sand at low tide. It guards the black pearl beds on the far beach.
 - [ ] **Boss: Mirelure, the Lantern Angler,** a huge anglerfish whose lure is a lantern that once drew ships onto the rocks.
