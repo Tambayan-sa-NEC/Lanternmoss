@@ -19,3 +19,5 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-14 15:19 | DOCS | TODO N/A | Change log timestamps to `YYYY-MM-DD HH:MM` and add a DURATION column and closing TOTAL row | chore/log-format | User instruction. Replaces the ISO-with-offset rule from earlier today. DURATION is measured from the clock per step; TOTAL is the whole execution from first start to last end. Older tables keep their columns. | 0h 01m |
 | 2026-10-14 15:24 | TEST | TODO N/A | Run required checks | chore/log-format | Documentation-only change. `npm test`: 208 passed, 0 failed. `npm run sim`: all 38 passed. | 0h 05m |
+| 2026-10-14 15:24 | MERGE | TODO N/A | Merge into `develop`, push and delete the task branch | develop | Merged with --no-ff and pushed to origin/develop; confirmed included, then deleted local chore/log-format (never pushed). These rows are a log-only commit on `develop`. | 0h 01m |
+| 2026-10-14 15:24 | TOTAL | TODO N/A | Log format change, start to finish | develop | Rules, checks, merge and logging done; `master` gets the new rules with the next release. | 0h 05m |
