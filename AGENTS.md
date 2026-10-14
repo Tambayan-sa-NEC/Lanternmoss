@@ -1,6 +1,10 @@
 # Project work logs
 
 Record every meaningful task, decision, change, and verification in a Markdown file under `docs/logs/`.
+Name each log file `YYMMDDHHMM <descriptive-title>.md`: the machine-clock time the work started (the log's first
+row), a space, then a short kebab-case title starting with the TODO stage when there is one, for example
+`2610141529 todo-27f-old-ironclaw.md` or `2610141529 project-status.md`. Get the prefix with `date +"%y%m%d%H%M"`
+in Bash or `Get-Date -Format "yyMMddHHmm"` in PowerShell. Quote the path in commands, since it contains a space.
 Use a Markdown table with one entry per row, keeping these seven columns in this order:
 
 | DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |

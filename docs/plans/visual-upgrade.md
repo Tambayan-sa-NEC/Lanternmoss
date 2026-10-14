@@ -573,8 +573,8 @@ contract. Refresh only affected reference captures during a batch, then the comp
 Inspect screenshots manually; tolerate documented rasterization differences rather than accepting an
 unreviewed pixel-diff threshold as aesthetic approval.
 
-Record meaningful work, decisions, limitations and verification in `docs/logs/` using the six-column
-table. Until visual IDs are formally adopted, use `TODO N/A` and put the V-ID in ACTION/REMARK. Do not
+Record meaningful work, decisions, limitations and verification in `docs/logs/` using the log
+format in `AGENTS.md`. Until visual IDs are formally adopted, use `TODO N/A` and put the V-ID in ACTION/REMARK. Do not
 check off gameplay TODOs merely because their planned models are complete.
 
 ## 8. Asset inventory and handoff template
