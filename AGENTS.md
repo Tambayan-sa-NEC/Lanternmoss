@@ -7,7 +7,9 @@ Use a Markdown table with one entry per row, keeping these six columns in this o
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-09T16:45:22+08:00 | FEATURE | TODO 19 | Describe the action | feat/todo-19-save-load | Record the outcome or limitation |
 
-Use an ISO 8601 datetime with timezone, a task type from the list below, the applicable TODO number
+Take every DATETIME from the machine clock at the moment the row is written, never typed or estimated:
+`date +%Y-%m-%dT%H:%M:%S%:z` in Bash, or `Get-Date -Format "yyyy-MM-ddTHH:mm:sszzz"` in PowerShell
+(ISO 8601 with the machine's own UTC offset, e.g. `2026-10-14T15:11:43+08:00`). Use a task type from the list below, the applicable TODO number
 (or `TODO N/A` for work outside the roadmap), and the current branch name. Record outcomes and limitations truthfully.
 Append new rows to the table. Escape literal pipes as `\|` and use `<br>` for line breaks inside cells.
 Preserve existing entries when changing the log format (older rows keep `TASK`).
@@ -59,6 +61,9 @@ After completing it:
 4. Push `develop` when a remote is configured. Confirm the task branch's work is included in it,
    then delete the task branch locally and remotely if it exists there.
 5. Record test results, the merge, push, and branch deletion in `docs/logs/` using the table format above.
+   These rows can only be written after the merge, so they may be committed directly on `develop` (or on `master`
+   after a release or hotfix) and pushed. This is the only exception to the no-direct-commits rule: the commit
+   must change log files under `docs/logs/` and nothing else.
 
 This is the standing completion workflow; no additional confirmation is needed for these steps.
 
