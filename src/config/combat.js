@@ -91,6 +91,24 @@ export const COMBAT = {
                    { below: 1.0, attacks: ['gaze', 'whip', 'lunge'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Enraged', attacks: ['gaze', 'whip', 'lunge', 'spit'], speedMul: 1.2, cooldownMul: 0.8 },
                  ] },
+    // Tidewhisper (TODO 27f). faceArc = half-angle (degrees) of the front that can be hurt; everywhere else is the bell,
+    // which only rings (bellRing: a shockwave after `delay`, at most once per `cooldown`; stun = seconds dazed).
+    // guarded = damage share while tucked in its shell; openBonus = extra while out of it (swap) or wedged in the sand
+    ironclaw:  { ai: 'boss', behavior: 'ironclaw', miniBoss: true, name: 'Old Ironclaw, Keeper of the Pearl Beds', color: 0xc8913a, capColor: 0xffc86a,
+                 hp: 1000, speed: 2.2, radius: 1.5, height: 2.8, aggro: 13, leash: 20, turnRate: 2.4,
+                 knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 180, cooldown: 1.2,
+                 faceArc: 70, guarded: 0.6, openBonus: 0.4, wedge: 5, swap: 5.5, swapSpeed: 0.6,
+                 bellRing: { delay: 0.45, speed: 9, maxRadius: 9, width: 1.2, damage: 7, stun: 1.0, cooldown: 3 },
+                 attacks: {
+                   pinch:  { windup: 0.7, range: 4.2, arc: 80, damage: 12, knockback: 7, recover: 0.7, cooldown: 0.8 },
+                   charge: { windup: 0.9, minRange: 4, speed: 13, distance: 14, width: 2.0, damage: 14, knockback: 11, recover: 0.9, cooldown: 1.2, reuse: 4 },
+                   toll:   { windup: 1.0, speed: 8, maxRadius: 12, width: 1.2, damage: 10, knockback: 5, stun: 0.8, recover: 1.0, cooldown: 1.2, reuse: 6 },
+                 },
+                 phases: [   // each threshold: out of the shell (the kit's onPhase), then a new one
+                   { below: 1.0, attacks: ['pinch', 'charge'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.66, title: 'Second shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.1, cooldownMul: 0.9 },
+                   { below: 0.33, title: 'Last shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.2, cooldownMul: 0.8 },
+                 ] },
     // ---- lair seals: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
     thornSeal: { ai: 'seal', object: true, static: true, name: 'Thorn Seal', color: 0xb48cff, hp: 90, speed: 0, radius: 0.75, height: 2.6,
                  aggro: 0, leash: 99, respawn: 0, xp: 12, knockResist: 1, slowResist: 1, staggerImmune: true },

@@ -29,7 +29,7 @@ export const NODE_KINDS = {
   shells: {name:'Shell washup',verb:'Gather',look:'shells',color:0xffe7cc,drops:[['shell',[2,3]],['seaglass',1]],regrow:120,vanish:true,r:.6,coastal:true,washup:true},
   seaweed: {name:'Seaweed washup',verb:'Gather',look:'herb',color:0x4a9d88,drops:[['seaweed',[2,3]]],regrow:120,vanish:true,r:.5,coastal:true,washup:true},
   clamBed: {name:'Clam bed',verb:'Gather',look:'shells',color:0xf5ceaf,drops:[['clam',2],['pearl',1]],regrow:300,vanish:true,r:.7,coastal:true,lowTide:true},
-  blackPearlBed: {name:'Black pearl bed',verb:'Gather',look:'shells',color:0x5f658a,drops:[['blackPearl',1],['clam',2]],regrow:600,vanish:true,r:.8,coastal:true,lowTide:true,rare:true},
+  blackPearlBed: {name:'Black pearl bed',verb:'Gather',look:'shells',color:0x5f658a,drops:[['blackPearl',1],['clam',2]],regrow:600,vanish:true,r:.8,coastal:true,lowTide:true,rare:true,guardedBy:'ironclaw'},
   coralReef: {name:'Exposed coral reef',verb:'Mine',tool:'pick',tier:1,hits:3,look:'coral',color:0xff958b,drops:[['coral',[1,2]]],regrow:240,r:1,coastal:true,lowTide:true},
   saltPan: {name:'Salt pan',verb:'Gather',look:'salt',color:0xf4f7ee,drops:[['seaSalt',[2,3]]],regrow:180,vanish:true,r:.7,coastal:true},
   seaglass: {name:'Seaglass washup',verb:'Gather',look:'pebbles',color:0x70dfd7,drops:[['seaglass',[2,3]]],regrow:120,vanish:true,r:.6,coastal:true,washup:true},

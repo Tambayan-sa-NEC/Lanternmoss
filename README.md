@@ -861,3 +861,7 @@ Tidewhisper's unreleased monsters read the live tide. Shellbacks turn a barnacle
 front, so circle round them. Jellybells drift onto the flats with the rising tide and sting in a ring, and are
 stranded when it falls. Surf skippers lurk untargetable in the surf, then leap at anyone near the water.
 Sea-green wisps return from Act I. See [regular enemy roster](docs/tidewhisper.md#regular-enemy-roster-27e).
+
+Old Ironclaw, a giant hermit crab in a sunken bronze bell, guards Tidewhisper's black pearl beds. Its bell only rings,
+sending out a stunning shockwave to jump. Hit its face, catch it out of its shell at 66% and 33%, or bait a charge
+across the wet sand at low tide to get it stuck. See [Old Ironclaw](docs/tidewhisper.md#old-ironclaw-27f).

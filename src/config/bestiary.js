@@ -95,6 +95,16 @@ export const BESTIARY_ENTRIES = {
       ['Tail whip', 'A spin through the marked circle around it.'], ['Lunge', 'It marks a lane and darts along it, jaws first.'], ['Venom', 'Once enraged: a fan of venom.']],
     counters: ['When its eyes blaze, turn your back: run away from it until they flare, then turn and strike.', 'Jump over the tail whip.', 'Sidestep the lunge, then punish it while it recovers.'],
   },
+  ironclaw: {
+    lore: 'The bell hung in the old lighthouse until the night the Lantern Angler drew a ship onto the rocks and both went down. '
+      + 'Ironclaw found it on the sea bed, crawled in, and has been carrying it about ever since. It hates being rung.',
+    blurb: 'A mini boss: a giant hermit crab in a sunken bronze bell, guarding the black pearl beds on the far beach. The bell takes no damage at all.',
+    attacks: [['Pinch', 'Rears its great claw over a wedge in front of it, then snaps.'], ['Charge', 'Marks a lane and barrels along it.'],
+      ['Bell ring', 'Strike the bell and it rings out a stunning shockwave after a short glow.'], ['Toll', 'From its second shell: it rears and slams the bell down, sending a shockwave rolling out.']],
+    counters: ['Jump over the shockwaves.', 'Hit its face, not the bell: tucked in its shell it only takes a little damage.',
+      'At 66% and 33% it crawls out to swap shells: that\'s your window, from any side.', 'At low tide, bait a charge across the wet sand: it gets stuck, soft and open.'],
+    drops: 'Two black pearls, and the pearl beds it guards are yours to gather.',
+  },
   gloomcap: {
     lore: 'Once the gentlest mushroom of the old woods, it drank the gloom that pooled under the lanterns until it grew a crown of it. '
       + 'The villagers sealed its glade with three thorn stones, and it has been sulking behind them ever since.',

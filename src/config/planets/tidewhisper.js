@@ -1,4 +1,4 @@
-// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c; village: 27d; regular enemies: 27e. Fights/release: 27f-27h.
+// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c; village: 27d; regular enemies: 27e; Old Ironclaw: 27f. Mirelure/release: 27g-27h.
 import { COASTAL_NPCS, COASTAL_HOUSES } from '../coastalVillage.js';
 export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
   village:{coastal:true},outfit:'beach',outfitColors:[0x4bacc0,0xf4d18a,0xff987b,0x6dc39b],npcs:COASTAL_NPCS,houses:COASTAL_HOUSES,
@@ -29,4 +29,5 @@ export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false
     birds:6,flocks:1,plumage:[{species:'gull',body:0xf4f6ee,belly:0xffffff,wing:0xa5b6bd},{species:'tern',body:0xd7e3e7,belly:0xffffff,wing:0x778f9d}],
     shoals:3,fishPerShoal:8,lanternfish:8},
   arrival: 'Tidewhisper. Afternoon low tide opens the sandbars; at night the sea takes them back. The village and farm stay above high water.',
+  miniBosses: [{ type: 'ironclaw', near: 'pearlBeach' }],   // guards the black pearl beds on the far beach (27f)
   boss: { type: 'mirelure', summon:{level:8,quest:'darkLighthouse',lowTide:true} } };

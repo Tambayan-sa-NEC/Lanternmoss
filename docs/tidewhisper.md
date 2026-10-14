@@ -1,7 +1,7 @@
 # Tidewhisper terrain and tides
 
-TODOs 27a-27e implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest and regular
-monsters. Tidewhisper remains `released: false`: its two fights belong to 27f-27g; campaign release requires 27h.
+TODOs 27a-27f implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest, regular
+monsters and Old Ironclaw. Tidewhisper remains `released: false`: Mirelure is 27g; campaign release requires 27h.
 The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
 gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
 
@@ -222,3 +222,44 @@ the capped turn, the pinch, rising/falling drift, the sting and dodging it, stra
 untargetable lurk, ambush, retreat, shore fence and stranding, extra drops, and a level-8 duel per hero. Every hero
 beat every monster with no HP top-ups (3-10 s each). These are access checks; the campaign's pacing targets,
 measured performance and the Iris Xe frame-time target remain 27h.
+
+## Old Ironclaw (27f)
+
+Tidewhisper's mini boss (`miniBosses: [{ type: 'ironclaw', near: 'pearlBeach' }]`) is a giant hermit crab living in a
+sunken bronze bell. It spawns on dry sand above high water, 4-14 m inland of the pearl flat reserved in 27c, and
+guards the two black pearl beds there: while it lives, gathering a bed is refused and its prompt says "(guarded)".
+Its kit is `src/entities/enemies/behaviors/boss/ironclaw.js` on the shared boss framework.
+
+- **The bell** covers its back, sides and top. A hero's blow there (any hit whose origin is outside the 70-degree
+  front cone, or right on top of it) is refused. After a 0.45 s glow the bell rings out a shockwave that hurts and
+  dazes a grounded hero for 1 s; jump over it. It rings at most once every 3 s, and pet strikes only clang, so a pet
+  cannot stun its own hero.
+- **The face** (the front cone) takes 60% damage while Ironclaw is tucked in its shell.
+- **Open** (+40% damage from any side, and the bell can't ring):
+  - *Shell swaps* at 66% and 33%: it crawls out and scuttles about for 5.5 s, then climbs into a new shell (bronze,
+    then verdigris, then a dark old bell).
+  - *Wedged*: a charge that crosses wet tidal sand (dry now but under high water: the flats at low tide) ploughs it
+    into the sand for 5 s. At high tide the flats are flooded, so it never wedges.
+- **Moves**: pinch (a marked wedge in front), charge (a marked lane), and from the second shell, toll (it rears and
+  slams the bell down: a shockwave to jump). Every move has a wind-up warning and a recovery.
+- **Reward**: two black pearls where it falls, plus the usual mini boss treasure roll, and the beds are free. Its
+  defeat is saved through the existing per-planet mini boss record, so it stays beaten through Continue and revisits.
+  A faint resets the fight: it walks home, heals and returns to its first shell.
+
+Behaviour modules and boss kits gained an optional `damageScale(e, hit)` hook (beside `refuses`) for the guarded and
+open multipliers.
+
+![Old Ironclaw on the pearl flat](screenshots/tidewhisper-ironclaw.jpg)
+
+Verify with `npm test`, `npm run sim` and `node scripts/ironclaw-smoke.mjs` (port 8112; Puppeteer Core/Chromium as in
+27e). The browser helper uses real **Z** Arcane Bolts into the bell (refused, then a ring that hurts) and its face
+(lands), a low-tide charge that wedges it, 720p/1080p low rendering in and out of its shell, and its defeat surviving
+reload Continue with the beds free, with zero page or shader errors. The `ironclaw` simulation covers placement and the
+guard, bell zones, ring telegraph/cooldown/jump/pet rule, guarded and open damage, the pinch and charge telegraphs,
+low- versus high-tide wedging, both shell swaps and the toll, the reset after a faint, loot and persistence.
+
+`ironclawDuels` gives each hero a level-8 bot using the bestiary's plan: bait charges across the wet sand at low tide,
+strike the face, and hit anywhere while it is open. It never jumps a shockwave or dodges; HP is topped up below 50%.
+Every hero beat it on two seeds. Most fights took 148-195 s with 8-13 top-ups, against the 90-180 s mini boss target
+(the existing mini bosses take 95-135 s with 6-13). One ranger fight took 41 s after four early wedges. Final
+three-hero pacing is 27h's balance pass.

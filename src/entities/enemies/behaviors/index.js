@@ -2,7 +2,8 @@
      { think(e, dt, dist) -> ground speed (required; sets e.move),
        init(e), reset(e) on (re)spawn, update(e, dt, collisionNormal) after moving, animate(e, dt), onDie(e), dispose(e),
        steer(e, dt, dist) -> a ground speed that overrides every state (even idle / wander / return), or undefined,
-       refuses(e, hitOptions) -> true when a hit glances off before doing anything (a Shellback's front plate) }
+       refuses(e, hitOptions) -> true when a hit glances off before doing anything (a Shellback's front plate),
+       damageScale(e, hitOptions) -> a multiplier on the damage that does land (Old Ironclaw in or out of its shell) }
    The original AIs ('melee', 'ranged', 'hopper') are still methods on Enemy. Planet bosses all have ai 'boss' and pick
    their own AI with def.behavior (each a kit on the shared boss framework in ./boss/core.js). seal = a lair seal (animate only). */
 import { amphibian } from './amphibian.js';
@@ -13,6 +14,7 @@ import { dragon } from './boss/dragon.js';
 import { gloomcap } from './boss/gloomcap.js';
 import { basilisk } from './boss/basilisk.js';
 import { hydra } from './boss/hydra.js';
+import { ironclaw } from './boss/ironclaw.js';
 import { burrower } from './burrower.js';
 import { charger } from './charger.js';
 import { drifter } from './drifter.js';
@@ -27,4 +29,4 @@ const seal = {
   },
 };
 
-export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk };
+export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk, ironclaw };
