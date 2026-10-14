@@ -1,18 +1,25 @@
 # Project work logs
 
 Record every meaningful task, decision, change, and verification in a Markdown file under `docs/logs/`.
-Use a Markdown table with one entry per row, keeping these six columns in this order:
+Use a Markdown table with one entry per row, keeping these seven columns in this order:
 
-| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK |
-| --- | --- | --- | --- | --- | --- |
-| 2026-10-09T16:45:22+08:00 | FEATURE | TODO 19 | Describe the action | feat/todo-19-save-load | Record the outcome or limitation |
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-14 15:18 | FEATURE | TODO 27f | Describe the action | feat/todo-27f-old-ironclaw | Record the outcome or limitation | 0h 25m |
+| 2026-10-14 18:40 | TOTAL | TODO 27f | Whole feature, start to finish | develop | Summary of the feature's outcome | 3h 22m |
 
-Take every DATETIME from the machine clock at the moment the row is written, never typed or estimated:
-`date +%Y-%m-%dT%H:%M:%S%:z` in Bash, or `Get-Date -Format "yyyy-MM-ddTHH:mm:sszzz"` in PowerShell
-(ISO 8601 with the machine's own UTC offset, e.g. `2026-10-14T15:11:43+08:00`). Use a task type from the list below, the applicable TODO number
-(or `TODO N/A` for work outside the roadmap), and the current branch name. Record outcomes and limitations truthfully.
-Append new rows to the table. Escape literal pipes as `\|` and use `<br>` for line breaks inside cells.
-Preserve existing entries when changing the log format (older rows keep `TASK`).
+- DATETIME is when the row is written (when that step finished), read from the machine clock, never typed or
+  estimated, as `YYYY-MM-DD HH:MM` and nothing else: `date +"%Y-%m-%d %H:%M"` in Bash or
+  `Get-Date -Format "yyyy-MM-dd HH:mm"` in PowerShell.
+- DURATION is how long that step took, measured from the clock: note the time when the step starts and subtract it
+  from the row's DATETIME. Write it as `Xh MMm` (`0h 25m`; `0h 01m` for anything under a minute).
+- Every feature or task log ends with one `TOTAL` row: its DURATION is the elapsed time from the start of the
+  first step to the end of the last one (the feature's whole execution, including checks, merge and logging).
+- Use a task type from the list below, the applicable TODO number (or `TODO N/A` for work outside the roadmap),
+  and the current branch name. Record outcomes and limitations truthfully.
+- Append new rows to the table. Escape literal pipes as `\|` and use `<br>` for line breaks inside cells.
+- Preserve existing entries when changing the log format: older rows and tables keep their original columns
+  (`TASK`, ISO datetimes, no DURATION). Start a new table in the new format below an old one rather than mixing them.
 
 Task types (pick the one that best describes the row):
 
@@ -37,6 +44,7 @@ Task types (pick the one that best describes the row):
 | `HOTFIX` | An urgent fix to the playable `master`, made on a `hotfix/` branch |
 | `SECURITY` | Security review, secrets or credential handling |
 | `BLOCKED` | Work that cannot continue, and why |
+| `TOTAL` | The last row of a feature or task log: the whole execution time |
 
 # Branches
 

@@ -12,3 +12,10 @@
 | 2026-10-14T15:11:55+08:00 | DOCS | TODO N/A | Require machine-clock log timestamps | chore/log-rules | User instruction: every DATETIME comes from the machine clock when the row is written (`date +%Y-%m-%dT%H:%M:%S%:z` or PowerShell `Get-Date -Format "yyyy-MM-ddTHH:mm:sszzz"`), with the machine's own offset. Limitation: the earlier TODO 27e rows stamped 12:05-14:30 were estimated, not read from the clock; they are kept unchanged as history. |
 | 2026-10-14T15:16:46+08:00 | TEST | TODO N/A | Run required checks | chore/log-rules | Documentation-only change. `npm test`: 208 passed, 0 failed. `npm run sim`: all 38 passed. |
 | 2026-10-14T15:16:46+08:00 | MERGE | TODO N/A | Merge into `develop`, push and delete the task branch | develop | Merged with --no-ff and pushed to origin/develop; confirmed included, then deleted local chore/log-rules (never pushed). This row is the first log-only commit made directly on `develop` under the new exception. |
+
+## Log format with durations (new format from here)
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-14 15:19 | DOCS | TODO N/A | Change log timestamps to `YYYY-MM-DD HH:MM` and add a DURATION column and closing TOTAL row | chore/log-format | User instruction. Replaces the ISO-with-offset rule from earlier today. DURATION is measured from the clock per step; TOTAL is the whole execution from first start to last end. Older tables keep their columns. | 0h 01m |
+| 2026-10-14 15:24 | TEST | TODO N/A | Run required checks | chore/log-format | Documentation-only change. `npm test`: 208 passed, 0 failed. `npm run sim`: all 38 passed. | 0h 05m |
