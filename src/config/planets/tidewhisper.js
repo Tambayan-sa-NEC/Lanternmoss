@@ -1,8 +1,12 @@
-// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c. Remaining content/release: 27d-27h.
+// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c; village: 27d; regular enemies: 27e. Fights/release: 27f-27h.
 import { COASTAL_NPCS, COASTAL_HOUSES } from '../coastalVillage.js';
 export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
   village:{coastal:true},outfit:'beach',outfitColors:[0x4bacc0,0xf4d18a,0xff987b,0x6dc39b],npcs:COASTAL_NPCS,houses:COASTAL_HOUSES,
-  expectedLevel: [7, 10], lowLevel: 9, scale: { hp: 2.9, damage: 2, speed: 1.25, cooldown: 0.78, xp: 2.6 },
+  expectedLevel: [7, 10], lowLevel: 9,
+  roster: [   // coastal groups: near 'beach' | 'shallows' | 'surf' (src/combat/spawning.js); the returning wisps glow sea-green
+    { type: 'shellback', groups: 3, size: 3, near: 'beach' }, { type: 'jellybell', count: 8, near: 'shallows' }, { type: 'surfSkipper', count: 6, near: 'surf' },
+    { type: 'wisp', count: 3, overrides: { color: 0x5fe8c0, look: { robe: 0x1d5a56, face: 0x0e3438 } } },
+  ], scale: { hp: 2.9, damage: 2, speed: 1.25, cooldown: 0.78, xp: 2.6 },
   material: 'seaglass', music: 'seaWaltz', weather: { clear: 5, breezy: 3, seaMist: 2, squall: 2 },
   resources: { coastal: true, catches: [['silverSprat',80],['goldenKoi',3]], nodes: [['driftwood',6],['shells',6],['seaweed',5],['seaglass',6],['saltPan',4],['clamBed',6],['coralReef',5],['shipwreckIron',3],['pebbles',6,'village'],['sweetleaf',5,'village']], rare: [['blackPearlBed',2]] },
   seed: 271828, mechanic: 'tides', physics: { seaLevel: 71, seaMaxLevel: 72.5 },

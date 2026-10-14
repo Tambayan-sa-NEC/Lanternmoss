@@ -25,7 +25,7 @@ test('catalog distinguishes released Act I from incomplete Act II metadata', () 
   assert.throws(() => validatePlanetCatalog([...PLANET_CATALOG, PLANETS[0]]), /duplicate/);
   assert.throws(() => validatePlanetCatalog([{ ...PLANETS[0], released: 'yes' }]), /metadata/);
   assert.throws(() => validatePlanetCatalog([{ ...PLANETS[0], released: false }]), /starting world/);
-  assert.throws(() => validatePlanetCatalog([PLANETS[0], { ...PLANET_CATALOG[3], released: true }]), /generation data/);
+  assert.throws(() => validatePlanetCatalog([PLANETS[0], { ...PLANET_CATALOG.find(p => p.id === 'duskhollow'), released: true }]), /generation data/);
 });
 
 test('keys and defeated ids cannot reach unreleased worlds or jump over a release gap', () => {

@@ -856,3 +856,8 @@ procedural sea waltz accompany the coast. See [resources, weather and music](doc
 The unreleased Tidewhisper village now has stilt buildings, a supported fishing pier, Marlo and two coastal
 interiors. Restore the lighthouse with seaglass and wood; the saved quest joins level 8 and low tide as the
 future boss gate. See [village and lighthouse](docs/tidewhisper.md#stilt-village-and-lighthouse-27d).
+
+Tidewhisper's unreleased monsters read the live tide. Shellbacks turn a barnacled plate that blocks hits from the
+front, so circle round them. Jellybells drift onto the flats with the rising tide and sting in a ring, and are
+stranded when it falls. Surf skippers lurk untargetable in the surf, then leap at anyone near the water.
+Sea-green wisps return from Act I. See [regular enemy roster](docs/tidewhisper.md#regular-enemy-roster-27e).

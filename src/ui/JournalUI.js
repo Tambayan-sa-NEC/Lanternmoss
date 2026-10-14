@@ -149,7 +149,7 @@ export const JournalUI = {
       ${list('How it fights', (e.attacks ?? []).map(([n, t]) => `<li><b>${n}</b> ${t}</li>`))}
       ${list('How to beat it', (e.counters ?? []).map(t => `<li>${t}</li>`))}
       ${beaten ? `<h4>Stats</h4><table class="bst-stats"><tr><th>Planet</th><th>Health</th><th>Damage</th><th>Speed</th><th>XP</th></tr>${stats}</table>
-        <h4>Drops</h4><p>${isBoss(type) ? BESTIARY_DROPS.boss : base.miniBoss ? BESTIARY_DROPS.miniBoss : BESTIARY_DROPS.monster}${type === 'slime' ? ' And two slimelings.' : ''}</p>`
+        <h4>Drops</h4><p>${isBoss(type) ? BESTIARY_DROPS.boss : base.miniBoss ? BESTIARY_DROPS.miniBoss : BESTIARY_DROPS.monster}${type === 'slime' ? ' And two slimelings.' : ''}${e.drops ? ` ${e.drops}` : ''}</p>`
       : '<p class="dim">Defeat one to note its stats and what it drops.</p>'}` +
       RECIPES.filter(r => r.discovery?.kind === 'bestiary' && r.discovery.enemy === type).map(r => `<h4>Recipe notes</h4><p>${itemRegistry.get(r.result).name}: ${RecipeBook.knows(r.id) ? 'learned for this adventure' : r.discovery.text}</p>` +
         (RecipeBook.knows(r.id) ? '' : `<button type="button" data-learn-recipe ${beaten && ctx.started && !ctx.player.dead ? '' : 'disabled'}>Learn recipe</button>`)).join('');

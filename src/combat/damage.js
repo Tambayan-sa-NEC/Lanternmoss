@@ -42,6 +42,11 @@ export function damageEnemy(e, amount, o = {}) {
     if (settings.damageNumbers && ctx.time - (e.immuneTextT ?? -9) > 0.6) { e.immuneTextT = ctx.time; floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), 'IMMUNE', '#b8b0c8'); }
     return;
   }
+  if (e.behavior?.refuses?.(e, o)) {                                  // e.g. a Shellback's front plate
+    if (settings.damageNumbers && ctx.time - (e.immuneTextT ?? -9) > 0.6) { e.immuneTextT = ctx.time; floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), 'BLOCKED', '#bff4ff'); }
+    encounterEvents.dispatchEvent(new CustomEvent('enemyrefused', { detail: { enemy: e, source: o.source ?? 'player' } }));
+    e.aggro(); return;
+  }
   if (!o.source) amount *= damageMultiplier(ctx.player.level) * (1 + (ctx.player.stats.damageBonus || 0));   // no source = the hero's own abilities (level + gear)
   if (o.source !== 'pet' && e.markT > 0) amount *= 1 + COMBAT.mark.bonus;
   if (!o.source && buffs.howl > 0) amount *= 1 + PETS.wolf.ability.damage;   // a pet's Howl (gameplay/petAbilities.js)

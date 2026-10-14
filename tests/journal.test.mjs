@@ -8,7 +8,8 @@ import { BESTIARY_ENTRIES } from '../src/config/bestiary.js';
 import { COMBAT } from '../src/config/combat.js';
 import { ITEM_DEFINITIONS } from '../src/config/items.js';
 import { PETS } from '../src/config/pets.js';
-import { PLANETS } from '../src/config/planets.js';
+import { PLANET_CATALOG, PLANETS } from '../src/config/planets.js';
+import { releasedEnemyTypes } from '../src/config/releasedEnemies.js';
 import { BESTIARY_ORDER, emptyJournal, goalTarget, isBoss, newlyDone, pageName, progress, sanitizeJournal, statValue } from '../src/gameplay/journalRules.js';
 
 const icons = readFileSync(new URL('../src/ui/icons.js', import.meta.url), 'utf8');
@@ -31,7 +32,9 @@ test('achievements are complete and reachable', () => {
 });
 
 test('every monster and boss has a bestiary page', () => {
-  assert.deepEqual([...BESTIARY_ORDER].sort(), Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object).sort(), 'every monster (lair objects aside)');
+  const released = releasedEnemyTypes(PLANET_CATALOG, COMBAT.enemies);   // staged monsters join with their world
+  assert.deepEqual([...BESTIARY_ORDER].sort(), Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object && released.has(t)).sort(), 'every released monster (lair objects aside)');
+  for (const t of Object.keys(COMBAT.enemies).filter(t => !COMBAT.enemies[t].object)) assert.ok(BESTIARY_ENTRIES[t]?.blurb && BESTIARY_ENTRIES[t].counters?.length, `${t}: a page, staged or not`);
   assert.ok(BESTIARY_ORDER.findIndex(isBoss) === BESTIARY_ORDER.filter(t => !isBoss(t)).length, 'bosses come last');
   for (const t of BESTIARY_ORDER) {
     const e = BESTIARY_ENTRIES[t];

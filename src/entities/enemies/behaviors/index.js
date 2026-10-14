@@ -1,8 +1,12 @@
 /* def.behavior ?? def.ai -> behaviour module for the newer enemy types. A behaviour is
      { think(e, dt, dist) -> ground speed (required; sets e.move),
-       init(e), reset(e) on (re)spawn, update(e, dt, collisionNormal) after moving, animate(e, dt), onDie(e), dispose(e) }
+       init(e), reset(e) on (re)spawn, update(e, dt, collisionNormal) after moving, animate(e, dt), onDie(e), dispose(e),
+       steer(e, dt, dist) -> a ground speed that overrides every state (even idle / wander / return), or undefined,
+       refuses(e, hitOptions) -> true when a hit glances off before doing anything (a Shellback's front plate) }
    The original AIs ('melee', 'ranged', 'hopper') are still methods on Enemy. Planet bosses all have ai 'boss' and pick
    their own AI with def.behavior (each a kit on the shared boss framework in ./boss/core.js). seal = a lair seal (animate only). */
+import { amphibian } from './amphibian.js';
+import { armoured } from './armoured.js';
 import { bomber } from './bomber.js';
 import { demonLord } from './boss/demonLord.js';
 import { dragon } from './boss/dragon.js';
@@ -11,6 +15,7 @@ import { basilisk } from './boss/basilisk.js';
 import { hydra } from './boss/hydra.js';
 import { burrower } from './burrower.js';
 import { charger } from './charger.js';
+import { drifter } from './drifter.js';
 import { support } from './support.js';
 import { ctx } from '../../../core/context.js';
 
@@ -22,4 +27,4 @@ const seal = {
   },
 };
 
-export const BEHAVIORS = { bomber, charger, burrower, support, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk };
+export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk };

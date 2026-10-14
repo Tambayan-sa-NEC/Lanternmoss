@@ -1115,7 +1115,7 @@ bosses and release balancing each get their own session. The otter remains optio
 | [x] **27b. Flora and wildlife** | 27a | 2-4 h | Add every listed plant, crab/turtle/seal builder, birds, fish and Pearl Turtle/charm. Verify schedules, rare-gift saves, gathering interactions and bounded scenery cost; this stage owns wildlife distinct from enemy Shellbacks. |
 | [x] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
 | [x] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
-| [ ] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
+| [x] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
 | [ ] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
 | [ ] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
 | [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
@@ -1150,6 +1150,16 @@ are tested using a borrowed sealed encounter; Mirelure remains 27g. All 206 unit
 720p/1080p low browser checks pass, including partial/completed Continue, interior gifts/lore and actual pier
 walking. Tidewhisper remains unreleased. Next: 27e, regular enemy roster.
 
+**27e implemented (2026-10-14):** Shellback (`armoured`), Jellybell (`drifter`) and Surf skipper (`amphibian`)
+modules with original bodies, bestiary pages and extra drops, plus sea-green returning wisps. Coastal roster groups
+spawn on the high-tide line, the shallows or the surf from their own seeded stream (26 population, 41 placed). The
+plate refuses front hits only, and the crab's capped turn lets a hero circle it. Jellybells drift with the measured
+tide and sting in a ring. Skippers lurk untargetable, then leap and retreat. A shared water fence keeps both water
+monsters in the sea; stranded ones crawl back and recover when water returns. New optional `steer`/`refuses`
+behaviour hooks; sea-only projectile flight fixes (Act I balance report unchanged). All 208 unit tests, 38
+simulations (including a level-8 duel for each hero) and the 720p/1080p low browser checks pass. Tidewhisper remains
+unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper.md#regular-enemy-roster-27e).
+
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
       on stilts on the largest island, with a pier for fishing.
@@ -1157,7 +1167,7 @@ walking. Tidewhisper remains unreleased. Next: 27e, regular enemy roster.
       tide pools (crabs, clams, pearls) and the causeway to the boss lagoon; high tide floods them (swim across;
       swimming drains energy faster, 16). Driftwood and shells wash up on the flats at each high tide, a reason to come
       back. A tide chip sits next to the clock.
-- [ ] **Monsters (new):**
+- [x] **Monsters (new):**
   - **Shellbacks:** crabs that scuttle sideways. The shell blocks hits from the front, so circle round them (facing, 14).
   - **Jellybells:** jellyfish that drift with the tide over the water and the flooded flats, pulsing a stinging ring;
     popped, they burst into light.

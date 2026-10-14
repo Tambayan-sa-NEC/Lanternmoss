@@ -40,7 +40,7 @@ function fixture(id='newWorld') {
 
 test('a complete expansion fixture passes; published drafts remain blocked by generation/content checks',()=>{
   const f=fixture();assert.deepEqual(f.check(),[]);
-  assert.throws(()=>assertReleasedContent([...PLANETS,{...PLANET_CATALOG[3],released:true}],f.r),/generation data/);
+  assert.throws(()=>assertReleasedContent([...PLANETS,{...PLANET_CATALOG.find(p=>p.id==='duskhollow'),released:true}],f.r),/generation data/);
   assert.doesNotThrow(()=>assertReleasedContent([f.p],f.r));
   assert.throws(()=>assertReleasedContent([{...f.p,released:false}],f.r),/starting world/);
 });

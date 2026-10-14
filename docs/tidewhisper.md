@@ -1,7 +1,7 @@
 # Tidewhisper terrain and tides
 
-TODOs 27a-27d implement the coast, ecosystem, economy, weather, music, stilt village and lighthouse quest. Tidewhisper remains
-`released: false`: regular enemies and fights belong to 27e-27g; campaign release requires 27h.
+TODOs 27a-27e implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest and regular
+monsters. Tidewhisper remains `released: false`: its two fights belong to 27f-27g; campaign release requires 27h.
 The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
 gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
 
@@ -49,7 +49,7 @@ captures in the temporary directory. `tests/sim/lib/tideFixture.mjs` is never im
 
 These checks verify this stage's rules and rendering; they do not certify the Intel Iris Xe 60-fps release
 target. Population, content, balance, complete-world browser traversal and measured performance remain 27h's
-requirements. Resources/weather/music are now implemented in 27c below; the village/lighthouse are implemented in 27d below; the next stage is 27e, regular enemies.
+requirements. Resources/weather/music are now implemented in 27c below; the village/lighthouse are implemented in 27d below; the regular enemies in 27e below.
 
 ## Coastal flora and wildlife (27b)
 
@@ -165,3 +165,60 @@ borrowed encounter/save-slot fixture. It checks actual E acceptance/hand-ins, pa
 interior doors, persistent gifts and 720p/1080p low lighthouse/outfit/pier rendering, with temporary interior
 captures. The simulation also checks real deck traversal, all 54 economy nodes, three gate predicates, saved
 lore and Continue from inside Marlo's room. Hardware frame-time certification remains 27h.
+
+## Regular enemy roster (27e)
+
+The roster (`roster` in `src/config/planets/tidewhisper.js`) adds three monsters found on no other world, each with
+its own behaviour module and original body, plus one returning type. Coastal groups place themselves against the
+declared high water from their own stream seeded by the planet, so adding them moves no scenery, node or chest:
+
+| Group | Count (x1.5 world scale) | Where | Module |
+| --- | --- | --- | --- |
+| Shellback | 3 camps of 3 (15) | `beach`: dry at high water, at most 2.5 m above it | `armoured` |
+| Jellybell | 8 (12) | `shallows`: water at every tide | `drifter` |
+| Surf skipper | 6 (9) | `surf`: deep at low water, dry land within 9 m | `amphibian` |
+| Wisp (returning) | 3 (5) | anywhere dry, sea-green (`overrides.color` / `look`) | `ranged` |
+
+The population (26) meets Frostveil's floor (25). Nothing spawns within the village's safe ring or the lagoon lair.
+
+- **Shellback.** It scuttles sideways around the hero and turns its barnacled shield plate their way at a capped
+  1.5 rad/s, so circling close out-turns it. The plate refuses every hit whose origin lies in a 65-degree half-angle
+  cone in front: no damage, knockback or stagger, just a "BLOCKED" spark and an `enemyrefused` event. Hits from the
+  sides or behind, blows landing on top of it, directionless damage (burning ground) and any hit while it is dazed
+  get through. Its pinch has a warning disc in front, then a recovery in which it cannot turn.
+- **Jellybell.** It floats at the surface and drifts with the measured change of the water level: up the slope onto
+  the flats as the tide rises, back out as it falls (up to 0.9 m/s at the fastest tide). A shared water fence keeps
+  it from swimming into water shallower than 0.45 m, so it cannot follow the hero ashore. Close in, it swells over a
+  ring on the water, then stings everything in it (jump or step out). If the water drains from under it (tide, time
+  skip or the lagoon), it is stranded: it cannot sting and crawls toward the nearest water, recovering the moment
+  there is enough water under it again. Popped, it bursts into light.
+- **Surf skipper.** Under at least 0.9 m of water it lurks submerged and untargetable, with only its fin and wake
+  showing. It follows the hero along the shore without leaving the water, has to show itself in the shallows, then
+  surfaces, marks a lane and leaps 6.6 m (airborne the whole way, so it clears the steep step at the waterline).
+  It stays exposed on the beach for 1.8 s, then scurries back to deep water and hides. A stagger while it surfaces
+  leaves it floundering for the same 1.8 s. When the tide strands it, it is visible and hittable while it hurries back.
+- **Sea-green wisps** reuse the original AI with a recoloured body and glow; the original wisp is unchanged.
+
+Behaviour modules gained two optional hooks: `steer(e, dt, dist)` overrides movement in any state (stranding, the
+skipper's retreat), and `refuses(e, hitOptions)` lets a monster turn a hit away before damage. Each sea monster adds
+its own extra drop roll after the usual monster drop: shells (Shellback, 50%), seaglass (Jellybell, 35%) or a silver
+sprat (Surf skipper, 40%). Monsters without an extra draw no more random numbers than before. All three have bestiary
+pages with attacks, counters and drops; staged pages stay out of the journal and its goals until the world releases.
+
+Two flight fixes keep sea fights fair; the original worlds have no sea, so they are unaffected (their balance report
+was rerun and matched exactly). Over the sea or lagoon, projectiles fly above the water rather than the sea bed. A
+hero's aimed shot at a target out on the sea starts at, and quickly settles to, the target's height, so a skipper in
+the shallows below a beach can be hit from 2 m away.
+
+![Shellback, Jellybell, Surf skipper and a sea-green wisp](screenshots/tidewhisper-enemies.jpg)
+
+Verify with `npm test`, `npm run sim` and `node scripts/coastal-enemies-smoke.mjs` (Puppeteer Core/Chromium, `CHROME`
+override; install with `npm install --no-save --no-package-lock puppeteer-core`). The browser helper owns port 8111,
+seeds the play stream and advances the paused game in fixed 60 fps steps, because software rendering is too slow for
+real-time checks. It checks real **Z** Arcane Bolts against the plate and the Shellback's back, a full skipper ambush
+on a hero on the beach, 720p/1080p low rendering of every new body, and reload Continue, with zero page or shader
+errors. The simulations (`coastalEnemies`, `coastalDuels`) cover placement and Continue determinism, plate geometry,
+the capped turn, the pinch, rising/falling drift, the sting and dodging it, stranding and both recoveries, the skipper's
+untargetable lurk, ambush, retreat, shore fence and stranding, extra drops, and a level-8 duel per hero. Every hero
+beat every monster with no HP top-ups (3-10 s each). These are access checks; the campaign's pacing targets,
+measured performance and the Iris Xe frame-time target remain 27h.

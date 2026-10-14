@@ -22,9 +22,10 @@ export function groundPoint(pos, lift = 0.12) { const up = pos.clone().normalize
 /** Animates mesh m out to `radius` over `dur` seconds while fading it, then disposes its material. */
 function playRing(m, dur, radius) { ringFxList.push({ m, t: 0, dur, radius }); }
 
-export function ringFX(pos, radius, color, dur = 0.45) {
+/** surface: draw it at that distance from the planet centre instead of on the ground (a ring on the water). */
+export function ringFX(pos, radius, color, dur = 0.45, surface = null) {
   const up = pos.clone().normalize(), m = new THREE.Mesh(ringGeo, fxMaterial(color));
-  m.position.copy(groundPoint(pos)); frameQuat(up, tangentFrame(up)[0], m.quaternion); m.renderOrder = 3; scene.add(m);
+  if (surface) m.position.copy(up).multiplyScalar(surface + 0.08); else m.position.copy(groundPoint(pos)); frameQuat(up, tangentFrame(up)[0], m.quaternion); m.renderOrder = 3; scene.add(m);
   playRing(m, dur, radius);
 }
 
