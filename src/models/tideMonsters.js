@@ -130,3 +130,47 @@ export function buildIronclaw(def = {}) {
   root.scale.setScalar(1.25);
   return { root, body, bell, bellMats, bellGlow: glow, clawL, clawR, legs, eyes };
 }
+
+/** Mirelure, the Lantern Angler (Tidewhisper's boss): a huge round anglerfish with a lantern lure on a stalk over her
+    brow. Parts: body, jaw (opens), lure (the stalk group: bends), lamp (its glowing bulb), tail, finL / finR, eyes[].
+    def.look: { skin, belly, fin, lamp }. */
+export function buildMirelure(def = {}) {
+  const L = { skin: 0x3d5a78, belly: 0x9fb8c8, fin: 0x6a4a8a, lamp: 0xffd36b, ...(def.look ?? {}) };
+  const root = new THREE.Group(), body = group(root, 0, 1.4, 0), eyes = [];
+  addTo(body, part(G.ico(1.5, 1), L.skin), [0, 0, 0], [0, 0, 0], [1.15, 0.95, 1.25]);
+  addTo(body, part(G.ico(1.2, 1), L.belly), [0, -0.55, 0.3], [0, 0, 0], [1.05, 0.55, 1.1]);
+  for (const [x, y, z] of [[0.9, 0.7, -0.4], [-0.8, 0.9, 0.1], [0.3, 1.2, -0.9], [-0.5, 0.4, -1.2]])
+    addTo(body, part(G.ico(0.14, 0), 0x2a4058), [x, y, z], [0, 0, 0], [1, 0.4, 1]);                          // spots
+  const jaw = group(body, 0, -0.35, 1.0);                                                                     // the lower jaw, hinged
+  addTo(jaw, part(G.ico(1.0, 1), L.skin), [0, -0.25, 0.35], [0, 0, 0], [1.3, 0.45, 0.9]);
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 6 - 0.5) * 2.2;
+    addTo(jaw, part(G.cone(0.09, 0.4, 4), 0xfff8e8), [Math.sin(a) * 1.05, 0.12, 0.35 + Math.cos(a) * 0.7], [0, 0, 0]);                 // lower teeth
+    addTo(body, part(G.cone(0.08, 0.34, 4), 0xfff8e8), [Math.sin(a) * 1.15, -0.25, 1.05 + Math.cos(a) * 0.55 - 0.55], [Math.PI, 0, 0]);  // upper teeth
+  }
+  for (const sx of [-1, 1]) {
+    addTo(body, part(G.ico(0.32, 1), 0xfff2c8), [sx * 0.75, 0.75, 0.95]);
+    const eye = addTo(body, part(G.ico(0.14, 0), 0x241c38, { outline: false }), [sx * 0.8, 0.8, 1.22]); eyes.push(eye);
+  }
+  const fin = sx => { const f = group(body, sx * 1.55, -0.3, 0.1); addTo(f, part(G.cone(0.5, 1.1, 4), L.fin), [sx * 0.35, 0, -0.2], [Math.PI / 2, 0, -sx * 1.2], [0.3, 1, 1]); return f; };
+  const finL = fin(-1), finR = fin(1);
+  const tail = group(body, 0, 0.1, -1.75);
+  addTo(tail, part(G.cone(0.9, 1.4, 4), L.fin), [0, 0, -0.5], [-Math.PI / 2, 0, 0], [0.25, 1, 1]);
+  addTo(body, part(G.cone(0.35, 0.9, 4), L.fin), [0, 1.35, -0.6], [-0.4, 0, 0], [0.25, 1, 1]);                // dorsal fin
+  const lure = group(body, 0, 1.25, 0.6);                                                                     // the stalk, arching forward
+  for (let i = 0; i < 5; i++) addTo(lure, part(G.cyl(0.05, 0.06, 0.45, 5), L.fin), [0, 0.2 + i * 0.36, i * i * 0.07], [0.15 + i * 0.22, 0, 0]);
+  const lamp = addTo(lure, part(G.ico(0.32, 1), L.lamp, { glow: true, intensity: 2.6 }), [0, 1.85, 1.3]);
+  addTo(lure, part(G.cyl(0.24, 0.3, 0.12, 6), 0x8a6a3a), [0, 2.1, 1.3]);                                      // its little lantern cap
+  root.scale.setScalar(1.35);
+  return { root, body, jaw, lure, lamp, tail, finL, finR, eyes };
+}
+
+/** One of Mirelure's lures (real or false: they look the same) bobbing on the lagoon. Parts: body (the stalk),
+    lamp (the glowing bulb that flickers). */
+export function buildMireLure(def = {}) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  for (let i = 0; i < 3; i++) addTo(body, part(G.cyl(0.05, 0.06, 0.4, 5), 0x6a4a8a), [0, 0.2 + i * 0.36, i * 0.05], [0.1 * i, 0, 0]);
+  const lamp = addTo(body, part(G.ico(0.3, 1), def.color ?? 0xffd36b, { glow: true, intensity: 2.6 }), [0, 1.2, 0.2]);
+  addTo(body, part(G.cyl(0.22, 0.28, 0.12, 6), 0x8a6a3a), [0, 1.45, 0.2]);
+  return { root, body, lamp };
+}

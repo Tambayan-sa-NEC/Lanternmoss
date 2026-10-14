@@ -1,7 +1,7 @@
 # Tidewhisper terrain and tides
 
-TODOs 27a-27f implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest, regular
-monsters and Old Ironclaw. Tidewhisper remains `released: false`: Mirelure is 27g; campaign release requires 27h.
+TODOs 27a-27g implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest, regular
+monsters, Old Ironclaw and Mirelure. Tidewhisper remains `released: false`: campaign release requires 27h.
 The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
 gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
 
@@ -263,3 +263,45 @@ strike the face, and hit anywhere while it is open. It never jumps a shockwave o
 Every hero beat it on two seeds. Most fights took 148-195 s with 8-13 top-ups, against the 90-180 s mini boss target
 (the existing mini bosses take 95-135 s with 6-13). One ranger fight took 41 s after four early wedges. Final
 three-hero pacing is 27h's balance pass.
+
+## Mirelure, the Lantern Angler (27g)
+
+Tidewhisper's boss sleeps in the lagoon lair. She wakes when the hero reaches level 8, Marlo's lighthouse is relit and
+the tide is low enough to cross the causeway (the gate registered in 27d), and the hero walks into the lagoon. The
+arena ring is crashing surf (`ARENA_WALLS.surf`). Her kit is `src/entities/enemies/behaviors/boss/mirelure.js`.
+
+- **Deep** (the lagoon is full): she stays under the water and cannot be hit. She lights three lures (four after the
+  reflood), which are lair objects that can be struck. One is real. Every 1.8 s her breath rises as a ring of bubbles,
+  and the real lure dims in time with it; the false ones flicker to their own beat. Strike a false lure and it bursts,
+  stinging anyone right next to it. Strike the real one and she surfaces under it for 7 s, open to everything (she bites
+  up close), then dives and relights. Meanwhile she sends geysers up under the hero: a marked circle, then a spout that
+  tosses a hero it hits.
+- **At 50%** she rises, swims to the sluice on the lagoon's rim facing the village and smashes it. Only the lagoon
+  drains, through the existing local water region; the ocean and causeway keep the tide. She is beached on the floor
+  and open to everything: she thrashes (a marked circle), rolls along a marked lane and bites. After 23 s the water
+  creeps back over 22 s (`drainLagoon(seconds, reflood)`); once there is 1 m of water over her she dives, and four
+  lures return.
+- **Retries**: a faint, walking away or a reload resets the fight. The lures go out, the lagoon refills and the sluice
+  is mended, so a saved drain never outlives its fight. The win drops her treasure chest with the **Tide Crown**, once;
+  Continue keeps her beaten without a second chest or crown.
+
+The tide mechanic gained an optional gradual reflood and `activeTides()` (the live instance, for encounters). The
+original drain behaviour is unchanged when no reflood is given, and the saved state only adds a bounded `reflood`
+field while one is in progress.
+
+| Lagoon at the start | Beached after the sluice break |
+| --- | --- |
+| ![Lit lures in the lagoon](screenshots/tidewhisper-mirelure-lures.jpg) | ![Mirelure beached on the drained floor](screenshots/tidewhisper-mirelure-beached.jpg) |
+
+Verify with `npm test`, `npm run sim` and `node scripts/mirelure-smoke.mjs` (port 8113; Puppeteer Core/Chromium as in
+27e). The browser helper checks the configured gate waking her inside the surf ring; real **Z** Arcane Bolts that burst
+a false lure and surface her from the real one (it presses again on a miss, as a player would); 720p/1080p low
+rendering of the lit lagoon and of her beached on the drained floor; and the win giving one Tide Crown through reload
+Continue, with zero page or shader errors. The `mirelure` simulation covers the gate, the deep phase and its breath cue,
+false and real lures, geysers, the sluice break and creeping reflood, beached moves, the dive to more lures, a faint,
+a reload mid-drain and the reward.
+
+`mirelureDuels` gives each hero a level-8 bot that watches her breath, strikes the lure that dims on it, and attacks her
+while she is up or beached; it never dodges, and HP is topped up below 50%. Every hero won on two seeds in 175-265 s
+(target 180-300 s) with 8-23 top-ups, close to the Act I bosses (8-28). Final three-hero pacing and the release gate are
+27h; the Iris Xe frame-time target remains unmeasured.

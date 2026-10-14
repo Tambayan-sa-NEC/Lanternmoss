@@ -865,3 +865,7 @@ Sea-green wisps return from Act I. See [regular enemy roster](docs/tidewhisper.m
 Old Ironclaw, a giant hermit crab in a sunken bronze bell, guards Tidewhisper's black pearl beds. Its bell only rings,
 sending out a stunning shockwave to jump. Hit its face, catch it out of its shell at 66% and 33%, or bait a charge
 across the wet sand at low tide to get it stuck. See [Old Ironclaw](docs/tidewhisper.md#old-ironclaw-27f).
+
+Mirelure, the Lantern Angler, hides in Tidewhisper's lagoon behind false lantern lures. Strike the lure that dims in
+time with her breathing and she surfaces. At half health she smashes the sluice and is beached until the water creeps
+back. Her trophy is the Tide Crown. See [Mirelure](docs/tidewhisper.md#mirelure-the-lantern-angler-27g).
