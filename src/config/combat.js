@@ -50,6 +50,19 @@ export const COMBAT = {
     hexlantern:{ ai: 'support', color: 0x8fffc0, hp: 75, speed: 3.6, radius: 0.4, height: 1.0, hover: 1.4, aggro: 15, leash: 22,
                  keepDistance: 10, healRadius: 9, heal: 18, healCooldown: 2.5, shieldTime: 4, shieldReduction: 0.5, shieldCooldown: 6,
                  cooldown: 1, respawn: 50, xp: 20 },
+    // ---- Tidewhisper (TODO 27e): sea monsters that read the live tide (behaviours: armoured, drifter, amphibian) ----
+    // turnRate here is a capped turn speed (rad/s); guardArc = half-angle (degrees) of the front plate that refuses hits
+    shellback: { ai: 'armoured', color: 0x2f7f86, hp: 120, speed: 2.4, radius: 0.75, height: 1.1, aggro: 10, leash: 16, turnRate: 1.5,
+                 guardArc: 65, range: 2.2, reach: 1.3, pinchRadius: 1.3, windup: 0.55, damage: 9, knockback: 5, cooldown: 1.6,
+                 knockResist: 0.7, slowResist: 0.3, telegraph: true, respawn: 50, xp: 20 },
+    // drift = m/s carried by the tide at its fastest (tideRate m/s of rise or fall); floatDepth = least water it floats in
+    jellybell: { ai: 'drifter', color: 0x9fe8ff, hp: 60, speed: 1.5, radius: 0.5, height: 1.0, aggro: 10, leash: 18, turnRate: 3,
+                 pulseRange: 2.6, pulseRadius: 3.0, reachUp: 1.4, windup: 1.0, damage: 8, knockback: 4, cooldown: 2.6,
+                 floatDepth: 0.45, sink: 0.2, drift: 0.9, tideRate: 0.0157, crawlSpeed: 0.8, telegraph: true, respawn: 45, xp: 14 },
+    // hideDepth = water deep enough to lurk unseen (untargetable); fenceDepth = shallowest water it stays in by choice
+    surfSkipper:{ ai: 'amphibian', color: 0x7f9a5c, hp: 70, speed: 3.6, swimSpeed: 4.2, radius: 0.45, height: 0.8, aggro: 14, leash: 22,
+                 turnRate: 8, ambushRange: 6.5, windup: 0.6, leapSpeed: 12, leapTime: 0.55, leapLift: 7, width: 1.1, damage: 11, knockback: 7,
+                 exposed: 1.8, cooldown: 2.0, fenceDepth: 0.3, hideDepth: 0.9, respawn: 45, xp: 18 },
     // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
     //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
     hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,

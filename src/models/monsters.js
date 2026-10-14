@@ -6,6 +6,7 @@ import { buildDemonLord } from './bosses.js';
 import { buildDragon } from './dragon.js';
 import { buildBasilisk, buildHydra } from './miniBosses.js';
 import { buildHumanoid } from './humanoid.js';
+import { buildJellybell, buildShellback, buildSurfSkipper } from './tideMonsters.js';
 
 export function buildGoblin() {
   const h = buildHumanoid({ skin: 0x8fcf5a, top: 0x8a6a4a, hem: 0x6a5238, pants: 0x5a4a3a, shoes: 0x3a2a2a, belt: 0x3a2a2a, sleeve: 0x8fcf5a,
@@ -30,14 +31,16 @@ export function buildOgre() {
   for (let i = 0; i < 3; i++) addTo(club, part(G.cone(0.04, 0.12, 4), 0xd6d6e6), [Math.cos(i * 2.1) * 0.14, Math.sin(i * 2.1) * 0.14, 0.75], [0, 0, i * 2.1 - Math.PI / 2]);
   h.root.scale.setScalar(1.55); return h;
 }
-export function buildWisp() {
+/** def.color tints the core and ring; def.look = { robe, face } recolours a returning wisp (Tidewhisper's sea-green). */
+export function buildWisp(def = {}) {
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
-  addTo(body, part(G.cone(0.42, 1.0, 7), 0x4a2e6a), [0, 0.45, 0]);
-  for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2 + 0.4; addTo(body, part(G.cone(0.1, 0.3, 4), 0x4a2e6a), [Math.cos(a) * 0.3, -0.1, Math.sin(a) * 0.3], [Math.PI, 0, 0]); }
-  addTo(body, part(G.ico(0.2, 1), 0x2a1840), [0, 0.55, 0.2]);
+  const glow = def.color ?? 0xb27cff, robe = def.look?.robe ?? 0x4a2e6a, face = def.look?.face ?? 0x2a1840;
+  addTo(body, part(G.cone(0.42, 1.0, 7), robe), [0, 0.45, 0]);
+  for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2 + 0.4; addTo(body, part(G.cone(0.1, 0.3, 4), robe), [Math.cos(a) * 0.3, -0.1, Math.sin(a) * 0.3], [Math.PI, 0, 0]); }
+  addTo(body, part(G.ico(0.2, 1), face), [0, 0.55, 0.2]);
   for (const sx of [-1, 1]) addTo(body, part(G.box(0.06, 0.1, 0.03), 0x9ff3ff, { glow: true, intensity: 2.6 }), [sx * 0.07, 0.58, 0.38]);
-  const core = addTo(body, part(G.ico(0.16, 1), 0xb27cff, { glow: true, intensity: 2.6 }), [0, 0.3, 0.45]);
-  const ring = addTo(body, part(new THREE.TorusGeometry(0.55, 0.025, 4, 18), 0xb27cff, { glow: true, intensity: 1.8 }), [0, 0.45, 0], [Math.PI / 2, 0, 0]);
+  const core = addTo(body, part(G.ico(0.16, 1), glow, { glow: true, intensity: 2.6 }), [0, 0.3, 0.45]);
+  const ring = addTo(body, part(new THREE.TorusGeometry(0.55, 0.025, 4, 18), glow, { glow: true, intensity: 1.8 }), [0, 0.45, 0], [Math.PI / 2, 0, 0]);
   return { root, body, core, ring };
 }
 export function buildSlime(scale = 1) {
@@ -130,4 +133,4 @@ export function buildThornSeal(def = {}) {
 export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buildWisp, slime: () => buildSlime(1), slimeling: () => buildSlime(0.55),
   puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern,
   gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord, thornSeal: buildThornSeal,
-  hydra: buildHydra, basilisk: buildBasilisk };
+  hydra: buildHydra, basilisk: buildBasilisk, shellback: buildShellback, jellybell: buildJellybell, surfSkipper: buildSurfSkipper };

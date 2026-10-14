@@ -91,6 +91,9 @@ export const MONSTER_DROPS = {
   perXp: 0.005,            // ...plus this per XP it's worth (a goblin ~15%, an ogre ~30%)
   max: 0.45,
   table: 'monster',
+  // a monster's own extra, rolled after (and apart from) the drop above: { chance, items: [[item, qty or [min, max]]] }
+  extra: { shellback: { chance: 0.5, items: [['shell', [1, 2]]] }, jellybell: { chance: 0.35, items: [['seaglass', 1]] },
+    surfSkipper: { chance: 0.4, items: [['silverSprat', 1]] } },
 };
 
 export const LOOT = {

@@ -7,6 +7,7 @@
      attacks   [name, what it does]
      counters  tips for beating it
      from      where it comes from, for monsters no planet's roster lists (a slimeling)
+     drops     optional: what it leaves besides the usual monster drops (config/chests.js MONSTER_DROPS.extra)
      lore      bosses: their story (the page also lists what wakes them, from PLANETS[i].boss.summon)
    Keys must match COMBAT.enemies; `npm test` checks every monster has a page.
    --------------------------------------------------------------------- */
@@ -56,6 +57,27 @@ export const BESTIARY_ENTRIES = {
     name: 'Hexlantern', blurb: 'A floating lantern that keeps other monsters fighting.',
     attacks: [['Mending light', 'Heals hurt monsters near it.'], ['Ward', 'Shields an ally, halving the damage it takes.']],
     counters: ['Defeat it first: everything else gets easier.', 'It hangs back, so reach it with ranged attacks or a dash.'],
+  },
+  shellback: {
+    name: 'Shellback', blurb: 'A broad crab behind a barnacled front plate. It scuttles sideways and always turns that plate your way, slowly.',
+    attacks: [['Pinch', 'Raises both claws over a warning circle in front of it, then snaps them shut.']],
+    counters: ['Hits from the front glance off the plate: circle round it faster than it can turn.', 'After a pinch it can\'t turn for a moment: that\'s your chance to get behind it.',
+      'A dazed Shellback forgets its plate, and a blow landing right on top of it goes past it.'],
+    drops: 'Often a shell or two as well.',
+  },
+  jellybell: {
+    name: 'Jellybell', blurb: 'A glowing jellyfish that drifts wherever the tide takes it: up onto the flats as the sea rises, back out as it falls.',
+    attacks: [['Stinging ring', 'Swells and glows, then pulses a ring of stings across the water around it.']],
+    counters: ['Step out of the ring or jump over it while it swells.', 'It can\'t leave the water: fight it from the shore.',
+      'Left high and dry by the tide, it can only flop back toward the sea, and can\'t sting.'],
+    drops: 'Sometimes a piece of seaglass as well.',
+  },
+  surfSkipper: {
+    name: 'Surf skipper', blurb: 'A mudskipper raider that lurks in the surf with only its sail fin showing, then leaps out at anyone near the water.',
+    attacks: [['Ambush leap', 'Surfaces, marks a lane and leaps along it, jaws first.']],
+    counters: ['Under deep water nothing can hit it: wait for it to come to you.', 'Sidestep the leap, then punish it on the beach before it scurries back.',
+      'Stand well back from the water and it has to show itself in the shallows first.', 'Stagger it as it surfaces and it flounders in the shallows, open to everything.'],
+    drops: 'Sometimes a silver sprat as well.',
   },
   hydra: {
     lore: 'Old Bramble swears the lake hydra was a single, harmless eel until somebody tried to chop it in half. '

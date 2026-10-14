@@ -171,7 +171,8 @@ export class Enemy extends Walker {
   }
   /** Returns the desired ground speed and sets this.move (tangent direction). */
   think(dt, dist) {
-    const d = this.def;
+    const d = this.def, steered = this.behavior?.steer?.(this, dt, dist);
+    if (steered !== undefined) return steered;
     switch (this.state) {
       case 'idle': if (this.timer < 0) { this.state = 'wander'; this.timer = mr(2, 4); this.turn = mr(-1, 1); } return 0;
       case 'wander':
