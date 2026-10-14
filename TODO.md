@@ -1117,7 +1117,7 @@ bosses and release balancing each get their own session. The otter remains optio
 | [x] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
 | [x] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
 | [x] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
-| [ ] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
+| [x] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
 | [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
 
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
@@ -1169,6 +1169,15 @@ hook. All 210 unit tests, 40 simulations and the 720p/1080p low browser checks p
 on two seeds (mostly 148-195 s against the 90-180 s target; final pacing is 27h). Tidewhisper remains unreleased.
 Next: 27g, Mirelure. See [Old Ironclaw](docs/tidewhisper.md#old-ironclaw-27f).
 
+**27g implemented (2026-10-14):** Mirelure wakes through the level-8, relit-lighthouse and low-tide gate inside a ring
+of crashing surf. While the lagoon is full she is untargetable and lights false lures; the real one dims in time with
+her breathing bubbles and surfaces her when struck, and false ones burst. Geysers mark the hero. At 50% she smashes the
+sluice, the lagoon alone drains, and she is beached (thrash, roll, bite) while the water creeps back on a timer; then
+she dives to more lures. A faint, leaving or reload resets lures, lagoon and sluice; the Tide Crown comes once. Tide
+mechanic: optional gradual reflood and `activeTides()`. Level-8 duels for each hero win on two seeds in 175-265 s.
+Tidewhisper remains unreleased. Next: 27h, campaign release and go/no-go.
+See [Mirelure](docs/tidewhisper.md#mirelure-the-lantern-angler-27g).
+
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
       on stilts on the largest island, with a pier for fishing.
@@ -1186,7 +1195,7 @@ Next: 27g, Mirelure. See [Old Ironclaw](docs/tidewhisper.md#old-ironclaw-27f).
 - [x] **Mini boss: Old Ironclaw,** a giant hermit crab wearing a sunken bronze bell. The bell takes no damage and rings
       a stunning shockwave when hit; Ironclaw is open when it pulls out to swap shells (at 66% and 33%) or when a charge
       wedges it in the sand at low tide. It guards the black pearl beds on the far beach.
-- [ ] **Boss: Mirelure, the Lantern Angler,** a huge anglerfish whose lure is a lantern that once drew ships onto the rocks.
+- [x] **Boss: Mirelure, the Lantern Angler,** a huge anglerfish whose lure is a lantern that once drew ships onto the rocks.
   - Wakes when: level 8, Marlo's quest is done (the lighthouse relit) and the tide is low enough to cross the causeway.
   - Phase 1, lagoon flooded: only her lure shows, and she lights false lures around the lagoon. Strike the real one (it
     flickers in time with her breathing) and she surfaces; strike a false one and it bursts.

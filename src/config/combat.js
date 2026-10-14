@@ -109,7 +109,9 @@ export const COMBAT = {
                    { below: 0.66, title: 'Second shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.1, cooldownMul: 0.9 },
                    { below: 0.33, title: 'Last shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.2, cooldownMul: 0.8 },
                  ] },
-    // ---- lair seals: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
+    // ---- lair seals and lures: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
+    mireLure:  { ai: 'mireLure', object: true, static: true, name: 'Lantern lure', color: 0xffd36b, hp: 1, speed: 0, radius: 0.45, height: 1.5,
+                 aggro: 0, leash: 99, respawn: 0, xp: 0, knockResist: 1, slowResist: 1, staggerImmune: true },   // Mirelure's: one real, the rest false
     thornSeal: { ai: 'seal', object: true, static: true, name: 'Thorn Seal', color: 0xb48cff, hp: 90, speed: 0, radius: 0.75, height: 2.6,
                  aggro: 0, leash: 99, respawn: 0, xp: 12, knockResist: 1, slowResist: 1, staggerImmune: true },
     // ---- planet bosses: ai 'boss' + behavior = their own AI kit (src/entities/enemies/behaviors/boss/) ----
@@ -117,6 +119,26 @@ export const COMBAT = {
     // move; reuse = seconds before that same move can be picked again. phases: the last whose `below` (fraction of max HP)
     // is >= current HP is active; title shows on the boss bar, enraged/flying are read by the kit.
     // stunResist = share of a stun shrugged off (bosses are only stunned between attacks); tallHitbox = hit along the body column.
+    // planet 4 (TODO 27g). pool = the lagoon's radius (she never leaves it); lures: count (countLate after the reflood),
+    // radius range from the lair, breath = seconds between her breaths (the real lure dims on each), surface = seconds
+    // up after the real lure is struck, burst = a false lure's flash. drain: the sluice break's drain and its creeping
+    // reflood (seconds); diveDepth = water over her that ends the beaching
+    mirelure:  { ai: 'boss', behavior: 'mirelure', name: 'Mirelure, the Lantern Angler', color: 0x3d5a78, capColor: 0xffd36b,
+                 hp: 3000, speed: 3.0, radius: 2.4, height: 3.2, aggro: 20, leash: 34, turnRate: 2.2,
+                 knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.3,
+                 telegraph: true, respawn: 0, xp: 220, cooldown: 1.2, pool: 18, diveDepth: 1.0,
+                 lures: { count: 3, countLate: 4, radius: [5, 12], breath: 1.8, surface: 7, burst: { radius: 3, damage: 12, knockback: 6 } },
+                 sluice: { at: 16.5, smash: 2.4 }, drain: { seconds: 45, reflood: 22 },
+                 attacks: {
+                   geyser: { windup: 1.2, radius: 2.6, damage: 14, knockback: 8, recover: 0.4, cooldown: 1.8, reuse: 3 },
+                   bite:   { windup: 0.7, range: 5.5, arc: 80, damage: 18, knockback: 8, recover: 0.8, cooldown: 0.8 },
+                   thrash: { windup: 0.9, radius: 5.5, damage: 14, knockback: 10, recover: 0.8, cooldown: 0.8, reuse: 4 },
+                   roll:   { windup: 1.0, minRange: 5, speed: 10, distance: 14, width: 3.0, damage: 18, knockback: 12, recover: 1.0, cooldown: 1.0, reuse: 5 },
+                 },
+                 phases: [   // the moves themselves check her mode (deep / surfaced / beached)
+                   { below: 1.0, title: 'Lantern lights', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Beached', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1.15, cooldownMul: 0.85 },
+                 ] },
     gloomcap:  { ai: 'boss', behavior: 'gloomcap', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6,   // planet 1: the introduction
                  look: { skin: 0x6a4a7a, armor: 0x2e2638, cape: 0x2a1838, horn: 0xe8dcc4, trim: 0xffd36b, eye: 0xffe066, motif: 'moss' },   // src/models/bosses.js
                  hp: 6700, speed: 2.6, radius: 1.3, height: 4.6,

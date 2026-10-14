@@ -42,5 +42,5 @@ test('summoning, elites and hints make sense', () => {
   assert.ok(SUMMON.rise[0] < SUMMON.rise[1] && SUMMON.rise[1] <= SUMMON.sequence && SUMMON.card[1] <= SUMMON.sequence, 'sequence timings');
   assert.ok(ELITE.hp > 1 && ELITE.damage >= 1 && ELITE.scale > 1, 'elites are tougher');
   for (const k of [...KINDS, 'ready']) assert.ok(SUMMON_HINTS[k]?.includes('{boss}') || k === 'level', `a villager hint for ${k}`);
-  for (const [id, w] of Object.entries(ARENA_WALLS)) assert.ok(['thorn', 'flame'].includes(w.kind) && w.height > 0, `${id}: wall look`);
+  for (const [id, w] of Object.entries(ARENA_WALLS)) assert.ok(['thorn', 'flame', 'surf'].includes(w.kind) && w.height > 0, `${id}: wall look`);
 });
