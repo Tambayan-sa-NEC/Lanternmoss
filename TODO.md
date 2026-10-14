@@ -712,7 +712,7 @@ Promoted from the suggested additions. **Size:** S. **Needs:** nothing.
 - [x] While here, from Small fixes: add a `favicon.ico` (the server returns 404 for it).
   - Done: a 32 px lantern in the game's colours with an ink outline, linked from `index.html`.
 
-## 19. Save / load **(core)** ?
+## 19. Save / load **(core)** ✓
 
 **Goal:** an adventure survives closing the browser: come back and carry on where you left off.
 Code: new `src/core/save.js` (format, versions, cleaning on load), `src/core/Game.js` (gathering and restoring state),
