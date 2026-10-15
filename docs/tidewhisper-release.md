@@ -72,6 +72,16 @@ node scripts/tidewhisper-performance.mjs --release
 The collector uses the actual fourth world, a 1280x720 viewport, Low preset, fixed village camera, daytime clear,
 night clear and daytime squall. Each scene has 30 warmup frames and 120 measured frames. It records the browser's
 actual WebGL GPU string, candidate commit, working-tree state, p95 frame interval and peak full-composer counts.
+
+The browser paces frames at 60 Hz, and `--disable-gpu-vsync --disable-frame-rate-limit` have no effect, headless or
+headed. An empty page in the same Edge measured a p95 interval of 16.8 ms (median 16.7 ms), already over a strict
+16.67 ms. So the collector first measures that empty-page frame clock (240 frames) and records it as `frameClock`.
+A scene passes if its p95 interval is no worse than max(16.67 ms, the empty-page p95). The clock only counts when
+its median is a real 60 Hz (within 5% of 16.67 ms), so a 30 Hz display cannot loosen the budget. The content gate
+applies the same rule (`frameLimitMs`). Per-frame CPU time of the game loop (`p95CpuMs`) and GPU time from timer
+queries (`p95GpuMs`) are recorded as diagnostics only. They omit browser compositing and GC, and on the HD 4600
+test machine they read up to 4 ms under the real interval, so they are never the pass number.
+
 Default invocation (without `--release`) writes a diagnostic report only. `--release` writes
 `docs/releases/tidewhisper.json` only if the candidate was clean, the actual renderer is Iris Xe and all scenes meet
 the frame/draw budgets. A JSON file copied from another device or synthetic test data is not certification.

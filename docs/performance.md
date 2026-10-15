@@ -3,6 +3,8 @@
 Tidewhisper 27h is currently a development candidate, with separate
 [diagnostic results](tidewhisper-performance.json) and an [Iris Xe handoff](tidewhisper-release.md).
 Its real fourth-world village/night/squall collector uses 1280x720 Low, 30 warmup frames and 120 samples per scene.
+It passes a scene against max(16.67 ms, the p95 of an empty page's 60 Hz frame clock measured in the same run), since
+the browser's frame clock alone measures about 16.8 ms p95.
 Available Intel UHD results do not certify Iris Xe or the release target. Run `node scripts/tidewhisper-performance.mjs`
 for diagnostics; `--release` requires a clean candidate, an actual Iris Xe renderer and passing frame/draw budgets
 before it writes a release evidence file. Tidewhisper remains unreleased.
