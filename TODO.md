@@ -989,6 +989,8 @@ counts across planets, which conflicts with a deliberately small Moon. These are
 | 32 Lantern Moon | 18-30 h | No: small terrain still needs gravity, three behaviors and a five-boss crossover | 32a-32g |
 
 **How stages land:** each letter is an independently tested feature branch following `AGENTS.md`, like 25a-25c.
+For multistep TODOs, each stage branches from and merges into its `feat/todo-<N>` parent; only the completed parent
+merges into `develop` after all required stages and combined acceptance checks pass.
 Stage completion is tracked below. Keep the original checklists as the parent acceptance criteria; finishing a letter
 does not finish its parent. Partial worlds and encounters can be exercised through a development harness, but stay out
 of normal campaign travel until their release stage passes the full checklist. Groundwork must distinguish the content
@@ -1233,7 +1235,7 @@ Keep trees small: each hero gets a bounded, documented set of ability upgrades/a
 | --- | --- | --- | --- |
 | [x] **28a. Set bonuses** | 26d; 27c for Tide acquisition | 3-4.5 h | Count distinct equipped pieces, apply two/three-piece Moss/Ember/Frost effects, show bonuses in equipment UI and attach the Tide set. Test burn/chill/healing, equip/unequip, hero compatibility and load without duplicate procs. Dusk/Star definitions and acquisition belong to 30c/32b and reuse this contract. |
 | [x] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
-| [ ] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
+| [x] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
 | [ ] **28d. Warrior talents** | 28b | 2-4 h | Implement the warrior tree, including wider Cleave or another bounded variant. Test arcs, costs/cooldowns, reset, saves and boss windows; expose the tree only after these pass. |
 | [ ] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
 
@@ -1258,6 +1260,17 @@ table every time, so casts, costs and the HUD cooldowns follow and a reset resto
 Checked on a test-only tree (`tests/sim/lib/talentFixture.mjs`) by `tests/talents.test.mjs`, `tests/sim/talents.sim.mjs`
 and `scripts/talents-smoke.mjs`. Ability descriptions on other screens still show base numbers: each tree's stage
 (28c-28e) updates them with its talents.
+
+**28c implemented (2026-10-16):** the real Witch tree has Bright Bolt (up to +20% damage), Quick Frost
+(Nova 8 → 6 s), Light Step (Blink 15 → 11 mana), Seeking Flame (a two-point homing Fireball alternative, needs
+Bright Bolt), and Deep Freeze (Nova slows 3.5 → 4.5 s, needs Quick Frost). Ten points of choices fit an eight-point
+earned budget. Seeking Fireball captures the aimed foe, stops tracking dead/hidden targets and flies straight
+without a lock; its damage, blast, cost and range stay unchanged. The HUD, tooltips and Controls use the learned
+kit, including remapped keys. Checked by 234 unit tests, all 46 simulations, paired three-hero throughput samples
+on seeds 1 and 7, and production/fixture talent, save, tutorial and set browser checks (720p/1080p Low for the
+production tree; zero page/shader errors). The README tour was retaken and spot-checked. Staged on `feat/todo-28`,
+pending 28d/28e before integration into `develop`; Warrior and Ranger trees remain unreleased.
+See [tree, saves and checks](docs/talents.md) and [pacing measurement limits](docs/balance.md#witch-talents-28c).
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
       chilling hits; the Moss set: more healing), shown in the bag's equipment side.
