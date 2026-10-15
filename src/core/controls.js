@@ -32,9 +32,10 @@ import { Building } from '../gameplay/Building.js';
 import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
 import { BountyUI } from '../ui/BountyUI.js';
+import { TalentUI } from '../ui/TalentUI.js';
 
 /** Keys whose browser default (page scroll, quick-find, focus moves...) would get in the way. */
-const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen || BountyUI.isOpen || BuildingUI.isOpen ? code === 'Escape' : code === 'Escape' || Building.active && code === 'Enter' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
+const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen || BountyUI.isOpen || TalentUI.isOpen || BuildingUI.isOpen ? code === 'Escape' : code === 'Escape' || Building.active && code === 'Enter' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
 
 function onKey(code) {
   if (is('togglePerformance', code) && !PauseMenu.capture) { setSetting('perfOverlay', !settings.perfOverlay); return; }
@@ -42,6 +43,7 @@ function onKey(code) {
   if (BuildingUI.isOpen) { BuildingUI.key(code); return; }
   if (HomeUI.isOpen) { HomeUI.key(code); return; }
   if (BountyUI.isOpen) { BountyUI.key(code); return; }
+  if (TalentUI.isOpen) { TalentUI.key(code); return; }   // over the pause menu: Esc comes back to it
   if (PortalUI.isOpen) { PortalUI.key(code); return; }
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens

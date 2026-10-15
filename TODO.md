@@ -1232,7 +1232,7 @@ Keep trees small: each hero gets a bounded, documented set of ability upgrades/a
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
 | [x] **28a. Set bonuses** | 26d; 27c for Tide acquisition | 3-4.5 h | Count distinct equipped pieces, apply two/three-piece Moss/Ember/Frost effects, show bonuses in equipment UI and attach the Tide set. Test burn/chill/healing, equip/unequip, hero compatibility and load without duplicate procs. Dusk/Star definitions and acquisition belong to 30c/32b and reuse this contract. |
-| [ ] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
+| [x] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
 | [ ] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
 | [ ] **28d. Warrior talents** | 28b | 2-4 h | Implement the warrior tree, including wider Cleave or another bounded variant. Test arcs, costs/cooldowns, reset, saves and boss windows; expose the tree only after these pass. |
 | [ ] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
@@ -1247,6 +1247,17 @@ every equip, unequip and load, so nothing is saved twice. The bag's equipment si
 set pieces' details show their set. Checked by `tests/sets.test.mjs`, `tests/sim/sets.sim.mjs` and
 `scripts/sets-smoke.mjs`. Balance targets use starting gear, so sets are optional power outside them (see
 `docs/balance.md`). The parent checklist stays open until the Dusk (30c) and Star (32b) sets exist.
+
+**28b implemented (2026-10-15):** talent rules, saves and the page, with every real tree still empty and
+`released: false` until 28c-28e. Points come from the level (one at 2, 4 ... 16: 8 by the cap) and are never stored,
+so level-ups and reloads cannot duplicate them; only the ranks are saved (`talents`, per adventure), and a load re-learns
+them in tree order against the level, dropping unknown talents, extra ranks, missing prerequisites and unearned points.
+A talent changes ability numbers per rank (`add`, `mul`, `set`); `kit()` rebuilds the hero's abilities from the base
+table every time, so casts, costs and the HUD cooldowns follow and a reset restores the base kit exactly. The page
+(`src/ui/TalentUI.js`) opens over the pause menu once a tree is released; Old Bramble offers a free reset in dialogue.
+Checked on a test-only tree (`tests/sim/lib/talentFixture.mjs`) by `tests/talents.test.mjs`, `tests/sim/talents.sim.mjs`
+and `scripts/talents-smoke.mjs`. Ability descriptions on other screens still show base numbers: each tree's stage
+(28c-28e) updates them with its talents.
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
       chilling hits; the Moss set: more healing), shown in the bag's equipment side.

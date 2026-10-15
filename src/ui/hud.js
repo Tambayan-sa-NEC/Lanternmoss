@@ -25,6 +25,7 @@ import { camera } from '../render/scene.js';
 import { clamp } from '../utils/math.js';
 import { dom, flashEl } from './dom.js';
 import { icon } from './icons.js';
+import { Talents } from '../gameplay/Talents.js';
 import { itemIconHtml } from './itemTooltip.js';
 
 const HUD = {
@@ -246,7 +247,7 @@ applyUiScale();
 
 // ---------------------------------------------------------------- per frame
 export function updateCombatHud(dt, spellState, aimTarget) {
-  const P = ctx.player, C = P.stats, hero = CHARACTERS[P.charId], abilities = hero.abilities;
+  const P = ctx.player, C = P.stats, hero = CHARACTERS[P.charId], abilities = Talents.kit();   // cooldowns and costs after talents
   if (shownRes !== hero.resource) { shownRes = hero.resource; dom.combat.dataset.res = hero.resource; bars.mp.label.textContent = titleCase(hero.resource); }
   setBar(bars.hp, P.hp / C.maxHp, `${Math.ceil(P.hp)} / ${C.maxHp}`, dt);
   setBar(bars.mp, P.mana / C.maxMana, `${Math.floor(P.mana)} / ${C.maxMana}`, dt);

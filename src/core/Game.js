@@ -45,6 +45,8 @@ import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
 import { BountyUI } from '../ui/BountyUI.js';
 import { Bounties } from '../gameplay/Bounties.js';
+import { Talents } from '../gameplay/Talents.js';
+import { TalentUI } from '../ui/TalentUI.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
 import { PlanetProgression } from '../gameplay/PlanetProgression.js';
@@ -118,7 +120,7 @@ export class Game {
     // then quest / challenge offers, then their ordinary chatter (Dialog falls back to npc.nextLine())
     const chat = npc => npc.reaction() || Quests.offerFor(npc) || BossGate.lineFor(npc) || Challenges.lineFor(npc);
     Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
-      || shopLineFor(npc, n => chat(n) || n.nextLine()) || chat(npc);
+      || shopLineFor(npc, n => chat(n) || n.nextLine()) || Talents.wizardLine(npc, n => chat(n) || n.nextLine()) || chat(npc);
     Quests.init(); ShopUI.init();
     Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
     Home.callbacks = { inside: () => Houses.inside, refresh: () => Houses.refreshHome(), save: () => this.saves?.save({ quiet: true }) };
@@ -128,7 +130,7 @@ export class Game {
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
     buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init(); PhotoMode.init(this.renderSystem);
-    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); BountyUI.init(); BuildingUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
+    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); BountyUI.init(); TalentUI.init(); Talents.init(levelEvents); BuildingUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -209,8 +211,8 @@ export class Game {
     try {
       const P = ctx.player, world = this.world;
       world.mechanics.exit();                                     // old rules/listeners leave before clocks and adventure state reset
-      BuildingUI.close(); Building.clear(); HomeUI.close(); BountyUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); PhotoMode.close(); Home.reset();
-      Tutorial.reset(); RecipeBook.reset(); JournalUI.close();
+      BuildingUI.close(); Building.clear(); HomeUI.close(); BountyUI.close(); TalentUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); PhotoMode.close(); Home.reset();
+      Tutorial.reset(); RecipeBook.reset(); Talents.clear(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
       for (const n of ctx.npcs) n.resetLines();
@@ -235,7 +237,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Building, BuildingUI, Bounties, BountyUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Building, BuildingUI, Bounties, BountyUI, Talents, TalentUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

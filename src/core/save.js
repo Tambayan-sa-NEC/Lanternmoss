@@ -24,6 +24,8 @@ import { xpToNext } from '../progression/leveling.js';
 import { cleanBuildings } from '../gameplay/buildingRules.js';
 import { cleanHomeState } from '../gameplay/homeRules.js';
 import { cleanBountyState } from '../gameplay/bountyRules.js';
+import { TALENTS } from '../config/talents.js';
+import { cleanTalents } from '../progression/talentRules.js';
 
 export const SAVE_KEY = 'lanternmoss.adventure';
 export const SAVE_VERSION = 1;
@@ -37,7 +39,7 @@ export const SAVE_SYSTEMS = {
   player: 'adventure', inventory: 'adventure', equipment: 'adventure', hotbar: 'adventure',
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
-  progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
+  progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
   building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
@@ -64,6 +66,7 @@ export const SAVE_OWNERS = {
   'gameplay/Home.js:Home': 'home',
   'gameplay/Building.js:Building': 'building',
   'gameplay/Bounties.js:Bounties': 'bounties',
+  'gameplay/Talents.js:Talents': 'talents',
   'gameplay/PlanetMechanics.js:PlanetMechanics': 'mechanics',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
@@ -107,7 +110,7 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
   .filter(([key]) => allow(key)).map(([key, n]) => [key, number(n, 0, min, max)]));
 
 /** Clean one system's plain snapshot before any runtime object sees it. */
-export function cleanState(key, value, hero = 'witch') {
+export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel) {
   const s = record(value);
   switch (key) {
     case 'mechanics': return cleanMechanicSnapshot(value);
@@ -194,6 +197,7 @@ export function cleanState(key, value, hero = 'witch') {
       lairs: Object.fromEntries(Object.entries(record(s.lairs)).filter(([id, v]) => ids.has(id) && direction(v)).map(([id, v]) => [id, direction(v)])) };
     case 'combat': return Object.fromEntries(Object.keys(CHARACTERS[hero].abilities).map(id => [id, number(s[id], 0, 0, 3600)]));
     case 'bounties': return cleanBountyState(value);
+    case 'talents': return cleanTalents(value, TALENTS.trees[hero], level);
     case 'farm': return { day: integer(s.day, 1, 1), plots: Array.from({ length: FARM.grid[0] * FARM.grid[1] }, (_, i) => {
       const p = record(list(s.plots)[i]), crop = known(p.crop, CROPS);
       return { tilled: bool(p.tilled) || !!crop, crop, growth: crop ? number(p.growth, 0, 0, 1) : 0, watered: bool(p.watered) };
@@ -226,7 +230,7 @@ export function sanitizeSave(data) {
   const s = record(data);
   if (s.game !== 'lanternmoss' || s.version !== SAVE_VERSION || !Object.hasOwn(record(s.systems), 'player')) return null;
   const player = cleanState('player', s.systems.player), systems = {}, planets = {};
-  for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'adventure') systems[key] = cleanState(key, s.systems[key], player.charId);
+  for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'adventure') systems[key] = cleanState(key, s.systems[key], player.charId, player.level);
   for (const [id, raw] of Object.entries(record(s.planets))) {
     if (!ids.has(id)) continue;
     const state = {}; for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'planet' && Object.hasOwn(record(raw), key))

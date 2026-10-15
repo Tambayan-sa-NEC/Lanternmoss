@@ -24,6 +24,8 @@ import { releaseAllKeys } from '../systems/InputSystem.js';
 import { dom } from './dom.js';
 import { icon } from './icons.js';
 import { JournalUI } from './JournalUI.js';
+import { TalentUI } from './TalentUI.js';
+import { Talents } from '../gameplay/Talents.js';
 import { toast } from './toast.js';
 
 const keys = list => list.map(k => `<kbd>${k}</kbd>`).join(' ');
@@ -59,6 +61,7 @@ const PAGES = {
         <button type="button" data-go="save">Save</button>
         <div class="row2"><button type="button" data-go="export">Export Save</button><button type="button" data-go="import">Import Save</button></div>
         <button type="button" data-go="journal">Journal</button>
+        ${Talents.open ? '<button type="button" data-go="talents">Talents</button>' : ''}
         <div class="row2"><button type="button" data-go="help">Help</button><button type="button" data-go="tutorial">Restart guided walk</button></div>
         <button type="button" data-go="settings">Settings</button>
         <button type="button" data-go="controls">Controls</button>
@@ -159,6 +162,7 @@ export const PauseMenu = {
     if (go === 'reset-keys') { resetBinds(); this.bindMsg = 'Keys are back to their defaults.'; this.show('settings'); return; }
     if (go === 'resume') this.close();
     else if (go === 'journal') JournalUI.open();                         // on top; closing it comes back here
+    else if (go === 'talents') TalentUI.open();                          // on top too (only listed once the tree is released)
     else if (go === 'help') JournalUI.open('help');
     else if (go === 'tutorial') { this.close(); this.handlers.onTutorial?.(); }
     else if (go === 'save') this.handlers.onSave();

@@ -5,6 +5,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { COMBAT } from '../config/combat.js';
 import { ctx } from '../core/context.js';
+import { Talents } from '../gameplay/Talents.js';
 import { emit } from '../core/events.js';
 import { audio } from '../systems/AudioSystem.js';
 import { flashManaBar, flashSlot } from '../ui/hud.js';
@@ -24,8 +25,8 @@ export const CombatState = {
   load(data) { resetCooldowns(kit()); spellState.cd = { ...data }; },
 };
 
-/** The active character's ability table. */
-export function kit() { return CHARACTERS[ctx.player.charId].abilities; }
+/** The active character's ability table, with their talents (gameplay/Talents.js; the base table when none). */
+export function kit() { return ctx.player ? Talents.kit() : CHARACTERS.witch.abilities; }
 
 export function resetCooldowns(abilities) {
   spellState.cd = {}; spellState.gcd = 0; spellState.queued = null; cancelAim();

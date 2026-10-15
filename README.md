@@ -346,6 +346,7 @@ node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p lay
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
+node scripts/talents-smoke.mjs     # talents on a test-only tree: Esc/Talents/Learn clicks, Continue, Old Bramble's reset (E); retakes its shot
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
@@ -433,6 +434,7 @@ src/
 │   ├── sets.js            gear sets: each world's pieces and their two- and three-piece bonuses (burn, chill, healing...)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
+│   ├── talents.js         talent points per level, the reset wizard, and each hero's tree (unreleased until 28c-28e)
 │   └── critters.js        ambient animal looks
 ├── core/
 │   ├── Game.js            startup order, per-frame update order, run lifecycle (begin / reset)
@@ -512,6 +514,7 @@ src/
 │   └── spawning.js        planet rosters, boss lairs, runtime spawning, reset / clear
 ├── progression/
 │   ├── leveling.js        pure XP / level / stat math (unit-tested)
+│   ├── talentRules.js     talent points, learning, save validation and the kit with talents applied (pure)
 │   ├── experience.js      applies XP to the hero and emits 'xp' / 'levelup' events
 │   └── levelFeedback.js   float text, burst, jingle and toast on those events
 ├── gameplay/
@@ -534,6 +537,7 @@ src/
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
+│   ├── Talents.js         the hero's learned talents: their kit for casting, saves, Old Bramble's free reset
 │   ├── bountyRules.js     the day's jobs generated from a planet's config, progress and the saved shape (pure)
 │   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)
 │   ├── heldTool.js        the tool in the hero's hand while working
@@ -562,7 +566,7 @@ src/
 │                          InventoryUI + itemTooltip (the bag window: the grid, the equipment side, the details
 │                          window under it, and the Craft tab), itemArt (SVG item
 │                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play), PhotoMode (photo mode),
-│                          BountyUI (the bounty board window),
+│                          BountyUI (the bounty board window), TalentUI (the talent page),
 │                          petViews (pet cards and detail panels for both pet screens), showcase (the menus' still
 │                          camera framings of the hero and pet, and finding a clear view for them),
 │                          itemNotices (item toasts), JournalUI (the journal screen: achievements, bestiary,
@@ -725,6 +729,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Crafting recipes | `src/config/crafting.js` |
 | Bounty board: kinds of job, counts, coins, material, rare-piece chance, board placement | `src/config/bounties.js` → `BOUNTIES` |
 | Gear sets: pieces, two- and three-piece bonuses (burn, chill, healing, swimming, push), burn tick | `src/config/sets.js` → `SETS`, `BURN_TICK` |
+| Talents: points per level, the reset wizard, each hero's tree and its release flag | `src/config/talents.js` → `TALENTS` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
