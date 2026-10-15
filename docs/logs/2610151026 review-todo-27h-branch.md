@@ -1,0 +1,6 @@
+# TODO 27h branch review
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-15 10:29 | REVIEW | TODO 27h | Check out origin/feat/todo-27h-release-validation and review develop...HEAD (5 commits, 26 files) | feat/todo-27h-release-validation | Branch contains develop 67a1647; nothing on develop is missing. npm test: 211 passed, 0 failed. mirelure, tidewhisperCampaign and contentGate simulations passed. git diff --check passed. Full npm run sim, balance reporter and browser helpers not rerun. Mirelure clock/dive fixes look correct and are covered. Concern: performance p95 is measured as the interval between rendered frames under a 60 Hz frame clock with a strict 16.67 ms limit, so a fast Iris Xe may still fail on jitter. Minor: committed balance baseline predates the bot fix; new logs have a UTF-8 BOM unlike older logs. Branch correctly left unmerged (27h incomplete). No code changed. | 0h 03m |
+| 2026-10-15 10:29 | TOTAL | TODO 27h | Review the 27h branch, start to finish | feat/todo-27h-release-validation | Work so far is sound; main risk is the frame-interval measurement before the Iris Xe run. Tidewhisper stays unreleased. | 0h 03m |
