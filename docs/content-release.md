@@ -78,4 +78,4 @@ New quests may use a stable planet id for their origin; old numeric origins rema
 Verify with `npm test`, `npm run sim`, and `node scripts/act-two-smoke.mjs` (Puppeteer Core plus Chromium, overridden
 by `CHROME`). The helper owns port 8106 and checks 720p/1080p title bounds, old/new level saves, the real portal
 picker and masked secret text. It closes its browser/server, stores QA captures in the temporary directory, and
-refreshes `docs/screenshots/title.jpg`.
+refreshes `docs/screenshots/huds/title.jpg`.

@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
-const root=fileURLToPath(new URL('..',import.meta.url)), port=8101, shots=fileURLToPath(new URL('../docs/screenshots/',import.meta.url));
+import { shotPath } from './shots.mjs';
+const root=fileURLToPath(new URL('..',import.meta.url)), port=8101;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser, stderr=''; server.stderr.on('data',d=>{stderr+=d;});
 try {
@@ -47,7 +48,7 @@ try {
   await page.waitForFunction(()=>!window.LANTERNMOSS.Building.active.problem,{timeout:15000});
   await page.waitForFunction(()=>document.getElementById('cresult').getAnimations().every(a=>a.playState==='finished'));
   await page.evaluate(async()=>{const {cam,updateCamera}=await import('/src/systems/CameraSystem.js');cam.fwd.applyAxisAngle(cam.up,.55);updateCamera(.1);});
-  await page.screenshot({path:shots+'building-preview.jpg',type:'jpeg',quality:85});
+  await page.screenshot({path:shotPath('building-preview'),type:'jpeg',quality:85});
   await page.keyboard.press('Enter'); assert.equal(await page.evaluate(()=>window.LANTERNMOSS.Building.list.length),1);
   assert.equal(await page.evaluate(()=>window.LANTERNMOSS.inventory.count('gardenFence')),1);
   await page.keyboard.press('Escape');
@@ -72,7 +73,7 @@ try {
   await page.click('[data-build-pickup]');assert.ok(await page.evaluate(()=>window.LANTERNMOSS.BuildingUI.isOpen));assert.match(await page.$eval('.building-panel [role="status"]',e=>e.textContent),/Empty/);
   const bounds=async()=>page.$eval('.building-panel',e=>({top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom,sw:e.scrollWidth,cw:e.clientWidth}));
   let b=await bounds();assert.ok(b.top>=18&&b.bottom<=702);assert.equal(b.sw,b.cw);
-  await page.screenshot({path:shots+'building-storage.jpg',type:'jpeg',quality:85});
+  await page.screenshot({path:shotPath('building-storage'),type:'jpeg',quality:85});
   await page.setViewport({width:1920,height:1080});b=await bounds();assert.ok(b.top>=18&&b.bottom<=1062);assert.equal(b.sw,b.cw);
   await page.click('[data-build-sort]');await page.keyboard.press('Escape');
   console.log('PASS real E management, trapped keyboard focus, exact/quick-stack/gear transfers, occupied-chest pickup refusal, sorting and 720p/1080p bounds');

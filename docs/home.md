@@ -26,9 +26,9 @@ and energy. A daytime nap advances the clock by 20 seconds and recovers 40% of e
 Existing watered-crop overnight growth still applies. Rest autosaves once its fade has finished; a fainted hero
 cannot use the bed.
 
-![Claiming an empty cottage](screenshots/home-claim.jpg)
-![Furnishing your cottage](screenshots/home-furnishings.jpg)
-![The furnished interior](screenshots/home-interior.jpg)
+![Claiming an empty cottage](screenshots/building/home-claim.jpg)
+![Furnishing your cottage](screenshots/building/home-furnishings.jpg)
+![The furnished interior](screenshots/building/home-interior.jpg)
 
 ## Persistence and implementation
 

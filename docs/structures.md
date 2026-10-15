@@ -64,8 +64,8 @@ Your built shelter remains in the outdoor simulation: time, weather, companions 
 Use an installed bed to rest, a chest to store items, or your stations to craft as described in
 [building and storage](building.md). The village's separately claimed cottage remains available too.
 
-![A completed modular shelter](screenshots/structures-exterior.jpg)
-![Walking inside with the roof and near wall cut away](screenshots/structures-interior.jpg)
+![A completed modular shelter](screenshots/building/structures-exterior.jpg)
+![Walking inside with the roof and near wall cut away](screenshots/building/structures-interior.jpg)
 
 ## Saves and verification
 

@@ -2,10 +2,11 @@
 // npm i --no-save --no-package-lock puppeteer-core; CHROME selects Chrome/Edge. --quick shortens sampling.
 // --baseline measures high only, before optimization; normal runs measure high/medium/low and check ceilings.
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import assert from 'node:assert/strict';
+import { shotPath } from './shots.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8095;
 const args = new Set(process.argv.slice(2)), baseline = args.has('--baseline'), quick = args.has('--quick');
@@ -79,7 +80,6 @@ try {
       const limit = PERFORMANCE_BUDGET.ceilings[row.planetId];
       if (row.calls > limit.calls || row.triangles > limit.triangles) throw new Error(`${row.planetId}/${row.quality} exceeds render budget`);
     }
-    const screenshots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(screenshots, { recursive: true });
     await page.evaluate(() => window.LANTERNMOSS.PauseMenu.open());
     await page.keyboard.press('F3');
     await page.waitForSelector('#perf-overlay:not([hidden])');
@@ -89,10 +89,10 @@ try {
     await page.keyboard.press('F3'); await page.waitForSelector('#perf-overlay:not([hidden])');
     await page.evaluate(() => { const L = window.LANTERNMOSS; L.PauseMenu.show('settings'); });
     assert.equal(await page.$$eval('[data-set$="Density"]', elements => elements.length), 5);
-    const settingsShot = fileURLToPath(new URL('../docs/screenshots/performance-settings.jpg', import.meta.url));
+    const settingsShot = shotPath('performance-settings');
     await page.screenshot({ path: settingsShot, type: 'jpeg', quality: 84 });
     await page.evaluate(() => window.LANTERNMOSS.PauseMenu.close());
-    await page.screenshot({ path: `${screenshots}performance.jpg`, type: 'jpeg', quality: 84 });
+    await page.screenshot({ path: shotPath('performance'), type: 'jpeg', quality: 84 });
   }
   console.log(`Saved ${fileURLToPath(output)}`);
 } finally { await browser?.close(); server.kill(); }

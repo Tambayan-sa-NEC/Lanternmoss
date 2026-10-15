@@ -2,10 +2,9 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8099;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let browser, stderr = ''; server.stderr.on('data', d => { stderr += d; });
 try {
@@ -39,12 +38,12 @@ try {
   await page.keyboard.down('Shift'); await page.keyboard.press('Tab'); await page.keyboard.up('Shift');
   assert.ok(await page.evaluate(() => document.activeElement.hasAttribute('data-portal-close')));
   await page.keyboard.press('Escape'); assert.equal(await page.evaluate(() => window.LANTERNMOSS.inventory.count('wayfarerKey')), 1);
-  await pickGate(); await page.screenshot({ path: shots + 'portal-destinations.jpg', type: 'jpeg', quality: 85 });
+  await pickGate(); await page.screenshot({ path: shotPath('portal-destinations'), type: 'jpeg', quality: 85 });
   await page.keyboard.press('Tab'); await page.keyboard.press('Space'); await arrive('emberfall');
   assert.equal(await page.evaluate(() => window.LANTERNMOSS.inventory.count('wayfarerKey')), 0);
   await pickGate(); assert.equal(await page.$eval('[data-destination="lanternmoss"]', e => e.disabled), true);
   assert.match(await page.$eval('.portal-warning', e => e.textContent), /gate home is dark/);
-  await page.screenshot({ path: shots + 'portal-one-way.jpg', type: 'jpeg', quality: 85 });
+  await page.screenshot({ path: shotPath('portal-one-way'), type: 'jpeg', quality: 85 });
   assert.ok(await page.evaluate(() => window.LANTERNMOSS.saves.save().ok));
   await page.reload({ waitUntil: 'networkidle0' }); await ready(); await page.locator('[data-act="continue"]').click();
   await page.waitForFunction(async () => (await import('/src/core/context.js')).ctx.started);

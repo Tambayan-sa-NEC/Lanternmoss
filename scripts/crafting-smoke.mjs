@@ -1,11 +1,10 @@
 // Optional real Chromium check: npm i --no-save --no-package-lock puppeteer-core; set CHROME for another browser.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8097;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let error = '', browser; server.stderr.on('data', d => { error += d; });
 const ready = new Promise((resolve, reject) => { server.stdout.once('data', resolve); server.once('error', reject); server.once('exit', code => reject(new Error(error || `Server exited (${code})`))); });
@@ -55,7 +54,7 @@ try {
     const L = window.LANTERNMOSS; L.inventory.add('wood', 30); L.inventory.add('ironOre', 12); L.inventory.add('emberShard', 15); L.player.coins = 500;
     L.InventoryUI.render();
   });
-  await page.screenshot({ path: shots + 'crafting.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('crafting'), type: 'jpeg', quality: 84 });
 
   await page.evaluate(async () => {
     const L = window.LANTERNMOSS, { damageEnemy } = await import('/src/combat/damage.js'), { ctx } = await import('/src/core/context.js');
@@ -97,7 +96,7 @@ try {
     }
   }
   await page.setViewport({ width: 1280, height: 720 });
-  await page.screenshot({ path: shots + 'enchanting.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('enchanting'), type: 'jpeg', quality: 84 });
   await page.evaluate(async () => {
     const L = window.LANTERNMOSS; L.InventoryUI.close(); const { ctx } = await import('/src/core/context.js'); ctx.paused = false;
     if (!L.saves.save().ok) throw new Error('Crafting smoke save failed');

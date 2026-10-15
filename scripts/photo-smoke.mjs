@@ -1,15 +1,15 @@
 // Photo mode (TODO 39) in a real browser: npm i --no-save --no-package-lock puppeteer-core; set CHROME for another browser.
 // Real K / drag / wheel / Q input, toolbar clicks, a real PNG download with the frame in its pixels, 720p/1080p bounds,
-// closing restores play, and zero page or shader errors. Writes docs/screenshots/photo-mode.jpg and photo-storybook.jpg.
+// closing restores play, and zero page or shader errors. Writes the photo-mode and photo-storybook shots (activities/).
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8116;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const downloads = mkdtempSync(join(tmpdir(), 'lanternmoss-photo-'));
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let error = '', browser; server.stderr.on('data', d => { error += d; });
@@ -91,7 +91,7 @@ try {
   await frames(60);
   const arm = await page.evaluate(() => window.LANTERNMOSS.player.armL.rotation.x);
   assert.ok(arm < -2.3, `the witch waves with her free hand (${arm})`);
-  await page.screenshot({ path: shots + 'photo-mode.jpg', type: 'jpeg', quality: 86 });
+  await page.screenshot({ path: shotPath('photo-mode'), type: 'jpeg', quality: 86 });
   // pixels of a fresh capture: the polaroid paper is in the corner and the deeper bottom edge, the scene in the middle
   const probe = () => page.evaluate(async () => {
     const L = window.LANTERNMOSS, { ctx } = await import('/src/core/context.js');
@@ -119,7 +119,7 @@ try {
   await page.keyboard.press('KeyH'); await frames(60);
   await page.evaluate(() => { document.getElementById('toast').style.opacity = 0; });
   assert.equal(await page.$eval('#photomode .ph-bar', b => getComputedStyle(b).display), 'none', 'H hides the toolbar');
-  await page.screenshot({ path: shots + 'photo-storybook.jpg', type: 'jpeg', quality: 86 });
+  await page.screenshot({ path: shotPath('photo-storybook'), type: 'jpeg', quality: 86 });
   await page.keyboard.press('KeyH');
   await page.setViewport({ width: 1920, height: 1080 }); await new Promise(r => setTimeout(r, 400));
   s = await state(); assert.equal(s.overflow, false, '1080p: the toolbar fits');

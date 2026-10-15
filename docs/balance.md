@@ -128,4 +128,4 @@ its capped/reset boss runs are not comparable completed-fight times.
 
 Verification: 142 unit tests, all 24 gameplay/audit sims, strict profile target checks, the affected Malgrath
 mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and shop screenshots are under
-`docs/screenshots/balance-flight.jpg` and `docs/screenshots/balance-shop.jpg`.
+`docs/screenshots/bosses/balance-flight.jpg` and `docs/screenshots/huds/balance-shop.jpg`.

@@ -1,13 +1,12 @@
 // Bounty board (TODO 34) in a real browser: npm i --no-save --no-package-lock puppeteer-core; set CHROME for another browser.
 // Real E at the board, the window at 720p/1080p, a real Claim click paying the reward, the claim surviving a full reload
-// and Continue, and zero page or shader errors. Writes docs/screenshots/bounty-board.jpg and bounty-window.jpg.
+// and Continue, and zero page or shader errors. Writes the bounty-board and bounty-window shots (village/, huds/).
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8117;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let error = '', browser; server.stderr.on('data', d => { error += d; });
 const ready = new Promise((resolve, reject) => { server.stdout.once('data', resolve); server.once('error', reject); server.once('exit', code => reject(new Error(error || `Server exited (${code})`))); });
@@ -71,7 +70,7 @@ try {
   });
   assert.notEqual(framed, null, 'a clear view of the board');
   await frames(90); await tidy();
-  await page.screenshot({ path: shots + 'bounty-board.jpg', type: 'jpeg', quality: 86 });
+  await page.screenshot({ path: shotPath('bounty-board'), type: 'jpeg', quality: 86 });
   await page.evaluate(async () => (await import('/src/systems/CameraSystem.js')).setShowcase(null)); await toBoard(); await frames(10);
   await page.keyboard.press('KeyE'); await frames(2);
   const titles = await page.evaluate(() => window.LANTERNMOSS.Bounties.list.map(b => b.title));
@@ -102,7 +101,7 @@ try {
     assert.ok(fits, `${w}x${h}: the board window fits`);
   }
   await tidy();
-  await page.screenshot({ path: shots + 'bounty-window.jpg', type: 'jpeg', quality: 86 });
+  await page.screenshot({ path: shotPath('bounty-window'), type: 'jpeg', quality: 86 });
   await page.click('#bounty-menu button[data-claim="0"]'); await frames(2);
   const after = await page.evaluate(() => { const L = window.LANTERNMOSS; return { coins: L.player.coins, claimed: [...L.Bounties.state.claimed], reward: L.Bounties.list[0].reward.coins,
     message: document.querySelector('#bounty-menu .home-message').textContent, done: document.querySelectorAll('#bounty-menu .bounty-done').length }; });

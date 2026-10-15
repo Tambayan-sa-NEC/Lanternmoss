@@ -29,6 +29,6 @@ browser check needs `puppeteer-core` (`npm i --no-save --no-package-lock puppete
 or uses the `CHROME` environment variable. It checks clicks, skip/reload/replay, all heroes with rebound prompts,
 guide/control overlap, pause/Help bounds at 1280×720 and 1920×1080, and fainting/paused countdown. Screenshots:
 
-![Guided first walk](screenshots/tutorial.jpg)
-![Persistent help](screenshots/help.jpg)
-![Fainting recap](screenshots/fainted.jpg)
+![Guided first walk](screenshots/huds/tutorial.jpg)
+![Persistent help](screenshots/huds/help.jpg)
+![Fainting recap](screenshots/huds/fainted.jpg)

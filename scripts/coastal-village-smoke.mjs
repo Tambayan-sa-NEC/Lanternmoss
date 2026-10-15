@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8110;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -52,7 +53,7 @@ try{
       camera.position.copy(at).addScaledVector(tangentFrame(d)[0],13).addScaledVector(d,6);camera.up.copy(d);camera.lookAt(at);camera.updateMatrixWorld();
       await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     });await page.screenshot({path:join(tmpdir(),`lanternmoss-27d-lighthouse-${height}.png`)});
-    if(height===720)await page.screenshot({path:join(root,'docs/screenshots/tidewhisper-village.jpg'),type:'jpeg',quality:88});
+    if(height===720)await page.screenshot({path:shotPath('tidewhisper-village'),type:'jpeg',quality:88});
     await page.evaluate(async()=>{(await import('/src/core/context.js')).ctx.paused=false;});
     console.log(`PASS ${width}x${height} low: stilt village, lit lighthouse, beach outfits and dry high-water pier`);
   }

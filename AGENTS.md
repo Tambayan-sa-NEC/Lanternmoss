@@ -70,7 +70,9 @@ Commits during the task:
 
 When the feature works and its checks pass, before merging:
 
-1. **Feature screenshots.** The feature's smoke script saves its own shots to `docs/screenshots/<feature>.jpg`.
+1. **Feature screenshots.** The feature's smoke script saves its own shots to `docs/screenshots/<folder>/<feature>.jpg`
+   through `shotPath()` in `scripts/shots.mjs`. Give each new shot a subject folder there first (`characters`, `pets`,
+   `critters`, `mobs`, `bosses`, `npcs`, `village`, `building`, `world`, `activities`, `huds`).
    - Stage a clean, readable frame. Pick a clear view of the hero (`clearStage` in `ui/showcase.js`), set a calm time
      and weather, and hide toasts and banners that are not the subject.
    - Open every new screenshot and look at it. Check that the subject is visible and unobstructed, nothing is

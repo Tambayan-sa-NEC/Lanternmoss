@@ -43,8 +43,8 @@ presets. `--quick` is useful for iteration; full sampling is used for final veri
 indicative. Neither result is a universal worst case for every combat encounter or camera bearing.
 
 The script fails if any preset exceeds its planet's calls/triangle ceiling, then verifies the live overlay, F3 while
-paused and all five density controls, and captures [the overlay](screenshots/performance.jpg) and
-[Graphics settings](screenshots/performance-settings.jpg). Commit refreshed JSON alongside intentional render changes
+paused and all five density controls, and captures [the overlay](screenshots/huds/performance.jpg) and
+[Graphics settings](screenshots/huds/performance-settings.jpg). Commit refreshed JSON alongside intentional render changes
 so count regressions can be reviewed in a diff. FPS is recorded rather than a portable CI pass/fail assertion.
 
 ## Measurements and ceilings
