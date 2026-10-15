@@ -850,3 +850,19 @@ body.paused #tutorial, body.menu #tutorial, body.menu #faint-screen, body.cutsce
 .storage-list small { display:block; opacity:.75; margin-top:2px }
 .building-panel button:focus-visible,#building-preview button:focus-visible { outline:3px solid #7d68a3; outline-offset:2px }
 @media(max-width:560px) { .storage-columns { gap:8px } .storage-list { height:34vh } #building-preview { top:88px } }
+
+/* ---------- photo mode (#photomode, src/ui/PhotoMode.js): the HUD hides, a toolbar sits at the bottom ---------- */
+body.photo #hint, body.photo #combat, body.photo #hud, body.photo #compass, body.photo #markers, body.photo #tip, body.photo #lowhp,
+body.photo #prompt, body.photo #ebars, body.photo #reticle, body.photo #aimhint, body.photo #challenge, body.photo #bossbar,
+body.photo #dialog, body.photo #perf-overlay { visibility:hidden; }
+#photomode { position:fixed; left:0; right:0; bottom:3vh; z-index:15; display:none; flex-direction:column; align-items:center; gap:8px; pointer-events:none; }
+#photomode.show { display:flex; animation:fadein .25s ease-out; }
+#photomode.bare .ph-bar, #photomode.bare .ph-keys { display:none; }
+#photomode .ph-bar { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:8px 10px; pointer-events:auto;
+  background:rgba(255,248,238,.92); border:3px solid var(--ink); border-radius:18px; box-shadow:0 4px 0 var(--ink); transform:scale(var(--ui,1)); transform-origin:bottom center; }
+#photomode button { font:inherit; font-weight:800; font-size:14px; color:var(--ink); padding:5px 12px; cursor:pointer; background:#fff;
+  border:3px solid var(--ink); border-radius:999px; box-shadow:0 3px 0 var(--ink); }
+#photomode button:hover { transform:translateY(-1px); }
+#photomode .ph-emote { font-size:17px; padding:2px 10px; -webkit-text-stroke:1px var(--ink); }
+#photomode .ph-save { background:var(--pink); }
+#photomode .ph-keys { font-size:12px; font-weight:800; color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill; max-width:94vw; text-align:center; }

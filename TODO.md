@@ -1509,9 +1509,18 @@ take the planet's colours; give the first three worlds their own versions only i
 **Goal:** a cozy, pretty game is one people want to take pictures of.
 Code: `src/systems/CameraSystem.js` (the showcase camera already exists), new `src/ui/PhotoMode.js`. **Size:** S.
 
-- [ ] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
-- [ ] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
-- [ ] Save the picture as an image file.
+- [x] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
+- [x] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
+- [x] Save the picture as an image file.
+
+**39 implemented (2026-10-15):** `K` opens photo mode (`src/ui/PhotoMode.js`, data in `src/config/photo.js`). The world
+pauses like the pet menu and the HUD hides. A free orbit camera (`setPhotoView`) stays within 1.6-12 m of the hero, with
+pitch and a +/-0.6 rad horizon tilt, and props pull it in as in play. Warm/night/pastel filters and polaroid/storybook
+frames are drawn by the existing paper post-processing pass, so they are in the picture; poses (wave with the free
+hand, cheer, bow) and emote bubbles run on the mode's own clock while the pet shows off. Save renders a fresh frame and
+downloads it as `lanternmoss-<planet>-<date>-<time>.png`. Checked by `tests/photo.test.mjs` and
+`scripts/photo-smoke.mjs` (real K/drag/wheel/Q/E input, toolbar, a downloaded PNG with the frame in its pixels,
+720p/1080p, close restores play, zero page/shader errors).
 
 ---
 

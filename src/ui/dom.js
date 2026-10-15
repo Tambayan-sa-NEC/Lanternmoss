@@ -28,6 +28,7 @@ export const dom = {
   selHead: $('selhead'), selKeys: $('selkeys'), petCards: $('pet-cards'), petDetail: $('pet-detail'),
   // pet menu (during play)
   petMenu: $('petmenu'),
+  photoMode: $('photomode'),
   // title screen
   title: $('title'), titleMenu: document.querySelector('#title .tmenu'), campaign: document.querySelector('#title .campaign'),
   saveSummary: $('save-summary'),
