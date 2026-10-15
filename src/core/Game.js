@@ -43,6 +43,8 @@ import { Home } from '../gameplay/Home.js';
 import { Building } from '../gameplay/Building.js';
 import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
+import { BountyUI } from '../ui/BountyUI.js';
+import { Bounties } from '../gameplay/Bounties.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
 import { PlanetProgression } from '../gameplay/PlanetProgression.js';
@@ -126,7 +128,7 @@ export class Game {
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
     buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init(); PhotoMode.init(this.renderSystem);
-    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); BuildingUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
+    watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); BountyUI.init(); BuildingUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
     initControls(this.renderSystem.canvas);
@@ -173,7 +175,7 @@ export class Game {
     this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
     BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
     Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Hotbar.update(dt); Journal.update(dt);
-    Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Stations.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
+    Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Stations.update(dt); Bounties.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
     CharacterSelect.update(dt);                                    // the picked hero shows off now and then
@@ -207,7 +209,7 @@ export class Game {
     try {
       const P = ctx.player, world = this.world;
       world.mechanics.exit();                                     // old rules/listeners leave before clocks and adventure state reset
-      BuildingUI.close(); Building.clear(); HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); PhotoMode.close(); Home.reset();
+      BuildingUI.close(); Building.clear(); HomeUI.close(); BountyUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); PhotoMode.close(); Home.reset();
       Tutorial.reset(); RecipeBook.reset(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
@@ -233,7 +235,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Building, BuildingUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Building, BuildingUI, Bounties, BountyUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

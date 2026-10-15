@@ -36,6 +36,7 @@ Object.assign(H.Farm.plots[0].s, { tilled: true, crop: 'carrot', growth: 0.45, w
 H.Gathering.nodes[0].regrowT = 75; H.Gathering.rest.set('tree:0', 23); H.Gathering.tipsShown.add('wood');
 H.Chests.opened.add(H.Chests.list[0].id); H.Chests.list[0].opened = true; H.Chests.sinceKey = 5;
 H.BossGate.seals[0]?.vanish(); H.BossGate.hinted.add('Old Bramble');
+H.Bounties.update(); H.Bounties.state.counts[0] = 1; H.Bounties.state.claimed[1] = true;   // day 3's board, part done
 spawnWorldItem('wood', 7, H.player.up, { props: { rarity: 'rare' }, pickupDelay: 0.7, stepAway: true });
 const expected = snapshot();
 for (const [key, system] of game.saves.registry.entries) {

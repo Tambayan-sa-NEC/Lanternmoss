@@ -866,3 +866,26 @@ body.photo #dialog, body.photo #perf-overlay { visibility:hidden; }
 #photomode .ph-emote { font-size:17px; padding:2px 10px; -webkit-text-stroke:1px var(--ink); }
 #photomode .ph-save { background:var(--pink); }
 #photomode .ph-keys { font-size:12px; font-weight:800; color:#fff; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill; max-width:94vw; text-align:center; }
+
+/* The bounty board (src/ui/BountyUI.js): today's three jobs, their progress and a Claim / Hand over button */
+#bounty-menu { position: fixed; inset: 0; z-index: 95; display: none; align-items: center; justify-content: center; background: #20192cc9; padding: 20px; }
+#bounty-menu.show { display: flex; }
+.bounty-panel { box-sizing: border-box; width: min(700px, 100%); padding: 18px; }
+.bounty-panel p { margin: 8px 0; }
+.bounty-list { display: grid; gap: 10px; margin: 12px 0; }
+.bounty-card { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 10px 14px; border: 2px solid #c7b3cd; border-radius: 14px; background: #fffbf2; }
+.bounty-card.ready { border-color: #e0a92e; background: #fff4cf; }
+.bounty-card.claimed { opacity: .62; }
+.bounty-icon svg { width: 32px; height: 32px; }
+.bounty-body strong, .bounty-body small { display: block; }
+.bounty-body strong { font-size: 16px; line-height: 1.25; }
+.bounty-body small { margin-top: 4px; font-size: 12px; line-height: 1.35; }
+.bounty-bar { position: relative; height: 16px; margin-top: 6px; border: 2px solid #4b3659; border-radius: 999px; background: #efe5db; overflow: hidden; }
+.bounty-bar i { position: absolute; inset: 0 auto 0 0; background: #8fd36b; }
+.bounty-card.ready .bounty-bar i { background: #f1c040; }
+.bounty-bar span { position: relative; display: block; text-align: center; font-size: 11px; font-weight: 800; line-height: 12px; }
+.bounty-panel button { cursor: pointer; padding: 8px 12px; border: 1px solid #a38bab; border-radius: 8px; background: #e2f2d9; color: inherit; font: inherit; font-weight: 800; }
+.bounty-panel header button { border: 0; padding: 0 8px; background: transparent; font-size: 28px; }
+.bounty-panel button:disabled { opacity: .5; cursor: default; }
+.bounty-done { font-weight: 800; color: #4f8a3a; }
+@media (max-width: 560px) { .bounty-card { grid-template-columns: 30px 1fr; } .bounty-card > button, .bounty-done { grid-column: 2; justify-self: start; } }

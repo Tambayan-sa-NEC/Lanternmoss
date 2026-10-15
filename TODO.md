@@ -1447,11 +1447,24 @@ Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts,
 Code: new `src/gameplay/Bounties.js`, `src/config/bounties.js`, a board prop in each village, `src/ui/` (the board).
 **Size:** S. **Needs:** 19.
 
-- [ ] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
+- [x] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
       ("3 ramhorns"), catch a fish ("a Golden Koi"), harvest a crop.
   - Generated from the planet's config (roster, nodes, fish, crops), so every world gets bounties without extra writing.
-- [ ] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
-- [ ] The journal counts bounties finished, with an achievement or two.
+- [x] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
+- [x] The journal counts bounties finished, with an achievement or two.
+
+**34 implemented (2026-10-15):** a notice board near every village square (`src/gameplay/Bounties.js`, model in
+`models/stations.js`, window `src/ui/BountyUI.js`, data `src/config/bounties.js`). Each day it posts three jobs of
+different kinds, generated deterministically from the planet's roster, own resource drops and material, common fish and
+farm (`gameplay/bountyRules.js`; the golden koi, ingots and other worlds' items are never asked for, and worlds without a
+farm skip harvests). Defeats (not a boss's summons), catches and harvests on that planet count once a job is posted;
+bring jobs hand the items over. Rewards: coins (about 23-35 a day across Act I, see `docs/balance.md`), 1-2 of the
+planet's material and a rare piece on 8% of jobs. Saved per planet (`bounties`), so travel keeps each board and Continue
+keeps progress; a new day posts a new set. The board is placed last, clear of the gate and resource nodes, so no saved
+world position moves for it (`planetCatalog` sim). The journal counts claims (Notice Board, Helping Hand achievements). Also
+fixed: the journal now keeps its fish, harvest and gathering counters across reloads (they were dropped on load, so
+Angler, Harvest Festival and Forager progress reset). Checked by `tests/bounties.test.mjs`,
+`tests/sim/bounties.sim.mjs` and `scripts/bounty-smoke.mjs`.
 
 ## 35. Pet care **(suggested)**
 

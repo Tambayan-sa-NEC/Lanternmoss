@@ -23,6 +23,11 @@ raw results. Set `BALANCE_CHECK=1` to make out-of-target profiles fail the repor
 and forge fuel budget from the actual configuration. `src/config/balance.js` holds targets and the reproducible route.
 Set `BALANCE_PLANET` to 0, 1 or 2 to rerun only the world being tuned; its JSON export contains only that world's rows.
 
+Bounty boards (TODO 34, `src/config/bounties.js`) are optional, repeatable income outside these budgets, like selling.
+Three jobs a day pay about 23 / 30 / 35 coins a day on average on Lanternmoss / Emberfall / Frostveil (200 sampled days,
+`tests/bounties.test.mjs`), plus 1-2 of the planet's material each and a rare piece of gear on 8% of jobs. That is
+about what selling chest finds pays; materials still gate crafting, so bounties speed gear up rather than replace it.
+
 ## Campaign and economy
 
 The audited route completes Humming Stones, Pie Delivery and First Harvest on Lanternmoss (three wisps and three
