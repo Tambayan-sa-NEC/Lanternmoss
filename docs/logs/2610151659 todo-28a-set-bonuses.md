@@ -15,4 +15,4 @@
 | 2026-10-15 17:28 | DOCS | TODO 28a | README tour retaken | feat/todo-28a-set-bonuses | 36 saved, errors: none. The bag shot now shows Moss 2/3 lit and Frost 1/3; fits | 0h 06m |
 | 2026-10-15 17:29 | MERGE | TODO 28a | Committed 232dead, merged into `develop` (5027e2d), pushed, deleted the branch | develop | | 0h 01m |
 | 2026-10-15 17:29 | BALANCE | TODO 28a | Recorded, not measured | develop | Duel targets use starting gear, so sets cannot move them; no set-wearing duel profile was measured. A full Ember set on a slow heavy hitter is the strongest case to watch in 28e's depth acceptance | 0h 01m |
-| 2026-10-15 17:29 | TOTAL | TODO 28a | Set bonuses, branch to log | develop | Moss/Ember/Frost/Tide sets with bag UI, unit, sim and browser checks | 0h 31m |
+| 2026-10-15 17:29 | TOTAL | TODO 28a | Set bonuses, branch to log | develop | Moss/Ember/Frost/Tide sets with bag UI, unit, sim and browser checks | 0h 30m |
