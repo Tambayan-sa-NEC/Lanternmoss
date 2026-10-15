@@ -1,0 +1,9 @@
+﻿# Multistep TODO branching workflow
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-15T23:21:22+08:00 | TASK | TODO N/A | Update develop and create docs/multistep-todo-branches | docs/multistep-todo-branches | develop already current; existing untracked audit logs preserved and excluded from this change. |
+| 2026-10-15T23:21:22+08:00 | TASK | TODO N/A | Update AGENTS.md task setup, branch definitions, checkpoints and completion workflow | docs/multistep-todo-branches | Parent feat/todo-N starts from develop; child feat/todo-N-letter starts from parent and merges there after passing checks. Parent reaches develop only after all required stages and combined acceptance checks pass. Push, inclusion verification, deletion and publication logging follow the actual merge target. |
+| 2026-10-15T23:21:22+08:00 | DECISION | TODO N/A | Adopt new branch structure without rewriting merged history | docs/multistep-todo-branches | For partially completed TODOs, create the parent from current develop and use children for remaining stages. Existing branches and commits are not migrated by this documentation task. |
+| 2026-10-15T23:21:22+08:00 | TASK | TODO N/A | Review patch and run git diff --check and npm test | docs/multistep-todo-branches | Whitespace check passed; 233/233 unit tests passed. Full 45-simulation suite running. No runtime or UI changes requiring browser checks. |
+| 2026-10-15T23:31:38+08:00 | TASK | TODO N/A | Complete validation and confirm branch synchronization | docs/multistep-todo-branches | npm test: 233/233 passed; npm run sim: 45/45 passed. origin/develop unchanged since task branch creation. Documentation reviewed for consistent parent/child merge targets. |
