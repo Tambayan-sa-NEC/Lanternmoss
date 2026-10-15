@@ -8,8 +8,9 @@ standing rules. Following them needs no extra confirmation, except where a secti
 
 1. Note the start time from the machine clock (`date +"%Y-%m-%d %H:%M"`). It is the log's file name prefix and the
    start of its `TOTAL` duration (see Project work logs).
-2. Update `develop` (`git pull --ff-only`) and check the working tree is clean. Then create the task branch from it
-   (see Branches). Never start work on `develop` or `master`.
+2. Update `develop` (`git pull --ff-only`) and check the working tree is clean. For a multistep TODO, create or
+   update its parent branch from `develop`, then create the stage branch from that parent (see Branches).
+   Other task branches start from `develop`. Never implement work directly on `develop` or `master`.
 3. Read the task's section in `TODO.md`: its goal, size, dependencies (`Needs`), checklist and any earlier
    "implemented" notes. Read the matching doc in `docs/` (for example `docs/tidewhisper.md`, `docs/balance.md`,
    `docs/performance.md`) and the latest related logs in `docs/logs/`.
@@ -64,7 +65,8 @@ Commits during the task:
 - Commit with a short type prefix: `feat:`, `fix:`, `balance:`, `docs:`, `chore:`. Write a body that says what
   changed and why.
 - Work that must pause before it can pass all checks (for example waiting for hardware) may be committed and pushed
-  on its task branch as a checkpoint. Say so in the log, and keep it out of `develop` until it is complete.
+  on its task branch as a checkpoint. Say so in the log; do not merge an incomplete stage into its parent or
+  `develop`. A parent may hold completed stages while its remaining stages are unfinished.
 
 # Finishing a feature: docs and screenshots
 
@@ -97,32 +99,50 @@ Then follow the task completion workflow below.
 - `master`: the public, playable game. It only receives tested releases from `develop` and hotfixes.
   Never commit or develop on it directly, and never delete it.
 - `develop`: the integration branch where new features and ideas are combined and tested. Never delete it.
-- Task branches: one per TODO stage, fix or idea, created from an up-to-date `develop`:
-  `feat/todo-<N>-<slug>` (e.g. `feat/todo-27f-old-ironclaw`), `fix/<slug>`, `docs/<slug>`, `chore/<slug>`,
-  `refactor/<slug>`, `perf/<slug>`.
+- Multistep TODO parent branches: `feat/todo-<N>` (e.g. `feat/todo-28`), created from an up-to-date `develop`.
+  Keep the parent for the whole TODO; it collects its completed stages and stays out of `develop` until all
+  required stages and the TODO's acceptance checks pass.
+- Stage branches: `feat/todo-<N><letter>` (e.g. `feat/todo-28a`, `feat/todo-28b`), created from the latest parent
+  branch, never directly from `develop`. A descriptive suffix is allowed. Merge each completed, tested stage
+  into its parent (`--no-ff`), never directly into `develop`. Start later stages from the updated parent so they
+  include earlier completed work.
+- Other task branches: one per standalone TODO, fix or idea, created from an up-to-date `develop`:
+  `feat/todo-<N>-<slug>`, `fix/<slug>`, `docs/<slug>`, `chore/<slug>`, `refactor/<slug>`, `perf/<slug>`.
 - Hotfix branches: `hotfix/<slug>`, created from `master` for an urgent problem in the playable game.
+
+For example: `develop` -> `feat/todo-28` -> `feat/todo-28a`; merge finished 28a back into `feat/todo-28`,
+then branch `feat/todo-28b` from that updated parent. After all required stages (28a-28e in this example)
+and the combined acceptance checks pass, merge `feat/todo-28` into `develop`.
+Do not rewrite already-merged history to adopt this rule: for an existing partially completed TODO, create its
+parent from current `develop` and use child branches for the remaining stages.
 
 # Task completion workflow
 
 Implement every TODO, feature or fix on its own task branch, never directly on `develop` or `master`.
 After completing it:
 
-1. Bring the task branch up to date with `develop` and resolve conflicts.
+1. Choose the merge target: the TODO parent for a stage, or `develop` for a standalone task or completed parent.
+   For a stage, first bring its parent up to date with `develop`, then bring the stage up to date with its parent
+   and resolve conflicts. For other tasks, bring the task branch up to date with `develop`.
 2. Run all project tests, including `npm test` and `npm run sim`, plus any required feature-specific or browser checks.
    All checks must pass before merging. Fix failures and rerun the affected checks; do not merge or delete the branch while any check fails.
    Run timing-sensitive suites (`npm run sim` includes a terrain timing check) when no other heavy job is running,
    for example not alongside the screenshot tour.
-3. Commit the completed changes and merge the tested task branch into `develop` (`--no-ff`).
+3. Commit the completed changes and merge the tested task branch into its merge target (`--no-ff`).
    If conflict resolution or additional edits change the tested code, rerun the tests before completing the merge.
-4. Push `develop` when a remote is configured. Confirm the task branch's work is included in it,
-   then delete the task branch locally and remotely if it exists there.
+   A parent can merge into `develop` only after every required stage is finished and merged into it; run the
+   complete suites and all required combined feature/browser/acceptance checks on the synchronized parent first.
+4. Push the merge target when a remote is configured. Confirm the task branch's work is included in it,
+   then delete the merged task branch locally and remotely if it exists there. After a stage merge, keep the
+   parent for the remaining stages. Delete the parent only after its completed work is merged and pushed to `develop`.
 5. Record test results, the merge, push, and branch deletion in `docs/logs/` using the table format below.
-   These rows can only be written after the merge, so they may be committed directly on `develop` (or on `master`
-   after a release or hotfix) and pushed. This is the only exception to the no-direct-commits rule: the commit
+   These rows can only be written after the merge, so they may be committed directly on the merge target
+   (a TODO parent, `develop`, or `master` after a release or hotfix) and pushed. For `develop` and `master`,
+   this is the only exception to the no-direct-commits rule: the commit
    must change log files under `docs/logs/` and nothing else.
 6. Report to the user: what was built, the check results (with any failure on the way and how it was fixed), the
    decisions made on their behalf, and what remains. A branch left behind `develop` (for example a paused checkpoint)
-   is updated from `develop` and rechecked before it resumes.
+   is synchronized with its merge target (and the parent's latest `develop`, for a stage) and rechecked before it resumes.
 
 This is the standing completion workflow; no additional confirmation is needed for these steps.
 
@@ -191,7 +211,7 @@ Task types (pick the one that best describes the row):
 | `DOCS` | README, docs, TODO, guides and screenshots |
 | `CHORE` | Maintenance: dependencies, tooling, branch cleanup, repository housekeeping |
 | `BUILD` | Build, packaging, scripts and CI setup |
-| `MERGE` | Merging a branch (task branch into `develop`, `develop` into `master`) |
+| `MERGE` | Merging a branch (stage into TODO parent, completed task/parent into `develop`, `develop` into `master`) |
 | `RELEASE` | Publishing a playable version on `master` (release merge, tag, release notes) |
 | `HOTFIX` | An urgent fix to the playable `master`, made on a `hotfix/` branch |
 | `SECURITY` | Security review, secrets or credential handling |
