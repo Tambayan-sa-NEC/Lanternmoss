@@ -26,6 +26,7 @@ import { Portals } from '../gameplay/Portals.js';
 import { Home } from '../gameplay/Home.js';
 import { Building } from '../gameplay/Building.js';
 import { Bounties } from '../gameplay/Bounties.js';
+import { Talents } from '../gameplay/Talents.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -49,7 +50,7 @@ export class AdventureSave {
     };
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
-      houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook,
+      houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook, talents: Talents,
       home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups, building: Building,
       mechanics: game.world.mechanics })) this.registry.register(key, system);
     this.registry.assertComplete();
