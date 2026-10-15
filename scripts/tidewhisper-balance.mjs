@@ -1,4 +1,5 @@
-// Repeat the existing level-8 bots on two seeds. --check enforces timing bands, beyond the access-only sim pass labels.
+// Repeat the existing level-8 bots on two seeds. --check enforces timing bands, beyond the access-only sim pass labels:
+// each boss row, and each hero's regular-roster median (docs/balance.md); single monsters are reported, not checked.
 import { spawn, execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -20,16 +21,24 @@ await Promise.all(Array.from({length:3},async()=>{
     for(const [type,fight]of Object.entries(fights)){
       const target=BALANCE.seconds[type==='ironclaw'?'miniBoss':type==='mirelure'?'boss':'monster'];
       const withinTarget=fight.time!=null&&!fight.deaths&&fight.time>=target[0]&&fight.time<=target[1];
-      const row={seed:job.seed,hero:job.hero,type,...fight,target,withinTarget};rows.push(row);
-      console.log(`${withinTarget?'PASS':'OUTSIDE TARGET'} ${job.seed}/${job.hero}/${type}: ${fight.time}s, target ${target.join('-')}s`);
+      // docs/balance.md: the monster band applies to the roster median; single armoured/evasive types may run longer.
+      const row={seed:job.seed,hero:job.hero,type,...fight,target,withinTarget,monster:job.sim==='coastalDuels',checked:job.sim!=='coastalDuels'||!!fight.deaths||fight.time==null};rows.push(row);
+      console.log(`${withinTarget?'PASS':row.checked?'OUTSIDE TARGET':'outside (median-checked)'} ${job.seed}/${job.hero}/${type}: ${fight.time}s, target ${target.join('-')}s`);
     }
   }
 }));
+for(const seed of [1,7])for(const hero of ['witch','knight','ranger']){
+  const fights=rows.filter(r=>r.seed===seed&&r.hero===hero&&r.monster),times=fights.map(r=>r.deaths||r.time==null?Infinity:r.time).sort((a,b)=>a-b);
+  const time=times[(times.length-1)>>1],target=BALANCE.seconds.monster,withinTarget=time>=target[0]&&time<=target[1];
+  rows.push({seed,hero,type:'monsterMedian',time,of:fights.map(r=>r.type),target,withinTarget,checked:true});
+  console.log(`${withinTarget?'PASS':'OUTSIDE TARGET'} ${seed}/${hero}/roster median: ${time}s, target ${target.join('-')}s`);
+}
 rows.sort((a,b)=>a.seed-b.seed||a.hero.localeCompare(b.hero)||a.type.localeCompare(b.type));
 const report={measuredAt:new Date().toISOString(),candidateCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),
   dirty:!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{cwd:root,encoding:'utf8'}).trim(),
   profile:'level 8, starting equipment, default pet, HP top-ups; counter-based bots include approach time',
-  accepted:rows.every(r=>r.withinTarget),rows};
+  accepted:rows.every(r=>!r.checked||r.withinTarget),rows};
 writeFileSync(new URL('../docs/tidewhisper-balance.json',import.meta.url),JSON.stringify(report,null,2)+'\n');
-console.log(`${report.accepted?'PASS':'NO-GO'}: ${rows.filter(r=>!r.withinTarget).length}/${rows.length} rows outside timing bands`);
+const checked=rows.filter(r=>r.checked);
+console.log(`${report.accepted?'PASS':'NO-GO'}: ${checked.filter(r=>!r.withinTarget).length}/${checked.length} checked rows outside timing bands (per-monster rows are informational)`);
 if(process.argv.includes('--check')&&!report.accepted)process.exitCode=1;

@@ -1124,7 +1124,8 @@ bosses and release balancing each get their own session. The otter remains optio
 Mirelure's breathing clue now shares its clock with the bubbles, and diving cancels unfinished surface attacks.
 Candidate checks use the real fourth-world id and save schema; they exposed missing forage/chest configuration,
 which is now explicit. The normal release flag remains off. Initial Intel UHD diagnostics do not meet the required
-Iris Xe evidence, and several three-hero duel timings remain outside the existing targets. This is a **no-go** for
+Iris Xe evidence. Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
+Mirelure HP 3250); the campaign XP/resource review remains. This is a **no-go** for
 release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/tidewhisper-release.md).
 
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,

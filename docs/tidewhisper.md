@@ -239,7 +239,9 @@ Its kit is `src/entities/enemies/behaviors/boss/ironclaw.js` on the shared boss 
   - *Shell swaps* at 66% and 33%: it crawls out and scuttles about for 5.5 s, then climbs into a new shell (bronze,
     then verdigris, then a dark old bell).
   - *Wedged*: a charge that crosses wet tidal sand (dry now but under high water: the flats at low tide) ploughs it
-    into the sand for 5 s. At high tide the flats are flooded, so it never wedges.
+    into the sand for 5 s. At high tide the flats are flooded, so it never wedges. It only falls for this once per
+    shell: afterwards it is wary, and its charges skid to a stop at the edge of the wet sand (still shut in its shell)
+    until it climbs into a new one. So a fight has at most three wedges (27h).
 - **Moves**: pinch (a marked wedge in front), charge (a marked lane), and from the second shell, toll (it rears and
   slams the bell down: a shockwave to jump). Every move has a wind-up warning and a recovery.
 - **Reward**: two black pearls where it falls, plus the usual mini boss treasure roll, and the beds are free. Its
@@ -260,9 +262,9 @@ low- versus high-tide wedging, both shell swaps and the toll, the reset after a 
 
 `ironclawDuels` gives each hero a level-8 bot using the bestiary's plan: bait charges across the wet sand at low tide,
 strike the face, and hit anywhere while it is open. It never jumps a shockwave or dodges; HP is topped up below 50%.
-Every hero beat it on two seeds. Most fights took 148-195 s with 8-13 top-ups, against the 90-180 s mini boss target
-(the existing mini bosses take 95-135 s with 6-13). One ranger fight took 41 s after four early wedges. Final
-three-hero pacing is 27h's balance pass.
+Every hero beat it on two seeds. In 27f most fights took 148-195 s with 8-13 top-ups, and one ranger fight took 41 s
+after four early wedges. The 27h balance pass made it wary after one wedge per shell and lowered its base HP from 1000
+to 800: every hero now takes 156-174 s with 6-12 top-ups, inside the 90-180 s mini boss target.
 
 ## Mirelure, the Lantern Angler (27g)
 
@@ -302,6 +304,7 @@ false and real lures, geysers, the sluice break and creeping reflood, beached mo
 a reload mid-drain and the reward.
 
 `mirelureDuels` gives each hero a level-8 bot that watches her breath, strikes the lure that dims on it, and attacks her
-while she is up or beached; it never dodges, and HP is topped up below 50%. Every hero won on two seeds in 175-265 s
-(target 180-300 s) with 8-23 top-ups, close to the Act I bosses (8-28). Final three-hero pacing and the release gate are
-27h; the Iris Xe frame-time target remains unmeasured.
+while she is up or beached; it never dodges, and HP is topped up below 50%. In 27g every hero won on two seeds in
+170-266 s, but the ranger's 171-176 s was under the 180-300 s target. 27h raised her base HP from 3000 to 3250: every
+hero now takes 188-289 s (ranger 188/191, witch 273/277, knight 281/289) with 6-26 top-ups, close to the Act I bosses
+(8-28). The release gate and the Iris Xe frame-time measurement are still pending.

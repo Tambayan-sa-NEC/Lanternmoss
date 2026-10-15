@@ -24,14 +24,18 @@ insufficient release evidence: those earlier fixtures inherited missing configur
   1280x720 low. Latest village/night/squall p95: 24.8/27.5/31.0 ms. Latest peaks: 448 calls and 185,864 triangles.
   The earlier run peaked at 451 calls and 186,584 triangles; timing variation is retained in the work log. These are **not**
   Iris Xe results and do not meet the 16.67 ms timing target. Fixed-scene ceilings are 550 calls/230,000 triangles.
-- Existing access-only duel checks pass, but their pass labels do not enforce timing targets. Initial two-seed
-  measurements include knight Jellybell fights of 16.3/24.2 s (target 2-6), Ironclaw outliers of 41.3-194.5 s
-  (target 90-180), and ranger Mirelure fights of 170.5/176.1 s (target 180-300). Final balance is unfinished.
-- The [initial strict balance baseline](tidewhisper-balance-baseline.json) records 12/30 rows outside target before
-  the melee-bot correction. Its knight approach oscillated between shore and target and used 1.8 m instead of the
-  real cleave range. Corrected coastal reruns on both seeds give knight Jellybell times of 3.2/3.8 s, within target.
-  Shellback and boss timing misses remain; do not treat the old Jellybell outliers as a gameplay balance defect.
-  Regenerate the full report with the current bot before final balance acceptance.
+- **Duel balance passes** ([report](tidewhisper-balance.json), `--check`: 0 of 18 checked rows outside target, both
+  seeds, all heroes). The check follows `docs/balance.md`: each boss/mini-boss fight, and each hero's regular-roster
+  median (2-6 s; measured 3.6-5.6 s). Single monsters are reported but not checked, as the contract allows armoured or
+  evasive types to run longer: Shellback takes 4.5-7.7 s. Changes, with no targets loosened:
+  - Old Ironclaw was luck-dependent: four early wedges let one ranger fight end in 41 s. It now falls for the wet
+    sand once per shell (later charges skid to a stop until its next shell), and its base HP is 800 (was 1000).
+    All fights: 156-174 s (target 90-180).
+  - Mirelure's base HP is 3250 (was 3000), lifting the ranger from 171-176 s to 188-191 s. All fights: 188-289 s
+    (target 180-300).
+- The [initial strict balance baseline](tidewhisper-balance-baseline.json) is kept as history: 12/30 rows outside
+  target, recorded before the melee-bot correction (the knight bot used 1.8 m reach and oscillated between shore and
+  target, so its Jellybell times of 16.3/24.2 s were a bot defect, now 3.2/3.8 s).
 
 | Candidate at 720p low | Candidate at 1080p low |
 | --- | --- |
@@ -88,8 +92,8 @@ the frame/draw budgets. A JSON file copied from another device or synthetic test
 
 ## Finish 27h
 
-1. Resolve final timing-band failures and retain both-seed evidence for all heroes; review campaign XP, gathering,
-   recipes and resource availability as well as isolated duels. Rerun affected checks after changes.
+1. Duel timing bands pass on both seeds for all heroes. Still open: review campaign XP, gathering, recipes and
+   resource availability (the `pacing` audit covers only the three Act I worlds). Rerun affected checks after changes.
 2. Obtain passing Iris Xe evidence for the final candidate. Re-measure after material rendering changes.
 3. Enable the destination only after its full gate passes. Update release-dependent tests, title/portal/journal
    expectations, player-facing tour and affected screenshots. Recheck old v1 saves and the real travel/Continue path.

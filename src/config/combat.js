@@ -95,7 +95,7 @@ export const COMBAT = {
     // which only rings (bellRing: a shockwave after `delay`, at most once per `cooldown`; stun = seconds dazed).
     // guarded = damage share while tucked in its shell; openBonus = extra while out of it (swap) or wedged in the sand
     ironclaw:  { ai: 'boss', behavior: 'ironclaw', miniBoss: true, name: 'Old Ironclaw, Keeper of the Pearl Beds', color: 0xc8913a, capColor: 0xffc86a,
-                 hp: 1000, speed: 2.2, radius: 1.5, height: 2.8, aggro: 13, leash: 20, turnRate: 2.4,
+                 hp: 800, speed: 2.2, radius: 1.5, height: 2.8, aggro: 13, leash: 20, turnRate: 2.4,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 180, cooldown: 1.2,
                  faceArc: 70, guarded: 0.6, openBonus: 0.4, wedge: 5, swap: 5.5, swapSpeed: 0.6,
                  bellRing: { delay: 0.45, speed: 9, maxRadius: 9, width: 1.2, damage: 7, stun: 1.0, cooldown: 3 },
@@ -124,7 +124,7 @@ export const COMBAT = {
     // up after the real lure is struck, burst = a false lure's flash. drain: the sluice break's drain and its creeping
     // reflood (seconds); diveDepth = water over her that ends the beaching
     mirelure:  { ai: 'boss', behavior: 'mirelure', name: 'Mirelure, the Lantern Angler', color: 0x3d5a78, capColor: 0xffd36b,
-                 hp: 3000, speed: 3.0, radius: 2.4, height: 3.2, aggro: 20, leash: 34, turnRate: 2.2,
+                 hp: 3250, speed: 3.0, radius: 2.4, height: 3.2, aggro: 20, leash: 34, turnRate: 2.2,
                  knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.3,
                  telegraph: true, respawn: 0, xp: 220, cooldown: 1.2, pool: 18, diveDepth: 1.0,
                  lures: { count: 3, countLate: 4, radius: [5, 12], breath: 1.8, surface: 7, burst: { radius: 3, damage: 12, knockback: 6 } },
