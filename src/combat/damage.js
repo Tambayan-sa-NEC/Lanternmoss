@@ -5,6 +5,7 @@ import { BESTIARY_ENTRIES } from '../config/bestiary.js';
 import { BUFFS } from '../config/game.js';
 import { NEEDS } from '../config/survival.js';
 import { PETS } from '../config/pets.js';
+import { nextBurn } from '../items/sets.js';
 import { LEVELING } from '../config/leveling.js';
 import { ctx } from '../core/context.js';
 import { settings } from '../core/settings.js';
@@ -35,7 +36,8 @@ function knockDir(from, ent, out) {
 const BIG_HIT = 40;
 
 /** o: from (knockback origin), knock, slow + slowTime, mark (seconds), stagger (seconds), stun (seconds, see Enemy.stun),
-    color (spark tint), source ('pet' for the companion; omitted for the hero's own abilities). */
+    color (spark tint), source ('pet' for the companion, 'burn' for an Ember set burn tick; omitted for the hero's own
+    abilities, which also carry the worn sets' burn / chill / knock: config/sets.js). */
 export function damageEnemy(e, amount, o = {}) {
   if (!e.alive || e.hidden) return;                                   // burrowed monsters can't be hit
   if (e.invulnerable) {                                               // e.g. a boss mid phase-transition
@@ -58,11 +60,12 @@ export function damageEnemy(e, amount, o = {}) {
   encounterEvents.dispatchEvent(new CustomEvent('enemyhit', { detail: { enemy: e, amount, source: o.source ?? 'player' } }));
   const marked = e.markT > 0 && o.source !== 'pet', big = amount >= BIG_HIT;
   if (settings.damageNumbers) floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
-    o.source === 'pet' ? '#c7a8ff' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
+    o.source === 'pet' ? '#c7a8ff' : o.source === 'burn' ? '#ff9a4a' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
   sparkles.emit(e.center(), { count: big ? 18 : 8, color: o.color ?? 0xffffff, speed: big ? 3.6 : 2.5, life: 0.4, size: big ? 0.4 : 0.3 });
   if (o.knock && o.from) e.knock.addScaledVector(knockDir(o.from, e, _tv), o.knock * (1 - (e.def.knockResist || 0)));
   if (o.slow) { e.slowT = o.slowTime; e.slowAmt = o.slow * (1 - (e.def.slowResist || 0)); }
   if (o.mark) e.markT = o.mark;
+  if (!o.source) setOnHit(e, amount);
   if (o.stagger) e.interrupt(o.stagger);
   if (o.stun && e.hp > 0) e.stun(o.stun);
   if (o.source !== 'pet') noteHit(e);
@@ -72,6 +75,20 @@ export function damageEnemy(e, amount, o = {}) {
     if (LEVELING.creditSources.includes(o.source || 'player')) { gainXp(e.def.xp, e); gainCoins(coinsForKill(e), _tv.copy(e.center()).addScaledVector(e.up, e.height * 0.9)); }
   }
 }
+
+/** The worn sets' effects on a hit of the hero's own (config/sets.js): burn, chill and a Breaker push. */
+function setOnHit(e, amount) {
+  const fx = ctx.player.stats.setFx; if (!fx) return;
+  if (fx.burn) e.burn = nextBurn(e.burn, amount, fx.burn);
+  if (fx.chill) {
+    const slow = fx.chill.slow * (1 - (e.def.slowResist || 0));
+    if (!(e.slowT > 0 && e.slowAmt > slow)) { e.slowT = Math.max(e.slowT, fx.chill.time); e.slowAmt = slow; }
+  }
+  if (fx.knock) e.knock.addScaledVector(knockDir(ctx.player.pos, e, _tv), fx.knock * (1 - (e.def.knockResist || 0)));
+}
+
+/** Healing after the worn sets' bonus (the Moss set): food, potions, regeneration and Mend all pass through here. */
+export const healAmount = amount => amount * (1 + (ctx.player.stats.setFx?.healing ?? 0));
 
 /** o.lethal = a boss's killing blow: ignores armor and Guard and always takes the hero down (only i-frames save you,
     which is why every lethal attack is telegraphed long enough to walk, blink, leap or dash clear). */
@@ -117,8 +134,8 @@ export function updatePlayerVitals(dt, world) {
   if (P.dead) { if ((P.deadT -= dt) <= 0) respawnPlayer(world); }
   else {
     P.mana = Math.min(C.maxMana, P.mana + C.manaRegen * dt);
-    if (ctx.time - P.lastHurt > C.hpRegenDelay) P.hp = Math.min(C.maxHp, P.hp + C.hpRegen * (P.regenK ?? 1) * dt);   // energy runs low: slower (gameplay/Needs.js)
-    if (buffs.mend > 0) P.hp = Math.min(C.maxHp, P.hp + BUFFS.mendRegen * dt);
+    if (ctx.time - P.lastHurt > C.hpRegenDelay) P.hp = Math.min(C.maxHp, P.hp + healAmount(C.hpRegen * (P.regenK ?? 1) * dt));   // energy runs low: slower (gameplay/Needs.js)
+    if (buffs.mend > 0) P.hp = Math.min(C.maxHp, P.hp + healAmount(BUFFS.mendRegen * dt));
     P.root.visible = !(P.hurtT > 0 && Math.floor(ctx.time * 18) % 2);
   }
   P.shadow.visible = !P.dead;

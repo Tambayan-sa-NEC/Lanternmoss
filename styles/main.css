@@ -448,6 +448,10 @@ body.menu #inventory { display:none; }
 .gear-empty { font-size:9.5px; font-weight:800; opacity:.5; }
 .inv-gear-stats { margin-top:8px; font-size:11.5px; font-weight:800; color:#3f9a5a; line-height:1.35; text-align:center; }
 .inv-gear-stats b { color:var(--ink); } .inv-gear-stats .dim { color:var(--ink); opacity:.55; font-weight:600; }
+/* worn sets (config/sets.js): a line per set, its bonuses lit once enough pieces are worn */
+.inv-set { margin-top:4px; }
+.inv-set b { color:var(--set); -webkit-text-stroke:.3px var(--ink); } .inv-set .on { color:var(--ink); } .inv-set .off { color:var(--ink); opacity:.45; font-weight:600; }
+.inv-d-fx .inv-d-set { list-style:none; margin-left:-14px; padding-left:6px; border-left:4px solid var(--set); color:var(--ink); font-weight:600; font-size:11.5px; }
 .inv-qty, .inv-qk { pointer-events:none; }
 .inv-qk { position:absolute; left:3px; top:1px; font-size:9.5px; font-weight:800; color:#fff; background:var(--ink); border-radius:4px; padding:0 3px; line-height:13px; }
 .inv-actions .inv-quick { font-size:11.5px; padding:3px 9px; }

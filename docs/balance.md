@@ -28,6 +28,11 @@ Three jobs a day pay about 23 / 30 / 35 coins a day on average on Lanternmoss / 
 `tests/bounties.test.mjs`), plus 1-2 of the planet's material each and a rare piece of gear on 8% of jobs. That is
 about what selling chest finds pays; materials still gate crafting, so bounties speed gear up rather than replace it.
 
+Gear sets (TODO 28a, `src/config/sets.js`) are likewise outside the duel targets, which use starting gear. They are
+optional power from crafting or finding a world's pieces: Moss heals up to 30% more, Ember burns add up to 70% of each
+hit over 3 s (a refreshed burn, so fast hitters gain less than slow heavy ones), Frost slows up to 35%. Bosses keep
+their slow and knock resistance.
+
 ## Campaign and economy
 
 The audited route completes Humming Stones, Pie Delivery and First Harvest on Lanternmoss (three wisps and three

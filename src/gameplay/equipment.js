@@ -8,6 +8,7 @@ import { EQUIP_SLOTS } from '../config/items.js';
 import { ctx } from '../core/context.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { applyGear, equipProblem, gearTotals } from '../items/gear.js';
+import { setEffects } from '../items/sets.js';
 import { dressHero } from '../models/vanity.js';
 import { statsForLevel } from '../progression/leveling.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -24,9 +25,10 @@ export function wornPieces(P = ctx.player) {
   return Object.entries(P.equipment ?? {}).filter(([, w]) => w).map(([slot, w]) => ({ slot, def: itemRegistry.get(w.itemId), props: w.props }));
 }
 
-/** The hero's stats right now: base -> level -> gear. */
+/** The hero's stats right now: base -> level -> gear, plus setFx: the worn sets' bonuses (items/sets.js). */
 export function computeStats(P = ctx.player) {
-  return applyGear(statsForLevel(CHARACTERS[P.charId].stats, P.level), gearTotals(wornPieces(P), P.charId));
+  const pieces = wornPieces(P);
+  return { ...applyGear(statsForLevel(CHARACTERS[P.charId].stats, P.level), gearTotals(pieces, P.charId)), setFx: setEffects(pieces, P.charId) };
 }
 
 /** Re-derives P.stats after gear changes; a bigger maximum adds the difference, a smaller one clamps. */

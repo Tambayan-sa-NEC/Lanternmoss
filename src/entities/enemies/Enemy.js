@@ -26,7 +26,8 @@ import { mr, rng } from '../../utils/random.js';
 import { arcDist, dirAlong, frameQuat, projectTangent, tangentFrame, tangentTo, tangentToward, turnToward } from '../../utils/sphere.js';
 import { SPAWN_DIR } from '../../world/World.js';
 import { groundHeight } from '../../world/terrain.js';
-import { hurtPlayer } from '../../combat/damage.js';
+import { damageEnemy, hurtPlayer } from '../../combat/damage.js';
+import { BURN_TICK } from '../../config/sets.js';
 import { forgetTarget } from '../../combat/targeting.js';
 import { encounterEvents } from '../../combat/events.js';
 import { Projectile } from '../Projectile.js';
@@ -61,7 +62,7 @@ export class Enemy extends Walker {
     this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, rng() * 6.28);
     Object.assign(this, { hp: this.def.hp, alive: true, state: 'idle', timer: mr(0.5, 2.5), cool: 0, speed: 0, phase: 0, deadT: 0, turn: 0,
       slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false,
-      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0 });   // hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
+      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0, burn: null, burnTick: 0 });   // burn = { dps, t }: the Ember set (config/sets.js)   // hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
     this.knock.set(0, 0, 0); this.selfCollider.active = true; this.root.visible = this.shadow.visible = true; this.root.scale.setScalar(this.baseScale);
     this.behavior?.reset?.(this);
   }
@@ -80,6 +81,13 @@ export class Enemy extends Walker {
     else this.interrupt(t);
     if (t < 0.05) return;
     this.stunT = Math.max(this.stunT, t); emote(this, '★', '#ffd24a');
+  }
+  /** An Ember set burn (config/sets.js): damage in BURN_TICK steps until it runs out; embers rise while it lasts. */
+  tickBurn(dt) {
+    const b = this.burn, step = Math.min(dt, b.t); b.t -= step; this.burnTick += step;
+    if (rng() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.3), { count: 1, color: 0xff8a3a, speed: 1.2, up: this.up, upBias: 1.2, life: 0.5, size: 0.28 });
+    if (this.burnTick >= BURN_TICK || b.t <= 0) { damageEnemy(this, b.dps * this.burnTick, { source: 'burn', color: 0xff8a3a }); this.burnTick = 0; }
+    if (b.t <= 0) this.burn = null;
   }
   die() {
     this.alive = false; this.state = 'dead'; this.deadT = 0; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
@@ -140,6 +148,7 @@ export class Enemy extends Walker {
     this.slowT = Math.max(0, this.slowT - dt); this.markT = Math.max(0, this.markT - dt); this.stunT = Math.max(0, this.stunT - dt);
     this.shieldT = Math.max(0, this.shieldT - dt); this.stunnedT = Math.max(0, this.stunnedT - dt);
     this.cool -= dt; this.timer -= dt; this.hitPop = Math.max(0, this.hitPop - dt * 6);
+    if (this.burn) { this.tickBurn(dt); if (!this.alive) return; }
     const dist = tangentTo(this.pos, this.up, ctx.player.pos, this.toP), safe = playerSafe();
     if (!ENGAGED.has(this.state) && this.state !== 'return' && dist < d.aggro) this.aggro();
     if (ENGAGED.has(this.state) && (safe || arcDist(this.up, this.home) > d.leash || dist > d.aggro * 2.2)) { this.state = 'return'; this.hideTele(); }

@@ -216,6 +216,16 @@ and the planet's material, now and then a rare piece of gear, and its note turns
 each planet keeps its own board, and the journal counts the bounties you claim.
 
 <p>
+  <img src="docs/screenshots/huds/gear-sets.jpg" width="70%" alt="The bag's equipment side listing the Ember and Moss sets, with the Ember Mail's set bonuses in its tooltip">
+</p>
+
+**Gear sets.** Each world's armour, helm and boots make a set. Wear two different pieces of one and a bonus switches
+on; wear all three and it grows. The Moss set heals you more (food, potions and regeneration), the Ember set makes
+your hits burn for a while after, and the Frost set's hits chill monsters so they slow down. The bag's equipment side
+lists each set you're wearing with its bonuses lit, and a set piece's details show what its set does. Pieces from
+different sets mix, so two Moss pieces and an Ember helm still heal more.
+
+<p>
   <img src="docs/screenshots/activities/photo-mode.jpg" width="49%" alt="Photo mode: the toolbar over a polaroid-framed shot of the witch waving">
   <img src="docs/screenshots/activities/photo-storybook.jpg" width="49%" alt="Photo mode: night filter and storybook frame, toolbar hidden">
 </p>
@@ -335,6 +345,7 @@ node scripts/structures-smoke.mjs  # structure controls, support/pickup, door mo
 node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
+node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
@@ -419,6 +430,7 @@ src/
 │   ├── chests.js          treasure chests and drops: kinds, loot tables, gear rarity odds, monster drops, keys, boss chest
 │   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
 │   ├── bounties.js        the bounty board: kinds of job, counts, coins, rare-piece chance, where the board stands
+│   ├── sets.js            gear sets: each world's pieces and their two- and three-piece bonuses (burn, chill, healing...)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   └── critters.js        ambient animal looks
@@ -469,7 +481,8 @@ src/
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
 ├── items/                 ItemRegistry (validated item catalogue), itemActions (what each category does),
-│                          gear (rarity -> stats, totals, caps) and crafting (recipe rules); all pure
+│                          gear (rarity -> stats, totals, caps), sets (worn sets -> bonuses) and crafting (recipe
+│                          rules); all pure
 ├── inventory/             Inventory: slot storage, stacking, capacity, moving / swapping, events (pure)
 ├── entities/              things that live and move in the world
 │   ├── player/            Player (movement, model swap, placement) and pose animation
@@ -711,6 +724,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |
 | Bounty board: kinds of job, counts, coins, material, rare-piece chance, board placement | `src/config/bounties.js` → `BOUNTIES` |
+| Gear sets: pieces, two- and three-piece bonuses (burn, chill, healing, swimming, push), burn tick | `src/config/sets.js` → `SETS`, `BURN_TICK` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
@@ -747,7 +761,8 @@ chest holds its crown and a piece of gear. Gifts that don't fit are set down at 
 piece rolls its own rarity (`props.rarity`, odds in `GEAR_RARITY`), and `RARITIES[r].statMult` scales its stats, so a
 Legendary Ember Ring is more than twice a Common one. Worn gear lives in `player.equipment` (not the bag), and the
 hero's stats are always `computeStats()` = base stats, grown to their level, plus gear (`items/gear.js`, with caps per
-stat in `STATS`): damage, max HP / mana, regeneration, armour and move speed.
+stat in `STATS`): damage, max HP / mana, regeneration, armour and move speed, plus `setFx`: the bonuses of the sets being
+worn (`items/sets.js`, data in `config/sets.js`; only distinct pieces the hero can wear count).
 
 **Crafting.** The bag's Craft tab lists every recipe the hero can use (`config/crafting.js`): Glowcaps, Ember Shards
 and Frost Petals become tonics, stews, draughts, Lantern Keys and gear. Crafted gear comes out at a set rarity.
