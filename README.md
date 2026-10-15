@@ -7,7 +7,7 @@ A tiny cozy planet of lanterns, moss and friendly critters: a third-person brows
 code). Pick the Girl Witch, the Boy Warrior or the Elf Archer, explore hilly little planets, help the villagers, open
 treasure chests, gear up, raise a pet, claim and furnish a cottage, and fight the monsters beyond the village lanterns.
 
-![The village of Lanternmoss](docs/screenshots/village.jpg)
+![The village of Lanternmoss](docs/screenshots/village/village.jpg)
 
 **Campaign:** every planet has a boss in a lair on its far side, marked by a shaft of light. Defeat it, open the treasure
 chest it leaves, and choose your next destination at the village lantern gate (Lanternmoss, Emberfall or Frostveil),
@@ -19,8 +19,8 @@ dragon, and Malgrath, the two-phase Winged Demon Lord.
 *Screenshots of the current version (retaken after every major update: see [Refreshing the screenshots](#refreshing-the-screenshots)).*
 
 <p>
-  <img src="docs/screenshots/title.jpg" width="49%" alt="Title screen">
-  <img src="docs/screenshots/select.jpg" width="49%" alt="Character select">
+  <img src="docs/screenshots/huds/title.jpg" width="49%" alt="Title screen">
+  <img src="docs/screenshots/characters/select.jpg" width="49%" alt="Character select">
 </p>
 
 **Three heroes.** The title screen shows the campaign ahead; the hero select compares the Girl Witch (arcane spells),
@@ -28,8 +28,8 @@ the Boy Warrior (a two-handed axe and a guard) and the Elf Archer (a longbow), w
 rating chart. Each hero has four abilities plus an aimed ultimate (Meteor, Leap Slam, Arrow Rain).
 
 <p>
-  <img src="docs/screenshots/select-pet.jpg" width="49%" alt="Choosing a pet">
-  <img src="docs/screenshots/pets.jpg" width="49%" alt="The pet menu">
+  <img src="docs/screenshots/pets/select-pet.jpg" width="49%" alt="Choosing a pet">
+  <img src="docs/screenshots/pets/pets.jpg" width="49%" alt="The pet menu">
 </p>
 
 **And a pet.** After the hero comes the pet: each one shows off in front of the hero with its stats, its strike and its
@@ -38,8 +38,8 @@ to show your pet: swap, rename and command them there. Each hero remembers the p
 still view on these screens instead of circling.
 
 <p>
-  <img src="docs/screenshots/dialogue.jpg" width="49%" alt="Talking to Fern">
-  <img src="docs/screenshots/night.jpg" width="49%" alt="The village at night">
+  <img src="docs/screenshots/npcs/dialogue.jpg" width="49%" alt="Talking to Fern">
+  <img src="docs/screenshots/village/night.jpg" width="49%" alt="The village at night">
 </p>
 
 **A living village.** Villagers keep a daily schedule on a day / night clock, sleep at night (some go home to bed),
@@ -47,8 +47,8 @@ remember your adventure, talk with portraits and expressions, and hand out mini-
 Pim runs the bakery shop by day; each later planet has a local of its own.
 
 <p>
-  <img src="docs/screenshots/house.jpg" width="49%" alt="Inside Pim's bakery">
-  <img src="docs/screenshots/chest.jpg" width="49%" alt="Opening a Lantern chest">
+  <img src="docs/screenshots/village/house.jpg" width="49%" alt="Inside Pim's bakery">
+  <img src="docs/screenshots/activities/chest.jpg" width="49%" alt="Opening a Lantern chest">
 </p>
 
 **Houses and treasure.** Walk into the village houses: furniture to use (a bed to nap or sleep till morning, chests,
@@ -56,8 +56,8 @@ bookshelves with lore, a kettle, an oven), and the people who live there. Out in
 Lantern chests (find a Lantern Key) and a boss treasure chest after every boss.
 
 <p>
-  <img src="docs/screenshots/combat.jpg" width="49%" alt="A fight with goblins">
-  <img src="docs/screenshots/boss-dragon.jpg" width="49%" alt="Pyrrhax, the red dragon">
+  <img src="docs/screenshots/mobs/combat.jpg" width="49%" alt="A fight with goblins">
+  <img src="docs/screenshots/bosses/boss-dragon.jpg" width="49%" alt="Pyrrhax, the red dragon">
 </p>
 
 **Combat.** Attacks go where your hero faces, with a soft lock-on in front of them. Turn by moving, or click the ground
@@ -66,9 +66,9 @@ their marker ahead of you (the wheel sets the distance). Damage numbers and hit-
 and every boss has telegraphed attacks to read and dodge.
 
 <p>
-  <img src="docs/screenshots/farm.jpg" width="32.5%" alt="The village farm">
-  <img src="docs/screenshots/fishing.jpg" width="32.5%" alt="Fishing: the reeling meter">
-  <img src="docs/screenshots/gathering.jpg" width="32.5%" alt="Mining a copper vein">
+  <img src="docs/screenshots/village/farm.jpg" width="32.5%" alt="The village farm">
+  <img src="docs/screenshots/activities/fishing.jpg" width="32.5%" alt="Fishing: the reeling meter">
+  <img src="docs/screenshots/activities/gathering.jpg" width="32.5%" alt="Mining a copper vein">
 </p>
 
 **Living off the land.** Your hero has an energy meter beside the XP bar. It drains slowly as you play, faster when you
@@ -85,8 +85,8 @@ Cook what you gather into meals with buffs (Mighty, Stoneskin, Quickstep, Mendin
 mana, toughen you or speed you up.
 
 <p>
-  <img src="docs/screenshots/storm.jpg" width="49%" alt="A storm over the village">
-  <img src="docs/screenshots/meadow.jpg" width="49%" alt="A deer and a bunny in the meadows">
+  <img src="docs/screenshots/world/storm.jpg" width="49%" alt="A storm over the village">
+  <img src="docs/screenshots/critters/meadow.jpg" width="49%" alt="A deer and a bunny in the meadows">
 </p>
 
 **Living planets.** Each planet grows its own trees: blossoms, oaks, willows by the water and birches on Lanternmoss,
@@ -96,8 +96,8 @@ blizzards on Frostveil. Bunnies hop away, deer bolt when you get close, frogs ri
 overhead. A golden koi swims in every lake.
 
 <p>
-  <img src="docs/screenshots/rare.jpg" width="49%" alt="Befriending the Golden Moonbunny">
-  <img src="docs/screenshots/dragontoad.jpg" width="49%" alt="Puddle the dragontoad">
+  <img src="docs/screenshots/critters/rare.jpg" width="49%" alt="Befriending the Golden Moonbunny">
+  <img src="docs/screenshots/pets/dragontoad.jpg" width="49%" alt="Puddle the dragontoad">
 </p>
 
 **Rare creatures and a new pet.** Each planet hides a rare creature: a Golden Moonbunny, an Ember Salamander, an Aurora
@@ -106,8 +106,8 @@ hatches into the dragontoad, a hopping, croaking pet whose Bellow stuns monsters
 mid-adventure.
 
 <p>
-  <img src="docs/screenshots/hydra.jpg" width="49%" alt="The Hydra">
-  <img src="docs/screenshots/basilisk.jpg" width="49%" alt="The Basilisk's gaze">
+  <img src="docs/screenshots/mobs/hydra.jpg" width="49%" alt="The Hydra">
+  <img src="docs/screenshots/mobs/basilisk.jpg" width="49%" alt="The Basilisk's gaze">
 </p>
 
 **Mini bosses.** Out in the wilds, away from the planet bosses:
@@ -117,8 +117,8 @@ mid-adventure.
 Both always leave a rare haul of loot.
 
 <p>
-  <img src="docs/screenshots/summon.jpg" width="49%" alt="Gloomcap wakes">
-  <img src="docs/screenshots/arena.jpg" width="49%" alt="Inside the ring of thorns">
+  <img src="docs/screenshots/bosses/summon.jpg" width="49%" alt="Gloomcap wakes">
+  <img src="docs/screenshots/bosses/arena.jpg" width="49%" alt="Inside the ring of thorns">
 </p>
 
 **Bosses you earn.** Each boss sleeps in a sealed lair until you've earned the fight:
@@ -131,8 +131,8 @@ When you walk in ready, the camera turns to the lair, the boss rises with its na
 ring of thorns or fire closes around the arena until one of you falls.
 
 <p>
-  <img src="docs/screenshots/mesas.jpg" width="49%" alt="Emberfall's mesas">
-  <img src="docs/screenshots/swim.jpg" width="49%" alt="Swimming in a lake">
+  <img src="docs/screenshots/world/mesas.jpg" width="49%" alt="Emberfall's mesas">
+  <img src="docs/screenshots/characters/swim.jpg" width="49%" alt="Swimming in a lake">
 </p>
 
 **Bigger, varied worlds.** Each planet has its own shape: Lanternmoss rolls with grassy hills, Emberfall rises in mesas
@@ -141,8 +141,8 @@ boulders can be climbed and stood on, and ponds and lakes can be waded into and 
 circle and each boss arena sit on level ground.
 
 <p>
-  <img src="docs/screenshots/boss-demon.jpg" width="49%" alt="Malgrath, the Winged Demon Lord">
-  <img src="docs/screenshots/bag.jpg" width="49%" alt="The bag with gear">
+  <img src="docs/screenshots/bosses/boss-demon.jpg" width="49%" alt="Malgrath, the Winged Demon Lord">
+  <img src="docs/screenshots/huds/bag.jpg" width="49%" alt="The bag with gear">
 </p>
 
 **Gear.** The bag's right side is the equipment side, like Minecraft. Your hero stands between the worn slots: head,
@@ -152,8 +152,8 @@ right under the bag. Monsters drop food, materials and gear. Food, tonics, gear 
 hold one, then use it (eat, drink, equip, or work with it).
 
 <p>
-  <img src="docs/screenshots/stations.jpg" width="49%" alt="The village's crafting corner">
-  <img src="docs/screenshots/crafting.jpg" width="49%" alt="The Craft tab at the forge">
+  <img src="docs/screenshots/village/stations.jpg" width="49%" alt="The village's crafting corner">
+  <img src="docs/screenshots/huds/crafting.jpg" width="49%" alt="The Craft tab at the forge">
 </p>
 
 **Crafting stations.** Every village has a crafting corner with four stations:
@@ -174,7 +174,7 @@ Ember or Frost rune to a weapon, armour piece or trinket at the forge, preservin
 favourites and enchantments are saved with the adventure. [Recipes and rules](docs/crafting.md).
 
 <p>
-  <img src="docs/screenshots/enchanting.jpg" width="49%" alt="The Enchant tab with a worn weapon and three rune choices">
+  <img src="docs/screenshots/huds/enchanting.jpg" width="49%" alt="The Enchant tab with a worn weapon and three rune choices">
 </p>
 
 **Smelting.** At the forge, ore and fuel become ingots: copper ore makes copper ingots, and iron ore makes iron ingots.
@@ -183,7 +183,7 @@ make the metal tools, weapons, armour and trinket settings. That includes the Ir
 than a tree or vein needs takes fewer swings.
 
 <p>
-  <img src="docs/screenshots/pet-field.jpg" width="49%" alt="Out with the dragon whelp">
+  <img src="docs/screenshots/pets/pet-field.jpg" width="49%" alt="Out with the dragon whelp">
 </p>
 
 **Crafting and pets.** Wood, stone, ore, gems, herbs and the planets' own materials craft into tools, meals, potions,
@@ -192,8 +192,8 @@ grow with you, take commands (follow, stay, attack, passive), have an ability of
 and new ones are found through quests and chests: an owl, a wolf, a fox, a wisp and a dragon whelp.
 
 <p>
-  <img src="docs/screenshots/journal.jpg" width="49%" alt="The journal: achievements">
-  <img src="docs/screenshots/bestiary.jpg" width="49%" alt="The journal: bestiary">
+  <img src="docs/screenshots/huds/journal.jpg" width="49%" alt="The journal: achievements">
+  <img src="docs/screenshots/huds/bestiary.jpg" width="49%" alt="The journal: bestiary">
 </p>
 
 **A journal.** `J` (or Journal on the pause menu or the title screen) opens your journal. **Achievements** cover
@@ -204,8 +204,8 @@ its stats per planet and its drops once you've beaten one. The **Collection** sh
 is kept on your device across adventures.
 
 <p>
-  <img src="docs/screenshots/bounty-board.jpg" width="49%" alt="The bounty board beside the Lanternmoss square">
-  <img src="docs/screenshots/bounty-window.jpg" width="49%" alt="The bounty board window: three jobs ready to claim">
+  <img src="docs/screenshots/village/bounty-board.jpg" width="49%" alt="The bounty board beside the Lanternmoss square">
+  <img src="docs/screenshots/huds/bounty-window.jpg" width="49%" alt="The bounty board window: three jobs ready to claim">
 </p>
 
 **A bounty board.** Every village has a notice board near the square with three small jobs a day: defeat a few of a
@@ -216,8 +216,8 @@ and the planet's material, now and then a rare piece of gear, and its note turns
 each planet keeps its own board, and the journal counts the bounties you claim.
 
 <p>
-  <img src="docs/screenshots/photo-mode.jpg" width="49%" alt="Photo mode: the toolbar over a polaroid-framed shot of the witch waving">
-  <img src="docs/screenshots/photo-storybook.jpg" width="49%" alt="Photo mode: night filter and storybook frame, toolbar hidden">
+  <img src="docs/screenshots/activities/photo-mode.jpg" width="49%" alt="Photo mode: the toolbar over a polaroid-framed shot of the witch waving">
+  <img src="docs/screenshots/activities/photo-storybook.jpg" width="49%" alt="Photo mode: night filter and storybook frame, toolbar hidden">
 </p>
 
 **Photo mode.** `K` pauses the world, hides the HUD and hands you the camera: drag (or `W A S D` / arrows) to orbit the
@@ -227,8 +227,8 @@ while your pet comes round to show off too. `Enter` or **Save** downloads exactl
 and frame included and the toolbar left out. `H` hides the toolbar to look at the shot; `K` or `Esc` goes back to play.
 
 <p>
-  <img src="docs/screenshots/keys.jpg" width="49%" alt="Settings: Keys">
-  <img src="docs/screenshots/controls.jpg" width="49%" alt="The Controls page">
+  <img src="docs/screenshots/huds/keys.jpg" width="49%" alt="Settings: Keys">
+  <img src="docs/screenshots/huds/controls.jpg" width="49%" alt="The Controls page">
 </p>
 
 **Your keys.** The HUD keeps the hotbar and vitals at the bottom centre, skills on the lower right and your pet on the
@@ -322,8 +322,9 @@ at every quality. See [the performance measurements and browser-check setup](doc
 
 ### Refreshing the screenshots
 
-The pictures above live in `docs/screenshots/` and are retaken after every major update by playing staged scenes in
-headless Chrome (a few minutes with software rendering):
+The pictures above live in `docs/screenshots/`, one folder per subject (`characters`, `pets`, `critters`, `mobs`, `bosses`,
+`npcs`, `village`, `building`, `world`, `activities`, `huds`; the list is in `scripts/shots.mjs`). They are retaken
+after every major update by playing staged scenes in headless Chrome (a few minutes with software rendering):
 
 ```sh
 npm i --no-save puppeteer-core     # once; not a project dependency
@@ -338,7 +339,8 @@ node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downl
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
-gets a scene in `scripts/screenshots.mjs` and a spot in the tour above.
+gets a scene in `scripts/screenshots.mjs` and a spot in the tour above; every new shot is first given a folder in
+`scripts/shots.mjs` (saving one without a folder stops the script).
 
 ### Controls
 
@@ -377,8 +379,9 @@ index.html                 markup only: HUD, dialogue box, challenge panel, char
 styles/main.css            all styling
 scripts/serve.mjs          zero-dependency dev server
 scripts/screenshots.mjs    retakes the README screenshots (headless Chrome)
+scripts/shots.mjs          which folder of docs/screenshots/ each screenshot belongs in
 scripts/save-smoke.mjs     checks real browser save/reload/export/import; retakes save-menu screenshots
-docs/screenshots/          the README screenshots
+docs/screenshots/          the README screenshots, one folder per subject (characters, mobs, huds...)
 docs/logs/                 timestamped decisions, tasks, actions and verification
 docs/typography.md         the type brief, the pairings compared (type-specimen.html) and the choice
 tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
@@ -770,8 +773,8 @@ A new gear stat = an entry in `STATS` plus where it's read (like `damageBonus` i
 ## Saving an adventure
 
 <p>
-  <img src="docs/screenshots/continue.jpg" width="49%" alt="Continue a saved adventure">
-  <img src="docs/screenshots/save-menu.jpg" width="49%" alt="Save, export and import in the pause menu">
+  <img src="docs/screenshots/huds/continue.jpg" width="49%" alt="Continue a saved adventure">
+  <img src="docs/screenshots/huds/save-menu.jpg" width="49%" alt="Save, export and import in the pause menu">
 </p>
 
 The browser keeps one adventure. Choose **Continue** to resume, or **New Adventure** to replace it after confirmation.

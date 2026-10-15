@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8106;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -28,7 +29,7 @@ try {
     assert.deepEqual(title.acts,['Act I','Act II']);assert.equal(title.planned,3);assert.equal(title.actions,0);assert.ok(title.fits);
     assert.ok(!title.text.includes('Nyxra')&&!title.text.includes('Lantern Moon'));
     await page.screenshot({path:join(tmpdir(),`lanternmoss-act-two-${height}.png`)});
-    if(height===1080)await page.screenshot({path:join(root,'docs/screenshots/title.jpg'),type:'jpeg',quality:88});
+    if(height===1080)await page.screenshot({path:shotPath('title'),type:'jpeg',quality:88});
   }
   console.log('PASS  720p/1080p low-preset title previews, masked secret, planned labels and footer bounds; refreshed title screenshot');
   await page.click('[data-act="play"]');await page.evaluate(async()=>{

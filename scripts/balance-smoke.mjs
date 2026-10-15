@@ -2,10 +2,9 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8098;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let browser, stderr = ''; server.stderr.on('data', d => { stderr += d; });
 try {
@@ -41,7 +40,7 @@ try {
     if (planet === 2) { assert.equal(result.flying, true); assert.equal(result.immune, false); }
     console.log(`PASS ${hero}/${planet}: ${JSON.stringify(result)}`);
   }
-  await page.screenshot({ path: shots + 'balance-flight.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('balance-flight'), type: 'jpeg', quality: 84 });
   await page.evaluate(async () => {
     const L = window.LANTERNMOSS, { ShopUI } = await import('/src/ui/ShopUI.js');
     L.player.coins = 20; ShopUI.open(L.npcs.find(n => n.name === 'Pim'));
@@ -52,7 +51,7 @@ try {
   }
   await page.click('[data-buy="carrotSeeds"]');
   assert.equal(await page.evaluate(() => window.LANTERNMOSS.player.coins), 17);
-  await page.screenshot({ path: shots + 'balance-shop.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('balance-shop'), type: 'jpeg', quality: 84 });
   assert.deepEqual(errors, []);
   console.log('All balance browser checks passed (720p, real WebGL).');
 } finally { if (browser) await browser.close(); server.kill(); }

@@ -1,12 +1,11 @@
 // Optional real-browser check. npm i --no-save --no-package-lock puppeteer-core; CHROME selects a Chromium browser.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8096;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let serverError = '';
 server.stderr.on('data', data => { serverError += data; });
@@ -34,12 +33,12 @@ try {
   assert.match(await page.$eval('#tutorial', e => e.textContent), /A few steps/);
   await wait(3500); // Let the three-second arrival animation finish before taking the guide screenshot.
   await page.waitForFunction(() => Number(getComputedStyle(document.getElementById('cresult')).opacity) < 0.01, { timeout: 60000 });
-  await page.screenshot({ path: shots + 'tutorial.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('tutorial'), type: 'jpeg', quality: 84 });
   await page.click('[data-tutorial="help"]'); await page.waitForSelector('#journal.show');
   assert.equal(await page.evaluate(async () => (await import('/src/core/context.js')).ctx.paused), true);
   for (const label of ['Energy and recovery', 'Gathering and tools', 'Crafting stations', 'Ore into metal', 'Fishing', 'Seeds and farming', 'Your companion', 'First finds'])
     assert.ok((await page.$eval('.help-page', e => e.textContent)).includes(label), label);
-  await page.screenshot({ path: shots + 'help.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('help'), type: 'jpeg', quality: 84 });
   await page.keyboard.press('Escape'); await page.click('[data-tutorial="skip"]');
   await page.reload({ waitUntil: 'networkidle0', timeout: 90000 }); await page.waitForFunction(() => window.LANTERNMOSS);
   await page.click('[data-act="continue"]');
@@ -86,7 +85,7 @@ try {
   });
   await page.waitForSelector('#faint-screen', { visible: true });
   assert.match(await page.$eval('#faint-screen', e => e.textContent), /You fainted.*Gloomcap.*1m 13s.*Back home in/s);
-  await page.screenshot({ path: shots + 'fainted.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('fainted'), type: 'jpeg', quality: 84 });
   await page.evaluate(() => window.LANTERNMOSS.PauseMenu.open());
   const remaining = await page.evaluate(() => window.LANTERNMOSS.player.deadT); await wait(500);
   assert.equal(await page.evaluate(() => window.LANTERNMOSS.player.deadT), remaining);

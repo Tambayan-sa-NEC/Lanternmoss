@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8111;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -76,7 +77,7 @@ try{
       return {crab:crab.root.visible,jelly:jelly.root.visible&&!jelly.stranded&&!!waterAt(jelly.up),skip:skip.root.visible&&!skip.hidden,wisp:wisp.root.visible&&wisp.def.color===0x5fe8c0};
     });assert.deepEqual(shown,{crab:true,jelly:true,skip:true,wisp:true});
     await page.screenshot({path:join(tmpdir(),`lanternmoss-27e-roster-${height}.png`)});
-    if(height===720)await page.screenshot({path:join(root,'docs/screenshots/tidewhisper-enemies.jpg'),type:'jpeg',quality:88});
+    if(height===720)await page.screenshot({path:shotPath('tidewhisper-enemies'),type:'jpeg',quality:88});
     console.log(`PASS ${width}x${height} low: Shellback, floating Jellybell, surfaced Surf skipper and sea-green wisp render`);
   }
   await page.evaluate(()=>{if(!window.LANTERNMOSS.saves.save().ok)throw new Error('save');});

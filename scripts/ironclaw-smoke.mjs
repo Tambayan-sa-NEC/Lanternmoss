@@ -9,6 +9,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8112;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -70,7 +71,7 @@ try{
         return {visible:ic.root.visible,out:pose==='swap'?out>0.8:out<0.2};
       },pose);assert.deepEqual(shown,{visible:true,out:true});
       await page.screenshot({path:join(tmpdir(),`lanternmoss-27f-ironclaw-${pose}-${height}.png`)});
-      if(height===720&&pose==='shell')await page.screenshot({path:join(root,'docs/screenshots/tidewhisper-ironclaw.jpg'),type:'jpeg',quality:88});
+      if(height===720&&pose==='shell')await page.screenshot({path:shotPath('tidewhisper-ironclaw'),type:'jpeg',quality:88});
     }
     console.log(`PASS ${width}x${height} low: Old Ironclaw in its bell and out of it`);
   }

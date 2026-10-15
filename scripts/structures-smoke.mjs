@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import puppeteer from 'puppeteer-core';
-const root=fileURLToPath(new URL('..',import.meta.url)),port=8102,shots=fileURLToPath(new URL('../docs/screenshots/',import.meta.url));
+import { shotPath } from './shots.mjs';
+const root=fileURLToPath(new URL('..',import.meta.url)),port=8102;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
 try {
   await new Promise((resolve,reject)=>{server.stdout.once('data',resolve);server.once('error',reject);server.once('exit',c=>reject(new Error(stderr||`server exited ${c}`)));});
@@ -39,13 +40,13 @@ try {
   assert.equal(await page.evaluate(()=>window.LANTERNMOSS.Building.list.length),6);
   await page.waitForFunction(()=>document.getElementById('cresult').getAnimations().every(a=>a.playState==='finished'));
   await page.evaluate(async()=>{const L=window.LANTERNMOSS,{floorFrame}=await import('/src/gameplay/structureRules.js'),{dirAlong,tangentToward}=await import('/src/utils/sphere.js'),{cam,snapCamera,updateCamera}=await import('/src/systems/CameraSystem.js');const f=floorFrame(L.Building.list,L.Building.list[0]);L.player.placeAt(dirAlong(f.root.dir,f.fwd,6));L.player.fwd.copy(tangentToward(L.player.up,f.root.dir));snapCamera(L.player.up,L.player.fwd);cam.dist=10;updateCamera(.1);L.Building.updateStructureView(cam.fwd);});
-  await page.screenshot({path:shots+'structures-exterior.jpg',type:'jpeg',quality:85});
+  await page.screenshot({path:shotPath('structures-exterior'),type:'jpeg',quality:85});
   console.log('PASS real hotbar preview, rotation and Enter build a floor, four panels and supported roof');
 
   await page.evaluate(()=>window.standInside());
   await page.waitForFunction(()=>!window.LANTERNMOSS.Building.list.find(e=>e.record.itemId==='timberRoof').parts.root.visible);
   const support=await page.evaluate(async()=>{const L=window.LANTERNMOSS,{supportHeight}=await import('/src/physics/colliders.js');return{r:L.player.r,h:supportHeight(L.player.up)};});assert.ok(Math.abs(support.r-support.h)<.02);
-  await page.screenshot({path:shots+'structures-interior.jpg',type:'jpeg',quality:85});
+  await page.screenshot({path:shotPath('structures-interior'),type:'jpeg',quality:85});
   await page.keyboard.press('KeyE');await page.waitForFunction(()=>window.LANTERNMOSS.BuildingUI.isOpen);
   const ids=await page.evaluate(()=>Object.fromEntries(window.LANTERNMOSS.Building.list.map(e=>[e.record.itemId+(e.record.itemId==='timberWall'?e.record.turn:''),e.record.id])));
   await page.click(`[data-build-piece="${ids.timberWall3}"]`);await page.click('[data-build-pickup]');

@@ -9,6 +9,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8113;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -69,7 +70,7 @@ try{
         return pose==='lures'?{ok:B.lures.length>=3&&B.hidden&&L.BossGate.posts.some(p=>p.post.visible)}:{ok:B.mode==='beached'&&B.root.visible&&activeTides().status.lagoonDrained&&B.sluice.broken};
       },pose);assert.deepEqual(shown,{ok:true},`${pose} pose`);
       await page.screenshot({path:join(tmpdir(),`lanternmoss-27g-mirelure-${pose}-${height}.png`)});
-      if(height===720)await page.screenshot({path:join(root,`docs/screenshots/tidewhisper-mirelure-${pose}.jpg`),type:'jpeg',quality:88});
+      if(height===720)await page.screenshot({path:shotPath(`tidewhisper-mirelure-${pose}`),type:'jpeg',quality:88});
       console.log(`PASS ${width}x${height} low: ${pose==='lures'?'the lit lagoon in its ring of surf':'Mirelure beached on the drained floor'}`);
     }
   }
