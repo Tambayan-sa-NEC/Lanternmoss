@@ -93,3 +93,10 @@ export const ABILITY_TEXT = {
   leap: 'Hop back, away from your aim. Briefly invulnerable.',
   rain: 'Aim a spot: arrows pour down for several seconds, hurting and slowing all inside.',
 };
+
+/** Live variant copy; character selection uses the base descriptions, play uses the learned kit. */
+export function abilityText(id, ability) {
+  return id === 'fireball' && ability.homing > 0
+    ? 'Follows the foe you aim at when cast; flies straight without a target. Explodes on impact, knocking foes back.'
+    : ABILITY_TEXT[id] ?? '';
+}

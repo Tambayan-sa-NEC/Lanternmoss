@@ -261,6 +261,17 @@ try {
       await ff(1); await wait(3000); await shot('blizzard');
     }
   }
+  // The real Witch tree (no fixture): keep this README picture current with the rest of the tour.
+  await page.addStyleTag({ content: 'body.talent-proof > :not(canvas):not(#talent-menu) { display: none !important; }' });
+  await run(() => {
+    const L = window.LANTERNMOSS; L.goToPlanet(0); window.__sky('clear'); L.player.placeAt(L.planets.world.spawnDir);
+    L.player.level = 16; L.Talents.reset();
+    for (const id of ['brightBolt', 'brightBolt', 'quickFrost', 'quickFrost', 'seekingFlame', 'deepFreeze', 'deepFreeze']) L.Talents.learn(id);
+    L.PauseMenu.open(); L.TalentUI.open();
+    document.body.classList.add('talent-proof');
+  });
+  await wait(800); await shot('talents');
+  await run(() => { const L = window.LANTERNMOSS; document.body.classList.remove('talent-proof'); L.TalentUI.close(); L.PauseMenu.close(); });
   console.log('errors:', errors.length ? errors : 'none');
 } finally {
   await browser.close(); server.kill();

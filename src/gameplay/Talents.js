@@ -5,6 +5,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { TALENTS } from '../config/talents.js';
 import { ctx } from '../core/context.js';
+import { onBindsChange } from '../core/keybinds.js';
 import { emit } from '../core/events.js';
 import { cleanTalents, learnProblem, pointsEarned, pointsSpent, talentKit } from '../progression/talentRules.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -60,4 +61,7 @@ export const Talents = {
         onNo: () => chat(npc) } };
   },
 };
+
+// Talent kits copy ability labels; remapping keys must invalidate those copies too.
+onBindsChange(() => { Talents.cache = null; });
 

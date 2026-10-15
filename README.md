@@ -27,6 +27,15 @@ dragon, and Malgrath, the two-phase Winged Demon Lord.
 the Boy Warrior (a two-handed axe and a guard) and the Elf Archer (a longbow), with every ability, its keys and a
 rating chart. Each hero has four abilities plus an aimed ultimate (Meteor, Leap Slam, Arrow Rain).
 
+**Witch talents.** The Witch earns a point every two levels. Open **Talents** from the pause menu to strengthen
+Arcane Bolt, shorten Frost Nova's cooldown, make Blink cheaper, prolong frost slows, or learn **Seeking Fireball**:
+it follows the foe aimed at when cast. There are more upgrades than points, and Old Bramble resets them for free.
+The Warrior and Ranger trees follow in 28d/28e. See [the tree, costs and saves](docs/talents.md).
+
+<p>
+  <img src="docs/screenshots/huds/talents.jpg" width="75%" alt="The Witch's talent tree with learned spells and points">
+</p>
+
 <p>
   <img src="docs/screenshots/pets/select-pet.jpg" width="49%" alt="Choosing a pet">
   <img src="docs/screenshots/pets/pets.jpg" width="49%" alt="The pet menu">
@@ -346,7 +355,8 @@ node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p lay
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
-node scripts/talents-smoke.mjs     # talents on a test-only tree: Esc/Talents/Learn clicks, Continue, Old Bramble's reset (E); retakes its shot
+node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
+node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
@@ -434,7 +444,7 @@ src/
 │   ├── sets.js            gear sets: each world's pieces and their two- and three-piece bonuses (burn, chill, healing...)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
-│   ├── talents.js         talent points per level, the reset wizard, and each hero's tree (unreleased until 28c-28e)
+│   ├── talents.js         talent points, reset wizard and trees (Witch available; Warrior/Ranger staged for 28d/28e)
 │   └── critters.js        ambient animal looks
 ├── core/
 │   ├── Game.js            startup order, per-frame update order, run lifecycle (begin / reset)

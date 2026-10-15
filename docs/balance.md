@@ -33,6 +33,30 @@ optional power from crafting or finding a world's pieces: Moss heals up to 30% m
 hit over 3 s (a refreshed burn, so fast hitters gain less than slow heavy ones), Frost slows up to 35%. Bosses keep
 their slow and knock resistance.
 
+## Witch talents (28c)
+
+The original duel targets remain base-kit, starting-gear targets. Learned talents are optional power. A paired
+level-8 diagnostic in `tests/sim/witchTalents.sim.mjs` compares an unlearned Witch with Bright Bolt rank 2 and
+Seeking Flame (four earned points). Real enemy AI, casts and projectile hits run in an isolated dry arena, without
+scenery colliders, with a passive pet and invulnerability. Both profiles start with full HP/mana, fresh needs,
+buffs/cooldowns and a reset gameplay seed. These short throughput probes are not summon-level target certification,
+boss measurements or evidence that a human survives without dodging. Unchanged hero controls may differ by up to
+two simulation frames because the surrounding world continues advancing between trials.
+
+| Hero / regular foe | Seed 1 base → talents | Seed 7 base → talents |
+| --- | --- | --- |
+| Witch / goblin | 1.350 → 1.350 s | 1.350 → 1.350 s |
+| Witch / ogre | 1.833 → 1.533 s | 1.833 → 1.533 s |
+| Warrior / goblin | 1.867 → 1.867 s | 1.867 → 1.867 s |
+| Warrior / ogre | 2.300 → 2.300 s | 2.300 → 2.300 s |
+| Ranger / goblin | 1.517 → 1.500 s | 1.500 → 1.500 s |
+| Ranger / ogre | 1.117 → 1.117 s | 1.117 → 1.117 s |
+
+The Witch's ogre sample improved by 16%; the goblin still fell on the same spell hit. A separate moving-target test
+records a missed straight Fireball and a successful seeking explosion (33.0 damage at level 16 in both seeds).
+Seeking Flame changes guidance, not damage, blast size, cost or range. Full mixed-set and three-tree acceptance
+remains TODO 28e; no balance target was changed for these talents.
+
 ## Campaign and economy
 
 The audited route completes Humming Stones, Pie Delivery and First Harvest on Lanternmoss (three wisps and three

@@ -1,7 +1,7 @@
 // TODO 28b (talent rules, saves and UI) on the test-only fixture tree: points come from levels, learning changes the
 // real casts (cost, cooldown) through kit(), Continue and repeated reloads never add points, a tampered save is
 // trimmed to what the level earned, Old Bramble's free reset restores the base kit, a new adventure starts empty, and
-// with the real (unreleased) tree nothing is offered to players.
+// the production witch tree has its page, but no reset offer before learning.
 import assert from 'node:assert/strict';
 import { boot, imp } from './lib/boot.mjs';
 import { installTalentFixture } from './lib/talentFixture.mjs';
@@ -15,14 +15,14 @@ const P = H.player, T = H.Talents, base = CHARACTERS.witch.abilities;
 const pass = m => console.log(`PASS  ${m}`);
 H.Tutorial.skip(); H.Pets.command('passive'); P.invuln = 1e9; step(0.3);
 
-// ---- unreleased: nothing for players -----------------------------------------------------------------------------------
+// ---- production tree: page offered, no reset needed before learning ----------------------------------------------------
 const bramble = H.npcs.find(n => n.name === 'Old Bramble');
 assert.ok(bramble, 'Old Bramble is in the village');
-assert.equal(T.open, false); assert.equal(kit(), base);
+assert.equal(T.open, true); assert.equal(kit(), base);
 const { dom } = await imp('ui/dom.js');
-PauseMenu.open(); assert.ok(!dom.pause.innerHTML.includes('data-go="talents"'), 'no Talents button while the tree is unreleased'); PauseMenu.close();
+PauseMenu.open(); assert.ok(dom.pause.innerHTML.includes('data-go="talents"'), 'the completed witch tree has a Talents button'); PauseMenu.close();
 assert.equal(T.wizardLine(bramble, () => null), null);
-pass('with the real, unreleased tree: no Talents button, no wizard offer, and the base kit');
+pass('with the real witch tree: a Talents button, no reset offer before learning, and the base kit');
 
 // ---- the fixture tree: points from levels, learning changes real casts -------------------------------------------------
 const fixture = installTalentFixture('witch');
@@ -60,5 +60,5 @@ pass(`Old Bramble's free reset gave ${spent} points back and restored the base k
 // ---- a new adventure starts with nothing learned -----------------------------------------------------------------------
 T.learn('sharpBolt'); assert.ok(T.spent > 0);
 game.resetRun(); assert.deepEqual(T.ranks, {});
-fixture.restore(); assert.equal(T.open, false);
+fixture.restore(); assert.equal(T.open, true);
 pass('a new adventure starts with no talents');
