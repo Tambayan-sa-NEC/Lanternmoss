@@ -1700,6 +1700,28 @@ branch completion workflow in `docs/logs/`. The detailed visual plan remains **n
 
 ---
 
+## 44. UI and HUD visual overhaul **(suggested, lowest priority)**
+
+**Goal:** a fresher, more consistent look for every screen: the in-play HUD, the bag and its tabs, menus, dialogue and
+windows, with the same information and controls as today.
+Code: `styles/main.css`, `index.html`, `src/ui/` (HUD, bag, journal, menus, windows), `src/ui/itemArt.js` and icons.
+**Size:** L. **Needs:** nothing, but it comes **last**: after the remaining worlds and features, so screens are restyled
+once, when their content has settled. Added 2026-10-15 at the user's request as the least concern.
+**Risk:** hiding combat information (cooldowns, key hints, telegraphs, boss bars) for a cleaner look, or a restyle
+that breaks layouts at 720p. **Recommendation:** restyle shared parts first (panel, button, slot, text), keep every
+value and key hint visible, and recheck each screen with its existing smoke at 720p and 1080p. If the
+[visual upgrade plan](docs/plans/visual-upgrade.md) is ever activated, its V13 (interface) replaces this item rather
+than running alongside it.
+
+- [ ] **Shared look:** one set of panel surfaces, spacing, borders, buttons, slots and text sizes for every window.
+- [ ] **HUD:** vitals, skills, hotbar, pet and boss cards, compass, prompts, quest and tutorial panels, toasts.
+- [ ] **Menus and windows:** title, character/pet select, bag/craft/enchant, shop, journal, portals, home/building,
+      bounty board, photo mode, pause, settings and keys.
+- [ ] **Check it:** every existing browser smoke passes; 720p/1080p have no overlap; text scaling and keyboard focus still
+      work; the README tour is retaken and spot-checked.
+
+---
+
 ## Suggested additions
 
 Smaller ideas, and where the promoted ones went.
