@@ -24,6 +24,7 @@ import { bindKbd } from '../core/keybinds.js';
 import { craftProblem, maxCraftable, recipesFor, requirements } from '../items/crafting.js';
 import { enchantProblem } from '../items/enchanting.js';
 import { formatStat, gearTotals } from '../items/gear.js';
+import { setSummary } from '../items/sets.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { dom } from './dom.js';
 import { icon } from './icons.js';
@@ -198,7 +199,9 @@ export const InventoryUI = {
     const pieces = Object.values(worn).filter(Boolean).map(w => ({ def: reg.get(w.itemId), props: w.props }));
     const t = gearTotals(pieces, P.charId), res = titleCase(CHARACTERS[P.charId].resource).toLowerCase();
     const parts = Object.entries(t).filter(([, v]) => v).map(([k, v]) => formatStat(k, v, res));
-    this.gearStats.innerHTML = parts.length ? `<b>Gear:</b> ${parts.join(' · ')}` : '<span class="dim">Nothing worn yet: equip a weapon, armour, boots or a trinket.</span>';
+    const sets = setSummary(pieces, P.charId).map(s => `<div class="inv-set" style="--set:${s.color}"><b>${s.name} ${s.count}/${s.total}</b> ` +
+      s.bonuses.map(b => `<span class="${b.active ? 'on' : 'off'}">${b.at}: ${b.text}</span>`).join(' · ') + '</div>').join('');
+    this.gearStats.innerHTML = (parts.length ? `<b>Gear:</b> ${parts.join(' · ')}` : '<span class="dim">Nothing worn yet: equip a weapon, armour, boots or a trinket.</span>') + sets;
   },
 
   renderDetail() {

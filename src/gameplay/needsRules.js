@@ -14,9 +14,9 @@ export function needEffects(energy, N = NEEDS) {
   return l === 'fed' ? { regen: 1, sprint: 1 } : { regen: N[l].regen, sprint: N[l].sprint };
 }
 
-/** Energy lost per second: a little all the time, more while sprinting or swimming. */
-export function drainRate({ sprinting = false, swimming = false } = {}, N = NEEDS) {
-  return N.drain + (sprinting ? N.sprint : 0) + (swimming ? N.swim : 0);
+/** Energy lost per second: a little all the time, more while sprinting or swimming (swimCut: the Tide set's share off). */
+export function drainRate({ sprinting = false, swimming = false, swimCut = 0 } = {}, N = NEEDS) {
+  return N.drain + (sprinting ? N.sprint : 0) + (swimming ? N.swim * (1 - swimCut) : 0);
 }
 
 /** The warning shares (NEEDS.warnings) crossed going from `before` to `after`. */
