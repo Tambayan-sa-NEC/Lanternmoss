@@ -115,7 +115,8 @@ With a rod on the hotbar, **E** near seawater fishes using the existing bite/ree
 common coastal catch and golden koi remain rare. The float follows the live tide and cancels if its water dries.
 At a cooking pot, make salted fish (sprat + salt), seaweed rolls (seaweed + sprat) and coastal chowder (clams +
 sprat + salt). At a forge, craft the Tide Circlet, Mantle and Boots from glass, pearls, coral and shells; a Tide
-Pendant uses a black pearl, glass and shells. These pieces use the existing equip/save/stat rules and are
+Pendant uses a black pearl, glass and shells. Since 27h they also carry forge fees (circlet 70, mantle 80, boots 70,
+pendant 60 coins: 280 for the set), which Tidewhisper's chests and lighthouse quest reserve. These pieces use the existing equip/save/stat rules and are
 explicitly crafted, so they cannot leak into Act I random gear rewards. Their set identity is recorded; bonuses
 remain TODO 28a.
 

@@ -92,8 +92,8 @@ the frame/draw budgets. A JSON file copied from another device or synthetic test
 
 ## Finish 27h
 
-1. Duel timing bands pass on both seeds for all heroes. Still open: review campaign XP, gathering, recipes and
-   resource availability (the `pacing` audit covers only the three Act I worlds). Rerun affected checks after changes.
+1. Done: duel timing bands pass on both seeds for all heroes, and the `pacing` audit now covers Tidewhisper's XP
+   route, coin budget (new Tide forge fees, 280 coins) and two-day material yields (see `docs/balance.md`).
 2. Obtain passing Iris Xe evidence for the final candidate. Re-measure after material rendering changes.
 3. Enable the destination only after its full gate passes. Update release-dependent tests, title/portal/journal
    expectations, player-facing tour and affected screenshots. Recheck old v1 saves and the real travel/Continue path.

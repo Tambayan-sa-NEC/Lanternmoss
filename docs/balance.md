@@ -37,6 +37,7 @@ Farming and gathering requirements still need play time; this is an XP route aud
 | Lanternmoss | 3 | 2 | 195–206 | 160 | 12 |
 | Emberfall | 5 | 4 | 226–237 | 220 | 46 |
 | Frostveil | 7 | 6 | 305–330 | 300, including two trinkets | 30 |
+| Tidewhisper (27h, unreleased) | 8 | 8 | 281–360 | 280, its own Tide set and pendant | 39 |
 
 The bounds cover every possible chest coin roll, including each planet?s boss chest. The pacing audit also samples 100 loot seeds for each hero/world.
 Selling **all** chest contents adds 101–207, 141–261 and 180–407 coins respectively in that sample, but sacrifices
@@ -49,6 +50,14 @@ Chest coins now have narrower ranges (common 8–9, rare 22–24) and increase b
 Warm Hearts 90 and Songs 40 coins; the earlier villager rewards remain 95 total. Boss kill XP is now 80/150/330 after
 planet scaling, avoiding the old early level jump while preserving the existing XP curve. Optional fights retain
 their rewards. Pim's seed prices are 3/3/5; every stocked item's buy price remains above its sell price.
+
+Tidewhisper is audited with its real id and planet index while it stays unreleased. Act I already ends at level 8,
+its summon level, so its route (The Dark Lighthouse and three Shellbacks crossing the beach) keeps the hero at 8
+without grinding. With no Act II gear beyond it yet, its coins reserve its own Tide set: the forge fees are 70/80/70
+and 60 for the pendant. Its materials are audited at minimum yields: washups return once per 300 s day and low-tide
+nodes are reachable once per day. The lens (6 seaglass, 6 wood) fits the first day, and the lens plus the whole set
+(28 seaglass, 14 wood including forge fuel, 4 pearls, 6 coral, 9 shells, 1 black pearl) fits two days. Revisit the
+budget when Duskhollow's gear exists.
 
 ## Survival, gathering and crafting
 

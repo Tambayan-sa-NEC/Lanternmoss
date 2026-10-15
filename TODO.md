@@ -1125,7 +1125,8 @@ Mirelure's breathing clue now shares its clock with the bubbles, and diving canc
 Candidate checks use the real fourth-world id and save schema; they exposed missing forage/chest configuration,
 which is now explicit. The normal release flag remains off. Initial Intel UHD diagnostics do not meet the required
 Iris Xe evidence. Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
-Mirelure HP 3250); the campaign XP/resource review remains. This is a **no-go** for
+Mirelure HP 3250), and the pacing audit covers Tidewhisper's XP, coins (new Tide forge fees) and materials.
+Iris Xe certification and the release itself remain. This is a **no-go** for
 release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/tidewhisper-release.md).
 
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
