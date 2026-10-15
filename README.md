@@ -204,6 +204,17 @@ its stats per planet and its drops once you've beaten one. The **Collection** sh
 is kept on your device across adventures.
 
 <p>
+  <img src="docs/screenshots/photo-mode.jpg" width="49%" alt="Photo mode: the toolbar over a polaroid-framed shot of the witch waving">
+  <img src="docs/screenshots/photo-storybook.jpg" width="49%" alt="Photo mode: night filter and storybook frame, toolbar hidden">
+</p>
+
+**Photo mode.** `K` pauses the world, hides the HUD and hands you the camera: drag (or `W A S D` / arrows) to orbit the
+hero, the wheel to zoom and `Q` / `E` to tilt the horizon, all within a short range of the hero. The toolbar (or `1`–`6`)
+picks a filter (warm, night, pastel), a frame (polaroid or storybook), a pose (wave, cheer, bow) and an emote bubble,
+while your pet comes round to show off too. `Enter` or **Save** downloads exactly what the camera sees as a PNG, filter
+and frame included and the toolbar left out. `H` hides the toolbar to look at the shot; `K` or `Esc` goes back to play.
+
+<p>
   <img src="docs/screenshots/keys.jpg" width="49%" alt="Settings: Keys">
   <img src="docs/screenshots/controls.jpg" width="49%" alt="The Controls page">
 </p>
@@ -310,6 +321,7 @@ node scripts/crafting-smoke.mjs    # bulk crafting, discovery, enchanting and re
 node scripts/structures-smoke.mjs  # structure controls, support/pickup, door movement and reload Continue
 node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
+node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
@@ -336,6 +348,7 @@ over). The defaults:
 | `N` | swap to your next pet right away |
 | `T` | pet command: follow → stay → attack my target → passive |
 | `J` | the journal: achievements, bestiary and collection (pauses; also on the pause menu and title screen) |
+| `K` | photo mode: pauses, hides the HUD; orbit / zoom / `Q` `E` tilt, `1`–`6` filter, frame, pose, emote, `Enter` saves a PNG, `H` hides the toolbar |
 | `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
 | drag / wheel | rotate / zoom camera (the view only: aiming follows the hero's facing) |
 | `Esc` / `P` | pause menu: resume, settings, controls, quit (Esc first closes the bag, aiming or dialogue) |
@@ -369,6 +382,7 @@ src/
 │   ├── render.js          pixel ratio, fog, bloom, outline width
 │   ├── combat.js          spells, enemy and boss stats, boss attacks and phases, XP per enemy, pet marks
 │   ├── pets.js            every pet: body, attack, ability, unlock; pet growth, care, commands, keys, motion
+│   ├── photo.js           photo mode: camera limits, filters, frames, poses, emotes, the picture's file name
 │   ├── planets.js         ordered catalog, released campaign views and transition timings
 │   ├── planets/           one config per world: seeds, content, NPCs, house overrides and release metadata
 │   ├── planetRules.js     release, secret-unlock, completion and population rules
@@ -515,7 +529,7 @@ src/
 │                          dialogue, challenge panel, banner + travel fade,
 │                          InventoryUI + itemTooltip (the bag window: the grid, the equipment side, the details
 │                          window under it, and the Craft tab), itemArt (SVG item
-│                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play),
+│                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play), PhotoMode (photo mode),
 │                          petViews (pet cards and detail panels for both pet screens), showcase (the menus' still
 │                          camera framings of the hero and pet, and finding a clear view for them),
 │                          itemNotices (item toasts), JournalUI (the journal screen: achievements, bestiary,
@@ -679,6 +693,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
+| Photo mode: camera range, filters, frames, poses, emotes | `src/config/photo.js` → `PHOTO` (filter / frame looks: `RenderSystem` paper pass) |
 | Achievements: goals, rewards, boss challenge levels, banner timing, when a monster counts as met | `src/config/achievements.js` |
 | Bestiary pages: blurbs, attacks, how to beat each monster, drop notes | `src/config/bestiary.js` |
 | Default keys, hotbar keys | `src/config/controls.js` → `KEYBINDS`, `HOTBAR_KEYS` |

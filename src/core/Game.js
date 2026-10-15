@@ -72,6 +72,7 @@ import { densityFor } from '../config/settings.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
 import { PetMenu } from '../ui/PetMenu.js';
+import { PhotoMode } from '../ui/PhotoMode.js';
 import { JournalUI } from '../ui/JournalUI.js';
 import { installAchievementToast } from '../ui/achievementToast.js';
 import { setPortraitRenderer } from '../ui/monsterPortraits.js';
@@ -124,7 +125,7 @@ export class Game {
     const bag = ctx.player.inventory;
     installItemNotices(bag);
     InventoryUI.init(bag, bagCommands(bag));
-    buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init();
+    buildHotbar(); buildPetCard({ onOpen: () => PetMenu.open() }); PetMenu.init(); PhotoMode.init(this.renderSystem);
     watchBag(bag); JournalUI.init(); PortalUI.init(Portals); HomeUI.init(); BuildingUI.init(); installAchievementToast(); setPortraitRenderer(this.renderSystem.renderer ?? null);
     CharacterSelect.init({ onPick: (id, quiet) => { applyCharacter(id); if (!quiet) showcaseHero(true); }, onShowcase: () => showcaseHero(),
       onConfirm: () => this.beginGame(), onOpen: () => this.resetRun() });
@@ -157,7 +158,7 @@ export class Game {
 
   /** One simulation step. The order mirrors the dependencies: movement first, then everything that reacts to it. */
   update(dt) {
-    if (ctx.paused) { Building.update(); if (PetMenu.isOpen) PetMenu.update(dt); return; }   // pause / pet menu open: freeze everything (rendering continues)
+    if (ctx.paused) { Building.update(); if (PetMenu.isOpen) PetMenu.update(dt); if (PhotoMode.isOpen) PhotoMode.update(dt); return; }   // pause / pet menu / photo mode: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
     if (ctx.started) { dayClock.update(dt); this.world.mechanics.update(dt); }
@@ -206,7 +207,7 @@ export class Game {
     try {
       const P = ctx.player, world = this.world;
       world.mechanics.exit();                                     // old rules/listeners leave before clocks and adventure state reset
-      BuildingUI.close(); Building.clear(); HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); Home.reset();
+      BuildingUI.close(); Building.clear(); HomeUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); PhotoMode.close(); Home.reset();
       Tutorial.reset(); RecipeBook.reset(); JournalUI.close();
       resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Chests.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
@@ -232,7 +233,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Building, BuildingUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Building, BuildingUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

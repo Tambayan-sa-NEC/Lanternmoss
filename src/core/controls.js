@@ -23,6 +23,7 @@ import { toggleHint } from '../ui/hud.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
 import { PetMenu } from '../ui/PetMenu.js';
+import { PhotoMode } from '../ui/PhotoMode.js';
 import { JournalUI } from '../ui/JournalUI.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
@@ -43,6 +44,7 @@ function onKey(code) {
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens
   if (PetMenu.isOpen) { PetMenu.key(code); return; }      // the pet menu pauses too
+  if (PhotoMode.isOpen) { PhotoMode.key(code); return; }  // so does photo mode
   if (ctx.transitioning) return;                       // travelling between planets
   if (ctx.cutscene && code !== 'Escape' && !is('pause', code)) return;   // a boss is waking: only pausing works
   if (Building.active && code === 'Escape') { Building.cancel(); return; }
@@ -61,6 +63,7 @@ function onKey(code) {
   }
   if (is('bag', code)) { if (Dialog.open) Dialog.close(); InventoryUI.toggle(); return; }
   if (is('petMenu', code)) { PetMenu.open(); return; }
+  if (is('photoMode', code)) { PhotoMode.open(); return; }
   if (is('journal', code)) { JournalUI.open(); return; }
   const slot = HOTBAR_KEYS.indexOf(code); if (slot >= 0) { Building.cancel(); Hotbar.select(slot); return; }   // hold / use a hotbar item (bag open or not)
   if (is('jump', code) && !player.dead) player.jumpBuf = 0.14;
@@ -106,7 +109,7 @@ export function initControls(canvas) {
     onMenuKey: code => MainMenu.key(code),
     onKey, onClick,
     onCancel: onRightClick,
-    onDrag: dragCamera,
-    onZoom: sign => (isAiming() ? nudgeAim(-sign) : zoomCamera(sign)),   // wheel up = farther while aiming
+    onDrag: (dx, dy) => (PhotoMode.isOpen ? PhotoMode.drag(dx, dy) : dragCamera(dx, dy)),
+    onZoom: sign => (PhotoMode.isOpen ? PhotoMode.zoom(sign) : isAiming() ? nudgeAim(-sign) : zoomCamera(sign)),   // wheel up = farther while aiming
   });
 }
