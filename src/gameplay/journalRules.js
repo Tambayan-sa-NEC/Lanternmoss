@@ -17,7 +17,8 @@ export const isMiniBoss = type => !!COMBAT.enemies[type]?.miniBoss;
 /** A bestiary page's title: the monster's name, or the boss's (without its epithet). */
 export const pageName = type => BESTIARY_ENTRIES[type]?.name ?? COMBAT.enemies[type]?.name?.split(',')[0] ?? type;
 
-const COUNTERS = ['monsters', 'bosses', 'chests', 'quests', 'crafted', 'minibosses', 'rareFriends'];
+// every counter Journal.add() keeps; a counter missing here is lost on reload (fish, harvests and gathered were, before 34)
+const COUNTERS = ['monsters', 'bosses', 'chests', 'quests', 'crafted', 'minibosses', 'rareFriends', 'gathered', 'fish', 'harvests', 'bounties'];
 const FLAGS = new Set(ACHIEVEMENTS.filter(a => a.goal.flag).map(a => a.goal.flag));
 
 /**   stats     lifetime counters (COUNTERS)

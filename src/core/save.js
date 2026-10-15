@@ -23,6 +23,7 @@ import { RUNES } from '../config/magic.js';
 import { xpToNext } from '../progression/leveling.js';
 import { cleanBuildings } from '../gameplay/buildingRules.js';
 import { cleanHomeState } from '../gameplay/homeRules.js';
+import { cleanBountyState } from '../gameplay/bountyRules.js';
 
 export const SAVE_KEY = 'lanternmoss.adventure';
 export const SAVE_VERSION = 1;
@@ -37,7 +38,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
-  building: 'planet', home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
+  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
@@ -62,6 +63,7 @@ export const SAVE_OWNERS = {
   'gameplay/Portals.js:Portals': 'portals',
   'gameplay/Home.js:Home': 'home',
   'gameplay/Building.js:Building': 'building',
+  'gameplay/Bounties.js:Bounties': 'bounties',
   'gameplay/PlanetMechanics.js:PlanetMechanics': 'mechanics',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
@@ -191,6 +193,7 @@ export function cleanState(key, value, hero = 'witch') {
       miniDefeated: stringIds(s.miniDefeated, id => PLANETS.some(p => (p.miniBosses ?? []).some((m, i) => id === `${p.id}:mini:${i}`))),
       lairs: Object.fromEntries(Object.entries(record(s.lairs)).filter(([id, v]) => ids.has(id) && direction(v)).map(([id, v]) => [id, direction(v)])) };
     case 'combat': return Object.fromEntries(Object.keys(CHARACTERS[hero].abilities).map(id => [id, number(s[id], 0, 0, 3600)]));
+    case 'bounties': return cleanBountyState(value);
     case 'farm': return { day: integer(s.day, 1, 1), plots: Array.from({ length: FARM.grid[0] * FARM.grid[1] }, (_, i) => {
       const p = record(list(s.plots)[i]), crop = known(p.crop, CROPS);
       return { tilled: bool(p.tilled) || !!crop, crop, growth: crop ? number(p.growth, 0, 0, 1) : 0, watered: bool(p.watered) };

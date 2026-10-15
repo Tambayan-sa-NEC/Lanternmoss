@@ -204,6 +204,18 @@ its stats per planet and its drops once you've beaten one. The **Collection** sh
 is kept on your device across adventures.
 
 <p>
+  <img src="docs/screenshots/bounty-board.jpg" width="49%" alt="The bounty board beside the Lanternmoss square">
+  <img src="docs/screenshots/bounty-window.jpg" width="49%" alt="The bounty board window: three jobs ready to claim">
+</p>
+
+**A bounty board.** Every village has a notice board near the square with three small jobs a day: defeat a few of a
+local monster, bring some of a local material, catch a fish, or harvest crops. They're made from each world's own
+monsters, resources, fish and farm, so every planet has its own. `E` at the board shows their progress; defeats, catches
+and harvests count from when a job goes up, and bring jobs hand the items over at the board. A finished job pays coins
+and the planet's material, now and then a rare piece of gear, and its note turns gold. A new set goes up each new day,
+each planet keeps its own board, and the journal counts the bounties you claim.
+
+<p>
   <img src="docs/screenshots/photo-mode.jpg" width="49%" alt="Photo mode: the toolbar over a polaroid-framed shot of the witch waving">
   <img src="docs/screenshots/photo-storybook.jpg" width="49%" alt="Photo mode: night filter and storybook frame, toolbar hidden">
 </p>
@@ -250,7 +262,7 @@ Major updates, newest first (the full list with notes is in [TODO.md](TODO.md)):
   you meet their conditions (level, seals, elite sigils, a villager's quest, night). They wake in a short sequence with a
   name card and battle music, and fight you inside a ring of thorns or fire. Villagers hint at what's needed, and the
   bestiary has boss lore.
-- **The journal:** 20 achievements (with three boss challenges), a bestiary page for every monster and boss with 3D
+- **The journal:** 31 achievements (with three boss challenges), a bestiary page for every monster and boss with 3D
   portraits, attacks, counters, stats and drops, and a collection of every item found. `J` opens it, and it's kept
   across adventures.
 - **Choosing a pet:** a pet step after the hero on character select, and a pet menu during play (`B`, or click the pet
@@ -321,6 +333,7 @@ node scripts/crafting-smoke.mjs    # bulk crafting, discovery, enchanting and re
 node scripts/structures-smoke.mjs  # structure controls, support/pickup, door movement and reload Continue
 node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
+node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
@@ -402,6 +415,7 @@ src/
 │   ├── houses.js          enterable houses per planet: layout, furniture, owner / resident, note, chest gift
 │   ├── chests.js          treasure chests and drops: kinds, loot tables, gear rarity odds, monster drops, keys, boss chest
 │   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
+│   ├── bounties.js        the bounty board: kinds of job, counts, coins, rare-piece chance, where the board stands
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   └── critters.js        ambient animal looks
@@ -503,6 +517,8 @@ src/
 │   ├── Fishing.js         casting, the bite, the reeling meter, catches
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
+│   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
+│   ├── bountyRules.js     the day's jobs generated from a planet's config, progress and the saved shape (pure)
 │   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)
 │   ├── heldTool.js        the tool in the hero's hand while working
 │   ├── dayClock.js        the village clock (phase, day, light)
@@ -530,6 +546,7 @@ src/
 │                          InventoryUI + itemTooltip (the bag window: the grid, the equipment side, the details
 │                          window under it, and the Craft tab), itemArt (SVG item
 │                          pictures), petHud (the pet card on the lower left), PetMenu (the pet menu during play), PhotoMode (photo mode),
+│                          BountyUI (the bounty board window),
 │                          petViews (pet cards and detail panels for both pet screens), showcase (the menus' still
 │                          camera framings of the hero and pet, and finding a clear view for them),
 │                          itemNotices (item toasts), JournalUI (the journal screen: achievements, bestiary,
@@ -690,6 +707,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |
 | Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |
+| Bounty board: kinds of job, counts, coins, material, rare-piece chance, board placement | `src/config/bounties.js` → `BOUNTIES` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
