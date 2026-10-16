@@ -97,21 +97,19 @@ base → sets and talents (Lanternmoss and Frostveil rows are unaffected by the 
 
 | World | Hero | Mini boss | Boss |
 | --- | --- | --- | --- |
-| Lanternmoss | Witch | 129 s → 124 s / 147 s → 121 s | 245 s → 233 s / 275 s → 220 s |
-| Lanternmoss | Warrior | 98 s → 91 s / 98 s → 91 s | 223 s → 206 s / 223 s → 202 s |
-| Lanternmoss | Ranger | 101 s → 91 s / 99 s → 89 s | 187 s → 169 s / 193 s → 170 s |
-| Emberfall | Witch | 145 s → 113 s / cap → 102 s | 245 s → 181 s / 245 s → 182 s |
-| Emberfall | Warrior | 116 s → 95 s / 107 s → 84 s | 235 s → 185 s / 235 s → 185 s |
-| Emberfall | Ranger | 101 s → 76 s / 101 s → 92 s | 193 s → 141 s / 189 s → 141 s |
-| Frostveil | Witch | cap → 145 s / 129 s → 110 s | 257 s → 214 s / 255 s → 226 s |
-| Frostveil | Warrior | cap → 118 s / cap → 104 s | 279 s → 262 s / cap → 259 s |
-| Frostveil | Ranger | cap → 112 s / 98 s → 65 s | 208 s → 168 s / 194 s → 185 s |
+| Lanternmoss | Warrior | 99.0 → 90.9 / 97.5 → 92.2 | 219.5 → 206.6 / 216.4 → 207.8 |
+| Lanternmoss | Ranger | 97.3 → 83.6 / 96.5 → 97.3 | 181.6 → 168.6 / 181.6 → 168.6 |
+| Lanternmoss | Witch | 142.8 → 122.8 / 130.8 → 119.6 | 237.8 → 219.6 / 239.1 → 219.6 |
+| Emberfall | Warrior | 110.8 → 86.0 / 107.0 → 88.5 | 234.7 → 185.4 / 234.7 → 185.8 |
+| Emberfall | Ranger | 102.7 → 134.0 / 111.3 → 143.3 | 186.4 → 140.6 / 186.0 → 140.6 |
+| Emberfall | Witch | 194.0 → 102.3 / 172.3 → 97.8 | 245.3 → 180.8 / 245.4 → 180.8 |
+| Frostveil | Warrior | 104.9 → 94.5 / 113.5 → 93.3 | 282.1 → 253.8 / 285.6 → 259.4 |
+| Frostveil | Ranger | 96.2 → 82.4 / 94.6 → 64.6 | 201.4 → 169.2 / 239.4 → 182.1 |
+| Frostveil | Witch | 174.3 → 106.9 / 135.2 → 116.1 | 256.1 → 216.6 / 252.4 → 215.4 |
 
-Every boss stays at or above 141 s (Ember Ranger) and most fights shorten by 5-27%. The steepest mini-boss cut is
-the Frostveil Ranger on seed 7 (98 → 65 s, -34%); mini bosses were not part of the acceptance line and are left as
-they are. **Open finding, not from 28:** the base profile now caps the Frostveil mini boss in several runs (the
-table above, and the Warrior on seed 1 at `a28e67a`, before 28a-28e), where the earlier report recorded 96-126 s.
-It needs its own investigation.
+Remeasured on 2026-10-16 with the corrected harness (see the next section): every boss stays at or above 140.6 s
+(Ember Ranger) and most fights shorten by 5-27%. The steepest mini-boss cut is the Frostveil Ranger on seed 7
+(94.6 → 64.6 s); mini bosses were not part of the acceptance line and are left as they are.
 
 ## Campaign and economy
 
@@ -210,6 +208,39 @@ transition fractions and flying damage. The first six rows came from the full ni
 Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](balance-before.json)
 was captured during harness repair, before in-range skill selection, Doom evasion and complete fight isolation;
 its capped/reset boss runs are not comparable completed-fight times.
+
+## Remeasured with the corrected harness (2026-10-16)
+
+The Frostveil mini boss started reaching the 300 s cap in some reports (bisected to `8dd269c`, 26b, which changed no
+combat code). Two harness defects caused it, not the game:
+
+- **An awake planet boss during the trials.** `boot()` in the sims wakes the planet boss by default and again after
+  every `goToPlanet`, so Malgrath roamed awake during the monster and mini-boss trials. Whenever he engaged, his arena
+  (`BossGate.keepInside`) pulled the hero ~150 m to his lair and the Hydra went home and healed. A player cannot get
+  there: a boss only wakes when its conditions are met and the hero comes to its lair. The report now boots sealed
+  (`wake: false`), wakes the boss just before its own fight, and throws if the boss is awake during the trials.
+- **An ultimate the spot refuses.** Leap Slam needs ground to land on; beside the lakeside Hydra there may be none.
+  The bot re-aimed every frame and never attacked (0 casts in 300 s). It now gives the aim up, fights on and retries
+  2 s later, and the report throws if an aim stays open for 2 s.
+
+The 26b commit only shifted the seeded random stream, which exposed both. Seeds 1 / 7 (top-ups: mini·boss):
+
+| Planet | Hero | Roster median (s) | Mini boss (s) | Boss (s) | Top-ups |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Lanternmoss | Warrior | 2.5 / 3.1 | 99.0 / 97.5 | 219.5 / 216.4 | 8·12 / 7·9 |
+| Lanternmoss | Ranger | 2.2 / 2.2 | 97.3 / 96.5 | 181.6 / 181.6 | 9·14 / 8·14 |
+| Lanternmoss | Witch | 2.4 / 2.4 | 142.8 / 130.8 | 237.8 / 239.1 | 11·19 / 10·18 |
+| Emberfall | Warrior | 3.0 / 3.0 | 110.8 / 107.0 | 234.7 / 234.7 | 6·19 / 6·19 |
+| Emberfall | Ranger | 3.3 / 3.3 | 102.7 / 111.3 | 186.4 / 186.0 | 10·9 / 10·6 |
+| Emberfall | Witch | 3.4 / 3.6 | 194.0 / 172.3 | 245.3 / 245.4 | 17·11 / 9·13 |
+| Frostveil | Warrior | 4.3 / 4.3 | 104.9 / 113.5 | 282.1 / 285.6 | 13·18 / 14·18 |
+| Frostveil | Ranger | 4.7 / 4.7 | 96.2 / 94.6 | 201.4 / 239.4 | 9·26 / 9·30 |
+| Frostveil | Witch | 5.5 / 4.8 | 174.3 / 135.2 | 256.1 / 252.4 | 19·30 / 13·30 |
+
+No fight caps any more. One profile is outside target: the Witch's Emberfall mini boss on seed 1 (194.0 s; 172.3 s on
+seed 7). **Open finding:** the Witch's mini-boss fights vary widely with the seed. The Frost Hydra takes 174 / 129 / 167
+/ 283 / 135 s on seeds 1, 2, 3, 4 and 7, so the measured pair (1, 7) understates the spread. It needs its own look (the
+bot's spacing against spit and sweep, or the fight), without loosening a target.
 
 Verification: 142 unit tests, all 24 gameplay/audit sims, strict profile target checks, the affected Malgrath
 mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and shop screenshots are under

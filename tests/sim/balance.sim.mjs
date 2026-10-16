@@ -86,7 +86,7 @@ async function child(hero, planet) {
   const { arcDist, offsetDir, tangentToward } = await imp('utils/sphere.js');
   const { tryCast, spellState, kit, resetCooldowns } = await imp('combat/casting.js');
   const { updateAim, targeting } = await imp('combat/targeting.js');
-  const { aim, updateAiming } = await imp('combat/aiming.js');
+  const { aim, cancelAim, updateAiming } = await imp('combat/aiming.js');
   const { computeStats } = await imp('gameplay/equipment.js');
   const { ENGAGED } = await imp('entities/enemies/states.js');
   const { COMBAT } = await imp('config/combat.js');
@@ -96,7 +96,9 @@ async function child(hero, planet) {
   const { Needs } = await imp('gameplay/Needs.js');
   const { clearHazards } = await imp('combat/hazards.js');
 
-  const { H, step, game } = await boot(hero);
+  // Sealed bosses (wake: false): an awake planet boss would roam during the monster and mini-boss trials and its arena
+  // would pull the hero away mid-fight. It is woken just before its own fight.
+  const { H, step, game } = await boot(hero, { wake: false });
   if (planet) H.goToPlanet(planet);
   step(1);
   const P = H.player, keys = H.keys, PL = H.PLANETS[planet];
@@ -125,9 +127,11 @@ async function child(hero, planet) {
   };
   const revive = () => { if (P.dead) step(COMBAT.player.respawnTime + 0.3); pinLevel(); refill(); P.invuln = 0; };
   const isFight = e => e.def.miniBoss || e === ctx.boss;
+  if (ctx.boss && !ctx.boss.dormant) throw new Error('the planet boss must stay sealed during the monster and mini-boss trials');
   for (const e of ctx.enemies) if (!isFight(e)) e.vanish();
   step(0.5);
 
+  let ultRetry = 0;   // after an ultimate aim the spot refused, wait this long before trying again
   /** One frame of the bot against `e`: steer to its distance, face it, and attack (useUlt: the aimed ultimate too). */
   function bot(e, useUlt) {
     clearKeys();
@@ -148,10 +152,13 @@ async function child(hero, planet) {
       return;
     }
     if (spellState.gcd > 0) return;
-    if (useUlt && ult && !spellState.cd[ult] && P.mana >= kit()[ult].cost && d < kit()[ult].range) {
+    if (useUlt && ult && ctx.time >= ultRetry && !spellState.cd[ult] && P.mana >= kit()[ult].cost && d < kit()[ult].range) {
       tryCast(ult);
       if (aim.id) { aim.reach = Math.min(1, d / aim.s.range); updateAiming(); tryCast(ult); }
-      return;
+      if (!aim.id) return;
+      // The spot can't take it (Leap Slam needs ground to land on, and a lakeside foe may have none): give up the aim
+      // and fight on, as a player would, instead of re-aiming every frame and never attacking.
+      cancelAim(); ultRetry = ctx.time + 2;
     }
     for (const id of skills) {
       const s = kit()[id], range = s.range ?? s.radius ?? s.distance ?? Infinity;
@@ -164,7 +171,7 @@ async function child(hero, planet) {
   function fight(e, cap, { topUp = false, engage, useUlt = false } = {}) {
     let t = 0, taken = 0, last = P.hp, deaths = 0, topUps = 0, done = false, lastMove = '';
     const moves = {}, flyingDamage = { taken: 0, hits: 0, maxHit: 0 };
-    let transition = null;
+    let transition = null, aimOpen = 0;
     for (let frame = 0; frame < cap * 60 && !done; frame++) {
       step(1 / 60);
       if (done) return;
@@ -178,6 +185,8 @@ async function child(hero, planet) {
       if (P.dead) { deaths++; done = true; break; }
       engage?.(t);
       bot(e, useUlt);
+      aimOpen = aim.id ? aimOpen + 1 / 60 : 0;
+      if (aimOpen > 2) throw new Error(`the bot kept an ultimate aim open for 2 s against ${e.type} (it never attacks)`);
       if (P.hp < last) {
         const loss = last - P.hp; taken += loss;
         if (e.flying) { flyingDamage.taken += loss; flyingDamage.hits++; flyingDamage.maxHit = Math.max(flyingDamage.maxHit, loss); }
@@ -226,6 +235,7 @@ async function child(hero, planet) {
   }
   const mini = ctx.enemies.find(e => e.def.miniBoss && e.alive);
   const miniBoss = mini ? bigFight(mini) : null;
+  if (ctx.boss) { H.wakeBoss(); step(0.2); }
   const boss = ctx.boss ? bigFight(ctx.boss) : null;
 
   console.log('RESULT ' + JSON.stringify({ hero, planet, planetName: PL.name, level, seed: Number(process.env.SIM_SEED ?? 1),
