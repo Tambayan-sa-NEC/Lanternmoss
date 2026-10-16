@@ -365,6 +365,7 @@ node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tre
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
 node scripts/warrior-talents-smoke.mjs # real Warrior tree: Wide Cleave in HUD/Controls/tooltips, keys, Continue/reset; retakes its shots
 node scripts/ranger-talents-smoke.mjs # real Ranger tree: Wide Fan in HUD/Controls/tooltips, keys, Continue/reset; retakes its shots
+node scripts/lighting-smoke.mjs    # local light harness: shaders compile, no recompiles, readable dark on Low/High; retakes its shot
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
@@ -472,6 +473,7 @@ src/
 ├── render/                Three.js building blocks
 │   ├── scene.js           the scene and camera
 │   ├── materials.js       toon ramp, glow, inverted-hull outline, point-sprite materials
+│   ├── lighting.js        local light: light radii in the toon shader, the shared real point lights, darkness
 │   ├── meshes.js          primitive geometries and outlined model parts
 │   └── Batcher.js         merges static scenery into a few draw calls
 ├── physics/
@@ -760,6 +762,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | How many chests each planet has, its loot material | `src/config/planets/<id>.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
+| Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](docs/lighting.md)) |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |
 
 ## Items and the bag

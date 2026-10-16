@@ -4,6 +4,7 @@
 import { WORLD } from '../config/game.js';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { patchLocalLight } from '../render/lighting.js';
 import { addCollider, colliders, freeOfColliders } from '../physics/colliders.js';
 import { facet, gradientMap } from '../render/materials.js';
 import { G, LM } from '../render/meshes.js';
@@ -122,6 +123,7 @@ export function chunkInstances(source, cellSize = 24) {
 function swayMaterial(color = 0xffffff) {
   const m = new THREE.MeshToonMaterial({ color, gradientMap });
   m.onBeforeCompile = sh => {
+    patchLocalLight(sh);   // its own patch replaces the toon prototype's, so it chains the local light itself
     sh.uniforms.uTime = WIND.uTime; sh.uniforms.uWind = WIND.uWind;
     sh.vertexShader = 'uniform float uTime; uniform float uWind;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
       #ifdef USE_INSTANCING
@@ -131,7 +133,7 @@ function swayMaterial(color = 0xffffff) {
         transformed.z += cos(uTime * 1.4 + iw.y * 0.3) * k * 0.25;
       #endif`);
   };
-  m.customProgramCacheKey = () => 'sway';
+  m.customProgramCacheKey = () => 'sway-local';
   return m;
 }
 /** A spot for low plants: not in water, not inside a big collider (and, with avoid, not near those spots). */

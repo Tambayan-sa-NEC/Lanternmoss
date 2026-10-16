@@ -46,6 +46,7 @@ import { HomeUI } from '../ui/HomeUI.js';
 import { BountyUI } from '../ui/BountyUI.js';
 import { Bounties } from '../gameplay/Bounties.js';
 import { Talents } from '../gameplay/Talents.js';
+import { LocalLights } from '../render/lighting.js';
 import { TalentUI } from '../ui/TalentUI.js';
 import { resetCompanion } from '../gameplay/characters.js';
 import { shopLineFor, ShopUI } from '../ui/ShopUI.js';
@@ -185,6 +186,7 @@ export class Game {
     updateWaypoints();                                             // after the camera: bearings are relative to the view
     this.world.setDaylight(dayClock.light());
     this.world.update(dt, ctx.time, ctx.player, cam.up, camera);
+    LocalLights.update(ctx.player, { indoors: !!ctx.indoors, world: this.world });   // after the daylight: dims it in the dark
     sparkles.update(dt); updateEmotes(dt);
     Dialog.update(dt);
     updateOverlay(dt); updateBuffs(dt); updateToast(dt); updatePetCard();
@@ -237,7 +239,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Building, BuildingUI, Bounties, BountyUI, Talents, TalentUI, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Building, BuildingUI, Bounties, BountyUI, Talents, TalentUI, LocalLights, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,
