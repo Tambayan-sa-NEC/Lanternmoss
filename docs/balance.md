@@ -57,6 +57,26 @@ records a missed straight Fireball and a successful seeking explosion (33.0 dama
 Seeking Flame changes guidance, not damage, blast size, cost or range. Full mixed-set and three-tree acceptance
 remains TODO 28e; no balance target was changed for these talents.
 
+## Warrior talents (28d)
+
+The same paired level-8 probe in `tests/sim/warriorTalents.sim.mjs` compares an unlearned Warrior with Keen Edge
+rank 2 and Wide Cleave (four earned points, as for the Witch), with the same limits as above. The Witch and Ranger
+rows are unchanged controls.
+
+| Hero / regular foe | Seed 1 base → talents | Seed 7 base → talents |
+| --- | --- | --- |
+| Witch / goblin | 1.350 → 1.350 s | 1.350 → 1.350 s |
+| Witch / ogre | 1.833 → 1.833 s | 1.833 → 1.833 s |
+| Warrior / goblin | 1.867 → 1.433 s | 1.867 → 1.433 s |
+| Warrior / ogre | 2.300 → 1.867 s | 2.300 → 1.867 s |
+| Ranger / goblin | 1.500 → 1.500 s | 1.500 → 1.500 s |
+| Ranger / ogre | 1.117 → 1.117 s | 1.117 → 1.117 s |
+
+The Warrior's samples improve by 23% (goblin) and 19% (ogre), a little more than the Witch's 16% ogre sample because
+Keen Edge raises his most-used hit. Wide Cleave adds no damage against one foe; its value is crowds (a foe 70° aside
+takes a full hit). Against a real Gloomcap hit three seconds into Guard, the Warrior takes 32 HP base and 10 with
+Steady Guard x2. Boss immunity windows are unchanged. No balance target was changed; combined acceptance is 28e.
+
 ## Campaign and economy
 
 The audited route completes Humming Stones, Pie Delivery and First Harvest on Lanternmoss (three wisps and three

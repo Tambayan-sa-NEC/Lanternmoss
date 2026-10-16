@@ -1,4 +1,4 @@
-# Talents: Witch (TODO 28c)
+# Talents: Witch (TODO 28c) and Warrior (TODO 28d)
 
 Open **Talents** from the pause menu while playing the Witch. Earn one point at levels 2, 4, 6, 8, 10, 12, 14 and
 16 (eight total). Each Learn click buys one rank. Grey Learn buttons explain a missing prerequisite, points or
@@ -13,7 +13,7 @@ maximum rank. Visit Old Bramble in the Lanternmoss village to reset every rank f
 | Deep Freeze | 1 | 2 | Quick Frost | Frost Nova slows last 0.5 seconds longer (3.5 → 4.5 seconds). |
 
 The whole tree costs ten points, so eight points cannot buy everything. A prerequisite needs one rank, not its
-maximum rank. The Warrior and Ranger trees remain hidden until their own stages (28d and 28e).
+maximum rank. The Ranger tree remains hidden until its own stage (28e).
 
 Seeking Fireball keeps Fireball's damage, blast radius, cost, cooldown and maximum flight time/range budget. It
 captures the current soft-lock target when cast; it does not choose a new target in flight. Without a target it
@@ -30,6 +30,23 @@ Reset rebuilds the original kit without changing its shared data, and starting a
 
 ![Witch tree at 720p](screenshots/huds/talents.jpg)
 
+## Warrior (TODO 28d)
+
+| Talent | Points per rank | Ranks | Needs | Effect per rank |
+| --- | ---: | ---: | --- | --- |
+| Keen Edge | 1 | 2 | — | Axe Cleave deals 10% more base damage (20% at two ranks). |
+| Quick Spin | 1 | 2 | — | Whirlwind cooldown falls by 1 second (7 → 5 seconds). |
+| Steady Guard | 1 | 2 | — | Guard lasts 0.5 seconds longer (2.5 → 3.5 seconds). |
+| Wide Cleave | 2 | 1 | Keen Edge | Axe Cleave becomes Wide Cleave: its arc grows from 110° to 170°. |
+| Tempest | 1 | 2 | Quick Spin | Whirlwind reaches 0.4 m further (3.4 → 4.2 m). |
+
+Again ten points of choices for eight. Wide Cleave keeps Axe Cleave's damage, reach, cost and cooldown: it only
+catches more foes, so against one foe it is no stronger (its value is crowds). The soft lock still aims the swing;
+the wider arc reaches foes beside the one locked. Shoulder Charge's hit sweep reads the learned kit like every cast,
+and ability tooltips list a swing's arc. Bosses keep their immunity windows: no talent lands while one is immune.
+
+![Warrior tree at 720p](screenshots/huds/warrior-talents.jpg)
+
 ## Verification
 
 - `node --test tests/talents.test.mjs`: tree validity, point budget, prerequisites, modifiers, variant text and saves.
@@ -39,6 +56,12 @@ Reset rebuilds the original kit without changing its shared data, and starting a
 - `node scripts/witch-talents-smoke.mjs`: real Learn clicks, budget and prerequisite UI, 720p/1080p Low layout,
   live HUD/Controls/tooltips and key labels, full browser reload + Continue, and real E with Old Bramble. Requires
   `puppeteer-core`; Edge by default (`CHROME` overrides). Owns port 8120 and its own browser profile.
+- `node tests/sim/warriorTalents.sim.mjs` (seeds 1 and 7): a foe 70° aside of a locked target takes nothing from Axe
+  Cleave and full damage from Wide Cleave; reach, cost and cooldown unchanged; Tempest reaches a foe 4.6 m away;
+  Quick Spin's cooldown; Guard against a real Gloomcap hit three seconds in (32 → 10 HP with Steady Guard x2); boss
+  immunity refuses the talents; two Continue cycles; Old Bramble's reset; paired pace samples.
+- `node scripts/warrior-talents-smoke.mjs`: the Warrior page, Wide Cleave in HUD/Controls/tooltips (170° arc), Tempest
+  radius, a remapped key, reload + Continue, real E with Old Bramble and Steady Guard's tooltip. Owns port 8121.
 - The older `talents` simulation and browser smoke retain their stable test-only tree for foundation regressions.
 
 The simulation also prints paired base/learned throughput samples for all three heroes on seeds 1 and 7. These

@@ -22,8 +22,7 @@ try {
   const frames = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.LANTERNMOSS.update(1 / 60); }, n);
   await page.evaluate(async () => {
     const { setSetting } = await import('/src/core/settings.js'); setSetting('pauseOnBlur', false); setSetting('quality', 'low');
-    const L = window.LANTERNMOSS; L.CharacterSelect.pick('knight');
-    if (L.Talents.open) throw new Error('Warrior tree exposed before 28d');
+    const L = window.LANTERNMOSS;
     L.CharacterSelect.pick('ranger'); if (L.Talents.open) throw new Error('Ranger tree exposed before 28e');
     L.CharacterSelect.pick('witch'); L.begin(); L.Tutorial.skip(); L.Pets.command('passive'); L.player.invuln = 1e9;
     const { xpToNext } = await import('/src/progression/leveling.js'); while (L.player.level < 16) L.gainXp(xpToNext(L.player.level) - L.player.xp);
