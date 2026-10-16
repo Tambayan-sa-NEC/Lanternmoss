@@ -7,6 +7,8 @@
 // between. It only evades Doom Blade; ordinary damage is a worst case. Each monster fight starts fresh (full HP and mana, skills
 // ready) without the ultimate; boss and mini boss fights use the ultimate (aimed at the target) on its cooldown.
 // Bosses and mini bosses: topped up below 50% HP ("top-ups"), up to FIGHT_CAP seconds. A death ends the trial.
+// BALANCE_BUILD=depth (TODO 28e, a diagnostic, not the target profile): the hero also spends the talent points earned at
+// that level in DEPTH_ORDER (the gated variant first) and wears that world's three-piece set (Moss, Ember, Frost).
 import { spawn } from 'node:child_process';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +17,11 @@ import { BALANCE } from '../../src/config/balance.js';
 
 const HEROES = ['witch', 'knight', 'ranger'], PLANETS_N = 3;
 const TRIALS = 3, MONSTER_CAP = 60, FIGHT_CAP = 300;
+const DEPTH = process.env.BALANCE_BUILD === 'depth';
+const DEPTH_ORDER = { witch: ['brightBolt', 'seekingFlame', 'brightBolt', 'quickFrost', 'quickFrost', 'deepFreeze', 'deepFreeze', 'lightStep'],
+  knight: ['keenEdge', 'wideCleave', 'keenEdge', 'quickSpin', 'quickSpin', 'tempest', 'tempest', 'steadyGuard'],
+  ranger: ['steadyAim', 'steadyAim', 'quickFan', 'wideFan', 'quickFan', 'brambleSnare', 'brambleSnare', 'lightFeet'] };
+const DEPTH_SETS = [['mossHood', 'mossCloak', 'wanderBoots'], ['emberHelm', 'emberMail', 'emberBoots'], ['frostCirclet', 'frostMantle', 'snowstepBoots']];
 const TARGETS = Object.entries(BALANCE.seconds).map(([k, [min, max]]) => `${k} ${min}-${max} s`).join(' · ');
 
 if (process.argv[2]) await child(process.argv[2], Number(process.argv[3] ?? 0));
@@ -97,6 +104,13 @@ async function child(hero, planet) {
   /** Pins the hero to the planet's level (kills during the trials would level it up). */
   const pinLevel = () => { P.level = level; P.xp = 0; P.stats = computeStats(P); };
   pinLevel(); step(0.2);
+  let build = 'starting gear';
+  if (DEPTH) {
+    const { equipFromSlot } = await imp('gameplay/equipment.js'), inv = P.inventory;
+    for (const id of DEPTH_SETS[planet]) { inv.add(id, 1); const r = equipFromSlot(inv, inv.getSlots().findIndex(s => s?.itemId === id)); if (!r.ok) throw new Error(r.message); }
+    for (const id of DEPTH_ORDER[hero]) H.Talents.learn(id);
+    pinLevel(); build = `${DEPTH_SETS[planet][0].replace(/[A-Z].*/, '')} set + talents ${JSON.stringify(H.Talents.ranks)}`;
+  }
 
   const abilities = Object.entries(kit()), basic = abilities[0][0];
   const skills = abilities.slice(1).filter(([, s]) => s.damage > 0 && !s.ult).map(([id]) => id);
@@ -215,6 +229,6 @@ async function child(hero, planet) {
   const boss = ctx.boss ? bigFight(ctx.boss) : null;
 
   console.log('RESULT ' + JSON.stringify({ hero, planet, planetName: PL.name, level, seed: Number(process.env.SIM_SEED ?? 1),
-    profile: 'starting gear; default pet; in-range affordable abilities; Doom evasion; 50% HP top-ups', monsters, miniBoss, boss }));
+    profile: `${build}; default pet; in-range affordable abilities; Doom evasion; 50% HP top-ups`, monsters, miniBoss, boss }));
   process.exit(0);
 }

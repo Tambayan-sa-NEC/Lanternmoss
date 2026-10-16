@@ -1237,7 +1237,7 @@ Keep trees small: each hero gets a bounded, documented set of ability upgrades/a
 | [x] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
 | [x] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
 | [x] **28d. Warrior talents** | 28b | 2-4 h | Implement the warrior tree, including wider Cleave or another bounded variant. Test arcs, costs/cooldowns, reset, saves and boss windows; expose the tree only after these pass. |
-| [ ] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
+| [x] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
 
 **28a implemented (2026-10-15):** four sets in `src/config/sets.js`, each a world's armour, head and feet (Moss tier 1,
 Ember tier 2, Frost tier 3) plus the four-piece Tide set (still unreleased with Tidewhisper). Two distinct worn pieces
@@ -1283,6 +1283,19 @@ boss immunity still refuses every talent, and saves, Continue and Old Bramble's 
 [balance](docs/balance.md#warrior-talents-28d). `scripts/warrior-talents-smoke.mjs` checks the page, HUD, Controls,
 tooltips, keys, reload Continue and the reset in Edge at 720p/1080p. Staged on `feat/todo-28`; the Ranger tree and
 the combined acceptance remain 28e.
+
+**28e implemented (2026-10-16):** the Ranger tree has Steady Aim (Arrow Shot up to +20% damage), Quick Fan (Arrow
+Fan 4 → 3 s), Light Feet (Evasive Leap 15 → 11), Wide Fan (a two-point alternative, needs Quick Fan: 7 arrows over
+60° instead of 5 over 40°, as tightly spaced, so one foe takes the same) and Bramble Snare (Thorn Arrow slow 3 → 4 s,
+needs Steady Aim). Depth acceptance: `tests/sim/talentDepth.sim.mjs` proves set bonuses ride on talent variants
+(Wide Cleave + Ember burns both foes, Wide Fan + Frost chills the foe aside, Seeking Fireball + Ember burns its
+target), Old Bramble resets talents only, unequipping removes set bonuses only, and Continue keeps both. A depth
+balance profile (`BALANCE_BUILD=depth`) found a 28a burn bug: a weaker hit kept a stronger burn alive, halving
+Emberfall fights; fixed, every boss now stays at or above 141 s with sets and talents (seeds 1 and 7; see
+[balance](docs/balance.md#sets-and-talents-together-28e)). Checked by `tests/talents.test.mjs`, the three hero
+talent sims, the depth sim, `scripts/ranger-talents-smoke.mjs` and the other talent/set smokes. Open finding, not
+from 28: the base balance report now caps the Frostveil mini boss in some runs. Parent 28's checklist items stay
+open until the Dusk (30c) and Star (32b) sets exist.
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
       chilling hits; the Moss set: more healing), shown in the bag's equipment side.

@@ -1,4 +1,4 @@
-# Talents: Witch (TODO 28c) and Warrior (TODO 28d)
+# Talents: Witch (28c), Warrior (28d) and Ranger (28e)
 
 Open **Talents** from the pause menu while playing the Witch. Earn one point at levels 2, 4, 6, 8, 10, 12, 14 and
 16 (eight total). Each Learn click buys one rank. Grey Learn buttons explain a missing prerequisite, points or
@@ -13,7 +13,7 @@ maximum rank. Visit Old Bramble in the Lanternmoss village to reset every rank f
 | Deep Freeze | 1 | 2 | Quick Frost | Frost Nova slows last 0.5 seconds longer (3.5 → 4.5 seconds). |
 
 The whole tree costs ten points, so eight points cannot buy everything. A prerequisite needs one rank, not its
-maximum rank. The Ranger tree remains hidden until its own stage (28e).
+maximum rank. All three heroes have a tree (28c-28e).
 
 Seeking Fireball keeps Fireball's damage, blast radius, cost, cooldown and maximum flight time/range budget. It
 captures the current soft-lock target when cast; it does not choose a new target in flight. Without a target it
@@ -47,6 +47,29 @@ and ability tooltips list a swing's arc. Bosses keep their immunity windows: no 
 
 ![Warrior tree at 720p](screenshots/huds/warrior-talents.jpg)
 
+## Ranger (TODO 28e)
+
+| Talent | Points per rank | Ranks | Needs | Effect per rank |
+| --- | ---: | ---: | --- | --- |
+| Steady Aim | 1 | 2 | — | Arrow Shot deals 10% more base damage (20% at two ranks). |
+| Quick Fan | 1 | 2 | — | Arrow Fan cooldown falls by 0.5 seconds (4 → 3 seconds). |
+| Light Feet | 1 | 2 | — | Evasive Leap costs 2 less stamina (15 → 11). |
+| Wide Fan | 2 | 1 | Quick Fan | Arrow Fan becomes Wide Fan: 7 arrows over 60° instead of 5 over 40°. |
+| Bramble Snare | 1 | 2 | Steady Aim | Thorn Arrow slows last 0.5 seconds longer (3 → 4 seconds). |
+
+Wide Fan keeps the arrows 10° apart, so a single foe takes what Arrow Fan dealt; the two extra arrows reach foes
+further aside. Damage per arrow, cost and range are unchanged.
+
+![Ranger tree at 720p](screenshots/huds/ranger-talents.jpg)
+
+## Sets and talents together (TODO 28e)
+
+Set bonuses ride on whatever an ability hits, so a talent variant spreads them: one Wide Cleave with the Ember set
+burns both foes it catches, Wide Fan with the Frost set chills the foe aside, and Seeking Fireball with the Ember set
+leaves its target burning. They stay independent: Old Bramble's reset takes talents only, taking a set off takes its
+bonus only, and Continue keeps both. Burns tick on monsters, not on static objects such as lair seals. Boss pacing
+with sets and talents is in [balance](balance.md#sets-and-talents-together-28e).
+
 ## Verification
 
 - `node --test tests/talents.test.mjs`: tree validity, point budget, prerequisites, modifiers, variant text and saves.
@@ -62,6 +85,13 @@ and ability tooltips list a swing's arc. Bosses keep their immunity windows: no 
   immunity refuses the talents; two Continue cycles; Old Bramble's reset; paired pace samples.
 - `node scripts/warrior-talents-smoke.mjs`: the Warrior page, Wide Cleave in HUD/Controls/tooltips (170° arc), Tempest
   radius, a remapped key, reload + Continue, real E with Old Bramble and Steady Guard's tooltip. Owns port 8121.
+- `node tests/sim/rangerTalents.sim.mjs` (seeds 1 and 7): Wide Fan reaches a foe 32° aside (0 → 16 damage) while a
+  lone foe takes the same 48; cost, Quick Fan, Bramble Snare, Light Feet, boss immunity, saves, reset, pace samples.
+- `node scripts/ranger-talents-smoke.mjs`: the Ranger page, Wide Fan in HUD/Controls/tooltips, Bramble Snare's slow,
+  keys, reload + Continue, real E with Old Bramble and Light Feet's HUD cost. Owns port 8122.
+- `node tests/sim/talentDepth.sim.mjs`: sets and talents together across all three heroes (see above).
+- `BALANCE_BUILD=depth node tests/sim/balance.sim.mjs`: the balance report with each world's set and the talents
+  earned at its boss level.
 - The older `talents` simulation and browser smoke retain their stable test-only tree for foundation regressions.
 
 The simulation also prints paired base/learned throughput samples for all three heroes on seeds 1 and 7. These
