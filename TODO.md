@@ -1294,7 +1294,8 @@ balance profile (`BALANCE_BUILD=depth`) found a 28a burn bug: a weaker hit kept 
 Emberfall fights; fixed, every boss now stays at or above 141 s with sets and talents (seeds 1 and 7; see
 [balance](docs/balance.md#sets-and-talents-together-28e)). Checked by `tests/talents.test.mjs`, the three hero
 talent sims, the depth sim, `scripts/ranger-talents-smoke.mjs` and the other talent/set smokes. Open finding, not
-from 28: the base balance report now caps the Frostveil mini boss in some runs. Parent 28's checklist items stay
+from 28: the base balance report capped the Frostveil mini boss in some runs (resolved 2026-10-16: two harness
+defects, see [balance](docs/balance.md#remeasured-with-the-corrected-harness-2026-10-16)). Parent 28's checklist items stay
 open until the Dusk (30c) and Star (32b) sets exist.
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
