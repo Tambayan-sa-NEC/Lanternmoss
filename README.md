@@ -27,6 +27,21 @@ dragon, and Malgrath, the two-phase Winged Demon Lord.
 the Boy Warrior (a two-handed axe and a guard) and the Elf Archer (a longbow), with every ability, its keys and a
 rating chart. Each hero has four abilities plus an aimed ultimate (Meteor, Leap Slam, Arrow Rain).
 
+**Talents.** Every hero earns a point every two levels. Open **Talents** from the pause menu. The **Witch** can strengthen
+Arcane Bolt, shorten Frost Nova's cooldown, make Blink cheaper, prolong frost slows, or learn **Seeking Fireball**:
+it follows the foe aimed at when cast. There are more upgrades than points, and Old Bramble resets them for free.
+The **Warrior** has his own tree: a sharper Axe Cleave, a quicker and wider Whirlwind, a longer Guard, or
+**Wide Cleave**, a swing broad enough to catch foes beside him. The **Ranger** sharpens Arrow Shot, readies Arrow Fan
+sooner, leaps for less, holds foes in Thorn Arrow's slow longer, or learns **Wide Fan**: seven arrows instead of five.
+Set bonuses ride along, so a Wide Cleave in Ember armour burns every foe it catches. See
+[the trees, costs and saves](docs/talents.md).
+
+<p>
+  <img src="docs/screenshots/huds/talents.jpg" width="32%" alt="The Witch's talent tree with learned spells and points">
+  <img src="docs/screenshots/huds/warrior-talents.jpg" width="32%" alt="The Warrior's talent tree with Wide Cleave and Tempest learned">
+  <img src="docs/screenshots/huds/ranger-talents.jpg" width="32%" alt="The Ranger's talent tree with Wide Fan and Bramble Snare learned">
+</p>
+
 <p>
   <img src="docs/screenshots/pets/select-pet.jpg" width="49%" alt="Choosing a pet">
   <img src="docs/screenshots/pets/pets.jpg" width="49%" alt="The pet menu">
@@ -346,7 +361,10 @@ node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p lay
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
-node scripts/talents-smoke.mjs     # talents on a test-only tree: Esc/Talents/Learn clicks, Continue, Old Bramble's reset (E); retakes its shot
+node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
+node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
+node scripts/warrior-talents-smoke.mjs # real Warrior tree: Wide Cleave in HUD/Controls/tooltips, keys, Continue/reset; retakes its shots
+node scripts/ranger-talents-smoke.mjs # real Ranger tree: Wide Fan in HUD/Controls/tooltips, keys, Continue/reset; retakes its shots
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 
@@ -434,7 +452,7 @@ src/
 │   ├── sets.js            gear sets: each world's pieces and their two- and three-piece bonuses (burn, chill, healing...)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
-│   ├── talents.js         talent points per level, the reset wizard, and each hero's tree (unreleased until 28c-28e)
+│   ├── talents.js         talent points, the reset wizard and each hero's tree (Witch, Warrior and Ranger)
 │   └── critters.js        ambient animal looks
 ├── core/
 │   ├── Game.js            startup order, per-frame update order, run lifecycle (begin / reset)

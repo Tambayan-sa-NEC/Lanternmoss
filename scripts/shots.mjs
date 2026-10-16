@@ -26,7 +26,7 @@ export const SHOT_FOLDERS = {
   activities: ['fishing', 'gathering', 'chest', 'photo-mode', 'photo-storybook'],
   huds: ['title', 'continue', 'save-menu', 'controls', 'keys', 'help', 'tutorial', 'fainted', 'bag', 'journal', 'bestiary',
     'achievement', 'crafting', 'enchanting', 'bounty-window', 'portal-destinations', 'portal-one-way', 'balance-shop',
-    'performance', 'performance-settings', 'gear-sets', 'talents'],
+    'performance', 'performance-settings', 'gear-sets', 'talents', 'witch-talents-1080', 'warrior-talents', 'warrior-talents-1080', 'ranger-talents', 'ranger-talents-1080'],
 };
 
 const FOLDER_OF = new Map(Object.entries(SHOT_FOLDERS).flatMap(([folder, names]) => names.map(n => [n, folder])));

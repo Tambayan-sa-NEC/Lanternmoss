@@ -46,6 +46,9 @@ const burned = hp0 - hit - e.hp;
 near(burned, hit * 0.7, 3, 'the burn dealt 70% of the hit over 3 s');
 assert.equal(e.burn, null, 'the burn ran out');
 damageEnemy(e, 40); step(1); damageEnemy(e, 40); assert.equal(e.burn.t, 3, 'a new hit refreshes the burn'); step(3.2);
+const big = target(); damageEnemy(big, 200); const bigDps = big.burn.dps;
+for (let i = 0; i < 8; i++) { step(0.5); damageEnemy(big, 5); }   // small hits for 4 s after one big one
+assert.ok(big.burn.dps < bigDps / 4, `the big burn ran out after 3 s instead of being kept alive: ${big.burn.dps.toFixed(1)} vs ${bigDps.toFixed(1)}`);
 const pe = target(); damageEnemy(pe, 40, { source: 'pet' }); assert.equal(pe.burn, null, 'pet hits never burn');
 const k = target('goblin'); k.hp = k.def.hp = 30; const xp0 = P.xp + P.level * 1e6;
 damageEnemy(k, 20); assert.ok(k.alive && k.burn);

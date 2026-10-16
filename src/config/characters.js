@@ -93,3 +93,11 @@ export const ABILITY_TEXT = {
   leap: 'Hop back, away from your aim. Briefly invulnerable.',
   rain: 'Aim a spot: arrows pour down for several seconds, hurting and slowing all inside.',
 };
+
+/** Live variant copy; character selection uses the base descriptions, play uses the learned kit. */
+export function abilityText(id, ability) {
+  if (id === 'fireball' && ability.homing > 0) return 'Follows the foe you aim at when cast; flies straight without a target. Explodes on impact, knocking foes back.';
+  if (id === 'volley' && ability.count > CHARACTERS.ranger.abilities.volley.count) return `Loose ${ability.count} arrows in a wide fan, knocking foes back.`;
+  if (id === 'slash' && ability.arc > CHARACTERS.knight.abilities.slash.arc) return 'A sweeping axe swing that catches foes beside you too. Hold to keep swinging.';
+  return ABILITY_TEXT[id] ?? '';
+}

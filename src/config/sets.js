@@ -11,7 +11,8 @@
    effects (several sets' effects combine: numbers add, burn / chill keep the stronger):
      healing     share added to all healing: food and potions, health regeneration and Mend (0.15 = +15%)
      burn        { share, time }: every hit of the hero's own sets the monster burning for `time` seconds, dealing
-                 `share` of that hit over the burn (a new hit refreshes it; the stronger burn wins)
+                 `share` of that hit over the burn (a hit at least as strong refreshes it; a weaker one leaves the stronger
+                 burn to run out, so a big hit cannot be kept burning by small ones)
      chill       { slow, time }: every hit of the hero's own slows the monster by `slow` for `time` seconds
                  (monsters' slowResist applies; it never weakens a stronger slow already on them)
      swimEnergy  share cut from the energy swimming costs (0.5 = half)

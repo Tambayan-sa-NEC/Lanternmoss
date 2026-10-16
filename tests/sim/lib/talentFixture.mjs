@@ -1,5 +1,5 @@
-/* Test-only talent tree (TODO 28b): the real trees stay empty and unreleased until 28c-28e. This fills the witch's
-   slot with a small tree of real ability changes so rules, saves, the page and the wizard reset can be exercised.
+/* Test-only talent tree (TODO 28b): replaces a hero's tree with stable generic test data, independently of the
+   production trees completed in 28c-28e, so rules, saves, the page and the wizard reset can be exercised.
    Never imported by the game. */
 import { TALENTS } from '../../../src/config/talents.js';
 

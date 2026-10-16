@@ -14,7 +14,7 @@ export const COMBAT = {
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
     fireball: { name: 'Fireball', color: 0xff9a4a,
-                cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 },
+                cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, homing: 0, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 }, // homing: turn strength; 0 flies straight
     nova:     { name: 'Frost Nova', color: 0x9fe8ff,
                 cost: 28, cooldown: 8, damage: 12, radius: 4.5, slow: 0.55, slowTime: 3.5, knockback: 4 },
     blink:    { name: 'Blink', color: 0xbff4ff,

@@ -33,6 +33,86 @@ optional power from crafting or finding a world's pieces: Moss heals up to 30% m
 hit over 3 s (a refreshed burn, so fast hitters gain less than slow heavy ones), Frost slows up to 35%. Bosses keep
 their slow and knock resistance.
 
+## Witch talents (28c)
+
+The original duel targets remain base-kit, starting-gear targets. Learned talents are optional power. A paired
+level-8 diagnostic in `tests/sim/witchTalents.sim.mjs` compares an unlearned Witch with Bright Bolt rank 2 and
+Seeking Flame (four earned points). Real enemy AI, casts and projectile hits run in an isolated dry arena, without
+scenery colliders, with a passive pet and invulnerability. Both profiles start with full HP/mana, fresh needs,
+buffs/cooldowns and a reset gameplay seed. These short throughput probes are not summon-level target certification,
+boss measurements or evidence that a human survives without dodging. Unchanged hero controls may differ by up to
+two simulation frames because the surrounding world continues advancing between trials.
+
+| Hero / regular foe | Seed 1 base → talents | Seed 7 base → talents |
+| --- | --- | --- |
+| Witch / goblin | 1.350 → 1.350 s | 1.350 → 1.350 s |
+| Witch / ogre | 1.833 → 1.533 s | 1.833 → 1.533 s |
+| Warrior / goblin | 1.867 → 1.867 s | 1.867 → 1.867 s |
+| Warrior / ogre | 2.300 → 2.300 s | 2.300 → 2.300 s |
+| Ranger / goblin | 1.517 → 1.500 s | 1.500 → 1.500 s |
+| Ranger / ogre | 1.117 → 1.117 s | 1.117 → 1.117 s |
+
+The Witch's ogre sample improved by 16%; the goblin still fell on the same spell hit. A separate moving-target test
+records a missed straight Fireball and a successful seeking explosion (33.0 damage at level 16 in both seeds).
+Seeking Flame changes guidance, not damage, blast size, cost or range. Full mixed-set and three-tree acceptance
+remains TODO 28e; no balance target was changed for these talents.
+
+## Warrior talents (28d)
+
+The same paired level-8 probe in `tests/sim/warriorTalents.sim.mjs` compares an unlearned Warrior with Keen Edge
+rank 2 and Wide Cleave (four earned points, as for the Witch), with the same limits as above. The Witch and Ranger
+rows are unchanged controls.
+
+| Hero / regular foe | Seed 1 base → talents | Seed 7 base → talents |
+| --- | --- | --- |
+| Witch / goblin | 1.350 → 1.350 s | 1.350 → 1.350 s |
+| Witch / ogre | 1.833 → 1.833 s | 1.833 → 1.833 s |
+| Warrior / goblin | 1.867 → 1.433 s | 1.867 → 1.433 s |
+| Warrior / ogre | 2.300 → 1.867 s | 2.300 → 1.867 s |
+| Ranger / goblin | 1.500 → 1.500 s | 1.500 → 1.500 s |
+| Ranger / ogre | 1.117 → 1.117 s | 1.117 → 1.117 s |
+
+The Warrior's samples improve by 23% (goblin) and 19% (ogre), a little more than the Witch's 16% ogre sample because
+Keen Edge raises his most-used hit. Wide Cleave adds no damage against one foe; its value is crowds (a foe 70° aside
+takes a full hit). Against a real Gloomcap hit three seconds into Guard, the Warrior takes 32 HP base and 10 with
+Steady Guard x2. Boss immunity windows are unchanged. No balance target was changed; combined acceptance is 28e.
+
+## Ranger talents (28e)
+
+The paired level-8 probe in `tests/sim/rangerTalents.sim.mjs` (Steady Aim x2 + Quick Fan x2): Ranger goblin
+1.500 → 1.117 s on seeds 1 and 7, ogre 1.117 → 1.117 s (the fight already ends on the opening volley); Witch and
+Warrior controls unchanged. Wide Fan adds no single-target damage (a lone foe takes 48 either way).
+
+## Sets and talents together (28e)
+
+`BALANCE_BUILD=depth node tests/sim/balance.sim.mjs` reruns the balance report with each world's three-piece set
+(Moss on Lanternmoss, Ember on Emberfall, Frost on Frostveil) and the talents earned at its boss level (1, 2 and 3
+points), spent in a fixed order. It is a diagnostic: the targets stay starting-gear targets. Acceptance line
+(28e decision): with sets and talents no boss falls below 135 s, three quarters of the 180 s floor.
+
+The first run failed it on Emberfall (Pyrrhax in 105-136 s, a mini boss in 54 s): a weaker hit refreshed a stronger
+burn, so one big hit (Fireball, Meteor, a heavy swing) stayed lit as long as small hits kept landing. A weaker hit now
+leaves the stronger burn to run out (`nextBurn`; `tests/sim/sets.sim.mjs` fails without it). Rerun, seeds 1 / 7,
+base → sets and talents (Lanternmoss and Frostveil rows are unaffected by the burn fix):
+
+| World | Hero | Mini boss | Boss |
+| --- | --- | --- | --- |
+| Lanternmoss | Witch | 129 s → 124 s / 147 s → 121 s | 245 s → 233 s / 275 s → 220 s |
+| Lanternmoss | Warrior | 98 s → 91 s / 98 s → 91 s | 223 s → 206 s / 223 s → 202 s |
+| Lanternmoss | Ranger | 101 s → 91 s / 99 s → 89 s | 187 s → 169 s / 193 s → 170 s |
+| Emberfall | Witch | 145 s → 113 s / cap → 102 s | 245 s → 181 s / 245 s → 182 s |
+| Emberfall | Warrior | 116 s → 95 s / 107 s → 84 s | 235 s → 185 s / 235 s → 185 s |
+| Emberfall | Ranger | 101 s → 76 s / 101 s → 92 s | 193 s → 141 s / 189 s → 141 s |
+| Frostveil | Witch | cap → 145 s / 129 s → 110 s | 257 s → 214 s / 255 s → 226 s |
+| Frostveil | Warrior | cap → 118 s / cap → 104 s | 279 s → 262 s / cap → 259 s |
+| Frostveil | Ranger | cap → 112 s / 98 s → 65 s | 208 s → 168 s / 194 s → 185 s |
+
+Every boss stays at or above 141 s (Ember Ranger) and most fights shorten by 5-27%. The steepest mini-boss cut is
+the Frostveil Ranger on seed 7 (98 → 65 s, -34%); mini bosses were not part of the acceptance line and are left as
+they are. **Open finding, not from 28:** the base profile now caps the Frostveil mini boss in several runs (the
+table above, and the Warrior on seed 1 at `a28e67a`, before 28a-28e), where the earlier report recorded 96-126 s.
+It needs its own investigation.
+
 ## Campaign and economy
 
 The audited route completes Humming Stones, Pie Delivery and First Harvest on Lanternmoss (three wisps and three

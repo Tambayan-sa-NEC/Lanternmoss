@@ -24,9 +24,11 @@ export const WITCH_ABILITIES = {
       size: 0.16, color: s.color, homing: s.homing, homeTo: () => (target && target.alive ? target.center() : null),
       onHit: (p, e) => { if (e) damageEnemy(e, s.damage, { from: p.pos }); sparkles.emit(p.pos, { count: 12, color: s.color, speed: 2.4, life: 0.4, size: 0.3 }); } }));
     audio.castBolt(); },
-  fireball(s, dir) {
+  fireball(s, dir) { const target = s.homing > 0 ? targeting.aim : null;
     ctx.projectiles.push(new Projectile({ team: 'player', up: dirAlong(ctx.player.up, dir, 0.6), dir, alt: 1.3, speed: s.speed, range: s.range, radius: s.radius,
-      size: 0.3, color: s.color, onHit: p => explode(p.pos, s) }));
+      size: 0.3, color: s.color, homing: s.homing,
+      homeTo: target ? () => (target.alive && !target.hidden ? target.center() : null) : null,
+      onHit: p => explode(p.pos, s) }));
     audio.castFire(); },
   nova(s) { const c = ctx.player.pos.clone();
     ringFX(c, s.radius, s.color, 0.5); ringFX(c, s.radius * 0.6, 0xffffff, 0.35);

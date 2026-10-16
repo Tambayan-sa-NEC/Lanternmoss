@@ -1,14 +1,13 @@
-// Talents (TODO 28b) in a real browser, on the test-only fixture tree (tests/sim/lib/talentFixture.mjs; the real trees
-// stay unreleased until 28c-28e): npm i --no-save --no-package-lock puppeteer-core; set CHROME for another browser.
-// Unreleased: the pause menu has no Talents button. With the fixture: real Esc opens the pause menu, a real click opens
+// Talents (TODO 28b) in a real browser, on the stable test-only fixture tree (tests/sim/lib/talentFixture.mjs):
+// npm i --no-save --no-package-lock puppeteer-core; set CHROME for another browser.
+// Production Witch: the page is offered. With the fixture: real Esc opens the pause menu, a real click opens
 // Talents on top of it, real Learn clicks spend points and change the kit, Esc comes back to the pause menu; 720p/1080p
 // fit; a full reload and Continue keep the ranks; real E with Old Bramble resets them for free; zero page or shader
-// errors. Writes the talents shot (huds/), a development preview of the page.
+// errors. The production witch-talents smoke owns the screenshot.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
-import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8119;
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let error = '', browser; server.stderr.on('data', d => { error += d; });
@@ -38,11 +37,11 @@ try {
   const pauseHasTalents = () => page.evaluate(() => !!document.querySelector('#pause [data-go="talents"]'));
   await frames(20);
 
-  // ---- unreleased: no Talents button --------------------------------------------------------------------------------
+  // ---- production Witch: Talents button -----------------------------------------------------------------------------
   await page.keyboard.press('Escape'); await frames(1);
-  assert.ok(await page.evaluate(() => window.LANTERNMOSS.PauseMenu.isOpen)); assert.equal(await pauseHasTalents(), false);
+  assert.ok(await page.evaluate(() => window.LANTERNMOSS.PauseMenu.isOpen)); assert.equal(await pauseHasTalents(), true);
   await page.keyboard.press('Escape'); await frames(1);
-  console.log('PASS  with the real, unreleased tree the pause menu has no Talents button');
+  console.log('PASS  with the completed witch tree the pause menu has a Talents button');
 
   // ---- the fixture tree: Esc, a click on Talents, Learn clicks --------------------------------------------------------
   const install = () => page.evaluate(async () => { const { installTalentFixture } = await import('/tests/sim/lib/talentFixture.mjs'); window.talentFixture = installTalentFixture('witch'); });
@@ -71,7 +70,7 @@ try {
     const fits = await page.$eval('#talent-menu .talent-panel', p => { const r = p.getBoundingClientRect(); return r.right <= innerWidth && r.bottom <= innerHeight && r.top >= 0 && document.documentElement.scrollWidth <= innerWidth; });
     assert.ok(fits, `${w}x${h}: the talent page fits`);
   }
-  await page.screenshot({ path: shotPath('talents'), type: 'jpeg', quality: 86 });
+  // The production witch smoke owns the talents screenshot; do not replace it with this fixture.
   await page.keyboard.press('Escape'); await frames(1);
   const back = await page.evaluate(() => ({ talents: window.LANTERNMOSS.TalentUI.isOpen, pause: window.LANTERNMOSS.PauseMenu.isOpen }));
   assert.deepEqual(back, { talents: false, pause: true }, 'Esc closes the page and leaves the pause menu');
