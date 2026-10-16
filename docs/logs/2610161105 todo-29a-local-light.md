@@ -17,4 +17,4 @@ tour), 11:50 (merge). Steps between reads are grouped at the next read.
 | 2026-10-16 11:49 | TEST | TODO 29a | lighting, building, home, structures, tides, coastal-wildlife and sets smokes; tour night/village/house | feat/todo-29a-local-light | All pass; tour errors: none. New night shot compared with the committed one: the same lighting; only wandering actors and a pet emote differ, so the committed tour shots were kept | 0h 17m |
 | 2026-10-16 11:50 | MERGE | TODO 29a | Committed efc22e1, merged into `feat/todo-29` (c73e3f2), pushed | feat/todo-29 | Not in `develop`: see the open decision below | 0h 01m |
 | 2026-10-16 11:51 | BLOCKED | TODO 29 / 30 | Parent integration needs the user | feat/todo-29 | 30a needs 29a, but the rule keeps `feat/todo-29` out of `develop` until all of 29 is done, and 29g needs 30i: as written, neither can finish. Options asked of the user | 0h 01m |
-| 2026-10-16 11:51 | TOTAL | TODO 29a | Local light, start to log | feat/todo-29 | Complete on the TODO 29 parent | 0h 106m |
+| 2026-10-16 11:51 | TOTAL | TODO 29a | Local light, start to log | feat/todo-29 | Complete on the TODO 29 parent | 0h 46m |
