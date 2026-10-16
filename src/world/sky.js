@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { PLANET_RADIUS as R } from '../config/game.js';
 import { Batcher } from '../render/Batcher.js';
 import { makePointsMaterial } from '../render/materials.js';
+import { SKY_DIM } from '../render/scene.js';
 import { G, LM } from '../render/meshes.js';
 import { rand, rpick, rr } from '../utils/random.js';
 import { matrixAt, randomDir, tangentFrame } from '../utils/sphere.js';
@@ -17,9 +18,9 @@ export function createSky({ horizon, mid, zenith }) {
     side: THREE.BackSide, depthWrite: false, fog: false,
     uniforms: { uUp: { value: new V3(0, 1, 0) }, uSun: { value: new V3(1, 0.2, 0) }, uTime: { value: 0 },
       cHorizon: { value: new THREE.Color(horizon) }, cMid: { value: new THREE.Color(mid) }, cZenith: { value: new THREE.Color(zenith) },
-      cSun: { value: new THREE.Color(0xffc987) }, cCloud: { value: new THREE.Color(0xfff1ec) } },
+      cSun: { value: new THREE.Color(0xffc987) }, cCloud: { value: new THREE.Color(0xfff1ec) }, uSkyDim: SKY_DIM },
     vertexShader: `varying vec3 vDir; void main(){ vDir = (modelMatrix * vec4(position,1.0)).xyz - cameraPosition; gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0); }`,
-    fragmentShader: `uniform vec3 uUp, uSun, cHorizon, cMid, cZenith, cSun, cCloud; uniform float uTime; varying vec3 vDir;
+    fragmentShader: `uniform vec3 uUp, uSun, cHorizon, cMid, cZenith, cSun, cCloud; uniform float uTime, uSkyDim; varying vec3 vDir;
     void main(){
       vec3 d = normalize(vDir); float h = dot(d, uUp);
       float wob = sin(d.x * 9.0 + uTime * 0.05) * sin(d.z * 7.0 + d.y * 5.0) * 0.03;
@@ -37,7 +38,7 @@ export function createSky({ horizon, mid, zenith }) {
       col = mix(col, vec3(1.7, 1.55, 1.25), smoothstep(0.9965, 0.9975, s));  // sun disc (blooms)
       col += vec3(0.25, 0.18, 0.1) * smoothstep(0.984, 0.985, s) * (1.0 - smoothstep(0.986, 0.987, s)); // anime halo ring
       if (h < 0.0) col = mix(cHorizon, cHorizon * 0.95, clamp(-h * 4.0, 0.0, 1.0));
-      gl_FragColor = vec4(col, 1.0); }`,
+      gl_FragColor = vec4(col * uSkyDim, 1.0); }`,
   }));
   sky.renderOrder = -10; sky.frustumCulled = false;
   return sky;

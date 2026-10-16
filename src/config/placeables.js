@@ -3,7 +3,7 @@
 import { FURNISHINGS } from './home.js';
 import { STRUCTURE_ITEMS } from './structures.js';
 
-export const BUILDING = { limit: 256, reach: 2.6, range: 8, grid: 1, storageSlots: 24, lightLimit: 4, maxSlope: 0.28, maxRelief: 0.4 };
+export const BUILDING = { limit: 256, reach: 2.6, range: 8, grid: 1, storageSlots: 24, maxSlope: 0.28, maxRelief: 0.4 };
 export const PLACEABLES = {
   ...STRUCTURE_ITEMS,
   ...Object.fromEntries(Object.entries(FURNISHINGS).map(([id, f]) => [id, { ...f,

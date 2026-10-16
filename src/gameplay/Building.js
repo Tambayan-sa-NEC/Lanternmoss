@@ -27,10 +27,12 @@ import { Stations } from './Stations.js';
 import { Home } from './Home.js';
 import { Challenges } from './challenges/Challenges.js';
 import { Gathering } from './Gathering.js';
+import { LocalLights } from '../render/lighting.js';
+import { RENDER } from '../config/render.js';
 import { Fishing } from './Fishing.js';
 
 export const Building = {
-  lights: [], list: [], active: null, world: null, callbacks: {},
+  lampLights: new Map(), list: [], active: null, world: null, callbacks: {},
   setup(world) { this.clear(); this.world = world; },
   toJSON() { return this.list.map(e => ({ ...e.record, ...(e.store ? { slots: e.store.toJSON() } : {}) })); },
   load(data) {
@@ -48,7 +50,7 @@ export const Building = {
       }
     }
   },
-  clear() { this.cancel(); for (const e of [...this.list]) this.uninstall(e); this.list = []; for (const light of this.lights) { scene.remove(light); light.dispose(); } this.lights = []; },
+  clear() { this.cancel(); for (const e of [...this.list]) this.uninstall(e); this.list = []; for (const handle of this.lampLights.values()) handle.remove(); this.lampLights.clear(); },
   available() { return ctx.started && !ctx.player.dead && !ctx.indoors && !ctx.transitioning && !ctx.cutscene && !Challenges.run && !Gathering.job && !Fishing.active; },
   canEdit(e) { return this.available() && dryGround(e.dir) && this.list.includes(e) && arcDist(ctx.player.up, e.dir) < BUILDING.reach; },
   changed() { audio.plip(); this.callbacks.save?.(); },
@@ -175,10 +177,12 @@ export const Building = {
     return result;
   },
   updateStructureView(cameraForward) { updateStructureView(this,ctx.indoors ? this.world.spawnDir : ctx.player.up,cameraForward); },
+  /** Each placed home lamp is a local light (render/lighting.js): the nearest ones share its real point lights. */
   updateLights() {
-    const lamps = ctx.indoors ? [] : this.list.filter(e => e.record.itemId === 'homeLamp').map(e => ({ e, d: arcDist(ctx.player.up, e.dir) })).filter(x => x.d < 12).sort((a, b) => a.d - b.d).slice(0, BUILDING.lightLimit);
-    if (lamps.length && !this.lights.length) for (let i = 0; i < BUILDING.lightLimit; i++) { const light = new THREE.PointLight(0xffd36b, 3, 7, 2); this.lights.push(light); scene.add(light); }
-    this.lights.forEach((light, i) => { light.visible = !!lamps[i]; if (lamps[i]) light.position.set(0,1.5,0).applyMatrix4(lamps[i].e.parts.root.matrix); });
+    const lamps = new Set(this.list.filter(e => e.record.itemId === 'homeLamp'));
+    for (const [e, handle] of this.lampLights) if (!lamps.has(e)) { handle.remove(); this.lampLights.delete(e); }
+    for (const e of lamps) if (!this.lampLights.has(e))
+      this.lampLights.set(e, LocalLights.add({ at: v => v.set(0, 1.5, 0).applyMatrix4(e.parts.root.matrix), radius: 5, color: 0xffd36b, intensity: 3 / RENDER.localLight.realPower, real: true }));   // the same 3-intensity light as before the pool
   },
   update() {
     this.updateLights();

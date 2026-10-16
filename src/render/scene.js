@@ -13,5 +13,7 @@ export const camera = new THREE.PerspectiveCamera(RENDER.fov, innerWidth / inner
 
 /** Fog distances as shared uniforms (outlines and water read them too), so weather can thicken the fog everywhere. */
 export const FOG_NEAR = { value: RENDER.fog.near }, FOG_FAR = { value: RENDER.fog.far };
+/** How bright the sky is drawn (1 normally): render/lighting.js dims it in the dark. Shared by every sky (world/sky.js). */
+export const SKY_DIM = { value: 1 };
 export function setFogColor(hex) { FOG_COLOR.set(hex); scene.fog.color.set(hex); }
 export function setFogRange(near, far) { FOG_NEAR.value = scene.fog.near = near; FOG_FAR.value = scene.fog.far = far; }
