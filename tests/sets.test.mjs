@@ -50,11 +50,12 @@ test('two sets at once: both bonuses apply (a mixed loadout)', () => {
   assert.deepEqual(summary.map(s => [s.id, s.count, s.bonuses.map(b => b.active)]), [['moss', 2, [true, false]], ['ember', 1, [false, false]]]);
 });
 
-test('a burn deals its share over its time, refreshes, and keeps the stronger one', () => {
+test('a burn deals its share over its time; an equal or stronger hit refreshes it; a weaker one cannot extend it', () => {
   const b = nextBurn(null, 30, { share: 0.4, time: 3 });
   assert.equal(b.t, 3); near(b.dps * b.t, 12);
   const weaker = nextBurn({ dps: 4, t: 1 }, 6, { share: 0.4, time: 3 });
-  assert.deepEqual(weaker, { dps: 4, t: 3 }, 'a weak hit refreshes the timer but keeps the stronger burn');
+  assert.deepEqual(weaker, { dps: 4, t: 1 }, 'a weak hit neither weakens nor extends the stronger burn');
+  assert.deepEqual(nextBurn({ dps: 4, t: 1 }, 30, { share: 0.4, time: 3 }), { dps: 4, t: 3 }, 'an equal hit refreshes it');
   near(nextBurn({ dps: 4, t: 0 }, 6, { share: 0.4, time: 3 }).dps, 0.8, 'an expired burn does not linger');
 });
 

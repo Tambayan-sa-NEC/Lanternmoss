@@ -11,10 +11,10 @@ test('a point at level 2 and every two levels after: 8 by the level cap', () => 
   assert.deepEqual([1, 2, 3, 4, 5, 15, 16, 40].map(l => pointsEarned(l)), [0, 1, 1, 2, 2, 7, 8, 8]);
 });
 
-test('the real trees are valid; only the completed witch and warrior trees are released', () => {
+test('the real trees are valid and all three are released', () => {
   for (const [hero, t] of Object.entries(TALENTS.trees)) {
     assert.deepEqual(validateTree(t, CHARACTERS[hero].abilities), [], hero);
-    assert.equal(t.released, hero === 'witch' || hero === 'knight', `${hero}: released only by its own stage (28c-28e)`);
+    assert.equal(t.released, true, `${hero}: released by its own stage (28c-28e)`);
   }
   assert.deepEqual(validateTree(tree, witch), []);
   const bad = { talents: [{ id: 'x', name: 'X', text: 't', row: 1, max: 4, cost: 1, needs: ['y'], mods: [{ ability: 'nope', key: 'damage', add: 1 }] }] };
@@ -100,4 +100,27 @@ test('the warrior tree: ten points of choices in an eight-point budget, with a g
   assert.equal(talentKit(knight, t, {}), knight); assert.equal(knight.slash.arc, 110);
   assert.deepEqual(cleanTalents({ ranks: { wideCleave: 1 } }, t, 16), { ranks: {} });
   assert.deepEqual(cleanTalents({ ranks }, t, 16), { ranks });
+});
+
+test('the ranger tree: ten points of choices in an eight-point budget, with a gated Wide Fan', () => {
+  const t = TALENTS.trees.ranger, ranger = CHARACTERS.ranger.abilities;
+  assert.deepEqual(validateTree(t, ranger), []);
+  assert.equal(t.talents.reduce((n, x) => n + x.max * x.cost, 0), 10);
+  assert.match(learnProblem(t, {}, 'wideFan', 16), /Quick Fan/);
+  assert.match(learnProblem(t, {}, 'brambleSnare', 16), /Steady Aim/);
+  let ranks = {};
+  for (const id of ['quickFan', 'quickFan', 'wideFan', 'steadyAim', 'steadyAim', 'brambleSnare', 'brambleSnare']) {
+    assert.equal(learnProblem(t, ranks, id, 16), null, id); ranks = learn(t, ranks, id, 16);
+  }
+  assert.equal(pointsSpent(t, ranks), 8); assert.match(learnProblem(t, ranks, 'lightFeet', 16), /Not enough/);
+  const kit = talentKit(ranger, t, ranks);
+  assert.equal(kit.volley.count, 7); assert.equal(kit.volley.spread, 60); assert.equal(kit.volley.name, 'Wide Fan');
+  assert.equal(kit.volley.spread / (kit.volley.count - 1), ranger.volley.spread / (ranger.volley.count - 1), 'arrows as tightly spaced');
+  for (const key of ['damage', 'cost', 'range', 'knockback']) assert.equal(kit.volley[key], ranger.volley[key], key);
+  assert.equal(kit.volley.cooldown, 3); assert.equal(kit.snare.slowTime, 4);
+  assert.ok(Math.abs(kit.shot.damage - ranger.shot.damage * 1.2) < 1e-9);
+  assert.equal(talentKit(ranger, t, { lightFeet: 2 }).leap.cost, 11);
+  assert.match(abilityText('volley', kit.volley), /7 arrows/); assert.doesNotMatch(abilityText('volley', ranger.volley), /7 arrows/);
+  assert.equal(talentKit(ranger, t, {}), ranger); assert.equal(ranger.volley.count, 5);
+  assert.deepEqual(cleanTalents({ ranks: { wideFan: 1 } }, t, 16), { ranks: {} });
 });

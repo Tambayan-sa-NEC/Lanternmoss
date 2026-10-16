@@ -43,9 +43,10 @@ export function setEffects(pieces, hero) {
   return fx;
 }
 
-/** A burning monster after a new hit: the stronger of its current burn and the new one, timer refreshed.
+/** A burning monster after a new hit: a burn at least as strong as the current one replaces it (timer refreshed); a
+    weaker hit leaves the stronger burn to run out, so one big hit cannot be kept burning by small ones.
     burn = { dps, t } or null; hit = the damage dealt; b = the hero's { share, time }. */
 export function nextBurn(burn, hit, b) {
   const dps = (hit * b.share) / b.time;
-  return { dps: Math.max(dps, burn?.t > 0 ? burn.dps : 0), t: b.time };
+  return burn?.t > 0 && burn.dps > dps ? { dps: burn.dps, t: burn.t } : { dps, t: b.time };
 }
