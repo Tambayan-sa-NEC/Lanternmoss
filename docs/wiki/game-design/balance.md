@@ -203,9 +203,9 @@ Individual monster types retain tactical differences: the Frostveil warrior take
 and some opening wisps fall before 2 s. These are reported outliers, not silently averaged away within a type.
 The pacing contract uses the planet?s roster median; each type?s median of three trials remains in the raw data.
 
-[Final raw measurements](balance-after.json) include each monster trial summary, big-fight move timestamps,
+[Final raw measurements](../../balance-after.json) include each monster trial summary, big-fight move timestamps,
 transition fractions and flying damage. The first six rows came from the full nine-profile report; the three
-Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](balance-before.json)
+Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](../../balance-before.json)
 was captured during harness repair, before in-range skill selection, Doom evasion and complete fight isolation;
 its capped/reset boss runs are not comparable completed-fight times.
 

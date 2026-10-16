@@ -70,8 +70,8 @@ individual gear properties in place. Sorting emits no collection rewards. Both s
 planted plot first. Picking up clears its model, movement/camera colliders, station access and plot registration.
 You can then place it somewhere else. Paused menus support Tab/Shift-Tab focus, Space/Enter buttons and Esc close.
 
-![A rotated placement preview](screenshots/building/building-preview.jpg)
-![Storage with bag and chest contents](screenshots/building/building-storage.jpg)
+![A rotated placement preview](../../screenshots/building/building-preview.jpg)
+![Storage with bag and chest contents](../../screenshots/building/building-storage.jpg)
 
 ## Saves and verification
 

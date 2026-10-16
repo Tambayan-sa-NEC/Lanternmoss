@@ -11,7 +11,7 @@ exports three views:
 
 Each entry has a stable `id`, `name`, positive `act`, and explicit boolean `released` and `secret` fields. The starting
 world must be released and non-secret. Released entries also need generation data and pass the mandatory
-[content release gate](content-release.md). Keep a new world unreleased until its own release stage passes that checklist. Tidewhisper,
+[content release gate](../technical/content-release.md). Keep a new world unreleased until its own release stage passes that checklist. Tidewhisper,
 Duskhollow and the Lantern Moon currently contain only unfinished metadata and cannot be selected or generated.
 
 The original runtime order remains Lanternmoss, Emberfall, Frostveil. Their seeds, placement lists and generated
@@ -27,12 +27,12 @@ Direct transition/load calls also refuse unreleased entries before changing worl
 
 A released entry may declare a registered `mechanic` id. Unknown modules disable that destination and direct
 loads refuse it before replacing the current world. Mechanic state loads before entry and population, is saved
-independently per planet, and receives separate frame/skip/away hooks. See [the mechanic contract](mechanics.md).
+independently per planet, and receives separate frame/skip/away hooks. See [the mechanic contract](../technical/planet-mechanics.md).
 The original worlds declare no mechanic; actual expansion modules remain later-stage work.
 
 Optional `physics` config supplies a gravity multiplier, sea level and pond offset with their maximum-water
 envelope. Generation and resource placement reserve that maximum; runtime mechanics change only live values
-within it. Defaults retain the original layouts and movement. See [physics config and queries](world-physics.md).
+within it. Defaults retain the original layouts and movement. See [physics config and queries](../technical/world-physics.md).
 
 A released secret world needs an explicit `unlock` gate, for example:
 
@@ -50,7 +50,7 @@ discovery behavior belong to TODO 32. Secrets do not block main-campaign complet
 The original `allBosses` achievement keeps its id and rewards and requires the three named Act I bosses, so adding a
 world cannot raise its goal or substitute a different boss. The cap is 16; new boss awards and the five-world award
 activate only as their worlds release. Expected levels/scaling/challenge targets live in each config. See the
-[Act II progression and acceptance rules](content-release.md).
+[Act II progression and acceptance rules](../technical/content-release.md).
 
 Tidewhisper now declares its archipelago, palette, seed, water envelope and registered `tides` mechanic, but
 remains unreleased. A development-only fixture exercises its terrain/clock/lagoon controls in an original save

@@ -24,7 +24,7 @@ fog at `skyFloor` (30%). While it is dark the hero carries a light (radius 5 m).
 Changing the darkness never compiles a new shader program: every toon material has one variant with the light radii
 built in and switched by a uniform.
 
-![The harness at Low: night, darkness 1, three lanterns](screenshots/world/lighting-harness.jpg)
+![The harness at Low: night, darkness 1, three lanterns](../../screenshots/world/lighting-harness.jpg)
 
 ## The harness and checks
 
@@ -47,5 +47,5 @@ There is no cave yet, so the harness is the Lanternmoss village at night with da
 The shader adds a uniform branch to every toon fragment (skipped at darkness 0) and up to 8 distance tests in the
 dark. It adds no draw calls or triangles. `scripts/performance.mjs --quick` was rerun on this machine (Intel UHD,
 SwiftShader in headless runs). Its ceilings passed and its timings are diagnostics only. As for every rendering
-change, real certification needs Iris Xe hardware (`docs/performance.md`), and the dark harness should be measured
+change, real certification needs Iris Xe hardware (`docs/wiki/technical/performance.md`), and the dark harness should be measured
 there before Duskhollow ships.

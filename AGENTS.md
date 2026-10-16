@@ -12,8 +12,9 @@ standing rules. Following them needs no extra confirmation, except where a secti
    update its parent branch from `develop`, then create the stage branch from that parent (see Branches).
    Other task branches start from `develop`. Never implement work directly on `develop` or `master`.
 3. Read the task's section in `TODO.md`: its goal, size, dependencies (`Needs`), checklist and any earlier
-   "implemented" notes. Read the matching doc in `docs/` (for example `docs/tidewhisper.md`, `docs/balance.md`,
-   `docs/performance.md`) and the latest related logs in `docs/logs/`.
+   "implemented" notes. Read the matching wiki pages (start at `docs/wiki/README.md`; for example
+   `docs/wiki/world/tidewhisper.md`, `docs/wiki/game-design/balance.md`, `docs/wiki/technical/performance.md`) and the
+   latest related logs in `docs/logs/`.
 4. Before designing, find the closest existing feature and follow it rather than inventing a new pattern. Examples:
    `ui/PetMenu.js` for a paused overlay, `CameraSystem` modes for a camera, the boss kits in
    `entities/enemies/behaviors/boss/` for an encounter. Reuse existing helpers.
@@ -28,7 +29,7 @@ Code conventions:
 
 - Tunable numbers and authored data live in `src/config/*.js`, with a header comment explaining every field.
   Pure helpers that go with that data may sit beside it (for example `photoFileName` in `config/photo.js`).
-  The README's tuning table points to them.
+  The wiki's tuning page (`docs/wiki/technical/tuning.md`) points to them.
 - Pure logic gets a unit test in `tests/*.test.mjs` (`npm test`, Node's test runner).
 - Runtime behaviour gets a simulation in `tests/sim/<name>.sim.mjs`, booted with `tests/sim/lib/boot.mjs`. Run one
   with `node tests/sim/<name>.sim.mjs` or `npm run sim -- <name>`, and all of them with `npm run sim`. Every new
@@ -53,11 +54,11 @@ Code conventions:
 
 Balance and performance:
 
-- Timing targets and their rules are in `docs/balance.md` and `src/config/balance.js`. Do not loosen a target to
+- Timing targets and their rules are in `docs/wiki/game-design/balance.md` and `src/config/balance.js`. Do not loosen a target to
   pass. First rule out a measurement defect (bot reach, approach, a misapplied rule), then tune gameplay numbers.
 - Measure on at least two seeds (1 and 7) for all three heroes, and show before and after numbers.
 - A new world is audited by the pacing simulation: its XP route, coin budget and material yields.
-- Performance acceptance is in `docs/performance.md`. Only real target hardware certifies a release. Diagnostic runs
+- Performance acceptance is in `docs/wiki/technical/performance.md`. Only real target hardware certifies a release. Diagnostic runs
   on other machines are recorded as diagnostics, never as certification.
 
 Commits during the task:
@@ -79,20 +80,46 @@ When the feature works and its checks pass, before merging:
      and weather, and hide toasts and banners that are not the subject.
    - Open every new screenshot and look at it. Check that the subject is visible and unobstructed, nothing is
      clipped, and no debug or HUD clutter shows. Fix the staging and retake until it reads well; record what was fixed.
-2. **The README tour.** After a player-facing update, retake every README screenshot with `node scripts/screenshots.mjs`
+2. **The screenshot tour.** After a player-facing update, retake every tour screenshot (used by the README and the
+   wiki's feature tour) with `node scripts/screenshots.mjs`
    (Google Chrome by default, `CHROME` to override; a few minutes). It must finish with `errors: none`.
    - Spot-check a few shots: the Controls page for new keys, and a gameplay shot to confirm normal play looks as before.
    - A feature that deserves a tour picture gets a scene in that script, or its own smoke shot.
-3. **README.md.**
-   - Feature tour: a paragraph and the screenshots.
-   - The controls table, for new keys.
-   - The file map, for new files.
-   - The tuning table, for new config.
-   - The list of browser checks, for a new smoke script.
+3. **The wiki** (see Documentation governance), each in the page that owns it:
+   - Feature tour (`docs/wiki/game-design/feature-tour.md`): a paragraph and the screenshots.
+   - Controls (`docs/wiki/reference/controls.md`), for new keys.
+   - The file map (`docs/wiki/technical/file-map.md`), for new files.
+   - The tuning page (`docs/wiki/technical/tuning.md`), for new config.
+   - The browser checks in `docs/wiki/technical/running-and-checks.md`, for a new smoke script.
+   - The wiki home (`docs/wiki/README.md`), for a new page.
+   - `README.md` only when the project overview, the key features, setup or onboarding change.
 4. **TODO.md and docs.** Tick the TODO checklist and add an "**N implemented (date):**" note saying what was built and
-   how it is checked. Update the feature's doc in `docs/`, and record any limitation honestly.
+   how it is checked. Update the feature's wiki page in `docs/wiki/`, and record any limitation honestly.
 
 Then follow the task completion workflow below.
+
+# Documentation governance
+
+Each document has one job:
+
+- **`README.md`**: the project's concise overview, onboarding guide and setup reference.
+- **`docs/wiki/`**: the authoritative source for detailed game design, gameplay mechanics, lore, terminology, system
+  specifications and technical decisions. One page owns each subject; `docs/wiki/README.md` is its index.
+- **`AGENTS.md`**: the authoritative source for agent operating instructions, development workflows and
+  repository-specific constraints. `TODO.md` stays the roadmap, and `docs/logs/` the record of work done.
+
+Before implementing or changing a game feature:
+
+1. Consult the relevant wiki pages and follow their confirmed rules and technical constraints.
+2. Distinguish implemented behaviour from planned or proposed behaviour (unreleased content and `docs/wiki/plans/`).
+3. Don't invent mechanics or silently change an established specification.
+4. Update the affected wiki pages in the same task whenever an implemented change makes them outdated.
+5. Update `README.md` only when the overview, major features, setup or onboarding change, and `AGENTS.md` only when
+   workflows, operating instructions or repository conventions change.
+
+When documentation and implementation disagree, don't assume either is right. Check the evidence (the code, its tests,
+`TODO.md` notes, decisions in `docs/logs/`), correct only what that evidence supports, and flag anything unresolved for
+the user rather than choosing a version.
 
 # Branches
 
@@ -208,7 +235,7 @@ Task types (pick the one that best describes the row):
 | `BALANCE` | Tuning numbers, pacing and difficulty |
 | `TEST` | Writing tests or running checks (unit, simulation, browser) and their results |
 | `REVIEW` | Code, visual or design review, and self-review before merging |
-| `DOCS` | README, docs, TODO, guides and screenshots |
+| `DOCS` | README, wiki, docs, TODO, guides and screenshots |
 | `CHORE` | Maintenance: dependencies, tooling, branch cleanup, repository housekeeping |
 | `BUILD` | Build, packaging, scripts and CI setup |
 | `MERGE` | Merging a branch (stage into TODO parent, completed task/parent into `develop`, `develop` into `master`) |

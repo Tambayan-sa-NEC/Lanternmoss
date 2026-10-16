@@ -28,7 +28,7 @@ Only ranks are saved, per adventure. Points are derived from the saved level. Co
 prerequisites and the point budget; old saves default to an empty tree. Two reloads cannot duplicate points.
 Reset rebuilds the original kit without changing its shared data, and starting a new adventure clears all ranks.
 
-![Witch tree at 720p](screenshots/huds/talents.jpg)
+![Witch tree at 720p](../../screenshots/huds/talents.jpg)
 
 ## Warrior (TODO 28d)
 
@@ -45,7 +45,7 @@ catches more foes, so against one foe it is no stronger (its value is crowds). T
 the wider arc reaches foes beside the one locked. Shoulder Charge's hit sweep reads the learned kit like every cast,
 and ability tooltips list a swing's arc. Bosses keep their immunity windows: no talent lands while one is immune.
 
-![Warrior tree at 720p](screenshots/huds/warrior-talents.jpg)
+![Warrior tree at 720p](../../screenshots/huds/warrior-talents.jpg)
 
 ## Ranger (TODO 28e)
 
@@ -60,7 +60,7 @@ and ability tooltips list a swing's arc. Bosses keep their immunity windows: no 
 Wide Fan keeps the arrows 10° apart, so a single foe takes what Arrow Fan dealt; the two extra arrows reach foes
 further aside. Damage per arrow, cost and range are unchanged.
 
-![Ranger tree at 720p](screenshots/huds/ranger-talents.jpg)
+![Ranger tree at 720p](../../screenshots/huds/ranger-talents.jpg)
 
 ## Sets and talents together (TODO 28e)
 
@@ -68,7 +68,7 @@ Set bonuses ride on whatever an ability hits, so a talent variant spreads them: 
 burns both foes it catches, Wide Fan with the Frost set chills the foe aside, and Seeking Fireball with the Ember set
 leaves its target burning. They stay independent: Old Bramble's reset takes talents only, taking a set off takes its
 bonus only, and Continue keeps both. Burns tick on monsters, not on static objects such as lair seals. Boss pacing
-with sets and talents is in [balance](balance.md#sets-and-talents-together-28e).
+with sets and talents is in [balance](../game-design/balance.md#sets-and-talents-together-28e).
 
 ## Verification
 
@@ -96,5 +96,5 @@ with sets and talents is in [balance](balance.md#sets-and-talents-together-28e).
 
 The simulation also prints paired base/learned throughput samples for all three heroes on seeds 1 and 7. These
 are isolated level-8 regular fights, with starting equipment, passive pets and invulnerability. See
-[measurement limits and numbers](balance.md#witch-talents-28c). They do not replace the original summon-level
+[measurement limits and numbers](../game-design/balance.md#witch-talents-28c). They do not replace the original summon-level
 balance contract or human playtesting. Mixed set/talent and all-tree acceptance belongs to 28e.
