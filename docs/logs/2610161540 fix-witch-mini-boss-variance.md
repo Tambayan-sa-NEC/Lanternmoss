@@ -17,4 +17,4 @@ Clock reads: 15:40 (start), 15:42 (per-seed stats), the user's decision, 15:56 (
 | 2026-10-16 16:18 | DOCS | TODO N/A | balance.md (leash section, tables, mini-boss health), README (mini-boss paragraph, tuning row) | fix/witch-mini-boss-variance | No visual change, so no screenshots retaken | (above) |
 | 2026-10-16 16:25 | TEST | TODO N/A | `npm test`, `npm run sim` | fix/witch-mini-boss-variance | 236/236, 51/51 (ironclaw, coastalDuels and bosses also checked earlier: pass) | 0h 07m |
 | 2026-10-16 16:26 | MERGE | TODO N/A | Committed d2941d3, merged into `develop` (7df9b8e), pushed, deleted the branch | develop | | 0h 01m |
-| 2026-10-16 16:26 | TOTAL | TODO N/A | Witch mini-boss variance, start to log | develop | Mini bosses keep damage past the leash (user rule), health +20%; all profiles in target | 0h 47m |
+| 2026-10-16 16:26 | TOTAL | TODO N/A | Witch mini-boss variance, start to log | develop | Mini bosses keep damage past the leash (user rule), health +20%; all profiles in target | 0h 46m |
