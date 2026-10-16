@@ -129,7 +129,8 @@ mid-adventure.
 - **The Hydra** guards its lake and grows a new head at each third of its health.
 - **The Basilisk** turns anyone looking at it to stone: when its eyes blaze, turn your back.
 
-Both always leave a rare haul of loot.
+Both always leave a rare haul of loot. Each keeps close to home: if a fight drifts too far it turns back, but it keeps
+the damage you dealt, so you can catch it and finish the job. Leave it alone for more than five seconds and it heals.
 
 <p>
   <img src="docs/screenshots/bosses/summon.jpg" width="49%" alt="Gloomcap wakes">
@@ -744,6 +745,7 @@ helpers such as `spawnEnemy('ramhorn')`, `gainXp(100)`, `boss`, `planet`, `goToP
 | Weather kinds (wind, fog, light, rain / snow / ash, lightning, sound), spell length | `src/config/weather.js` |
 | Animals: looks and behaviour kinds, rare creatures and their gifts, how shy they are | `src/config/critters.js` |
 | Mini bosses (the Hydra, the Basilisk): stats, attacks, phases; their loot | `src/config/combat.js` → `hydra`, `basilisk`; `src/config/chests.js` → `MINI_BOSS_LOOT` |
+| Giving up a chase: healing on the way home, the mini boss's delay before it heals | `src/config/combat.js` → `leashReturn` |
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |
 | Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |

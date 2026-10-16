@@ -62,7 +62,7 @@ export class Enemy extends Walker {
     this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, rng() * 6.28);
     Object.assign(this, { hp: this.def.hp, alive: true, state: 'idle', timer: mr(0.5, 2.5), cool: 0, speed: 0, phase: 0, deadT: 0, turn: 0,
       slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false,
-      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0, burn: null, burnTick: 0 });   // burn = { dps, t }: the Ember set (config/sets.js)   // hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
+      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0, burn: null, burnTick: 0, calmT: 0 });   // calmT = seconds out of combat; burn = { dps, t }: the Ember set (config/sets.js); hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
     this.knock.set(0, 0, 0); this.selfCollider.active = true; this.root.visible = this.shadow.visible = true; this.root.scale.setScalar(this.baseScale);
     this.behavior?.reset?.(this);
   }
@@ -149,6 +149,9 @@ export class Enemy extends Walker {
     this.shieldT = Math.max(0, this.shieldT - dt); this.stunnedT = Math.max(0, this.stunnedT - dt);
     this.cool -= dt; this.timer -= dt; this.hitPop = Math.max(0, this.hitPop - dt * 6);
     if (this.burn) { this.tickBurn(dt); if (!this.alive) return; }
+    this.calmT = ENGAGED.has(this.state) ? 0 : this.calmT + dt;
+    if (this.def.miniBoss && this.calmT > COMBAT.leashReturn.miniBossHealDelay && this.hp < this.def.hp)   // a mini boss heals only once properly out of the fight
+      this.hp = Math.min(this.def.hp, this.hp + this.def.hp * COMBAT.leashReturn.heal * dt);
     const dist = tangentTo(this.pos, this.up, ctx.player.pos, this.toP), safe = playerSafe();
     if (!ENGAGED.has(this.state) && this.state !== 'return' && dist < d.aggro) this.aggro();
     if (ENGAGED.has(this.state) && (safe || arcDist(this.up, this.home) > d.leash || dist > d.aggro * 2.2)) { this.state = 'return'; this.hideTele(); }
@@ -191,8 +194,8 @@ export class Enemy extends Walker {
         this.move.copy(this.fwd); return d.speed * 0.35;
       case 'return':
         turnToward(this.fwd, tangentToward(this.up, this.home), this.up, damp(5, dt)); this.move.copy(this.fwd);
-        this.hp = Math.min(d.hp, this.hp + d.hp * 0.3 * dt);
-        if (arcDist(this.up, this.home) < 1.5) { this.state = 'idle'; this.timer = 1; this.hp = d.hp; }
+        if (!d.miniBoss) this.hp = Math.min(d.hp, this.hp + d.hp * COMBAT.leashReturn.heal * dt);   // mini bosses: see update (calmT)
+        if (arcDist(this.up, this.home) < 1.5) { this.state = 'idle'; this.timer = 1; if (!d.miniBoss) this.hp = d.hp; }
         return d.speed;
     }
     if (this.behavior) return this.behavior.think(this, dt, dist);

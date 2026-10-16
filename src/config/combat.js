@@ -10,6 +10,10 @@ export const COMBAT = {
   autoAimAngle: 40,            // soft lock-on cone (degrees either side of where the hero faces; the camera doesn't aim)
   autoAimRange: 20,
   castFaceTime: 0.35,          // seconds the magician keeps facing her target after casting
+  // A monster that gives up a chase (past its leash, or the hero ran off) walks home healing `heal` of its health per
+  // second, and is whole once home. A mini boss keeps its damage on the way: it only starts healing once it has been out
+  // of combat for more than `miniBossHealDelay` seconds, so a fight that drifts past its short leash can be resumed.
+  leashReturn: { heal: 0.3, miniBossHealDelay: 5 },
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
@@ -66,7 +70,7 @@ export const COMBAT = {
     // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
     //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
     hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,
-                 hp: 2800, speed: 1.6, radius: 1.5, height: 3.6, aggro: 14, leash: 18, turnRate: 2.2,
+                 hp: 3360, speed: 1.6, radius: 1.5, height: 3.6, aggro: 14, leash: 18, turnRate: 2.2,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 160, cooldown: 1.3,
                  attacks: {
                    bite:  { windup: 0.65, range: 6.5, arc: 70, damage: 16, knockback: 6, recover: 0.6, cooldown: 0.6 },
@@ -79,7 +83,7 @@ export const COMBAT = {
                    { below: 0.33, heads: 5, title: 'Five heads', attacks: ['bite', 'spit', 'sweep'], speedMul: 1.2, cooldownMul: 0.75 },
                  ] },
     basilisk:  { ai: 'boss', behavior: 'basilisk', miniBoss: true, name: 'The Basilisk, Stone-Gazer', color: 0x5a7a3a, capColor: 0xfff066,
-                 hp: 2200, speed: 3.4, radius: 1.1, height: 2.0, aggro: 15, leash: 22, turnRate: 3.5,
+                 hp: 2640, speed: 3.4, radius: 1.1, height: 2.0, aggro: 15, leash: 22, turnRate: 3.5,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 170, cooldown: 1.1,
                  attacks: {   // gaze: anyone FACING it when its eyes flare is turned to stone for `petrify` seconds (turn away!)
                    gaze:  { windup: 1.5, range: 20, damage: 12, petrify: 1.8, recover: 1.2, cooldown: 1.2, reuse: 7 },
