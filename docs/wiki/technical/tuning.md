@@ -58,4 +58,5 @@
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
 | Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](lighting.md)) |
+| Caves: the room kit, grid step, corridor width, darkness, lanterns, the surface mouth, each planet's cave | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |

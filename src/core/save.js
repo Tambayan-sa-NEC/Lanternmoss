@@ -44,6 +44,7 @@ export const SAVE_SYSTEMS = {
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
+  'gameplay/Dungeons.js': 'Being inside a cave is not saved yet: a save made inside records the surface mouth (29d keeps the indoor pose).',
   'gameplay/Stations.js': 'Station models and proximity are rebuilt from the planet.',
   'gameplay/petAbilities.js': 'Visual scouting/fetch targets are transient; lasting buffs and cooldowns are saved.',
 };
