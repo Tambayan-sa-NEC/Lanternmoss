@@ -97,19 +97,19 @@ base → sets and talents (Lanternmoss and Frostveil rows are unaffected by the 
 
 | World | Hero | Mini boss | Boss |
 | --- | --- | --- | --- |
-| Lanternmoss | Warrior | 99.0 → 90.9 / 97.5 → 92.2 | 219.5 → 206.6 / 216.4 → 207.8 |
-| Lanternmoss | Ranger | 97.3 → 83.6 / 96.5 → 97.3 | 181.6 → 168.6 / 181.6 → 168.6 |
-| Lanternmoss | Witch | 142.8 → 122.8 / 130.8 → 119.6 | 237.8 → 219.6 / 239.1 → 219.6 |
-| Emberfall | Warrior | 110.8 → 86.0 / 107.0 → 88.5 | 234.7 → 185.4 / 234.7 → 185.8 |
-| Emberfall | Ranger | 102.7 → 134.0 / 111.3 → 143.3 | 186.4 → 140.6 / 186.0 → 140.6 |
-| Emberfall | Witch | 194.0 → 102.3 / 172.3 → 97.8 | 245.3 → 180.8 / 245.4 → 180.8 |
-| Frostveil | Warrior | 104.9 → 94.5 / 113.5 → 93.3 | 282.1 → 253.8 / 285.6 → 259.4 |
-| Frostveil | Ranger | 96.2 → 82.4 / 94.6 → 64.6 | 201.4 → 169.2 / 239.4 → 182.1 |
-| Frostveil | Witch | 174.3 → 106.9 / 135.2 → 116.1 | 256.1 → 216.6 / 252.4 → 215.4 |
+| Lanternmoss | Warrior | 119.0 → 109.5 / 118.0 → 110.4 | 219.3 → 202.2 / 217.6 → 201.5 |
+| Lanternmoss | Ranger | 96.9 → 89.1 / 97.6 → 90.9 | 181.6 → 168.7 / 181.6 → 168.7 |
+| Lanternmoss | Witch | 127.3 → 117.0 / 127.2 → 117.4 | 237.8 → 219.6 / 244.0 → 219.6 |
+| Emberfall | Warrior | 136.6 → 102.8 / 133.0 → 99.6 | 234.7 → 185.4 / 235.2 → 185.8 |
+| Emberfall | Ranger | 97.3 → 122.0 / 97.3 → 136.1 | 186.0 → 140.6 / 186.7 → 140.6 |
+| Emberfall | Witch | 137.0 → 97.4 / 167.5 → 97.4 | 245.3 → 180.8 / 245.3 → 180.8 |
+| Frostveil | Warrior | 126.5 → 114.3 / 136.7 → 113.2 | 285.6 → 252.8 / 288.2 → 255.2 |
+| Frostveil | Ranger | 93.6 → 77.4 / 92.2 → 79.0 | 241.1 → 171.6 / 198.5 → 160.7 |
+| Frostveil | Witch | 124.8 → 106.3 / 125.1 → 106.2 | 253.6 → 219.8 / 254.5 → 218.6 |
 
-Remeasured on 2026-10-16 with the corrected harness (see the next section): every boss stays at or above 140.6 s
-(Ember Ranger) and most fights shorten by 5-27%. The steepest mini-boss cut is the Frostveil Ranger on seed 7
-(94.6 → 64.6 s); mini bosses were not part of the acceptance line and are left as they are.
+Remeasured on 2026-10-16 with the corrected harness, the mini-boss leash rule and the raised mini-boss health (see
+the next section): every boss stays at or above 140.6 s (Ember Ranger) and most fights shorten by 5-27%. The steepest
+mini-boss cut is the Frostveil Ranger (93.6 → 77.4 s); mini bosses were not part of the acceptance line.
 
 ## Campaign and economy
 
@@ -162,7 +162,7 @@ avoid making Frostveil a slog. Puffcaps warn for two seconds. The warrior keeps 
 cleave is 11 damage/6 stamina with 13/s regeneration. The witch now regenerates 13 mana/s as well; her more expensive
 skills previously crowded out basic bolts in long encounters. Ranger stats remain unchanged.
 
-Boss health is 6,700 / 8,000 / 8,640 after planet scaling. Mini bosses have 2,800 / 3,520 / 3,700 HP. Malgrath's Doom
+Boss health is 6,700 / 8,000 / 8,640 after planet scaling. Mini bosses have 3,360 / 4,224 / 4,440 HP (raised 20% on 2026-10-16, see below; were 2,800 / 3,520 / 3,700). Malgrath's Doom
 Blade remains lethal, warns for two seconds, commits its aim partway through, then waits at least 24 seconds after
 the move finishes before reuse (previously 14). It is absent from the flying phase. Flying-phase base damage is now
 21/8/14/16 for dive/barrage/rain/strafe; the highest scaled single hit is 36.75 before armor. Movement, attack identity,
@@ -227,20 +227,29 @@ The 26b commit only shifted the seeded random stream, which exposed both. Seeds 
 
 | Planet | Hero | Roster median (s) | Mini boss (s) | Boss (s) | Top-ups |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Lanternmoss | Warrior | 2.5 / 3.1 | 99.0 / 97.5 | 219.5 / 216.4 | 8·12 / 7·9 |
-| Lanternmoss | Ranger | 2.2 / 2.2 | 97.3 / 96.5 | 181.6 / 181.6 | 9·14 / 8·14 |
-| Lanternmoss | Witch | 2.4 / 2.4 | 142.8 / 130.8 | 237.8 / 239.1 | 11·19 / 10·18 |
-| Emberfall | Warrior | 3.0 / 3.0 | 110.8 / 107.0 | 234.7 / 234.7 | 6·19 / 6·19 |
-| Emberfall | Ranger | 3.3 / 3.3 | 102.7 / 111.3 | 186.4 / 186.0 | 10·9 / 10·6 |
-| Emberfall | Witch | 3.4 / 3.6 | 194.0 / 172.3 | 245.3 / 245.4 | 17·11 / 9·13 |
-| Frostveil | Warrior | 4.3 / 4.3 | 104.9 / 113.5 | 282.1 / 285.6 | 13·18 / 14·18 |
-| Frostveil | Ranger | 4.7 / 4.7 | 96.2 / 94.6 | 201.4 / 239.4 | 9·26 / 9·30 |
-| Frostveil | Witch | 5.5 / 4.8 | 174.3 / 135.2 | 256.1 / 252.4 | 19·30 / 13·30 |
+| Lanternmoss | Warrior | 2.5 / 3.1 | 119.0 / 118.0 | 219.3 / 217.6 | 9·11 / 9·10 |
+| Lanternmoss | Ranger | 2.2 / 2.2 | 96.9 / 97.6 | 181.6 / 181.6 | 9·14 / 8·14 |
+| Lanternmoss | Witch | 2.4 / 2.4 | 127.3 / 127.2 | 237.8 / 244.0 | 9·18 / 10·19 |
+| Emberfall | Warrior | 3.0 / 3.0 | 136.6 / 133.0 | 234.7 / 235.2 | 7·19 / 7·19 |
+| Emberfall | Ranger | 3.3 / 3.3 | 97.3 / 97.3 | 186.0 / 186.7 | 9·4 / 9·7 |
+| Emberfall | Witch | 3.4 / 3.6 | 137.0 / 167.5 | 245.3 / 245.3 | 11·10 / 8·8 |
+| Frostveil | Warrior | 4.3 / 4.3 | 126.5 / 136.7 | 285.6 / 288.2 | 16·18 / 18·19 |
+| Frostveil | Ranger | 4.7 / 4.7 | 93.6 / 92.2 | 241.1 / 198.5 | 9·27 / 9·23 |
+| Frostveil | Witch | 5.5 / 4.8 | 124.8 / 125.1 | 253.6 / 254.5 | 14·28 / 14·28 |
 
-No fight caps any more. One profile is outside target: the Witch's Emberfall mini boss on seed 1 (194.0 s; 172.3 s on
-seed 7). **Open finding:** the Witch's mini-boss fights vary widely with the seed. The Frost Hydra takes 174 / 129 / 167
-/ 283 / 135 s on seeds 1, 2, 3, 4 and 7, so the measured pair (1, 7) understates the spread. It needs its own look (the
-bot's spacing against spit and sweep, or the fight), without loosening a target.
+Every profile is inside its target on both seeds.
+
+**Mini bosses and their leash (resolved the same day).** After the harness fix the Witch's mini-boss times still
+swung with the seed (Frost Hydra 174 / 129 / 167 / 283 / 135 s on seeds 1, 2, 3, 4, 7; Emberfall 194 s on seed 1).
+Cause: the leash. A mini boss that chases past its short leash (Hydra 18 m, Basilisk 22 m) walked home and healed
+to full, once at 155 HP of 3,700. The Witch triggers it most: she fights at about 6 m, inside the Hydra's 6.5 m
+bite, and each bite's knockback lets the fight creep outward. A player fighting at that range meets the same reset.
+**User decision:** a mini boss now keeps its damage when it gives up a chase, and only heals back once it has been
+out of combat for more than 5 s (`COMBAT.leashReturn`, `tests/sim/miniBossLeash.sim.mjs`). Ordinary monsters still
+heal on their way home. With the reset gone the Witch's mini bosses settled (Frost Hydra 103-105 s, Emberfall
+111-127 s on seeds 1-7), but the Ranger's fell below the 90 s floor (77-83 s; her earlier ~95-111 s had been
+inflated by the same resets). Mini-boss health was raised 20% (Hydra 2,800 → 3,360, Basilisk 2,200 → 2,640, Frost
+Hydra 3,700 → 4,440); the table above is the result. Old Ironclaw (unreleased) is unchanged and is rebalanced with 27h.
 
 Verification: 142 unit tests, all 24 gameplay/audit sims, strict profile target checks, the affected Malgrath
 mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and shop screenshots are under
