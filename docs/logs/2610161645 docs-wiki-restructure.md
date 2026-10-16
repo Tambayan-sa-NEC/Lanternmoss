@@ -10,4 +10,4 @@
 | 2026-10-16 16:59 | TEST | TODO N/A | `npm test`, `npm run sim` | docs/wiki-restructure | 236/236, 51/51 | (above) |
 | 2026-10-16 16:59 | MERGE | TODO N/A | Committed 6908c4c, merged into `develop` (24d4aa0), pushed, deleted the branch | develop | | 0h 01m |
 | 2026-10-16 17:00 | DOCS | TODO N/A | Flagged for review | develop | The changelog stops at TODO 21 (later updates are in TODO.md notes only); `feat/todo-27h-release-validation` still edits the old docs/ paths and adds docs/tidewhisper-release.md, so its next sync with develop needs the paths moved | 0h 01m |
-| 2026-10-16 17:00 | TOTAL | TODO N/A | Documentation restructure, start to log | develop | README is an overview; docs/wiki holds the detail; AGENTS.md governs | 0h 16m |
+| 2026-10-16 17:00 | TOTAL | TODO N/A | Documentation restructure, start to log | develop | README is an overview; docs/wiki holds the detail; AGENTS.md governs | 0h 15m |
