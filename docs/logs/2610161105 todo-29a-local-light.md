@@ -18,3 +18,9 @@ tour), 11:50 (merge). Steps between reads are grouped at the next read.
 | 2026-10-16 11:50 | MERGE | TODO 29a | Committed efc22e1, merged into `feat/todo-29` (c73e3f2), pushed | feat/todo-29 | Not in `develop`: see the open decision below | 0h 01m |
 | 2026-10-16 11:51 | BLOCKED | TODO 29 / 30 | Parent integration needs the user | feat/todo-29 | 30a needs 29a, but the rule keeps `feat/todo-29` out of `develop` until all of 29 is done, and 29g needs 30i: as written, neither can finish. Options asked of the user | 0h 01m |
 | 2026-10-16 11:51 | TOTAL | TODO 29a | Local light, start to log | feat/todo-29 | Complete on the TODO 29 parent | 0h 46m |
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-16 12:47 | DECISION | TODO 29a | User chose option 1: integrate 29a into `develop` ahead of the rest of TODO 29 | develop | 30a needs 29a and 29g needs 30i, so the parent could not wait for 29g. Rejected: building TODO 30 from `feat/todo-29`; changing the AGENTS.md rule (this is a one-off) | 0h 01m |
+| 2026-10-16 12:47 | MERGE | TODO 29a | Merged `feat/todo-29` (29a and its logs only) into `develop` (84ce06a), pushed | develop | The parent was 0 behind `develop` and its tree is the one tested (236 tests, 50 sims, the smokes). `feat/todo-29` stays open for 29b-29g | 0h 01m |
+| 2026-10-16 12:47 | TOTAL | TODO 29a | Integration into develop | develop | 29a available on `develop` for TODO 30 | 0h 01m |
