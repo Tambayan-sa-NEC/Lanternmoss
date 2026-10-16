@@ -123,6 +123,7 @@ function tipHtml(id, s) {
   if (s.damage) stats.push(s.tick ? `${dmg(s.damage)} damage every ${s.tick}s for ${s.duration}s` : `${dmg(s.damage)} damage`);
   if (s.target) stats.push(`${s.radius} radius, up to ${s.range} away`);
   else if (s.radius) stats.push(`${s.blastRadius ?? s.radius} radius`);
+  if (s.arc && s.arc < 360) stats.push(`${s.arc}° arc`);
   if (s.stun) stats.push(`stuns ${s.stun}s`);
   if (s.slow) stats.push(`slows ${Math.round(s.slow * 100)}% for ${s.slowTime}s`);
   if (s.reduction) stats.push(`-${Math.round(s.reduction * 100)}% damage for ${s.duration}s`);

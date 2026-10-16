@@ -11,10 +11,10 @@ test('a point at level 2 and every two levels after: 8 by the level cap', () => 
   assert.deepEqual([1, 2, 3, 4, 5, 15, 16, 40].map(l => pointsEarned(l)), [0, 1, 1, 2, 2, 7, 8, 8]);
 });
 
-test('the real trees are valid; only the completed witch tree is released', () => {
+test('the real trees are valid; only the completed witch and warrior trees are released', () => {
   for (const [hero, t] of Object.entries(TALENTS.trees)) {
     assert.deepEqual(validateTree(t, CHARACTERS[hero].abilities), [], hero);
-    assert.equal(t.released, hero === 'witch', `${hero}: released only by its own stage (28c-28e)`);
+    assert.equal(t.released, hero === 'witch' || hero === 'knight', `${hero}: released only by its own stage (28c-28e)`);
   }
   assert.deepEqual(validateTree(tree, witch), []);
   const bad = { talents: [{ id: 'x', name: 'X', text: 't', row: 1, max: 4, cost: 1, needs: ['y'], mods: [{ ability: 'nope', key: 'damage', add: 1 }] }] };
@@ -76,4 +76,28 @@ test('the kit changes per rank, the base table is never touched, and no ranks gi
   assert.equal(talentKit(witch, tree, {}), witch, 'reset: the base table itself');
   const set = { talents: [{ id: 's', name: 'S', text: 't', row: 1, max: 1, cost: 1, needs: [], mods: [{ ability: 'bolt', key: 'homing', set: 9 }] }] };
   assert.equal(talentKit(witch, set, { s: 1 }).bolt.homing, 9);
+});
+
+test('the warrior tree: ten points of choices in an eight-point budget, with a gated Wide Cleave', () => {
+  const t = TALENTS.trees.knight, knight = CHARACTERS.knight.abilities;
+  assert.deepEqual(validateTree(t, knight), []);
+  assert.equal(t.talents.reduce((n, x) => n + x.max * x.cost, 0), 10);
+  assert.match(learnProblem(t, {}, 'wideCleave', 16), /Keen Edge/);
+  assert.match(learnProblem(t, {}, 'tempest', 16), /Quick Spin/);
+  let ranks = {};
+  for (const id of ['keenEdge', 'keenEdge', 'wideCleave', 'quickSpin', 'quickSpin', 'tempest', 'tempest']) {
+    assert.equal(learnProblem(t, ranks, id, 16), null, id); ranks = learn(t, ranks, id, 16);
+  }
+  assert.equal(pointsSpent(t, ranks), 8); assert.match(learnProblem(t, ranks, 'steadyGuard', 16), /Not enough/);
+  const kit = talentKit(knight, t, ranks);
+  assert.equal(kit.slash.damage, knight.slash.damage * 1.2); assert.equal(kit.slash.arc, 170); assert.equal(kit.slash.name, 'Wide Cleave');
+  for (const key of ['cost', 'cooldown', 'range', 'knockback']) assert.equal(kit.slash[key], knight.slash[key], key);
+  assert.equal(kit.whirl.cooldown, 5); assert.ok(Math.abs(kit.whirl.radius - 4.2) < 1e-9);
+  assert.equal(talentKit(knight, t, { steadyGuard: 2 }).guard.duration, 3.5);
+  assert.deepEqual(kit.dash, knight.dash, 'Shoulder Charge is untouched');
+  assert.match(abilityText('slash', kit.slash), /catches foes beside you/);
+  assert.doesNotMatch(abilityText('slash', knight.slash), /beside you/);
+  assert.equal(talentKit(knight, t, {}), knight); assert.equal(knight.slash.arc, 110);
+  assert.deepEqual(cleanTalents({ ranks: { wideCleave: 1 } }, t, 16), { ranks: {} });
+  assert.deepEqual(cleanTalents({ ranks }, t, 16), { ranks });
 });
