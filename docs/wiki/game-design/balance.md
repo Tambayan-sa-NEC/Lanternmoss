@@ -97,21 +97,19 @@ base → sets and talents (Lanternmoss and Frostveil rows are unaffected by the 
 
 | World | Hero | Mini boss | Boss |
 | --- | --- | --- | --- |
-| Lanternmoss | Witch | 129 s → 124 s / 147 s → 121 s | 245 s → 233 s / 275 s → 220 s |
-| Lanternmoss | Warrior | 98 s → 91 s / 98 s → 91 s | 223 s → 206 s / 223 s → 202 s |
-| Lanternmoss | Ranger | 101 s → 91 s / 99 s → 89 s | 187 s → 169 s / 193 s → 170 s |
-| Emberfall | Witch | 145 s → 113 s / cap → 102 s | 245 s → 181 s / 245 s → 182 s |
-| Emberfall | Warrior | 116 s → 95 s / 107 s → 84 s | 235 s → 185 s / 235 s → 185 s |
-| Emberfall | Ranger | 101 s → 76 s / 101 s → 92 s | 193 s → 141 s / 189 s → 141 s |
-| Frostveil | Witch | cap → 145 s / 129 s → 110 s | 257 s → 214 s / 255 s → 226 s |
-| Frostveil | Warrior | cap → 118 s / cap → 104 s | 279 s → 262 s / cap → 259 s |
-| Frostveil | Ranger | cap → 112 s / 98 s → 65 s | 208 s → 168 s / 194 s → 185 s |
+| Lanternmoss | Warrior | 119.0 → 109.5 / 118.0 → 110.4 | 219.3 → 202.2 / 217.6 → 201.5 |
+| Lanternmoss | Ranger | 96.9 → 89.1 / 97.6 → 90.9 | 181.6 → 168.7 / 181.6 → 168.7 |
+| Lanternmoss | Witch | 127.3 → 117.0 / 127.2 → 117.4 | 237.8 → 219.6 / 244.0 → 219.6 |
+| Emberfall | Warrior | 136.6 → 102.8 / 133.0 → 99.6 | 234.7 → 185.4 / 235.2 → 185.8 |
+| Emberfall | Ranger | 97.3 → 122.0 / 97.3 → 136.1 | 186.0 → 140.6 / 186.7 → 140.6 |
+| Emberfall | Witch | 137.0 → 97.4 / 167.5 → 97.4 | 245.3 → 180.8 / 245.3 → 180.8 |
+| Frostveil | Warrior | 126.5 → 114.3 / 136.7 → 113.2 | 285.6 → 252.8 / 288.2 → 255.2 |
+| Frostveil | Ranger | 93.6 → 77.4 / 92.2 → 79.0 | 241.1 → 171.6 / 198.5 → 160.7 |
+| Frostveil | Witch | 124.8 → 106.3 / 125.1 → 106.2 | 253.6 → 219.8 / 254.5 → 218.6 |
 
-Every boss stays at or above 141 s (Ember Ranger) and most fights shorten by 5-27%. The steepest mini-boss cut is
-the Frostveil Ranger on seed 7 (98 → 65 s, -34%); mini bosses were not part of the acceptance line and are left as
-they are. **Open finding, not from 28:** the base profile now caps the Frostveil mini boss in several runs (the
-table above, and the Warrior on seed 1 at `a28e67a`, before 28a-28e), where the earlier report recorded 96-126 s.
-It needs its own investigation.
+Remeasured on 2026-10-16 with the corrected harness, the mini-boss leash rule and the raised mini-boss health (see
+the next section): every boss stays at or above 140.6 s (Ember Ranger) and most fights shorten by 5-27%. The steepest
+mini-boss cut is the Frostveil Ranger (93.6 → 77.4 s); mini bosses were not part of the acceptance line.
 
 ## Campaign and economy
 
@@ -164,7 +162,7 @@ avoid making Frostveil a slog. Puffcaps warn for two seconds. The warrior keeps 
 cleave is 11 damage/6 stamina with 13/s regeneration. The witch now regenerates 13 mana/s as well; her more expensive
 skills previously crowded out basic bolts in long encounters. Ranger stats remain unchanged.
 
-Boss health is 6,700 / 8,000 / 8,640 after planet scaling. Mini bosses have 2,800 / 3,520 / 3,700 HP. Malgrath's Doom
+Boss health is 6,700 / 8,000 / 8,640 after planet scaling. Mini bosses have 3,360 / 4,224 / 4,440 HP (raised 20% on 2026-10-16, see below; were 2,800 / 3,520 / 3,700). Malgrath's Doom
 Blade remains lethal, warns for two seconds, commits its aim partway through, then waits at least 24 seconds after
 the move finishes before reuse (previously 14). It is absent from the flying phase. Flying-phase base damage is now
 21/8/14/16 for dive/barrage/rain/strafe; the highest scaled single hit is 36.75 before armor. Movement, attack identity,
@@ -205,11 +203,53 @@ Individual monster types retain tactical differences: the Frostveil warrior take
 and some opening wisps fall before 2 s. These are reported outliers, not silently averaged away within a type.
 The pacing contract uses the planet?s roster median; each type?s median of three trials remains in the raw data.
 
-[Final raw measurements](balance-after.json) include each monster trial summary, big-fight move timestamps,
+[Final raw measurements](../../balance-after.json) include each monster trial summary, big-fight move timestamps,
 transition fractions and flying damage. The first six rows came from the full nine-profile report; the three
-Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](balance-before.json)
+Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](../../balance-before.json)
 was captured during harness repair, before in-range skill selection, Doom evasion and complete fight isolation;
 its capped/reset boss runs are not comparable completed-fight times.
+
+## Remeasured with the corrected harness (2026-10-16)
+
+The Frostveil mini boss started reaching the 300 s cap in some reports (bisected to `8dd269c`, 26b, which changed no
+combat code). Two harness defects caused it, not the game:
+
+- **An awake planet boss during the trials.** `boot()` in the sims wakes the planet boss by default and again after
+  every `goToPlanet`, so Malgrath roamed awake during the monster and mini-boss trials. Whenever he engaged, his arena
+  (`BossGate.keepInside`) pulled the hero ~150 m to his lair and the Hydra went home and healed. A player cannot get
+  there: a boss only wakes when its conditions are met and the hero comes to its lair. The report now boots sealed
+  (`wake: false`), wakes the boss just before its own fight, and throws if the boss is awake during the trials.
+- **An ultimate the spot refuses.** Leap Slam needs ground to land on; beside the lakeside Hydra there may be none.
+  The bot re-aimed every frame and never attacked (0 casts in 300 s). It now gives the aim up, fights on and retries
+  2 s later, and the report throws if an aim stays open for 2 s.
+
+The 26b commit only shifted the seeded random stream, which exposed both. Seeds 1 / 7 (top-ups: mini·boss):
+
+| Planet | Hero | Roster median (s) | Mini boss (s) | Boss (s) | Top-ups |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Lanternmoss | Warrior | 2.5 / 3.1 | 119.0 / 118.0 | 219.3 / 217.6 | 9·11 / 9·10 |
+| Lanternmoss | Ranger | 2.2 / 2.2 | 96.9 / 97.6 | 181.6 / 181.6 | 9·14 / 8·14 |
+| Lanternmoss | Witch | 2.4 / 2.4 | 127.3 / 127.2 | 237.8 / 244.0 | 9·18 / 10·19 |
+| Emberfall | Warrior | 3.0 / 3.0 | 136.6 / 133.0 | 234.7 / 235.2 | 7·19 / 7·19 |
+| Emberfall | Ranger | 3.3 / 3.3 | 97.3 / 97.3 | 186.0 / 186.7 | 9·4 / 9·7 |
+| Emberfall | Witch | 3.4 / 3.6 | 137.0 / 167.5 | 245.3 / 245.3 | 11·10 / 8·8 |
+| Frostveil | Warrior | 4.3 / 4.3 | 126.5 / 136.7 | 285.6 / 288.2 | 16·18 / 18·19 |
+| Frostveil | Ranger | 4.7 / 4.7 | 93.6 / 92.2 | 241.1 / 198.5 | 9·27 / 9·23 |
+| Frostveil | Witch | 5.5 / 4.8 | 124.8 / 125.1 | 253.6 / 254.5 | 14·28 / 14·28 |
+
+Every profile is inside its target on both seeds.
+
+**Mini bosses and their leash (resolved the same day).** After the harness fix the Witch's mini-boss times still
+swung with the seed (Frost Hydra 174 / 129 / 167 / 283 / 135 s on seeds 1, 2, 3, 4, 7; Emberfall 194 s on seed 1).
+Cause: the leash. A mini boss that chases past its short leash (Hydra 18 m, Basilisk 22 m) walked home and healed
+to full, once at 155 HP of 3,700. The Witch triggers it most: she fights at about 6 m, inside the Hydra's 6.5 m
+bite, and each bite's knockback lets the fight creep outward. A player fighting at that range meets the same reset.
+**User decision:** a mini boss now keeps its damage when it gives up a chase, and only heals back once it has been
+out of combat for more than 5 s (`COMBAT.leashReturn`, `tests/sim/miniBossLeash.sim.mjs`). Ordinary monsters still
+heal on their way home. With the reset gone the Witch's mini bosses settled (Frost Hydra 103-105 s, Emberfall
+111-127 s on seeds 1-7), but the Ranger's fell below the 90 s floor (77-83 s; her earlier ~95-111 s had been
+inflated by the same resets). Mini-boss health was raised 20% (Hydra 2,800 → 3,360, Basilisk 2,200 → 2,640, Frost
+Hydra 3,700 → 4,440); the table above is the result. Old Ironclaw (unreleased) is unchanged and is rebalanced with 27h.
 
 Verification: 142 unit tests, all 24 gameplay/audit sims, strict profile target checks, the affected Malgrath
 mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and shop screenshots are under

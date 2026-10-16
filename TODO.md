@@ -194,7 +194,7 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
   - Before picking, write a short brief on the game's look and feel (mood words, references), and compare 2–3
     candidate pairings in a mock-up of the HUD and the title screen.
   - Done: the brief, the three pairings compared (Fredoka, Grandstander or Fraunces, each with Nunito) and the choice,
-    **Grandstander + Nunito**, are in `docs/typography.md`. The specimen is in `docs/type-specimen.html`.
+    **Grandstander + Nunito**, are in `docs/wiki/technical/typography.md`. The specimen is in `docs/type-specimen.html`.
 - [x] **10.2 Item hotbar** at the lower centre of the screen:
   - Numbered slots (`1`–`9`). Pressing a number selects that slot and the hero **holds** that item; clicking a slot does
     the same.
@@ -749,7 +749,7 @@ snapshots). **Size:** L. **Needs:** 18.
   - Start with one slot, but make the slot a field in the format. Export / import is cheap and helps with bug reports,
     so do it in this item; extra slots are deferred.
 
-Implementation notes: [save format and ownership](docs/save-format.md), version-1 fixture, registry coverage and
+Implementation notes: [save format and ownership](docs/wiki/technical/save-format.md), version-1 fixture, registry coverage and
 real-system round trips. House interiors, active challenges and uncollected boss loot restore without replaying rewards.
 
 ## 20. Performance budget **(core)** ✓
@@ -764,7 +764,7 @@ support (40) need numbers to stay under.
 - [x] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
 - [x] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
       record it as the ceiling. The target is a steady 60 fps at 1080p on integrated graphics (Iris Xe class) at the
-      default quality. Write the numbers down in `docs/performance.md`.
+      default quality. Write the numbers down in `docs/wiki/technical/performance.md`.
 - [x] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
       quality preset from 2a, so lower presets draw less, not only at a lower resolution.
 - [x] Batching, culling and level of detail where the overlay shows the need (scenery first).
@@ -772,7 +772,7 @@ support (40) need numbers to stay under.
 
 Implemented: F3 / Graphics overlay, five live density sliders, spatial scenery/grass batches, resource and static
 prop batching, distant actor culling, and a real-WebGL per-planet regression script. See [measurements, ceilings and
-reproduction steps](docs/performance.md). **Target status:** the available Intel UHD test machine remains below
+reproduction steps](docs/wiki/technical/performance.md). **Target status:** the available Intel UHD test machine remains below
 60 FPS; Iris Xe default-quality validation and further frame-time optimization remain performance work.
 
 ---
@@ -798,7 +798,7 @@ Promoted from the suggested additions (tutorial, death screen). **Size:** M. **N
 
 Implemented: an action-driven, skippable first walk with pause-menu replay, Journal Help and saved progress/seen
 tips. Prompts follow the current hero and bindings; the fainting recap identifies enemies and hazard owners and
-preserves its countdown across Continue. Original v1 saves still load. See [tutorial notes and screenshots](docs/tutorial.md).
+preserves its countdown across Continue. Original v1 saves still load. See [tutorial notes and screenshots](docs/wiki/systems/tutorial.md).
 Verified: 134 unit tests, all 21 gameplay simulations, and real-browser refresh/replay, help and fainting checks
 at 720p and 1080p for all three heroes.
 
@@ -831,7 +831,7 @@ brews, and each combat piece has one replaceable rune without changing rarity. O
 independent potion/pet timers. Existing essential recipes stay available. Learned recipes, favourites, enchantments
 and meal timers persist in version-1 saves, including old-save defaults. Bulk exchanges preflight exact bag capacity
 and pool fuel before spending anything; their output counts toward crafting achievements. See
-[docs/crafting.md](docs/crafting.md) for recipes and discovery sources.
+[docs/wiki/systems/crafting.md](docs/wiki/systems/crafting.md) for recipes and discovery sources.
 
 ## 23. Balance and pacing pass **(core)**
 
@@ -854,7 +854,7 @@ Merges the two high-priority balance items from the suggested additions. **Size:
     intended, but by this much?).
 - [x] **Targets first** (risk 5), reported by the sims per hero: a regular monster falls in 2–6 s at the planet's
       expected level; a mini boss takes 1.5–3 min, a boss 3–5 min; a natural play-through reaches each boss's summon
-      level (2, 4, 6) without grinding. Write them in `docs/balance.md`.
+      level (2, 4, 6) without grinding. Write them in `docs/wiki/game-design/balance.md`.
 - [x] Balance and pacing (was a suggested addition): play through with each hero and tune the numbers that were set by
       hand and never tested together: energy drain, node regrow times, crop growth, fuel costs, mini boss health, coin
       prices and shop costs.
@@ -867,7 +867,7 @@ Merges the two high-priority balance items from the suggested additions. **Size:
 Implemented: combat/resource tuning, longer bosses and mini bosses, fairer melee dive punish windows,
 energy/growth/fuel and seed-price adjustments, and coin/XP budgets covering first visits without respawn grinding.
 All nine hero/planet timing profiles meet the documented targets. Reports expose individual monster outliers,
-Doom warnings, transition timing, flying damage and HP top-ups. See [docs/balance.md](docs/balance.md) for the
+Doom warnings, transition timing, flying damage and HP top-ups. See [docs/wiki/game-design/balance.md](docs/wiki/game-design/balance.md) for the
 target definitions, raw measurements, economy ledger and verification limits.
 
 ---
@@ -903,7 +903,7 @@ Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/w
 **Implemented (2026-10-11):** village lantern gates and a paused destination picker replace automatic departure.
 Wayfarer's Keys allow early one-way travel, with saved return restrictions and one-time no-hit rewards. Planet
 chest/resource deltas, farms, ground loot, defeated bosses and local progress survive revisits and Continue.
-Regular monsters respawn; resources regrow by elapsed unpaused play time. See [portal rules and saves](docs/portals.md).
+Regular monsters respawn; resources regrow by elapsed unpaused play time. See [portal rules and saves](docs/wiki/systems/portals.md).
 
 ## 25. Building **(core)**
 
@@ -931,13 +931,13 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 **25a implemented (2026-10-12):** a separate claimable cottage on each planet, five craftable furnishings in fixed
 indoor spots, bag/hotbar placement and safe furniture removal, and an own bed with naps/night sleep and energy
 recovery. Homes persist through portal visits, indoor Continue and version-1 saves; existing villagers keep their
-houses. 25b and 25c are implemented below. See [cottage controls, recipes, screenshots and saves](docs/home.md).
+houses. 25b and 25c are implemented below. See [cottage controls, recipes, screenshots and saves](docs/wiki/systems/home.md).
 
 **25b implemented (2026-10-13):** 13 craftable outdoor placeables, ground/grid ghost previews, quarter-turn rotation,
 protected terrain and occupied-footprint checks, safe pickup, 24-stack storage chests with quick-stacking,
 bag sorting that preserves the hotbar, working crafting stations and farm plots, outdoor bed rest, movement/camera
 colliders, bounded nearby lantern lighting, and separate per-planet saves through portal travel and Continue.
-Walls, floors and roofs are implemented in 25c below. See [building controls, recipes, screenshots and saves](docs/building.md).
+Walls, floors and roofs are implemented in 25c below. See [building controls, recipes, screenshots and saves](docs/wiki/systems/building.md).
 
 **25c implemented (2026-10-13):** craftable Timber Floors, wall/door/window panels and Shingled Roofs; connected
 4-metre tiles on a shared foundation plane; rotatable floor-edge attachments and opposite-wall roof support;
@@ -945,7 +945,7 @@ walkable square floors, open doorway movement, roof ceilings and camera cutaways
 stations; attachment management, safe dependency/connectivity-aware pickup and topological per-planet save restore.
 Shelters are ground level, bounded to five tiles per side where terrain permits; walk physically inside in the
 outdoor world. A separate indoor house instance and upper storeys are not part of this implementation. See
-[structure controls, recipes, screenshots and saves](docs/structures.md).
+[structure controls, recipes, screenshots and saves](docs/wiki/systems/structures.md).
 
 ---
 
@@ -1037,7 +1037,7 @@ saved object positions are preserved. Keys/direct transitions cannot reach unfin
 night-authorized trips survive dawn during their fade. Main completion excludes secrets, the Act I award requires its
 original bosses, and small secret rosters may declare a tested population minimum. All 174 unit tests, 29 simulations
 and the 720p/1080p browser checks passed, including v1 Continue and pre-extraction layout/arrival fixtures.
-See [catalog, release and compatibility rules](docs/planets.md).
+See [catalog, release and compatibility rules](docs/wiki/world/planets.md).
 
 **26b implemented (2026-10-13):** a pure mechanic registry and world-owned controller restore cleaned per-planet
 state and apply away time before entry and actor/resource population. Frame updates precede physics and freeze on
@@ -1045,7 +1045,7 @@ the title and pause; naps/sleep notify a separate bounded advancement hook once.
 retain one active instance, with exit/listener cleanup before world disposal. Optional v1 snapshots default safely
 for old saves and reject unknown/mismatched modules; the original fixture is unchanged. A development-only module
 proves ordering and independent state through real keyed travel and reload Continue. All 181 unit tests, 30 simulations
-and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/mechanics.md).
+and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/wiki/technical/planet-mechanics.md).
 Actual tides, lantern darkness and lunar gravity remain their owning world stages; shared progression follows in 26d below.
 
 **26c implemented (2026-10-13):** shared planet gravity composes with actor acceleration and Moon-Hop. Live pond
@@ -1056,7 +1056,7 @@ config and mechanic saves on Continue/travel and reset on disposal. Sea meshes/m
 once; the sea shader uses world-space ripples/glints. Development-only fixtures prove moving water, real hero
 gravity, high-water safety, crop/build preservation, keyed travel, Continue and old-v1 compatibility. All 186 unit
 tests, 31 simulations and 720p/1080p low-preset browser checks passed, including original layout digests and visible
-pond/sea captures with zero page/shader errors. See [shared gravity and moving water](docs/world-physics.md).
+pond/sea captures with zero page/shader errors. See [shared gravity and moving water](docs/wiki/technical/world-physics.md).
 No Tidewhisper content or timed tide cycle is enabled; Act II progression follows in 26d below.
 
 **26d implemented (2026-10-13):** cap 16 extends the unchanged XP curve, and old level-10 v1 saves resume gaining
@@ -1069,7 +1069,7 @@ recorded Iris Xe 720p low performance evidence. Only the secret Moon waives a mi
 farm/cave with a small population floor. Original Act I content is grandfathered through the common checks;
 its outstanding hardware target is not newly certified. All 195 unit tests, 32 simulations and 720p/1080p low
 browser checks passed, including Continue, portal release guards and masked secret text. See
-[progression and release acceptance](docs/content-release.md). Actual expansion content remains in TODOs 27/30/32;
+[progression and release acceptance](docs/wiki/technical/content-release.md). Actual expansion content remains in TODOs 27/30/32;
 the next main-world stage is 27a.
 
 - [x] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
@@ -1131,7 +1131,7 @@ Development-only borrowed actors/resources prove real low/high traversal, swimmi
 stable node positions, pause, sleep, keyed travel, reload Continue and original-v1 compatibility. All 199 unit tests, 33 simulations
 and 720p/1080p low browser checks passed. Tidewhisper remains unreleased; actual stilt-village content,
 flora/wildlife, resources/weather/music, enemies/fights and measured release performance remain 27b-27h.
-See [terrain, controls and development previews](docs/tidewhisper.md). Flora/wildlife follows in 27b below.
+See [terrain, controls and development previews](docs/wiki/world/tidewhisper.md). Flora/wildlife follows in 27b below.
 
 **27b implemented (2026-10-13):** lantern palms with glowing coconuts/wood gathering, shader-swaying kelp,
 non-wood coral fans, dune grass, sea thrift and sea lavender; original ambient crab/turtle/seal bodies;
@@ -1142,7 +1142,7 @@ Fixed scenery/animal/fish caps and quality-independent placement are tested. The
 drained water, gathering, respawn, charm/equipment Continue and disposal are verified in gameplay and low-preset
 browser checks. All 201 unit tests, 34 simulations and 720p/1080p low browser checks passed. Tidewhisper remains
 unreleased: resources/weather/music, village, enemies/fights and measured
-release performance remain 27c-27h. See [coastal flora/wildlife](docs/tidewhisper.md#coastal-flora-and-wildlife-27b).
+release performance remain 27c-27h. See [coastal flora/wildlife](docs/wiki/world/tidewhisper.md#coastal-flora-and-wildlife-27b).
 Stage 27c adds 54 resource nodes, saved washup claims, shore fishing, coastal recipes/Tide gear, dawn mist, squall whitecaps and a procedural waltz. All 205 unit tests, 35 simulations and 720p/1080p low browser checks pass; the world remains unreleased.
 
 **27d implemented (2026-10-13):** stilt village, supported high-water fishing pier, Saltwind Kitchen and keeper
@@ -1160,7 +1160,7 @@ tide and sting in a ring. Skippers lurk untargetable, then leap and retreat. A s
 monsters in the sea; stranded ones crawl back and recover when water returns. New optional `steer`/`refuses`
 behaviour hooks; sea-only projectile flight fixes (Act I balance report unchanged). All 208 unit tests, 38
 simulations (including a level-8 duel for each hero) and the 720p/1080p low browser checks pass. Tidewhisper remains
-unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper.md#regular-enemy-roster-27e).
+unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/wiki/world/tidewhisper.md#regular-enemy-roster-27e).
 
 **27f implemented (2026-10-14):** Old Ironclaw, a hermit crab in a sunken bronze bell, guards the black pearl beds on
 the far beach (beds refuse gathering while it lives). The bell refuses blows and rings a jumpable, stunning shockwave
@@ -1169,7 +1169,7 @@ the far beach (beds refuse gathering while it lives). The bell refuses blows and
 black pearls and stays beaten through Continue and revisits; a faint resets the fight. New optional `damageScale`
 hook. All 210 unit tests, 40 simulations and the 720p/1080p low browser checks pass. A level-8 duel for each hero wins
 on two seeds (mostly 148-195 s against the 90-180 s target; final pacing is 27h). Tidewhisper remains unreleased.
-Next: 27g, Mirelure. See [Old Ironclaw](docs/tidewhisper.md#old-ironclaw-27f).
+Next: 27g, Mirelure. See [Old Ironclaw](docs/wiki/world/tidewhisper.md#old-ironclaw-27f).
 
 **27g implemented (2026-10-14):** Mirelure wakes through the level-8, relit-lighthouse and low-tide gate inside a ring
 of crashing surf. While the lagoon is full she is untargetable and lights false lures; the real one dims in time with
@@ -1178,7 +1178,7 @@ sluice, the lagoon alone drains, and she is beached (thrash, roll, bite) while t
 she dives to more lures. A faint, leaving or reload resets lures, lagoon and sluice; the Tide Crown comes once. Tide
 mechanic: optional gradual reflood and `activeTides()`. Level-8 duels for each hero win on two seeds in 175-265 s.
 Tidewhisper remains unreleased. Next: 27h, campaign release and go/no-go.
-See [Mirelure](docs/tidewhisper.md#mirelure-the-lantern-angler-27g).
+See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 
 - [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
@@ -1248,7 +1248,7 @@ a Breaker push. Only the hero's own hits proc, not pets or burn ticks. Effects l
 every equip, unequip and load, so nothing is saved twice. The bag's equipment side lists worn sets with lit bonuses and
 set pieces' details show their set. Checked by `tests/sets.test.mjs`, `tests/sim/sets.sim.mjs` and
 `scripts/sets-smoke.mjs`. Balance targets use starting gear, so sets are optional power outside them (see
-`docs/balance.md`). The parent checklist stays open until the Dusk (30c) and Star (32b) sets exist.
+`docs/wiki/game-design/balance.md`). The parent checklist stays open until the Dusk (30c) and Star (32b) sets exist.
 
 **28b implemented (2026-10-15):** talent rules, saves and the page, with every real tree still empty and
 `released: false` until 28c-28e. Points come from the level (one at 2, 4 ... 16: 8 by the cap) and are never stored,
@@ -1270,7 +1270,7 @@ kit, including remapped keys. Checked by 234 unit tests, all 46 simulations, pai
 on seeds 1 and 7, and production/fixture talent, save, tutorial and set browser checks (720p/1080p Low for the
 production tree; zero page/shader errors). The README tour was retaken and spot-checked. Staged on `feat/todo-28`,
 pending 28d/28e before integration into `develop`; Warrior and Ranger trees remain unreleased.
-See [tree, saves and checks](docs/talents.md) and [pacing measurement limits](docs/balance.md#witch-talents-28c).
+See [tree, saves and checks](docs/wiki/systems/talents.md) and [pacing measurement limits](docs/wiki/game-design/balance.md#witch-talents-28c).
 
 **28d implemented (2026-10-16):** the real Warrior tree has Keen Edge (Axe Cleave up to +20% damage), Quick Spin
 (Whirlwind 7 → 5 s), Steady Guard (Guard 2.5 → 3.5 s), Wide Cleave (a two-point alternative, needs Keen Edge: the
@@ -1280,7 +1280,7 @@ and ability tooltips show a swing's arc. `tests/sim/warriorTalents.sim.mjs` (see
 that a foe 70° aside of a locked target takes nothing from Axe Cleave and full damage from Wide Cleave, Tempest
 reaches a foe 4.6 m away, Guard still cuts a real Gloomcap hit three seconds in only with Steady Guard (32 → 10 HP),
 boss immunity still refuses every talent, and saves, Continue and Old Bramble's reset hold; paired pace samples in
-[balance](docs/balance.md#warrior-talents-28d). `scripts/warrior-talents-smoke.mjs` checks the page, HUD, Controls,
+[balance](docs/wiki/game-design/balance.md#warrior-talents-28d). `scripts/warrior-talents-smoke.mjs` checks the page, HUD, Controls,
 tooltips, keys, reload Continue and the reset in Edge at 720p/1080p. Staged on `feat/todo-28`; the Ranger tree and
 the combined acceptance remain 28e.
 
@@ -1292,9 +1292,10 @@ needs Steady Aim). Depth acceptance: `tests/sim/talentDepth.sim.mjs` proves set 
 target), Old Bramble resets talents only, unequipping removes set bonuses only, and Continue keeps both. A depth
 balance profile (`BALANCE_BUILD=depth`) found a 28a burn bug: a weaker hit kept a stronger burn alive, halving
 Emberfall fights; fixed, every boss now stays at or above 141 s with sets and talents (seeds 1 and 7; see
-[balance](docs/balance.md#sets-and-talents-together-28e)). Checked by `tests/talents.test.mjs`, the three hero
+[balance](docs/wiki/game-design/balance.md#sets-and-talents-together-28e)). Checked by `tests/talents.test.mjs`, the three hero
 talent sims, the depth sim, `scripts/ranger-talents-smoke.mjs` and the other talent/set smokes. Open finding, not
-from 28: the base balance report now caps the Frostveil mini boss in some runs. Parent 28's checklist items stay
+from 28: the base balance report capped the Frostveil mini boss in some runs (resolved 2026-10-16: two harness
+defects, see [balance](docs/wiki/game-design/balance.md#remeasured-with-the-corrected-harness-2026-10-16)). Parent 28's checklist items stay
 open until the Dusk (30c) and Star (32b) sets exist.
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
@@ -1336,7 +1337,7 @@ indoors where an interior keeps its single light; darkness dims the sun, sky lig
 a light. Home lamps are the first real sources (same brightness as before). Bloom on glowing lanterns is the existing
 pass. Checked by `tests/sim/lighting.sim.mjs`, `tests/sim/building.sim.mjs` and `scripts/lighting-smoke.mjs` (real
 WebGL compile, no recompiles, readable dark on Low and High) in a night-village harness; performance rerun as a
-diagnostic only, Iris Xe certification pending like 27h. See [local light](docs/lighting.md).
+diagnostic only, Iris Xe certification pending like 27h. See [local light](docs/wiki/technical/lighting.md).
 
 - [ ] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
       that are found nowhere else.
@@ -1528,7 +1529,7 @@ Code: new `src/gameplay/Bounties.js`, `src/config/bounties.js`, a board prop in 
 different kinds, generated deterministically from the planet's roster, own resource drops and material, common fish and
 farm (`gameplay/bountyRules.js`; the golden koi, ingots and other worlds' items are never asked for, and worlds without a
 farm skip harvests). Defeats (not a boss's summons), catches and harvests on that planet count once a job is posted;
-bring jobs hand the items over. Rewards: coins (about 23-35 a day across Act I, see `docs/balance.md`), 1-2 of the
+bring jobs hand the items over. Rewards: coins (about 23-35 a day across Act I, see `docs/wiki/game-design/balance.md`), 1-2 of the
 planet's material and a rare piece on 8% of jobs. Saved per planet (`bounties`), so travel keeps each board and Continue
 keeps progress; a new day posts a new set. The board is placed last, clear of the gate and resource nodes, so no saved
 world position moves for it (`planetCatalog` sim). The journal counts claims (Notice Board, Helping Hand achievements). Also
@@ -1722,7 +1723,7 @@ it does not require every suggested feature, multiplayer or the wiki to be finis
 Code/docs: release packaging under `scripts/` if needed, `docs/releases/`, launch/dependency instructions,
 Git release tags and an optional maintenance branch/worktree. **Size:** M–L, in four stages.
 **Needs:** 18–20 for verification, save export and performance evidence; an explicitly chosen, accepted release
-scope from the current track. No dependency on implementing the [visual upgrade plan](docs/plans/visual-upgrade.md).
+scope from the current track. No dependency on implementing the [visual upgrade plan](docs/wiki/plans/visual-upgrade.md).
 **Risk:** a Git snapshot restores source but not browser saves or remote dependencies; a ZIP that still loads
 Three.js/fonts from CDNs is not a self-contained backup. **Recommendation:** use the same repository, an immutable
 named release tag and a verified runnable archive. Use a second working folder when both editions are needed.
@@ -1769,7 +1770,7 @@ once, when their content has settled. Added 2026-10-15 at the user's request as 
 **Risk:** hiding combat information (cooldowns, key hints, telegraphs, boss bars) for a cleaner look, or a restyle
 that breaks layouts at 720p. **Recommendation:** restyle shared parts first (panel, button, slot, text), keep every
 value and key hint visible, and recheck each screen with its existing smoke at 720p and 1080p. If the
-[visual upgrade plan](docs/plans/visual-upgrade.md) is ever activated, its V13 (interface) replaces this item rather
+[visual upgrade plan](docs/wiki/plans/visual-upgrade.md) is ever activated, its V13 (interface) replaces this item rather
 than running alongside it.
 
 - [ ] **Shared look:** one set of panel surfaces, spacing, borders, buttons, slots and text sizes for every window.

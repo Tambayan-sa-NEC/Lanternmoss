@@ -1,5 +1,30 @@
 # Tidewhisper terrain and tides
 
+## In brief (unreleased)
+
+These summaries moved here from the root README; each is detailed in its section below.
+
+Tidewhisper's unreleased economy stage adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
+claims, shore fishing, three coastal meals and craftable Tide gear. Dawn sea mist, rain/wind/whitecaps and a
+procedural sea waltz accompany the coast. See [resources, weather and music](#coastal-resources-weather-and-music-27c).
+
+The unreleased Tidewhisper village now has stilt buildings, a supported fishing pier, Marlo and two coastal
+interiors. Restore the lighthouse with seaglass and wood; the saved quest joins level 8 and low tide as the
+future boss gate. See [village and lighthouse](#stilt-village-and-lighthouse-27d).
+
+Tidewhisper's unreleased monsters read the live tide. Shellbacks turn a barnacled plate that blocks hits from the
+front, so circle round them. Jellybells drift onto the flats with the rising tide and sting in a ring, and are
+stranded when it falls. Surf skippers lurk untargetable in the surf, then leap at anyone near the water.
+Sea-green wisps return from Act I. See [regular enemy roster](#regular-enemy-roster-27e).
+
+Old Ironclaw, a giant hermit crab in a sunken bronze bell, guards Tidewhisper's black pearl beds. Its bell only rings,
+sending out a stunning shockwave to jump. Hit its face, catch it out of its shell at 66% and 33%, or bait a charge
+across the wet sand at low tide to get it stuck. See [Old Ironclaw](#old-ironclaw-27f).
+
+Mirelure, the Lantern Angler, hides in Tidewhisper's lagoon behind false lantern lures. Strike the lure that dims in
+time with her breathing and she surfaces. At half health she smashes the sluice and is beached until the water creeps
+back. Her trophy is the Tide Crown. See [Mirelure](#mirelure-the-lantern-angler-27g).
+
 TODOs 27a-27g implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest, regular
 monsters, Old Ironclaw and Mirelure. Tidewhisper remains `released: false`: campaign release requires 27h.
 The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
@@ -13,7 +38,7 @@ stilt houses, supported pier, coastal interiors and lighthouse are implemented i
 
 | Development preview | Low tide | High tide |
 | --- | --- | --- |
-| Causeway | ![Dry sandbar](screenshots/world/tidewhisper-low.jpg) | ![Flooded sandbar](screenshots/world/tidewhisper-high.jpg) |
+| Causeway | ![Dry sandbar](../../screenshots/world/tidewhisper-low.jpg) | ![Flooded sandbar](../../screenshots/world/tidewhisper-high.jpg) |
 
 `tides` is a registered mechanic. Its phase comes from the adventure calendar, with one smooth cycle per
 300-second day: low at 40% (afternoon), high at 90% (night). Sea radius ranges from 71 to 72.5 metres, a total
@@ -65,7 +90,7 @@ scenery is spatially batched, and decorative quality changes do not change place
 The seeded development fixture measured **30,197 static scenery triangles in 65 batches**, including its borrowed
 village. This is a geometry-cost check, not an Iris Xe frame-rate certification.
 
-![Lantern palm development preview](screenshots/world/tidewhisper-flora.jpg)
+![Lantern palm development preview](../../screenshots/world/tidewhisper-flora.jpg)
 
 Three original ambient body builders cover crabs, turtles and seals. They share the Walker/animation/disposal
 contract but are independent of combat enemies. Six hermit crabs scuttle at afternoon low tide and withdraw
@@ -80,7 +105,7 @@ fish each, plus eight emissive lanternfish visible at night: **32 fish in four i
 same live sea/lagoon queries as movement, hide when water drains, freeze on pause, and dispose with their world.
 They are ambient visuals; shore fishing and food are implemented in 27c, and the supported pier is implemented in 27d.
 
-![Pearl Turtle development preview](screenshots/critters/tidewhisper-pearl-turtle.jpg)
+![Pearl Turtle development preview](../../screenshots/critters/tidewhisper-pearl-turtle.jpg)
 
 Walk up slowly and press **E** to befriend the Pearl Turtle. Its first gift is the legendary **Pearl of the Deep**
 charm, which adds armor and mana regeneration. The existing adventure-wide rare-gift ledger, inventory and
@@ -157,7 +182,7 @@ reports these predicates and seals again if the tide rises before awakening. The
 sealed original boss to exercise the live gate; it does not implement Mirelure. That encounter is 27g, and the
 world stays unreleased. Actual low-tide causeway geometry/physics continues to come from 27a.
 
-![Relit lighthouse development preview](screenshots/village/tidewhisper-village.jpg)
+![Relit lighthouse development preview](../../screenshots/village/tidewhisper-village.jpg)
 
 Verify with `npm test`, `npm run sim` and `node scripts/coastal-village-smoke.mjs` (Puppeteer Core/Chromium, `CHROME`
 override). The browser helper owns port 8110 and uses `coastalVillageFixture.mjs`; production never imports the
@@ -210,7 +235,7 @@ was rerun and matched exactly). Over the sea or lagoon, projectiles fly above th
 hero's aimed shot at a target out on the sea starts at, and quickly settles to, the target's height, so a skipper in
 the shallows below a beach can be hit from 2 m away.
 
-![Shellback, Jellybell, Surf skipper and a sea-green wisp](screenshots/mobs/tidewhisper-enemies.jpg)
+![Shellback, Jellybell, Surf skipper and a sea-green wisp](../../screenshots/mobs/tidewhisper-enemies.jpg)
 
 Verify with `npm test`, `npm run sim` and `node scripts/coastal-enemies-smoke.mjs` (Puppeteer Core/Chromium, `CHROME`
 override; install with `npm install --no-save --no-package-lock puppeteer-core`). The browser helper owns port 8111,
@@ -249,7 +274,7 @@ Its kit is `src/entities/enemies/behaviors/boss/ironclaw.js` on the shared boss 
 Behaviour modules and boss kits gained an optional `damageScale(e, hit)` hook (beside `refuses`) for the guarded and
 open multipliers.
 
-![Old Ironclaw on the pearl flat](screenshots/bosses/tidewhisper-ironclaw.jpg)
+![Old Ironclaw on the pearl flat](../../screenshots/bosses/tidewhisper-ironclaw.jpg)
 
 Verify with `npm test`, `npm run sim` and `node scripts/ironclaw-smoke.mjs` (port 8112; Puppeteer Core/Chromium as in
 27e). The browser helper uses real **Z** Arcane Bolts into the bell (refused, then a ring that hurts) and its face
@@ -291,7 +316,7 @@ field while one is in progress.
 
 | Lagoon at the start | Beached after the sluice break |
 | --- | --- |
-| ![Lit lures in the lagoon](screenshots/bosses/tidewhisper-mirelure-lures.jpg) | ![Mirelure beached on the drained floor](screenshots/bosses/tidewhisper-mirelure-beached.jpg) |
+| ![Lit lures in the lagoon](../../screenshots/bosses/tidewhisper-mirelure-lures.jpg) | ![Mirelure beached on the drained floor](../../screenshots/bosses/tidewhisper-mirelure-beached.jpg) |
 
 Verify with `npm test`, `npm run sim` and `node scripts/mirelure-smoke.mjs` (port 8113; Puppeteer Core/Chromium as in
 27e). The browser helper checks the configured gate waking her inside the surf ring; real **Z** Arcane Bolts that burst

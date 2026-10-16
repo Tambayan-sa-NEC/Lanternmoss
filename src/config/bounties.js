@@ -11,7 +11,7 @@
    material   [min, max] of the planet's material added to every reward
    rareChance share of bounties that also pay a rare piece of gear (rolled for the hero when claimed)
    board      where it stands: distance from the square (m), clearance radius, and how near you stand to read it
-   Bounties are optional, repeatable income on top of the first-visit budgets in docs/balance.md: kept to about what
+   Bounties are optional, repeatable income on top of the first-visit budgets in docs/wiki/game-design/balance.md: kept to about what
    selling chest finds pays (Lanternmoss 20-30 coins a day), while materials still gate crafting.
    --------------------------------------------------------------------- */
 

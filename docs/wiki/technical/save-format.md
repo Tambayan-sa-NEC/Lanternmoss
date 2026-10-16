@@ -55,7 +55,7 @@ TODO 26b adds optional per-planet `mechanics: { id, state, at } | null`. The mod
 records adventure-calendar seconds rather than wall-clock time. Missing old-v1 state uses defaults; unknown or
 mismatched modules are discarded. Continue loads this state and applies away time before mechanic entry and
 actor/resource population. Later planet restoration skips it to avoid undoing that advancement. Weather stays
-transient. See [mechanic lifecycle and save hooks](mechanics.md); the original v1 fixture is unchanged.
+transient. See [mechanic lifecycle and save hooks](planet-mechanics.md); the original v1 fixture is unchanged.
 
 TODO 26c derives gravity and moving-water queries from planet config plus that mechanic snapshot, before
 population. They have no separate save owner. Travel/disposal resets the previous world's queries and water

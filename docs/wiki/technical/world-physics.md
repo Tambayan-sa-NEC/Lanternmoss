@@ -4,7 +4,7 @@
 `World.generate()` configures them before placement; `World.dispose()` resets them after the mechanic exits.
 The original three worlds have no physics overrides, so gravity, pond baselines and generated ids retain their
 previous defaults. The registered Tidewhisper tide module is exercised through a development fixture; no expansion
-world is enabled for campaign travel. See [Tidewhisper terrain and tides](tidewhisper.md).
+world is enabled for campaign travel. See [Tidewhisper terrain and tides](../world/tidewhisper.md).
 
 A planet's optional `physics` config may declare:
 
@@ -71,7 +71,7 @@ amphibious enemies belong to their owning content stages.
 
 Physics values are derived state, rebuilt from config and the mechanic's existing per-planet snapshot before
 population. They are not saved separately. Continue, travel and reset cannot carry another world's rules or sea
-meshes into a destination; the old v1 save fixture remains readable. See [mechanic lifecycle and saves](mechanics.md).
+meshes into a destination; the old v1 save fixture remains readable. See [mechanic lifecycle and saves](planet-mechanics.md).
 
 Verify with `npm test`, `npm run sim` and `node scripts/world-physics-smoke.mjs`. The development-only fixture
 `tests/sim/lib/physicsFixture.mjs` supports full-game/browser checks without a production import; unit tests

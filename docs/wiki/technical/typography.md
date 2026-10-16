@@ -21,8 +21,8 @@ A Short Hike, Ooblets); chalkboard menus at a village bakery.
 ## Candidates
 
 All candidates are free (SIL Open Font License) fonts on Google Fonts. Each was compared on a mock-up of the title,
-a planet banner, a dialogue box, the vitals and hotbar, and a tooltip: [type-specimen.html](type-specimen.html)
-(rendered: ![specimen](type-specimen.jpg)).
+a planet banner, a dialogue box, the vitals and hotbar, and a tooltip: [type-specimen.html](../../type-specimen.html)
+(rendered: ![specimen](../../type-specimen.jpg)).
 
 | | Display | Body | Verdict |
 |---|---|---|---|

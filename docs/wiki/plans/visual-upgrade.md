@@ -11,7 +11,7 @@
 **Prepared:** 2026-10-13, Asia/Manila.<br>
 **Target:** an original, rounded, expressive, tactile cozy style inspired by Animal Crossing: New Horizons.<br>
 **Recommended starting point:** the existing Three.js browser game and repository.<br>
-**Planning IDs:** `V01`–`V18`; these are independent of the numbered gameplay TODOs in [TODO.md](../../TODO.md).
+**Planning IDs:** `V01`–`V18`; these are independent of the numbered gameplay TODOs in [TODO.md](../../../TODO.md).
 
 ## 1. Recommendation and timing
 
@@ -41,7 +41,7 @@ This is a proposed sequencing change, not an edit to TODO.md. If a Tidewhisper r
 priority, finishing 27b–27h before the visual prototype is a valid alternative, with the acknowledged
 cost of replacing more finished art later. Do not interrupt a feature midway to adopt this plan.
 
-**Preserving the version you like:** [TODO 43: Classic release checkpoint](../../TODO.md#43-preserve-the-classic-version-before-a-visual-upgrade-core-checkpoint)
+**Preserving the version you like:** [TODO 43: Classic release checkpoint](../../../TODO.md#43-preserve-the-classic-version-before-a-visual-upgrade-core-checkpoint)
 records a tagged release, restore-tested runnable archive, separate save backups and an optional side-by-side
 worktree. If the chosen route is to finish the current track first, complete that checkpoint before starting the
 visual overhaul. An earlier accepted milestone can also be preserved without finishing every optional TODO.
@@ -200,7 +200,7 @@ performance and regression work. Do not assign a confident whole-project deliver
 **Goal:** a repeatable style guide that an artist or future contributor can follow.<br>
 **Why:** consistency across assets matters more than increasing detail individually.<br>
 **Size:** M, with art iteration estimated separately. **Needs:** V01.<br>
-**Touches:** proposed `docs/art-direction.md`, `docs/typography.md`, eventual README/TODO assumption updates.<br>
+**Touches:** proposed `docs/art-direction.md`, `docs/wiki/technical/typography.md`, eventual README/TODO assumption updates.<br>
 **Risk:** drifting toward a generic reference imitation or inconsistent asset packs. **Recommendation:** retain Lanternmoss motifs.
 
 | Sub-TODO | Description and deliverable |
@@ -220,7 +220,7 @@ all remain proposals until this stage is activated and reviewed.
 **Goal:** set achievable budgets before adding richer art.<br>
 **Why:** current performance tooling exists, but the documented default-quality target is not yet met on available hardware.<br>
 **Size:** M–L. **Needs:** V01–V02.<br>
-**Touches:** `scripts/performance.mjs`, `src/config/render.js`, `src/core/performance.js`, `docs/performance.md`.<br>
+**Touches:** `scripts/performance.mjs`, `src/config/render.js`, `src/core/performance.js`, `docs/wiki/technical/performance.md`.<br>
 **Risk:** treating fewer triangles or a headless sim as proof of browser frame rate. **Recommendation:** measure real scenes and GPUs.
 
 | Sub-TODO | Description and deliverable |
@@ -539,11 +539,11 @@ are proposals for V03/V07 to calibrate, not current measurements or approved new
 The historical checked-in performance results use Intel UHD and report roughly 18–19 FPS at High in
 their full 2026-10-10 samples. They are a warning about headroom, not a fresh measurement of today's
 working tree. Low-quality count compliance alone does not prove the target frame rate. See
-[performance notes](../performance.md) and [content acceptance](../content-release.md).
+[performance notes](../technical/performance.md) and [content acceptance](../technical/content-release.md).
 
 ## 7. Verification and implementation workflow, when activated
 
-Every activated implementation stage follows [AGENTS.md](../../AGENTS.md). Work on a feature branch,
+Every activated implementation stage follows [AGENTS.md](../../../AGENTS.md). Work on a feature branch,
 bring it up to date with the default branch, run **all** `npm test` and `npm run sim` checks, plus relevant
 browser/feature checks, fix failures, commit and merge the tested tree, push when a remote exists,
 verify inclusion and then delete the feature branch. Rerun affected checks if merge resolution changes
