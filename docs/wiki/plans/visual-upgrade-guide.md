@@ -22,7 +22,7 @@ feels to play. For the full boundaries, see the agent plan's
 
 - [ ] Choose whether to finish your current gameplay milestone first or prioritize the visual sample.
 - [ ] Tell the agents which version you want to keep. If you are preserving a finished edition first,
-      complete [TODO 43](../../TODO.md#43-preserve-the-classic-version-before-a-visual-upgrade-core-checkpoint).
+      complete [TODO 43](../../../TODO.md#43-preserve-the-classic-version-before-a-visual-upgrade-core-checkpoint).
       Ask to see that the backup opens and your exported adventure can be restored.
 - [ ] Name the devices you care about, such as your laptop and its usual browser. Do not assume phone
       controls or multiplayer are included in this visual update.

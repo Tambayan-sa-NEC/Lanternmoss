@@ -18,11 +18,17 @@ test('every screenshot sits in the folder scripts/shots.mjs gives it, and every 
   assert.throws(() => shotLink('not-a-shot'), /no folder/);
 });
 
-test('README and docs link only screenshots that exist', () => {
-  const docs = ['README.md', ...readdirSync(join(root, 'docs')).filter(f => f.endsWith('.md')).map(f => `docs/${f}`)];
+test('README and the wiki link only screenshots that exist', () => {
+  const wiki = dir => readdirSync(join(root, dir), { withFileTypes: true })
+    .flatMap(d => (d.isDirectory() ? wiki(`${dir}/${d.name}`) : d.name.endsWith('.md') ? [`${dir}/${d.name}`] : []));
+  const docs = ['README.md', ...wiki('docs/wiki')];
+  assert.ok(docs.length > 20, 'the wiki pages are found');
+  let checked = 0;
   for (const doc of docs) {
-    for (const [, path] of readFileSync(join(root, doc), 'utf8').matchAll(/(?:src="|\]\()((?:docs\/)?screenshots\/[^")]+\.jpg)/g)) {
+    for (const [, path] of readFileSync(join(root, doc), 'utf8').matchAll(/(?:src="|\]\()((?:\.\.\/)*(?:docs\/)?screenshots\/[^")]+\.jpg)/g)) {
+      checked++;
       assert.ok(existsSync(join(root, dirname(doc), path)), `${doc} links a missing ${path}`);
     }
   }
+  assert.ok(checked > 40, `the screenshot links are found (${checked})`);
 });

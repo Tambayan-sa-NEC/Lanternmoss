@@ -37,14 +37,14 @@ DPR 1, bloom enabled. High and Medium render at 1920 × 1080 on this display; Lo
 warmup frames, collect 90 frames per planet/preset. Record mean cadence, p95 frame time and peak counts. NPC movement
 and weather animation can produce small variations, so count ceilings include headroom.
 
-The checked-in [original baseline](performance-baseline.json) was captured before optimization, using `--baseline
---quick` (12 warmup/20 measured frames, High only). [Current results](performance-results.json) record all three
+The checked-in [original baseline](../../performance-baseline.json) was captured before optimization, using `--baseline
+--quick` (12 warmup/20 measured frames, High only). [Current results](../../performance-results.json) record all three
 presets. `--quick` is useful for iteration; full sampling is used for final verification. Timing from short samples is
 indicative. Neither result is a universal worst case for every combat encounter or camera bearing.
 
 The script fails if any preset exceeds its planet's calls/triangle ceiling, then verifies the live overlay, F3 while
-paused and all five density controls, and captures [the overlay](screenshots/huds/performance.jpg) and
-[Graphics settings](screenshots/huds/performance-settings.jpg). Commit refreshed JSON alongside intentional render changes
+paused and all five density controls, and captures [the overlay](../../screenshots/huds/performance.jpg) and
+[Graphics settings](../../screenshots/huds/performance-settings.jpg). Commit refreshed JSON alongside intentional render changes
 so count regressions can be reviewed in a diff. FPS is recorded rather than a portable CI pass/fail assertion.
 
 ## Measurements and ceilings
