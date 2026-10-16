@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RENDER } from '../config/render.js';
 import { FOG_COLOR, FOG_FAR, FOG_NEAR, PIXEL_RATIO } from './scene.js';
+import './lighting.js';   // installs the local-light patch on every toon material before any shader compiles
 
 export const gradientMap = (() => {
   const d = new Uint8Array([92, 92, 92, 255, 172, 172, 172, 255, 255, 255, 255, 255]);

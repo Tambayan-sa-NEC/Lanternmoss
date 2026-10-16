@@ -1320,13 +1320,23 @@ precedence over the old six-cave estimate. Expansion cave configs follow their w
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **29a. Shared local-light rendering** | 19, 20, 26b | 3-4.5 h | Implement hero/lantern shader light radii, emissive glow/bloom and readable minimum ambient/ink outlines in a small harness. Bound real point lights to about four across all active sources, including building lamps. Check lowest-preset readability, material caches, disposal and measured rendering cost. This is the only cave prerequisite for 30a. |
+| [x] **29a. Shared local-light rendering** | 19, 20, 26b | 3-4.5 h | Implement hero/lantern shader light radii, emissive glow/bloom and readable minimum ambient/ink outlines in a small harness. Bound real point lights to about four across all active sources, including building lamps. Check lowest-preset readability, material caches, disposal and measured rendering cost. This is the only cave prerequisite for 30a. |
 | [ ] **29b. Seeded cave layout and traversal** | 29a, 26a | 3-4.5 h | Add the reusable room kit, seeded connections, surface entrance, flat-floor collisions/camera, entry/exit and safe death return. Prove deterministic room ids and no stranded player; keep the unfinished dungeon outside normal travel. |
 | [ ] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
 | [ ] **29d. Cave rewards and persistence** | 29c | 2-4 h | Register room/chest/ore/enemy progress, saved indoor pose and death/revisit/Continue behavior. Prove old-save defaults, portal isolation, unique cave ore and no reward duplication after reload or regeneration. |
 | [ ] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
 | [ ] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
 | [ ] **29g. Expansion cave rollout** | 29f, 27h, 30i | 2-4 h | Configure/release Tidewhisper and Duskhollow caves from the proven kit, including tide-safe entrances and lantern readability. Check both complete paths and saved progress. No Moon cave or extra room technology; if either config needs new mechanics, split this rollout before coding. |
+
+**29a implemented (2026-10-16):** `src/render/lighting.js` (`RENDER.localLight`): light radii in every toon shader
+(patched on the material prototype, grass and kelp chained), up to 8 spots for the nearest sources, toon-banded and
+scaled by a place's darkness, so the surface (darkness 0) is unchanged; a minimum ambient keeps the dark readable; a
+pool of four real point lights shared by every source, switched on and off together (no one-by-one recompiles), off
+indoors where an interior keeps its single light; darkness dims the sun, sky light, sky and fog, and the hero carries
+a light. Home lamps are the first real sources (same brightness as before). Bloom on glowing lanterns is the existing
+pass. Checked by `tests/sim/lighting.sim.mjs`, `tests/sim/building.sim.mjs` and `scripts/lighting-smoke.mjs` (real
+WebGL compile, no recompiles, readable dark on Low and High) in a night-village harness; performance rerun as a
+diagnostic only, Iris Xe certification pending like 27h. See [local light](docs/lighting.md).
 
 - [ ] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
       that are found nowhere else.

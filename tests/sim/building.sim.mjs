@@ -47,7 +47,8 @@ for(const e of entries.filter(e=>e.colliders.length)) {
   assert.ok(cameraBlocked(c.dir.clone().multiplyScalar(groundHeight(c.dir)+Math.min(0.5,PLACEABLES[e.record.itemId].height*0.5))),`${e.record.itemId} blocks camera`);
 }
 assert.equal(entries.find(e=>e.record.itemId==='stonePath').colliders.length,0); assert.equal(plot.colliders.length,0);
-assert.ok(B.lights.length <= 4);
+H.LocalLights.update(P, { indoors: false }); assert.equal(B.lampLights.size, entries.filter(e => e.record.itemId === 'homeLamp').length, 'every lamp is a light source');
+assert.ok(H.LocalLights.pool.length <= 4 && H.LocalLights.litPointLights() <= 4, 'at most four real point lights');
 const fp0=fence.colliders.map(c=>c.dir.toArray()); assert.equal(fp0.length,5);
 console.log('PASS all pieces place/rotate; solids block movement and camera; paths, rugs and plots stay walk-through; E opens paused management');
 
