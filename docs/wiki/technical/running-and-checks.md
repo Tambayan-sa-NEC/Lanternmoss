@@ -59,6 +59,7 @@ node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys,
 node scripts/warrior-talents-smoke.mjs # real Warrior tree: Wide Cleave in HUD/Controls/tooltips, keys, Continue/reset; retakes its shots
 node scripts/ranger-talents-smoke.mjs # real Ranger tree: Wide Fan in HUD/Controls/tooltips, keys, Continue/reset; retakes its shots
 node scripts/lighting-smoke.mjs    # local light harness: shaders compile, no recompiles, readable dark on Low/High; retakes its shot
+node scripts/caves-smoke.mjs       # caves (unreleased): real keys room to room, readable dark, real E leaves; retakes its shot
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 

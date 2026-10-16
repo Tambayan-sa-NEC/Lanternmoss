@@ -37,6 +37,7 @@ not confirmed design.
 | --- | --- |
 | [Planet catalog and release rules](world/planets.md) | The worlds, their configuration and which are released |
 | [Monsters and bosses](world/monsters-and-bosses.md) | Every monster, mini boss and boss, and how they fight |
+| [Caves](world/caves.md) | Seeded cave layouts, entering, walking and leaving (**unreleased**; TODO 29) |
 | [Tidewhisper](world/tidewhisper.md) | The fourth world (**unreleased**): terrain and tides, wildlife, resources, village, monsters and its encounters |
 
 ## Technical

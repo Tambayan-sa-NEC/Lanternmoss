@@ -27,6 +27,7 @@ import { Home } from '../gameplay/Home.js';
 import { Building } from '../gameplay/Building.js';
 import { Bounties } from '../gameplay/Bounties.js';
 import { Talents } from '../gameplay/Talents.js';
+import { Dungeons } from '../gameplay/Dungeons.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -39,12 +40,19 @@ import { toast } from '../ui/toast.js';
 import { dom } from '../ui/dom.js';
 import { projectTangent } from '../utils/sphere.js';
 
+/** Saved inside a cave: the hero is recorded at its surface mouth, so Continue never starts underground (29d keeps the
+    indoor pose). */
+const caveSafePose = () => {
+  const m = Dungeons.inside && (Dungeons.mouth?.dir ?? Dungeons.world?.spawnDir);
+  return m ? { up: m.toArray(), fwd: (Dungeons.mouth?.fwd ?? ctx.player.fwd).toArray() } : {};
+};
+
 export class AdventureSave {
   constructor(game) {
     this.game = game; this.store = new SaveStore(); this.registry = new SaveRegistry();
     this.restoring = false; this.suspended = false; this.timer = AUTOSAVE_SECONDS; this.errorShown = false;
     const player = {
-      toJSON: () => ({ ...ctx.player.toJSON(), indoors: Houses.inside?.index ?? null,
+      toJSON: () => ({ ...ctx.player.toJSON(), ...caveSafePose(), indoors: Houses.inside?.index ?? null,
         roomX: Houses.inside?.x ?? 0, roomZ: Houses.inside?.z ?? 0 }),
       load: data => ctx.player.load(data),
     };
