@@ -191,3 +191,9 @@ The original-mode report above used a hidden browser and GPU queries. The matche
 `docs/tidewhisper-performance-acer-rtx4050-headed-before-20261017.json`, with every changed runtime rendering file
 replayed from `b3074d5`, plus the corrected collector/reference configuration. GPU queries are off in both final
 comparison runs. A visible-browser performance artifact is still required before enabling the destination.
+
+The first clean optimized run (`8a8e432`) is preserved as
+[the loaded-host report](../../tidewhisper-performance-acer-rtx4050-loaded-after-20261017.json).
+All 18 render-count rows pass (peak 474 calls and 209111 triangles), but only one timing row passes;
+p95 spans 16.1–27.5 ms. Available RAM was approximately 1 GB with active paging during the run.
+The owner is closing unused apps for a repeat. This report failed acceptance and produced no release artifact.
