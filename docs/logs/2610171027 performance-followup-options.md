@@ -1,0 +1,7 @@
+﻿# Next diagnostic steps after the UHD 620 benchmark
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-17 10:28 | REVIEW | TODO 20 | Review benchmark summary, available graphics settings and local-light implementation | develop | Started 2026-10-17 10:27. develop clean and up to date at 110dd97 before this advice log. Previous 24-row diagnostic records 3.0-4.4 FPS and memory pressure; causes have not been isolated. Local-light fragment work is guarded by strength > 0, so no evidence yet identifies it as the culprit. | 0h 01m |
+| 2026-10-17 10:28 | PLAN | TODO 20 | Recommend focused profiling and controlled rendering comparisons before choosing a fix | develop | Use one fixed village scene, fresh memory/paging observations, CPU/browser timing and GPU timing where supported; compare bloom and density costs one setting at a time. If needed, compare an earlier build under the same conditions to investigate regression. Then implement only the measured fix with before/after numbers and required checks. Independent feature work available: 29b cave layout/traversal; 30a still depends on 27h. No acceptance target changed and no new benchmark or implementation started. | 0h 01m |
+| 2026-10-17 10:28 | TOTAL | TODO N/A | Next-step advice | develop | Recommendation only; this log is left uncommitted. No tests, merge or push for this advice session. | 0h 01m |

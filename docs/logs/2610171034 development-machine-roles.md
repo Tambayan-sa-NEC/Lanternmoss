@@ -1,0 +1,9 @@
+﻿# Development and validation machine roles
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-17 10:35 | RESEARCH | TODO N/A | Review existing performance guidance, repair-delay advice and clean tracked base | docs/development-machine-roles | Started 2026-10-17 10:34. develop up to date at 110dd97; the only existing untracked files were two advice logs from this conversation. Preserved them for this documentation task. | 0h 01m |
+| 2026-10-17 10:35 | DOCS | TODO 20 | Record machine-role recommendation at the user's explicit request | docs/development-machine-roles | AGENTS.md points to a new performance-wiki table: higher-spec laptop for primary coding/full tests/browser review, UHD 620 laptop for occasional low-end diagnostics, repaired Iris Xe laptop for final target validation. Higher-spec specifications remain unknown; no migration is claimed. Repair estimate is dated and tentative; release gates and roadmap dependencies retained. | 0h 01m |
+| 2026-10-17 10:36 | TEST | TODO N/A | Run npm test -- --test-concurrency=1 and whitespace check | docs/development-machine-roles | 236 passed, 0 failed, no skips (41.0 s); git diff --check passed. | 0h 01m |
+| 2026-10-17 10:53 | TEST | TODO N/A | Run full npm run sim with no browser benchmark running | docs/development-machine-roles | All 51 simulations passed, including terrain timing, content gate, saves, lighting and performance regression checks. No failures. | 0h 17m |
+| 2026-10-17 10:53 | REVIEW | TODO N/A | Review AGENTS pointer, wiki table and dated availability note | docs/development-machine-roles | Relative page/section references match their headings; guidance is a recommendation, exact higher-spec hardware remains unverified, and Iris Xe acceptance is preserved. Only two existing documents and three work logs are included. No player-facing changes or screenshots required. | 0h 01m |
