@@ -8,6 +8,10 @@ Latest functional regression checkpoint: **243 units, all 53 simulations and all
 pass**. See [step 2](#step-2-full-regression-checks), including the corrected pause-menu overflow and failed-attempt
 history. Normal clean 18-case hardware acceptance, destination enablement and final tour/integration remain pending.
 
+Latest ordinary hardware attempt: **5/18 timing cases pass; all 18 render-count cases pass**. See
+[step 3](#step-3-ordinary-hardware-acceptance-attempt). The collector failed acceptance and produced no release
+artifact. Step 3 remains open; production enablement still depends on passing it.
+
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
 Tidewhisper object and its `released: false` flag remain untouched. Restoration reinstates the original catalog identity.
@@ -285,3 +289,38 @@ the final screenshot tour remains step 5.
 Step 2 is complete. Remaining: **3**, clean ordinary 18-case 1080p High reference acceptance; **4**, enable the
 destination only after acceptance and check production saves/travel/completion; **5**, final tour/docs and tested
 stage/parent integration. No destination flag, merge or public release was performed here.
+
+### Step 3: ordinary hardware acceptance attempt
+
+[Raw report](../../tidewhisper-performance-acer-rtx4050-step-3-20261017.json), clean candidate `da96f77`, collected
+on AC in visible Edge on the actual RTX 4050 Laptop GPU at 1920x1080 High/DPR1. Ordinary live gameplay/audio,
+fresh adventure per row, 120 setup updates, 30 warmup and 120 real render intervals: 18 unique cases / 2160 samples.
+No source overrides, fixed poses, GPU-query instrumentation or competing test/tour jobs were used.
+
+The empty-page clock is 6.1 ms median / 6.3 ms p95 over 240 samples (~165 Hz); it cannot supply the 60 Hz allowance.
+The unchanged limit is 16.67 ms. Five cases pass and thirteen fail:
+
+| Hero / seed | Village p95 | Night p95 | Squall p95 |
+| --- | ---: | ---: | ---: |
+| Witch / 1 | 15.9 ms pass | 16.8 ms fail | 16.9 ms fail |
+| Knight / 1 | 18.3 ms fail | 19.0 ms fail | 18.5 ms fail |
+| Ranger / 1 | 18.5 ms fail | 17.1 ms fail | 13.9 ms pass |
+| Witch / 7 | 14.0 ms pass | 13.8 ms pass | 17.3 ms fail |
+| Knight / 7 | 15.2 ms pass | 17.0 ms fail | 18.5 ms fail |
+| Ranger / 7 | 17.4 ms fail | 18.8 ms fail | 20.7 ms fail |
+
+Average rates span 76.02-102.24 FPS; that does not satisfy the separate p95 rule. All count rows pass: 329-479
+calls and 198667-210017 triangles, below 550/230000. CPU p95 spans 8.3-14.3 ms; this diagnostic omits browser
+work and is not a substitute for actual frame intervals. Every row verifies the actual adapter, true buffer,
+quality, active simulation and visible document; there are zero page/shader errors.
+
+The host had 2096-2108 MiB available before launch, with zero pages input in the two pre-run samples and
+30-39% total CPU use. Reported free memory immediately before browser launch is 2.00 GiB. These snapshots do
+not identify the cause of the timing failures. The earlier freed-memory attempt and fixed-pose comparison have
+different motion/load; no controlled optimization gain is inferred from their averages.
+
+`--release` exited with the frame-time acceptance assertion and no `docs/releases/tidewhisper.json` was written.
+No target, density, preset, release flag or runtime source was changed. Step 3 remains open: profile failing live
+scenes (starting with Ranger/7 squall), distinguish update/render/browser stalls, make evidence-backed fixes and
+rerun affected regressions plus clean normal acceptance. Step 4 enablement and step 5 tour/docs/integration wait
+for a full pass. The test run is finished; the acceptance milestone is not complete.

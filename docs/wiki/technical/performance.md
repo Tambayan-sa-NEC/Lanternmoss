@@ -10,6 +10,10 @@ Historical Intel UHD results do not certify the current reference. Run `node scr
 for diagnostics; `--release` requires a clean candidate, a visible browser, an actual RTX 4050 Laptop GPU renderer and passing frame/draw budgets
 before it writes a release evidence file. Tidewhisper remains unreleased.
 
+The [latest ordinary reference attempt](tidewhisper-release.md#step-3-ordinary-hardware-acceptance-attempt),
+clean `da96f77`, passes all 18 count budgets but only 5/18 timing cases. Acceptance remains a no-go;
+the raw matrix is retained and no release artifact was written.
+
 The owner selected the **Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, NVIDIA RTX 4050 Laptop GPU** as the default
 desktop validation machine on 2026-10-17. The target remains **60 FPS at a 1920 × 1080 viewport**, DPR 1, default
 High preset: 16.67 ms per frame. Run on AC with Edge, request the high-performance GPU, and verify the actual WebGL

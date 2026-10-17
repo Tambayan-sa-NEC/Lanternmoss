@@ -229,3 +229,6 @@ instrumented live-scene timeline summaries; these are diagnostics, not release e
 
 `docs/tidewhisper-step-2-regressions-20261017.json` records the full unit/simulation summaries, all 17 browser
 regressions, failed attempts and successful reruns, script/style provenance and incidental capture restoration.
+
+`docs/tidewhisper-performance-acer-rtx4050-step-3-20261017.json` preserves the ordinary clean 18-case hardware
+acceptance attempt after step 2. Thirteen timing rows fail; count budgets pass. It is not release evidence.

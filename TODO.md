@@ -1163,6 +1163,12 @@ reruns passing. Older save/portal/tutorial checks now collect shader errors and 
 timeout; save checks cover both resolutions. Ordinary clean 18-case hardware acceptance is next; release stays off.
 See [the regression record](docs/wiki/technical/tidewhisper-release.md#step-2-full-regression-checks).
 
+**27h step 3 acceptance attempt (2026-10-17):** ordinary clean `da96f77` run, all 18 cases / 2160 samples on the
+RTX 4050 at 1080p High. All draw/triangle budgets pass, but only 5/18 cases meet the unchanged 16.67 ms p95 limit
+(76.02-102.24 average FPS; p95 13.8-20.7 ms). Zero page/shader errors. The collector correctly failed and wrote no
+release evidence. Step 3 remains open: diagnose the failing live scenes, improve frame pacing, recheck affected
+code and repeat clean acceptance before destination enablement. See [the result matrix](docs/wiki/technical/tidewhisper-release.md#step-3-ordinary-hardware-acceptance-attempt).
+
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
 1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway
