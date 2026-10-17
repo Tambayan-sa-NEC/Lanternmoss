@@ -371,3 +371,32 @@ page errors. All 18 rows ran, but the old error assertion preceded report persis
 explicitly rounded console summary, not reconstructed raw evidence or certification. The collector now waits for
 the loss event with a bounded timeout before disposal, and writes complete matrices before error assertions.
 The browser regression exercises captured and initial title contexts with live animation frames afterward.
+
+### Step 3 continuation: conservative view-frustum gates
+
+The corrected clean `65f6a00` [ordinary recheck](../../tidewhisper-performance-acer-rtx4050-step-3-final-20261017.json)
+completed all 18 cases with zero page/shader errors, but only five timing passes (p95 15.0-24.2 ms). It preserved
+all render-count budgets and correctly wrote no release evidence. That result prompted a second render change.
+
+Actor gates now derive a conservative envelope from geometry spheres and current local translations/scales,
+independent of rotations. Only immutable branches cache extents. No authored size guesses or distance reductions
+are used; hidden effects stay included and unsupported/unbounded or nested rigs keep the old path. Local animation,
+AI, collisions, populations and actor-owned visibility continue unchanged. On return, the existing gate refreshes
+the complete current pose. Unit properties and a negative simulation control cover this behavior.
+
+The [paired diagnostic](../../tidewhisper-frustum-comparison-20261017.json) uses 24 ABBA rows/8640 render samples,
+both seeds and all heroes, matching setup poses and every sampled draw/triangle pair exactly. Pooled p95:
+
+| Hero / seed | Before interval | After interval | Before render callback | After render callback |
+| --- | ---: | ---: | ---: | ---: |
+| witch / 1 | 16.5 ms | 11.9 ms | 13.4 ms | 9.4 ms |
+| knight / 1 | 14.2 ms | 12.9 ms | 12.1 ms | 10.9 ms |
+| ranger / 1 | 14.1 ms | 12.0 ms | 11.6 ms | 9.9 ms |
+| witch / 7 | 13.9 ms | 13.3 ms | 11.7 ms | 11.0 ms |
+| knight / 7 | 14.0 ms | 12.1 ms | 11.6 ms | 10.0 ms |
+| ranger / 7 | 15.1 ms | 12.7 ms | 12.7 ms | 10.2 ms |
+
+All six pooled profiles improve in this diagnostic. Host scheduling/load is not experimentally controlled, and
+simulation is paused, so these numbers cannot certify release or replace the ordinary live 18-case matrix.
+The four-world browser check also restores distance-only gates after movement and requires identical raw canvas
+pixels at 720p/1080p; it restored 7-13 completely off-screen branches per fixture with no pixel change.

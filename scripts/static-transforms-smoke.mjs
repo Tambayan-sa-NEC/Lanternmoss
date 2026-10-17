@@ -52,8 +52,23 @@ try {
       const changed = await page.evaluate(() => window.__staticChanged);
       assert.equal(changed.length, 0, `${planet}: forced traversal changes world matrices: ${JSON.stringify(changed.slice(0,8))}`);
       assert.equal(after === before, true, `${planet}: forced traversal changes canvas pixels at ${width}x${height}`);
+      const distanceOnly = await page.evaluate(async () => {
+        const THREE = await import('three');
+        const { ctx } = await import('/src/core/context.js'), { camera } = await import('/src/render/scene.js');
+        const { RENDER } = await import('/src/config/render.js'), { settings } = await import('/src/core/settings.js');
+        const distance = RENDER.actorDistance[settings.quality]; let restored = 0;
+        for (const actors of [ctx.npcs,ctx.critters,ctx.birds,ctx.enemies]) for (const actor of actors) {
+          const root=actor.root,gate=root?.children[0]; if (!root || root.isMesh || !gate) continue;
+          const pos=root.getWorldPosition(new THREE.Vector3());
+          const visible=pos.distanceTo(camera.position)<=distance || pos.distanceTo(ctx.player.pos)<=24;
+          if(visible&&!gate.visible)restored++;gate.visible=visible;
+        }
+        window.__staticRender.composer.render();
+        return {png:window.__staticRender.canvas.toDataURL('image/png'),restored};
+      });
+      assert.equal(distanceOnly.png === after, true, `${planet}: frustum gating changes canvas pixels at ${width}x${height}`);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
-      console.log(`PASS ${planet} ${width}x${height}: movement, identical matrices and canvas pixels after forced traversal; no overflow`);
+      console.log(`PASS ${planet} ${width}x${height}: movement, identical matrices/pixels after forced traversal and restoring ${distanceOnly.restored} off-screen branches; no overflow`);
     }
   }
   await page.evaluate(() => { window.__tideRenderer = window.__staticRender.renderer; });

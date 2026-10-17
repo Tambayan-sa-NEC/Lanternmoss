@@ -168,5 +168,11 @@
   "errors": [],
   "candidateCommit": "4f105f2",
   "profiledSource": "before immutable subtree shortcut",
-  "note": "Instrumented live diagnostic; draw group totals cover two render callbacks. Not frame-time acceptance."
+  "note": "Instrumented live diagnostic; draw group totals cover two render callbacks. Not frame-time acceptance.",
+  "sampledMsByAncestor": {
+    "render": 3019.709,
+    "gameUpdate": 1215.191,
+    "otherOrUnattributed": 1936.265
+  },
+  "ancestorAnalysis": "Each sample is assigned by its RenderSystem.render or Game.update ancestor. Remaining samples are not attributed; these are sampled wall durations of the original 4f105f2 diagnostic, not current acceptance CPU or GPU time."
 }

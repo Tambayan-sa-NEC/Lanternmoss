@@ -225,6 +225,9 @@ it also checks immutable subtree traversal, moving parents and explicit world qu
 
 `scripts/static-transforms-smoke.mjs` compares world matrices and raw canvas pixels after forcing visible immutable
 branches on all four worlds at 720p/1080p after keyboard movement. Diagnostic captures go to the system temp folder.
+It also restores the old distance-only actor gates and requires identical raw canvas pixels.
+`src/render/radialBounds.js` derives conservative rotation-independent rig envelopes and caches immutable branches;
+`tests/radialBounds.test.mjs` checks pose containment, cached extents, instances and unbounded fallbacks.
 `docs/tidewhisper-live-profile-20261017.json` summarizes the live Ranger/7 squall CPU profile;
 `docs/tidewhisper-static-comparison-20261017.json` preserves the separate 24-row immutable traversal ABBA comparison
 with source hashes, exact pose/draw assertions and changing host-load limitations.
@@ -244,3 +247,8 @@ regressions, failed attempts and successful reruns, script/style provenance and 
 
 `docs/tidewhisper-performance-acer-rtx4050-step-3-20261017.json` preserves the ordinary clean 18-case hardware
 acceptance attempt after step 2. Thirteen timing rows fail; count budgets pass. It is not release evidence.
+
+`docs/tidewhisper-frustum-comparison-20261017.json` preserves the six-profile paired culling diagnostic.
+`docs/tidewhisper-step-3-frustum-regressions-20261018.json` records the subsequent affected checks.
+`docs/tidewhisper-performance-acer-rtx4050-step-3-final-20261017.json` is the clean `65f6a00` ordinary recheck
+before frustum gating (five timing passes, thirteen failures, zero page/shader errors), retained as historical evidence.

@@ -74,6 +74,15 @@ nestedParent.position.set(1000,0,0); nestedRoot.position.set(0,20,0); nestedPare
 ctx.npcs.push({root:nestedRoot}); camera.position.set(1000,20,0); H.player.pos.copy(camera.position); cullActors(camera);
 assert.equal(nestedRoot.children[0].visible,true,'nested actor culling uses the parent world transform');
 ctx.npcs.pop(); scene.remove(nestedParent);
+const offscreen = new THREE.Group(), limb = new THREE.Group(), decoration = new THREE.Mesh(new THREE.BoxGeometry(1,1,1));
+limb.add(decoration);offscreen.add(limb);offscreen.position.set(0,0,20);scene.add(offscreen);ctx.npcs.push({root:offscreen});
+camera.position.set(0,0,0);camera.quaternion.identity();H.player.pos.set(0,0,20);cullActors(camera);
+assert.equal(offscreen.children[0].visible,false,'a rig entirely behind the view skips render traversal even in the player safety range');
+limb.position.z=-22;cullActors(camera);
+assert.equal(offscreen.children[0].visible,true,'current animated translations expand the envelope before culling');
+limb.position.z=0;camera.lookAt(0,0,20);cullActors(camera);
+assert.equal(offscreen.children[0].visible,true,'turning the camera restores the actor');
+ctx.npcs.pop();scene.remove(offscreen);
 const { HERO_BUILDERS } = await imp('models/heroes.js');
 const { buildShellback, buildJellybell, buildSurfSkipper } = await imp('models/tideMonsters.js');
 const { buildChestModel } = await imp('models/chest.js');

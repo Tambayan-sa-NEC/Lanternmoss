@@ -4,6 +4,8 @@
 movement input and explicit simulation frames, compares world matrices and raw canvas pixels after forcing all
 visible immutable branches on all four worlds at 720p/1080p, checks overflow and page/shader errors, and saves diagnostic
 captures to the system temp folder. Tidewhisper is installed through the test-only candidate fixture.
+It also restores distance-only actor gates and requires identical raw canvas pixels, checking that frustum-gated
+rigs contribute no visible geometry in those fixtures.
 The same check verifies bounded context-loss/disposal ordering with live animation frames for captured and
 uncaptured title renderers, plus repeated cleanup, and requires zero resulting page/shader errors.
 

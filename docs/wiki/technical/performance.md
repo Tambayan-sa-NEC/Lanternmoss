@@ -149,6 +149,15 @@ separate. Distant actor render gates use 65/50/38 m camera distance for High/Med
 They preserve actor root visibility, animation references, AI and collisions.
 Hidden actor render branches also skip descendant world-matrix traversal. Local poses keep advancing;
 the first visible traversal refreshes the complete pose, while explicit world-position queries still update normally.
+For direct-scene rigs, a conservative view-frustum envelope also rejects completely off-screen branches. Its
+radius derives from full geometry spheres, child translation lengths and largest absolute scales; rotations
+cannot increase that bound. Current animated translations/scales are read before each cull, hidden effects stay
+included, and only immutable decoration caches its radius. Instanced objects use their complete object sphere.
+Deliberately unbounded, skinned/morph and nested rigs keep the safe old path. The camera and distance/player-safety
+rules remain intact; this skips matrix/projection walks for geometry that could not contribute a pixel.
+Unit properties exercise rotated/scaled/hidden poses and instances. Runtime assertions check behind-camera
+rejection, expanding animation and camera-turn restoration. Browser checks compare raw pixels with the previous
+distance-only gates restored, including 7-13 off-screen branches in the four-world movement fixtures.
 
 `batchRigidParts` in `render/staticParts.js` merges rigid decorations between explicitly named animation pivots.
 Hero rigs, coastal regular enemies/wildlife, NPC bodies/outfits and treasure chests use it. Animated pincer joints,
@@ -159,7 +168,7 @@ The origin scene, baked terrain/scenery/grass and new rigid decoration retain th
 recomposing them every frame. Dynamic parents still propagate their world transforms; animated roots/pivots remain
 live. This follows a CPU profile whose largest sampled JavaScript cost was matrix updates.
 An immutable branch also skips descendant matrix walks when its own world matrix and its parent's transform are
-unchanged. `freezeStaticTransforms` is for complete branches with fixed local transforms and child lists; do not
+unchanged. `freezeStaticTransforms` is for complete branches with fixed local transforms, geometry bounds and child lists; do not
 attach animated descendants afterward. A forced parent update still refreshes the branch, and explicit world
 queries keep Three's normal behavior. The unit regression checks clean-walk skipping, moving parents and queries;
 the performance simulation checks real scenery/grass on every released planet. The static-transform browser
