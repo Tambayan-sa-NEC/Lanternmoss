@@ -2,6 +2,8 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import puppeteer from 'puppeteer-core';
 import { shotPath } from './shots.mjs';
 
@@ -22,6 +24,7 @@ try {
     headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage(); await page.setViewport({ width: 1280, height: 720 });
   const errors = []; page.on('pageerror', e => errors.push(String(e)));
+  page.on('console', m => { if (m.type() === 'error' && /shader|WebGLProgram|VALIDATE_STATUS/i.test(m.text())) errors.push(m.text()); });
   await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0', timeout: 90000 });
   await page.waitForFunction(() => window.LANTERNMOSS, { timeout: 60000 });
   await page.click('[data-act="play"]');
@@ -69,8 +72,15 @@ try {
         }), `${size}/${hero}/${id}: guide must not overlap controls`);
       }
     }
-    await page.keyboard.press('Escape'); await wait(300);
-    assert.ok(await page.$eval('#pause .panel', e => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && e.scrollHeight <= e.clientHeight + 2; }), 'pause menu fits');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('#pause .panel');
+      return window.LANTERNMOSS.PauseMenu.isOpen && panel.getAnimations().every(a => a.playState === 'finished');
+    });
+    const panel = await page.$eval('#pause .panel', e => { const r = e.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, scroll: e.scrollHeight, client: e.clientHeight, viewport: innerHeight }; });
+    const fits = panel.top >= 0 && panel.bottom <= panel.viewport && panel.scroll <= panel.client + 2;
+    if (!fits) await page.screenshot({ path: join(tmpdir(), `lanternmoss-tutorial-layout-${size[1]}.png`) });
+    assert.ok(fits, `pause menu fits ${size}: ${JSON.stringify(panel)}`);
     for (const selector of ['[data-go="help"]', '[data-go="tutorial"]', '[data-go="quit"]']) assert.ok(await page.$eval(selector, e => e.getBoundingClientRect().bottom <= innerHeight));
     await page.click('[data-go="help"]'); await page.waitForSelector('#journal.show');
     assert.ok(await page.$eval('.jpanel', e => e.getBoundingClientRect().bottom <= innerHeight));
@@ -93,7 +103,10 @@ try {
   await page.waitForFunction(() => !window.LANTERNMOSS.player.dead, { timeout: 60000 });
   assert.equal(await page.$eval('#faint-screen', e => getComputedStyle(e).display), 'none');
   assert.deepEqual(errors, []);
-  console.log('PASS  browser guide, Help, skip/reload/replay, rebound hero prompts, menu bounds at 720p/1080p, fainting and paused countdown');
+  console.log('PASS  browser guide, Help, skip/reload/replay, rebound hero prompts, menu bounds at 720p/1080p, fainting and paused countdown; zero page/shader errors');
 } finally {
-  await browser?.close(); server.kill();
+  server.kill(); server.stdout?.destroy(); server.stderr?.destroy(); server.unref();
+  if (browser) { let timer; try { await Promise.race([browser.close(), new Promise(resolve => { timer = setTimeout(() => {
+    const child = browser.process(); child?.kill(); browser.disconnect(); for (const stream of child?.stdio ?? []) stream?.destroy?.(); child?.unref(); resolve();
+  }, 10000); })]); } finally { clearTimeout(timer); } }
 }

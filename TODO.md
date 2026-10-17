@@ -1156,6 +1156,13 @@ computed-style reads in the edge-marker loop. The new UI simulation and 720p/108
 changes; full regression suites, clean normal 18-case performance acceptance and release work remain pending.
 See [the comparison and trace findings](docs/wiki/technical/tidewhisper-release.md#step-1-controlled-render-comparison).
 
+**27h step 2 regression (2026-10-17):** 243 unit tests, all 53 simulations (including terrain timing), and all
+17 affected Edge browser checks pass. The tutorial check exposed a 3-pixel overflow in the 720p main pause page;
+its viewport height allowance is now scoped to that page, with the strict assertion retained and tutorial/save
+reruns passing. Older save/portal/tutorial checks now collect shader errors and close browsers with a bounded
+timeout; save checks cover both resolutions. Ordinary clean 18-case hardware acceptance is next; release stays off.
+See [the regression record](docs/wiki/technical/tidewhisper-release.md#step-2-full-regression-checks).
+
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
 1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway

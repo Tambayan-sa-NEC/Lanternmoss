@@ -89,3 +89,7 @@ See the [handoff](tidewhisper-release.md).
 coin and rebound-key updates, the live marker scale, real rebound keyboard interaction and 720p/1080p bounds,
 with zero page/shader errors. Review captures go to the system temp folder, not the feature tour.
 `node tests/sim/hudUpdates.sim.mjs` covers the same update rules, prompt hide/return and settings/resize scale.
+
+Save, portal and tutorial browser checks collect both page and shader errors and use bounded browser cleanup.
+Save defaults to Edge; its final menu checks assert viewport and content fit at 720p/1080p and place review captures
+in the system temp folder. Tutorial waits for the pause-page opening animation before asserting content fit.

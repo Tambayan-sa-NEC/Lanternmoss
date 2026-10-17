@@ -4,6 +4,10 @@ Status: **in progress / no-go**. Tidewhisper remains `released: false`. No relea
 by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
 the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
+Latest functional regression checkpoint: **243 units, all 53 simulations and all 17 affected Edge browser checks
+pass**. See [step 2](#step-2-full-regression-checks), including the corrected pause-menu overflow and failed-attempt
+history. Normal clean 18-case hardware acceptance, destination enablement and final tour/integration remain pending.
+
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
 Tidewhisper object and its `released: false` flag remain untouched. Restoration reinstates the original catalog identity.
@@ -250,3 +254,33 @@ Targeted UI simulation and the new Edge smoke cover unchanged DOM, live coins/ke
 real rebound keyboard interaction and bounds at 720p/1080p, with zero page/shader errors. The remaining sequence is:
 full regressions; clean ordinary 18-case acceptance; destination enablement and production saves/travel/completion;
 then tour/docs and stage/parent integration. Tidewhisper stays unreleased until the complete gate passes.
+
+### Step 2: full regression checks
+
+[Structured results](../../tidewhisper-step-2-regressions-20261017.json) retain every browser attempt, timestamps,
+durations, output, script hashes and style provenance. The candidate game JavaScript is unchanged from `3be9e00`.
+
+- `npm test`: 243 pass, zero failures/skips. Repeated after the check/layout corrections: 243 pass (7.1 seconds).
+- `npm run sim`: all 53 pass, seed 1; 22:12:38-22:24:27 local clock. The terrain timing check ran without a browser,
+  performance collector or screenshot job competing. Includes the new HUD check, all hero kits, rendering pivots,
+  encounters/duels, saves/travel, coastal systems and the Tidewhisper campaign.
+- All 17 browser regressions pass on their latest attempt: HUD performance; coastal enemies, wildlife, village and
+  resources; Witch, Warrior and Ranger talents; Ironclaw; Mirelure; Tidewhisper campaign; portals; saves; sets;
+  photo; lighting; tutorial. They run sequentially in Edge. Coverage includes real input, 720p/1080p bounds,
+  reward/Continue behavior and zero page/shader errors. Software rendering costs are not hardware FPS evidence.
+
+The tutorial script initially failed the main pause-page fit assertion at 720p. A diagnostic capture showed
+`scrollHeight: 614`, `clientHeight: 611`; waiting for the opening animation did not fix it. The new main-page-only
+viewport height allowance leaves at least 16 px above/below and preserves all actions. The existing strict fit
+assertion stays intact. Tutorial and save reruns pass, including content fit at both resolutions; both corrected
+save-menu captures were opened and reviewed. Three failed tutorial attempts remain in the report (22 total browser
+attempts, 17 distinct scripts). Final successful runs use the current script versions.
+
+Older save/portal/tutorial checks now catch shader console errors and close browsers with a bounded timeout.
+Save defaults to Edge and checks 1080p as well as 720p. Simulation source did not change; the only product correction
+in this session is scoped CSS, checked by the affected browser reruns. Incidental tracked captures were restored;
+the final screenshot tour remains step 5.
+
+Step 2 is complete. Remaining: **3**, clean ordinary 18-case 1080p High reference acceptance; **4**, enable the
+destination only after acceptance and check production saves/travel/completion; **5**, final tour/docs and tested
+stage/parent integration. No destination flag, merge or public release was performed here.

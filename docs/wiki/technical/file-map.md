@@ -226,3 +226,6 @@ culled-branch matrix skipping/current-pose restoration;
 checks and all 8640 sampled frames. `docs/tidewhisper-frame-trace-{before,after}-20261017.json` retain separate
 instrumented live-scene timeline summaries; these are diagnostics, not release evidence.
 `tests/sim/hudUpdates.sim.mjs` and `scripts/hud-performance-smoke.mjs` cover DOM preservation and live UI scaling.
+
+`docs/tidewhisper-step-2-regressions-20261017.json` records the full unit/simulation summaries, all 17 browser
+regressions, failed attempts and successful reruns, script/style provenance and incidental capture restoration.
