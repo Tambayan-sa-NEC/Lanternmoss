@@ -1122,6 +1122,16 @@ bosses and release balancing each get their own session. The otter remains optio
 | [x] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
 | [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
 
+**27h in progress (2026-10-15):** release validation continues on `feat/todo-27h-campaign-release`, from parent `feat/todo-27`.
+The earlier `feat/todo-27h-release-validation` checkpoint is preserved in its history.
+Mirelure's breathing clue now shares its clock with the bubbles, and diving cancels unfinished surface attacks.
+Candidate checks use the real fourth-world id and save schema; they exposed missing forage/chest configuration,
+which is now explicit. The normal release flag remains off. Initial Intel UHD diagnostics do not meet the required
+Iris Xe evidence. Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
+Mirelure HP 3250), and the pacing audit covers Tidewhisper's XP, coins (new Tide forge fees) and materials.
+Iris Xe certification and the release itself remain. This is a **no-go** for
+release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/wiki/technical/tidewhisper-release.md).
+
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
 1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway

@@ -41,7 +41,9 @@ Every expansion world additionally needs:
 - A unique registered music theme and a registered mechanic.
 - Passing recorded release performance evidence for village, night and weather scenes on Intel Iris Xe at
   1280×720, low graphics: at least 90 samples per scene, p95 frame time at or below the 60-fps budget, and peak draw
-  calls/triangles within the world-specific ceilings in `config/render.js`.
+  calls/triangles within the world-specific ceilings in `config/render.js`. The owner-approved frame-clock rule
+  compares p95 against max(16.67 ms, the same run?s calibrated empty-page p95); calibration requires at least 120
+  samples and a median within 5% of the target. See [the collector/handoff](tidewhisper-release.md).
 
 Only the released secret `lanternMoon` may omit a mini boss; it must explicitly set `farm: false`, `caves: false`
 and a positive population minimum. Its other checklist requirements and known boss/rare-gift unlock references

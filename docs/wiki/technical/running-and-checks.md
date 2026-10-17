@@ -65,3 +65,17 @@ node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downl
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
 gets a scene in `scripts/screenshots.mjs` and a spot in the tour above; every new shot is first given a folder in
 `scripts/shots.mjs` (saving one without a folder stops the script).
+
+## Tidewhisper candidate checks (27h)
+
+These use a test catalog substitute; the authored destination stays unreleased. Install optional Puppeteer Core
+as above. `node scripts/tidewhisper-campaign-smoke.mjs` owns port 8114 and checks the real fourth-world portal UI,
+quest/node Continue, revisit, quest/tide gate, one crown and 720p/1080p bounds with zero page/shader errors.
+It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
+
+`node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
+`node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 720p Low.
+Omit `--output` for the historical default diagnostic path; use a separate output for a new device/run.
+`--release` additionally requires a clean commit, a real Iris Xe renderer and passing timing/count budgets before
+writing certification. Run performance alone, with no simulation suite or screenshot job competing for resources.
+See the [handoff](tidewhisper-release.md).

@@ -1,5 +1,14 @@
 # Performance budget
 
+Tidewhisper 27h is currently a development candidate, with separate
+[diagnostic results](../../tidewhisper-performance.json) and an [Iris Xe handoff](tidewhisper-release.md).
+Its real fourth-world village/night/squall collector uses 1280x720 Low, 30 warmup frames and 120 samples per scene.
+It passes a scene against max(16.67 ms, the p95 of an empty page's 60 Hz frame clock measured in the same run), since
+the browser's frame clock alone measures about 16.8 ms p95.
+Available Intel UHD results do not certify Iris Xe or the release target. Run `node scripts/tidewhisper-performance.mjs`
+for diagnostics; `--release` requires a clean candidate, an actual Iris Xe renderer and passing frame/draw budgets
+before it writes a release evidence file. Tidewhisper remains unreleased.
+
 The target is steady **60 FPS at a 1920 × 1080 viewport on Iris Xe class integrated graphics**, using the default
 High preset: 16.67 ms per frame. The available test machine reports Intel UHD through Edge/ANGLE/D3D11, not Iris Xe.
 It remains below 60 FPS. These measurements establish a reproducible render budget; they do not certify the target.
@@ -10,7 +19,7 @@ Recommended machine roles, recorded at the owner's request on 2026-10-17:
 
 | Machine | Recommended use |
 | --- | --- |
-| Owner's higher-spec laptop (exact specifications not yet recorded) | Primary development: coding, full unit/simulation suites, browser checks and visual review. |
+| Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, Intel UHD and RTX 4050 Laptop GPU (inventory recorded October 17) | Primary development: coding, full unit/simulation suites, browser checks and visual review. |
 | Lenovo 81MU, Core i3-8145U, Intel UHD Graphics 620, approximately 4 GB RAM | Occasional low-end compatibility and controlled performance diagnostics. Its measured memory pressure and slow browser rendering make it a poor primary development machine. |
 | Iris Xe laptop, when available again | Final target-device performance validation, using the required scene, preset, viewport and sampling rules. |
 

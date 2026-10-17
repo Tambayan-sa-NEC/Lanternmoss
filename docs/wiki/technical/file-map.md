@@ -195,3 +195,13 @@ src/
 
 There are no asset files: every model, texture and sound is generated in code. Real assets would replace the
 builders in `src/models`, the props in `src/world/props.js`, or the methods in `src/systems/AudioSystem.js`.
+
+## Tidewhisper release validation (27h, incomplete)
+
+`tests/sim/lib/tidewhisperCandidate.mjs` substitutes a test catalog entry while preserving the authored release flag.
+`tests/sim/tidewhisperCampaign.sim.mjs` and `tests/tidewhisper-readiness.test.mjs` check fourth-world integration and
+content completeness. `scripts/lib/tidewhisper-browser.mjs` boots the isolated candidate browser.
+`scripts/tidewhisper-campaign-smoke.mjs`, `scripts/tidewhisper-balance.mjs` and
+`scripts/tidewhisper-performance.mjs` cover travel/Continue, two-seed balance and actual hardware diagnostics.
+The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` reports remain separate from new runs.
+The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { contentProblems, assertReleasedContent } from '../src/config/contentGate.js';
+import { contentProblems, assertReleasedContent, frameLimitMs } from '../src/config/contentGate.js';
 import { PLANET_CATALOG, PLANETS } from '../src/config/planets.js';
 import { COMBAT } from '../src/config/combat.js';
 import { ITEM_DEFINITIONS } from '../src/config/items.js';
@@ -58,10 +58,22 @@ test('new worlds cannot waive distinct content or performance readiness',()=>{
     f=>f.p.boss.type='gloomcap',f=>f.r.behaviors[f.r.enemies.gloomcap.behavior]=f.r.behaviors.probeBoss,
     f=>f.p.miniBosses=[],f=>f.p.flora.trees={pine:1},f=>f.p.wildlife.critters=[['bunny',3]],
     f=>f.p.wildlife.rare='goldBunny',f=>f.p.weather={clear:1},f=>f.p.material='glowcap',f=>f.p.resources.rare=[],
-    f=>f.p.npcs.locals=[],f=>f.p.npcs.arrivals={},f=>f.p.music='cozy',f=>delete f.r.releases.newWorld,
+    f=>f.p.npcs.locals=[],f=>f.p.npcs.arrivals={},f=>f.p.music='cozy',f=>delete f.p.forage,f=>delete f.r.releases.newWorld,
     f=>f.r.releases.newWorld.rows[1].p95FrameMs=30,f=>f.r.releases.newWorld.rows.pop(),
     f=>f.r.releases.newWorld.device='Software renderer',f=>f.r.releases.newWorld.rows[0].calls=2000];
   for(const mutate of cases){const f=fixture();mutate(f);assert.ok(f.check().length>0,mutate.toString());}
+});
+test('frame budget allows the measured 60 Hz frame clock, never a slow or missing one',()=>{
+  const target=1000/60,clock={samples:240,medianMs:16.7,p95Ms:16.8};
+  assert.equal(frameLimitMs(target,undefined),target);assert.equal(frameLimitMs(target,clock),16.8);
+  assert.equal(frameLimitMs(target,{...clock,p95Ms:16}),target,'a tight clock never lowers below the target');
+  assert.equal(frameLimitMs(target,{samples:240,medianMs:33.3,p95Ms:33.5}),target,'a 30 Hz clock cannot loosen the budget');
+  assert.equal(frameLimitMs(target,{samples:240,medianMs:8.3,p95Ms:33.5}),target,'a jittery 120 Hz clock is outside the approved 60 Hz calibration band');
+  assert.equal(frameLimitMs(target,{...clock,samples:60}),target,'a short calibration is ignored');
+  const f=fixture(),report=f.r.releases.newWorld;for(const row of report.rows)row.p95FrameMs=16.8;
+  assert.ok(f.check().length>0,'16.8 ms fails without a recorded clock');
+  report.frameClock=clock;assert.deepEqual(f.check(),[]);
+  report.rows[2].p95FrameMs=16.9;assert.ok(f.check().length>0,'slower than the empty-page clock fails');
 });
 test('only the secret Moon waives its mini boss and requires no farm/cave plus a small population floor',()=>{
   const f=fixture('lanternMoon');Object.assign(f.p,{secret:true,miniBosses:[],farm:false,caves:false,population:{min:3},unlock:{bosses:['lanternmoss'],night:true,rareGifts:['goldenClover']}});

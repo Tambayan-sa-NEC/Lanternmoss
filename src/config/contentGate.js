@@ -4,6 +4,14 @@ import { populationProblem, validatePlanetCatalog } from './planetRules.js';
 const ORIGINALS = new Set(['lanternmoss', 'emberfall', 'frostveil']);
 const positive = n => Number.isFinite(n) && n > 0;
 const unique = values => [...new Set(values)];
+/** The browser paces frames at 60 Hz, so even an empty page measures a p95 just over 16.67 ms. A world passes if its p95 is
+    no worse than the target or the empty-page clock measured in the same run. The clock only counts when it is a real
+    60 Hz clock (median within 5% of the target), so a slow display or broken calibration cannot loosen the budget. */
+export function frameLimitMs(target, clock) {
+  const genuine = clock?.samples >= 120 && positive(clock.medianMs) && positive(clock.p95Ms)
+    && Math.abs(clock.medianMs - target) <= target * 0.05;
+  return genuine ? Math.max(target, clock.p95Ms) : target;
+}
 export function contentProblems(p, catalog, r) {
   const errors = [], require = (ok, message) => { if (!ok) errors.push(`${p.id}: ${message}`); };
   const legacy = p.act === 1 && ORIGINALS.has(p.id), moon = p.id === 'lanternMoon' && p.secret === true;
@@ -29,6 +37,7 @@ export function contentProblems(p, catalog, r) {
   for (const attack of Object.values(r.enemies[p.boss?.type]?.attacks ?? {})) for (const type of attack.types ?? []) enemy(type, 'regular');
   const item = id => require(r.items.has(id), `unknown item ${id}`);
   item(p.boss?.trophy); item(p.material);
+  require(Array.isArray(p.forage), 'forage must be an explicit array for world generation');
   for (const f of p.forage ?? []) { item(f.item); require(positive(f.count), `invalid forage count ${f.item}`); }
   for (const c of p.chests ?? []) require(!!r.chests[c.kind] && Number.isInteger(c.count) && positive(c.count), `invalid chest ${c.kind}`);
   const trees = Object.entries(p.flora?.trees ?? {}).filter(([,n]) => positive(n)).map(([id]) => id);
@@ -101,9 +110,10 @@ export function contentProblems(p, catalog, r) {
   }
   const report = r.releases[p.id];
   require(report?.device?.includes('Iris Xe') && report.quality === 'low' && report.viewport?.[0] === 1280 && report.viewport?.[1] === 720, 'release performance needs Iris Xe at 720p low');
+  const frameLimit = frameLimitMs(r.targetFrameMs, report?.frameClock);
   for (const scene of ['village','night','weather']) {
     const row = report?.rows?.find(row => row.scene === scene);
-    require(row?.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= r.targetFrameMs && positive(row.calls) && row.calls <= ceiling?.calls && positive(row.triangles) && row.triangles <= ceiling?.triangles, `performance fixture ${scene} must pass its frame/draw budget`);
+    require(row?.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= frameLimit && positive(row.calls) && row.calls <= ceiling?.calls && positive(row.triangles) && row.triangles <= ceiling?.triangles, `performance fixture ${scene} must pass its frame/draw budget`);
   }
   return errors;
 }

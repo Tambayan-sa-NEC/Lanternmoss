@@ -52,6 +52,7 @@ not confirmed design.
 | [Shared planet gravity and water](technical/world-physics.md) | Gravity, water levels and moving water |
 | [Local light](technical/lighting.md) | Light radii in the shaders, the shared real lights and darkness |
 | [Performance budget](technical/performance.md) | The 60 FPS target, measurements and acceptance |
+| [Tidewhisper release handoff](technical/tidewhisper-release.md) | The incomplete 27h checkpoint, reproducible candidate checks and hardware handoff |
 | [Act II progression and release acceptance](technical/content-release.md) | Level cap 16, the content gate and how a world is released |
 | [Typography](technical/typography.md) | The type brief and the chosen faces |
 | [Refactor notes](technical/refactor-notes.md) | How the single-file original became modules |

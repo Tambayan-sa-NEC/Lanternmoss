@@ -11,6 +11,7 @@ const {damageEnemy}=await imp('combat/damage.js'),{encounterEvents}=await imp('c
 const {waterAt,groundHeight}=await imp('world/terrain.js'),{seaLevelAt}=await imp('world/physics.js'),{activeTides}=await imp('world/mechanics/tides.js');
 const {arcDist,dirAlong,offsetDir,tangentToward}=await imp('utils/sphere.js'),{COMBAT}=await imp('config/combat.js'),{Chests}=await imp('gameplay/Chests.js');
 const {currentInteraction}=await imp('gameplay/Houses.js');
+const {sparkles}=await imp('fx/sparkles.js');
 const P=H.player,D=COMBAT.enemies.mirelure,G=H.BossGate;
 const phase=f=>{dayClock.skip((f*DAY.length-dayClock.t+DAY.length)%DAY.length||DAY.length,'test');step(.1);};
 const hurts=[];encounterEvents.addEventListener('playerhurt',e=>hurts.push(e.detail.source));
@@ -35,9 +36,14 @@ try{
   for(let i=0;i<60*3&&B.lures.length===0;i++)step(1/60);
   assert.equal(B.mode,'deep');assert.ok(B.hidden);let hp=B.hp;damageEnemy(B,500,{});assert.equal(B.hp,hp,'nothing hits her under the water');
   assert.equal(B.lures.length,D.lures.count);assert.equal(B.lures.filter(l=>l.real).length,1,'one real lure');
-  let realDim=0,falseDim=0,beats=0;
-  for(let i=0;i<60*6;i++){step(1/60);const t=ctx.time,k=Math.pow(Math.max(0,Math.cos(((t/D.lures.breath)%1)*Math.PI*2)),6);
-    if(k>0.9){beats++;for(const l of B.lures){if(l.lamp.scale.x<0.6){if(l.real)realDim++;else falseDim++;}}}}
+  // Observe the actual bubble cue after an arbitrary amount of adventure time, rather than reproducing the lamp's clock.
+  ctx.time=1000.31;
+  let realDim=0,falseDim=0,beats=0,bubbled=false;
+  const emit=sparkles.emit;
+  sparkles.emit=function(pos,o){if(o.color===0xe8fbff&&o.count===2&&o.upBias===2)bubbled=true;return emit.call(this,pos,o);};
+  try{for(let i=0;i<60*6;i++){bubbled=false;step(1/60);
+    if(bubbled){beats++;for(const l of B.lures){if(l.lamp.scale.x<0.6){if(l.real)realDim++;else falseDim++;}}}}}
+  finally{sparkles.emit=emit;}
   const fakes=B.lures.length-1;assert.ok(beats>0&&realDim/beats>0.9,`the real lure dims on every breath (${realDim}/${beats})`);
   assert.ok(falseDim/(beats*fakes)<0.5,`false lures keep their own beat (${falseDim}/${beats*fakes})`);
   console.log(`PASS  deep: untargetable; ${D.lures.count} lures, the real one dims on her breath (${realDim}/${beats} beats), false ones off-beat`);
@@ -82,6 +88,21 @@ try{
   assert.ok(B.hp>=B.def.hp&&B.bossPhase===0,'full health, first phase');assert.ok(!B.sluice.broken,'sluice mended');
   assert.ok(!tides().status.lagoonDrained&&B.lures.length===0,'lagoon full, lures out');
   console.log('PASS  after a faint she resets: full health, sluice mended, lagoon full, lures out');
+
+  // A reflood must cancel both a pending and an active roll before she becomes invisible; a timed dive cancels a bite.
+  P.placeAt(shore());P.invuln=1e5;
+  for(const state of ['windup','active']){
+    Object.assign(B,{mode:'beached',state,attack:'roll',bossPhase:1,hp:B.def.hp*.4,rolling:true,rollT:1});
+    B.rollDir.copy(B.fwd);B.laneFrom.copy(B.up);tides().refloodLagoon();
+    B.behavior.update(B,1/60);
+    assert.equal(B.mode,'deep');assert.ok(B.hidden);assert.equal(B.state,'chase');assert.equal(B.attack,null);
+    assert.equal(B.rolling,false);assert.ok(B.lane.dots.every(d=>!d.visible),'roll lane cleared');
+    B.behavior.think(B,1/60,9);assert.notEqual(B.state,'active','no underwater roll');
+  }
+  Object.assign(B,{mode:'surfaced',state:'windup',attack:'bite',surfaceT:0,gape:1});B.behavior.update(B,1/60);
+  assert.equal(B.mode,'deep');assert.equal(B.attack,null);assert.equal(B.gape,0);assert.ok(!B.biteMark.mesh.visible);
+  B.spawn(B.home);P.placeAt(shore());
+  console.log('PASS  reflood cancels pending/active rolls and their lane; a timed dive cancels a pending bite');
 
   // ---- a reload mid-drain: the save comes back with the fight reset and the lagoon full -------------------------------
   P.placeAt(shore());step(1);B.aggro();for(let i=0;i<60*3&&B.lures.length===0;i++)step(1/60);
