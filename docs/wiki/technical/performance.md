@@ -10,8 +10,8 @@ Historical Intel UHD results do not certify the current reference. Run `node scr
 for diagnostics; `--release` requires a clean candidate, a visible browser, an actual RTX 4050 Laptop GPU renderer and passing frame/draw budgets
 before it writes a release evidence file. Tidewhisper remains unreleased.
 
-The [latest ordinary reference attempt](tidewhisper-release.md#step-3-ordinary-hardware-acceptance-attempt),
-clean `da96f77`, passes all 18 count budgets but only 5/18 timing cases. Acceptance remains a no-go;
+The [latest ordinary reference attempt](tidewhisper-release.md#step-3-live-recheck-after-frustum-gating),
+clean `c3375f0`, passes all 18 count budgets but only 5/18 timing cases (p95 14.4-23.6 ms). Acceptance remains a no-go;
 the raw matrix is retained and no release artifact was written.
 
 The owner selected the **Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, NVIDIA RTX 4050 Laptop GPU** as the default

@@ -1169,6 +1169,15 @@ RTX 4050 at 1080p High. All draw/triangle budgets pass, but only 5/18 cases meet
 release evidence. Step 3 remains open: diagnose the failing live scenes, improve frame pacing, recheck affected
 code and repeat clean acceptance before destination enablement. See [the result matrix](docs/wiki/technical/tidewhisper-release.md#step-3-ordinary-hardware-acceptance-attempt).
 
+**27h step 3 optimization checkpoint (2026-10-18):** profiled live rendering, skipped clean immutable subtree
+walks and added conservative actor-frustum bounds derived from geometry/current transforms. Pixel controls preserve
+all four worlds; paired six-profile render diagnostics improve with exact pose/draw matches. Final affected checks
+pass 248 units, six sims and three Edge browser scripts. A collector cleanup race was fixed and audited. Ordinary
+clean `c3375f0` acceptance still passes only 5/18 timing rows (p95 14.4-23.6 ms), although every count budget passes
+and page/shader errors are zero. Step 3 remains open; isolate live CPU/host-memory stalls and repeat full acceptance.
+Steps 4 (enable/production checks) and 5 (tour/docs/full integration) remain pending; Tidewhisper stays unreleased.
+See [the current handoff](docs/wiki/technical/tidewhisper-release.md#step-3-live-recheck-after-frustum-gating).
+
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
 1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway

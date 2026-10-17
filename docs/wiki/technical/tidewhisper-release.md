@@ -4,12 +4,12 @@ Status: **in progress / no-go**. Tidewhisper remains `released: false`. No relea
 by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
 the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
-Latest functional regression checkpoint: **243 units, all 53 simulations and all 17 affected Edge browser checks
-pass**. See [step 2](#step-2-full-regression-checks), including the corrected pause-menu overflow and failed-attempt
-history. Normal clean 18-case hardware acceptance, destination enablement and final tour/integration remain pending.
+The earlier complete [step 2 checkpoint](#step-2-full-regression-checks) passed 243 units, all 53 simulations and
+17 Edge browser checks. After subsequent render changes, the latest affected checks pass **248 units, six simulations
+and three browser scripts**. Complete integration suites remain required on the final synchronized candidate.
 
 Latest ordinary hardware attempt: **5/18 timing cases pass; all 18 render-count cases pass**. See
-[step 3](#step-3-ordinary-hardware-acceptance-attempt). The collector failed acceptance and produced no release
+[the live frustum recheck](#step-3-live-recheck-after-frustum-gating). The collector failed acceptance and produced no release
 artifact. Step 3 remains open; production enablement still depends on passing it.
 
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
@@ -400,3 +400,42 @@ All six pooled profiles improve in this diagnostic. Host scheduling/load is not 
 simulation is paused, so these numbers cannot certify release or replace the ordinary live 18-case matrix.
 The four-world browser check also restores distance-only gates after movement and requires identical raw canvas
 pixels at 720p/1080p; it restored 7-13 completely off-screen branches per fixture with no pixel change.
+
+### Step 3: live recheck after frustum gating
+
+[Complete raw report](../../tidewhisper-performance-acer-rtx4050-step-3-frustum-20261018.json), clean `c3375f0`,
+actual RTX 4050 in visible Edge, High 1920x1080/DPR1, all heroes and seeds 1/7, all three scenes: 18 rows/2160 real
+render samples with ordinary live simulation/audio. No source overrides, paused poses or GPU-query instrumentation.
+Zero page/shader errors; every row verifies the renderer, drawing buffer, preset, started/unpaused/visible state.
+The 240-sample empty-page clock remains 6.1 ms median/6.3 ms p95, so the unchanged 16.67 ms limit applies.
+
+| Hero / seed | Village p95 | Night p95 | Squall p95 |
+| --- | ---: | ---: | ---: |
+| witch / 1 | 22.6 ms fail | 18.6 ms fail | 18.6 ms fail |
+| knight / 1 | 20.0 ms fail | 22.7 ms fail | 19.5 ms fail |
+| ranger / 1 | 17.5 ms fail | 18.7 ms fail | 15.6 ms pass |
+| witch / 7 | 14.4 ms pass | 14.6 ms pass | 23.6 ms fail |
+| knight / 7 | 14.5 ms pass | 17.6 ms fail | 16.1 ms pass |
+| ranger / 7 | 18.5 ms fail | 20.6 ms fail | 19.7 ms fail |
+
+Five timing cases pass and thirteen fail. Actual average FPS spans 59.41-80.85; p95 spans 14.4-23.6 ms, and
+callback p95 spans 11.4-18.6 ms. All 18 count budgets pass: 329-474 calls and 198669-209113 triangles, below the
+unchanged 550/230000 ceilings. The collector exits 1 for frame-time acceptance, saves its raw report and writes
+no `docs/releases/tidewhisper.json`. The authored release flag remains false.
+
+Before launch, available memory was 3797-3808 MiB, CPU 16-18%, and pages input 19-21/sec in two snapshots.
+Memory recorded before individual rows ranged from about 325 to 3303 MiB. That large host variation is retained;
+it does not establish that browser context retention or memory pressure caused the timing failures. Counts pass
+and the paired render-only comparison improves, but neither substitutes for passing ordinary live frame times.
+
+[Final affected regressions](../../tidewhisper-step-3-frustum-regressions-20261018.json) pass 248 units, six simulations
+and three Edge browser scripts, with negative controls and pixel equivalence recorded above. The latest Tidewhisper
+720p/1080p captures were reopened: the hero and village remain readable, without clipped subjects or rendering defects.
+The old full step 2 results are historical; complete suites/tour still precede integration.
+
+**Step 3 remains open.** Next, isolate live update/render and host-memory stalls under steady conditions, then
+make measured fixes and repeat the complete clean acceptance matrix. Do not cherry-pick passing rows, freeze the
+acceptance simulation, loosen the target or treat the paused comparison as certification. Remaining afterward:
+**4**, enable the destination and verify production travel/saves/completion; **5**, final tour/docs, complete
+synchronized integration checks and stage/parent merges. No stage merge, deletion, destination enablement or public
+release is performed by this checkpoint.

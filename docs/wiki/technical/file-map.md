@@ -252,3 +252,7 @@ acceptance attempt after step 2. Thirteen timing rows fail; count budgets pass. 
 `docs/tidewhisper-step-3-frustum-regressions-20261018.json` records the subsequent affected checks.
 `docs/tidewhisper-performance-acer-rtx4050-step-3-final-20261017.json` is the clean `65f6a00` ordinary recheck
 before frustum gating (five timing passes, thirteen failures, zero page/shader errors), retained as historical evidence.
+
+`docs/tidewhisper-performance-acer-rtx4050-step-3-frustum-20261018.json` retains the latest clean live 18-case
+acceptance attempt after frustum gating: all count budgets pass, only five timing cases pass, zero page/shader
+errors. It is a no-go result and no release evidence file was written.
