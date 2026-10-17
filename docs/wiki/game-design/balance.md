@@ -127,7 +127,7 @@ Farming and gathering requirements still need play time; this is an XP route aud
 | Frostveil | 7 | 6 | 305–330 | 300, including two trinkets | 30 |
 | Tidewhisper (27h, unreleased) | 8 | 8 | 281–360 | 280, its own Tide set and pendant | 39 |
 
-The bounds cover every possible chest coin roll, including each planet?s boss chest. The pacing audit also samples 100 loot seeds for each hero/world.
+The bounds cover every possible chest coin roll, including each planet's boss chest. The pacing audit also samples 100 loot seeds for each hero/world.
 Selling **all** chest contents adds 101–207, 141–261 and 180–407 coins respectively in that sample, but sacrifices
 the food, materials and gear they contained. It is deliberately optional, not counted twice as equipment and income.
 The reported reserve is a per-planet increment, not a cap on accumulated wealth. Rare chests require keys, available
@@ -210,7 +210,7 @@ Ordinary damage is handled by the reported HP top-ups; only Doom Blade is active
 
 Individual monster types retain tactical differences: the Frostveil warrior takes 11.8 s to chase a Hexlantern,
 and some opening wisps fall before 2 s. These are reported outliers, not silently averaged away within a type.
-The pacing contract uses the planet?s roster median; each type?s median of three trials remains in the raw data.
+The pacing contract uses the planet's roster median; each type's median of three trials remains in the raw data.
 
 [Final raw measurements](../../balance-after.json) include each monster trial summary, big-fight move timestamps,
 transition fractions and flying damage. The first six rows came from the full nine-profile report; the three
@@ -270,18 +270,18 @@ mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and 
 The [fresh report](../../tidewhisper-balance-20261017.json) measures clean synchronized commit `2c42fce`
 against the [accepted October 15 checkpoint](../../tidewhisper-balance.json). Both use level 8, starting equipment,
 default pets, counter bots and counted HP top-ups. No gameplay numbers were tuned in this synchronization.
-All 18 required checks pass: six regular-roster medians at 2?6 seconds, six Ironclaw fights at 90?180 seconds,
-and six Mirelure fights at 180?300 seconds. Individual armored/evasive monsters remain informational.
+All 18 required checks pass: six regular-roster medians at 2-6 seconds, six Ironclaw fights at 90-180 seconds,
+and six Mirelure fights at 180-300 seconds. Individual armored/evasive monsters remain informational.
 
-| Hero | Seed | Roster median: before ? after (s) | Ironclaw: before ? after (s) | Mirelure: before ? after (s) |
+| Hero | Seed | Roster median: before / after (s) | Ironclaw: before / after (s) | Mirelure: before / after (s) |
 | --- | --- | ---: | ---: | ---: |
-| Witch | 1 | 3.58 ? 3.58 | 171.6 ? 171.6 | 273.4 ? 273.4 |
-| Witch | 7 | 4.77 ? 4.77 | 173.7 ? 174.1 | 276.9 ? 276 |
-| Warrior | 1 | 5.55 ? 5.55 | 172.4 ? 172.4 | 288.9 ? 286.6 |
-| Warrior | 7 | 5.03 ? 5.03 | 169.5 ? 169.5 | 281.4 ? 284.3 |
-| Ranger | 1 | 3.7 ? 3.7 | 155.4 ? 155.4 | 187.8 ? 187.8 |
-| Ranger | 7 | 4.47 ? 4.47 | 156 ? 156 | 190.8 ? 190.8 |
+| Witch | 1 | 3.58 / 3.58 | 171.6 / 171.6 | 273.4 / 273.4 |
+| Witch | 7 | 4.77 / 4.77 | 173.7 / 174.1 | 276.9 / 276 |
+| Warrior | 1 | 5.55 / 5.55 | 172.4 / 172.4 | 288.9 / 286.6 |
+| Warrior | 7 | 5.03 / 5.03 | 169.5 / 169.5 | 281.4 / 284.3 |
+| Ranger | 1 | 3.7 / 3.7 | 155.4 / 155.4 | 187.8 / 187.8 |
+| Ranger | 7 | 4.47 / 4.47 | 156 / 156 | 190.8 / 190.8 |
 
-The full synchronized pacing simulation also passes all three heroes: level 8 before Tide summon, 281?360 coins
+The full synchronized pacing simulation also passes all three heroes: level 8 before Tide summon, 281-360 coins
 against a 280-coin Tide gear reserve, lighthouse materials within one day and lighthouse plus gear within two days.
 This route audit does not replace combat or target-device performance validation.

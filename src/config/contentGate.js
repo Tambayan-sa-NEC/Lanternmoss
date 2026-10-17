@@ -4,7 +4,7 @@ import { populationProblem, validatePlanetCatalog } from './planetRules.js';
 const ORIGINALS = new Set(['lanternmoss', 'emberfall', 'frostveil']);
 const positive = n => Number.isFinite(n) && n > 0;
 const unique = values => [...new Set(values)];
-/** The browser paces frames at 60 Hz, so even an empty page measures a p95 just over 16.67 ms. A world passes if its p95 is
+/** On a 60 Hz browser clock even an empty page can measure a p95 just over 16.67 ms. A world passes if its p95 is
     no worse than the target or the empty-page clock measured in the same run. The clock only counts when it is a real
     60 Hz clock (median within 5% of the target), so a slow display or broken calibration cannot loosen the budget. */
 export function frameLimitMs(target, clock) {

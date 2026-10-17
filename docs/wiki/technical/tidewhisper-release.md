@@ -1,7 +1,7 @@
 # Tidewhisper 27h: validation and hardware handoff
 
 Status: **in progress / no-go**. Tidewhisper remains `released: false`. No release tag or `master` merge is authorized
-by this checkpoint. On October 17 the owner reported a repair delay, with the next possible Iris Xe run around October 25?26. Confirm availability before scheduling.
+by this checkpoint. On October 17 the owner reported a repair delay, with the next possible Iris Xe run around October 25-26. Confirm availability before scheduling.
 
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
@@ -81,10 +81,10 @@ night clear and daytime squall. Each scene has 30 warmup frames and 120 measured
 (18 rows). World generation retains its authored seed. Light/tide phase is held fixed; real render time continues. It records the browser's
 actual WebGL GPU string, candidate commit, working-tree state, p95 frame interval and peak full-composer counts.
 
-The browser paces frames at 60 Hz, and `--disable-gpu-vsync --disable-frame-rate-limit` have no effect, headless or
-headed. An empty page in the same Edge measured a p95 interval of 16.8 ms (median 16.7 ms), already over a strict
+The historical HD 4600 browser session paced frames at 60 Hz; `--disable-gpu-vsync --disable-frame-rate-limit`
+did not change it there. Its empty-page Edge clock measured a p95 interval of 16.8 ms (median 16.7 ms), over a strict
 16.67 ms. So the collector first measures that empty-page frame clock (240 frames) and records it as `frameClock`.
-A scene passes if its p95 interval is no worse than max(16.67 ms, the empty-page p95). The clock only counts when
+A scene passes if its p95 interval is no worse than max(16.67 ms, a valid empty-page p95). The clock only counts when
 its median is a real 60 Hz (within 5% of 16.67 ms), so a 30 Hz display cannot loosen the budget. The content gate
 applies the same rule (`frameLimitMs`). Per-frame CPU time of the game loop (`p95CpuMs`) and GPU time from timer
 queries (`p95GpuMs`) are recorded as diagnostics only. They omit browser compositing and GC, and on the HD 4600
@@ -119,7 +119,7 @@ The published `ae543c0` checkpoint is preserved in the continuation history. Its
 the current concise overview; detailed handoff material now lives here in the wiki.
 
 - 239 unit tests and all 52 simulations pass. The clock-calibration guard was corrected to enforce both sides
-  of the previously approved ?5% median band; the final unit suite and affected content-gate simulation pass.
+  of the previously approved +/-5% median band; the final unit suite and affected content-gate simulation pass.
 - Campaign, Ironclaw and Mirelure Edge browser checks pass real input, 720p/1080p rendering, saved progress and
   zero page/shader errors. Campaign replay includes portal travel, partial quest/node Continue, revisit,
   quest/tide gate, full completion and one crown after a full reload.
@@ -135,5 +135,17 @@ journal checks and the final affected screenshot tour still belong to completion
 ### Fresh two-seed balance
 
 [October 17 report](../../tidewhisper-balance-20261017.json): clean commit `2c42fce`, all 36 rows present,
-all 18 required checks pass. Roster medians 3.58?5.55 s, Ironclaw 155.4?174.1 s, Mirelure 187.8?286.6 s.
+all 18 required checks pass. Roster medians 3.58-5.55 s, Ironclaw 155.4-174.1 s, Mirelure 187.8-286.6 s.
 See [the six-profile before/after table](../game-design/balance.md#tidewhisper-27h-synchronization-2026-10-17).
+
+### Acer UHD measurement and go/no-go
+
+[Fresh hardware report](../../tidewhisper-performance-acer-20261017.json), clean `1860d90`: all three heroes,
+seeds 1/7, 18 cases / 2,160 frames, actual Intel UHD A7A8, 720p Low (896x503 buffer). 37.5-44.6 FPS,
+p95 26.4-32.8 ms; none meets the applicable fixed 16.67 ms budget. Empty-page median/p95 6.1/6.4 ms is near 165 Hz,
+so it cannot provide the 60 Hz calibration allowance. Eight cases exceed 550 calls (peak 636); triangles fit
+230,000 (peak 191,804), with zero page/shader errors. See [conditions and scene table](performance.md#acer-intel-uhd-tidewhisper-diagnostic-2026-10-17).
+
+Recommendation: retain the Iris Xe gate. Profile and reduce draw-call peaks, repeat controlled diagnostics, then
+collect real Iris Xe evidence when available. Do not raise ceilings or enable the destination from this report.
+The synchronized functional/balance checks pass; performance acceptance and release-dependent work remain open.

@@ -18,8 +18,8 @@ const host = { platform: platform(), osRelease: osRelease(), cpu: cpus()[0]?.mod
 const { browser, page, errors, close } = await tidewhisperBrowser({ port: 8115, software: false });
 try {
   // p95FrameMs is the real interval between rendered frames: the only number that includes browser compositing, GC and
-  // everything else. The browser paces frames at 60 Hz (uncapping flags have no effect, headless or headed), so even an
-  // empty page measures ~16.7 ms with jitter. Record that empty-page clock in the same browser so the report shows how
+  // everything else. On 60 Hz hosts even an empty page measures ~16.7 ms with jitter. Higher-refresh clocks fall back
+  // to the fixed target through frameLimitMs. Record the empty-page clock in the same browser so the report shows how
   // close to the frame clock the game is. Per-frame CPU (game loop) and GPU (timer query) times are diagnostics only:
   // they omit browser work and can read well under the real interval.
   const session = await page.createCDPSession();

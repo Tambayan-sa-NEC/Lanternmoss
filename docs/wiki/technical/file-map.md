@@ -207,3 +207,4 @@ The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` re
 The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.
 
 `docs/tidewhisper-balance-20261017.json` is the clean-commit synchronization audit; the earlier balance JSON remains historical.
+`docs/tidewhisper-performance-acer-20261017.json` records the separate 18-case Acer Intel UHD diagnostic, not certification.

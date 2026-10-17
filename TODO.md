@@ -1132,6 +1132,13 @@ Mirelure HP 3250), and the pacing audit covers Tidewhisper's XP, coins (new Tide
 Iris Xe certification and the release itself remain. This is a **no-go** for
 release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/wiki/technical/tidewhisper-release.md).
 
+**27h sync/audit checkpoint (2026-10-17):** current child `feat/todo-27h-campaign-release` is synchronized from
+parent `feat/todo-27`; published old-stage history is preserved. 239 unit tests, all 52 simulations, affected
+content-gate rerun, campaign/encounter browser checks and 18 strict balance checks pass. Actual Acer UHD diagnostic:
+18 cases / 2,160 frames at 720p Low, 37.5-44.6 FPS and p95 26.4-32.8 ms; zero cases meet the fixed frame budget,
+and 8 exceed the 550-call ceiling (peak 636). Keep release/next-world approval pending; profile draw-call peaks
+and obtain target-device evidence. See the [current handoff](docs/wiki/technical/tidewhisper-release.md).
+
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
 1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway

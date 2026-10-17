@@ -3,8 +3,8 @@
 Tidewhisper 27h is currently a development candidate, with separate
 [diagnostic results](../../tidewhisper-performance.json) and an [Iris Xe handoff](tidewhisper-release.md).
 Its real fourth-world village/night/squall collector uses 1280x720 Low, 30 warmup frames and 120 samples per scene.
-It passes a scene against max(16.67 ms, the p95 of an empty page's 60 Hz frame clock measured in the same run), since
-the browser's frame clock alone measures about 16.8 ms p95.
+It passes a scene against max(16.67 ms, the p95 of a valid empty-page 60 Hz clock measured in the same run).
+Calibration requires a median within 5% of the target; faster or slower display clocks retain the fixed 16.67 ms limit.
 Available Intel UHD results do not certify Iris Xe or the release target. Run `node scripts/tidewhisper-performance.mjs`
 for diagnostics; `--release` requires a clean candidate, an actual Iris Xe renderer and passing frame/draw budgets
 before it writes a release evidence file. Tidewhisper remains unreleased.
@@ -182,3 +182,37 @@ attributing the whole shortfall to GPU throughput or choosing gameplay/rendering
 Render/update CPU durations describe only the JavaScript work they wrap, not GPU time or all browser work. Neither
 passing count ceilings nor running on a weaker GPU substitutes for actual Iris Xe release evidence. These scenes,
 resolution and source differ from the historical 1080p measurements above; this is not an optimization before/after.
+
+## Acer Intel UHD Tidewhisper diagnostic (2026-10-17)
+
+[Separate report](../../tidewhisper-performance-acer-20261017.json), clean synchronized commit `1860d90`:
+Acer Nitro ANV15-51, Core i5-13420H, 16 GB installed RAM, Windows 11 / Edge 155 headless. Every row confirms actual
+Intel UHD A7A8 through ANGLE/D3D11, driver 31.0.101.4146. The RTX 4050 is present as a secondary adapter and was not
+the WebGL renderer. AC connected, Acer power plan, approximately 3.5 GiB available before browser launch. Other
+user applications stayed open; pre-run Windows sampling recorded 645 pages input/s, so this was not a fully idle host.
+
+All three heroes on runtime seeds 1/7, three scenes each: 18 cases, 120 samples per case (2,160 total), 30 warmup
+frames. Authored generation seed, stationary invulnerable level-1 hero, passive pets (IDs recorded per row), fixed
+light/tide phase and camera. Viewport 1280x720, DPR 1, Low, actual buffer 896x503. Setup uses explicit simulation
+updates; all measured intervals use real render timestamps. The empty-page clock freezes the game tab to remove
+its background rendering. No other test, screenshot or benchmark job ran alongside this collector.
+
+The empty clock has 240 samples, median 6.1 ms / p95 6.4 ms (near 165 Hz), outside the approved 60 Hz calibration
+band. The applicable frame limit is therefore the fixed 16.67 ms. This supersedes any general claim that all
+headless sessions are paced at 60 Hz; the historical HD 4600 observation only described that host.
+
+| Scene (six hero/seed cases each) | FPS range | p95 frame interval (ms) | Peak calls | Peak triangles |
+| --- | ---: | ---: | ---: | ---: |
+| Afternoon village | 38.8-43.9 | 26.7-32.8 | 580 | 189708 |
+| Night clear | 37.5-41.8 | 27.6-32.3 | 636 | 191804 |
+| Afternoon squall | 38.3-44.6 | 26.4-31.9 | 594 | 190212 |
+
+**NO-GO on this diagnostic host:** none of 18 cases meets the timing budget; 8/18 exceed the unchanged 550-call
+ceiling, peaking at 636. All triangle counts fit the 230,000 ceiling (peak 191,804). Zero page/shader errors, no
+hidden or paused samples, and complete hero/seed/scene coverage. CPU p95 ranges 21.1-27.5 ms, GPU p95 17.6-22.9 ms;
+these omit browser work and are not additive. A trace is needed to attribute the delay.
+
+Next: identify the meshes/actors behind draw-call peaks, reduce them within the existing ceiling, and repeat a
+controlled diagnostic with more memory headroom before attributing the whole shortfall to the GPU. This broader
+matrix and fixed-phase collector differ from the earlier three-scene UHD report; it is not an optimization
+before/after. Preserve the Iris Xe hardware gate and keep Tidewhisper unreleased pending real target evidence.
