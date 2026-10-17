@@ -141,6 +141,7 @@ from commit dates. Consequently, the whole TODO 27 cost cannot be stated as a co
 | Controlled comparison and UI cleanup (step 1) | 0h 22m | [Clock-based step 1 log](../../logs/2610172143%20todo-27h-matrix-comparison.md); completed diagnostic/targeted cleanup, full 27h acceptance pending. |
 | Full regressions and pause-menu correction (step 2) | 0h 38m | [Clock-based step 2 log](../../logs/2610172211%20todo-27h-step-2-regression.md); 243 units, 53 sims and 17 final browser checks pass; hardware acceptance remains pending. |
 | Ordinary hardware acceptance attempt (step 3) | 0h 05m | [Clock-based step 3 log](../../logs/2610172307%20todo-27h-step-3-acceptance.md); completed the run and audit, acceptance failed (5/18 timing rows pass), milestone still open. |
+| Step 3 profiling, render fixes and acceptance continuation | 1h 00m | [Clock-based continuation log](../../logs/2610172317%20todo-27h-step-3-optimization.md); includes both comparisons, collector race and fix, final 248-unit/six-sim/three-browser checks and three acceptance attempts. Final ordinary timing remains no-go. |
 
 Groundwork corrections found during 27h include explicit forage/chest configuration, actual fourth-world save ids,
 Mirelure clue/dive consistency, and the two-sided frame-clock guard. The Acer continuation also corrects carried
