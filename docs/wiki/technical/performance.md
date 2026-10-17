@@ -4,6 +4,25 @@ The target is steady **60 FPS at a 1920 × 1080 viewport on Iris Xe class integr
 High preset: 16.67 ms per frame. The available test machine reports Intel UHD through Edge/ANGLE/D3D11, not Iris Xe.
 It remains below 60 FPS. These measurements establish a reproducible render budget; they do not certify the target.
 
+## Development and validation machines
+
+Recommended machine roles, recorded at the owner's request on 2026-10-17:
+
+| Machine | Recommended use |
+| --- | --- |
+| Owner's higher-spec laptop (exact specifications not yet recorded) | Primary development: coding, full unit/simulation suites, browser checks and visual review. |
+| Lenovo 81MU, Core i3-8145U, Intel UHD Graphics 620, approximately 4 GB RAM | Occasional low-end compatibility and controlled performance diagnostics. Its measured memory pressure and slow browser rendering make it a poor primary development machine. |
+| Iris Xe laptop, when available again | Final target-device performance validation, using the required scene, preset, viewport and sampling rules. |
+
+Continue development on the higher-spec laptop while Iris Xe validation is pending. Faster-machine measurements
+are diagnostic evidence and do not certify the Iris Xe target. Keep Tidewhisper's release gate and the existing
+roadmap dependencies in place; independent work can proceed through its normal checks and stage branches.
+
+On 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
+8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
+Confirm availability before scheduling that run, and measure the synchronized final candidate when it returns.
+The [UHD 620 diagnostic](#uhd-620-laptop-diagnostic-2026-10-17) records the evidence behind the secondary-machine recommendation.
+
 ## Measuring the game
 
 Press **F3** during play or enable Settings → Graphics → **Performance overlay**. F3 can be rebound, and works while
