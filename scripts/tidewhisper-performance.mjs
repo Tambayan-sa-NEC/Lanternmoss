@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { cpus, freemem, totalmem, platform, release as osRelease } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { tidewhisperBrowser } from './lib/tidewhisper-browser.mjs';
+import { discardWebGL } from './lib/discard-webgl.mjs';
 import { PERFORMANCE_BUDGET, PERFORMANCE_REFERENCE, referenceProfile, referenceRenderer } from '../src/config/render.js';
 import { frameLimitMs } from '../src/config/contentGate.js';
 const release = process.argv.includes('--release');
@@ -85,13 +86,8 @@ try {
       // A new adventure per row prevents prior heroes, visits and elapsed actor motion from changing later fixtures.
       // Release the previous adventure's GPU allocations before discarding its document. A reload alone leaves
       // context destruction to browser GC. Cleanup is outside all setup/warmup/timing samples, including row one.
-      await page.evaluate(() => {
-        localStorage.clear();
-        const renderer = window.__tideRenderer;
-        renderer?.dispose();
-        const gl = renderer?.getContext() ?? document.querySelector('canvas')?.getContext('webgl2');
-        gl?.getExtension('WEBGL_lose_context')?.loseContext();
-      });
+      await discardWebGL(page);
+      await page.evaluate(() => localStorage.clear());
       const freeMemoryBeforeRowBytes = freemem();
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.LANTERNMOSS);
@@ -132,18 +128,18 @@ try {
       const row = { seed, hero, scene, phase, weather, freeMemoryBeforeRowBytes, ...measurement }; rows.push(row); console.log(JSON.stringify(row));
     }
     }
-    assert.deepEqual(errors, []);
-    assert.equal(rows.length, 18);
-    assert.equal(new Set(rows.map(r => `${r.seed}/${r.hero}/${r.scene}`)).size, 18);
     const gpu = rows[0].gpu;
     const report = { measuredAt: new Date().toISOString(), candidateCommit, dirty, gpuTiming,
-      rowCleanup: 'dispose and lose previous WebGL context before reload, outside measured frames', device: gpu,
+      rowCleanup: 'await previous WebGL context loss, then dispose before reload, outside measured frames', device: gpu,
       target: `${PERFORMANCE_REFERENCE.machine} / ${PERFORMANCE_REFERENCE.renderer}`, host, gpuDevices: gpuInfo?.devices ?? [],
       browser: { ...device, headless: !headed }, quality, viewport: [viewport.width,viewport.height], candidate: true,
       profile: 'fresh reload and empty test storage per row; play stream seeded before hero/travel setup; stationary invulnerable hero at village spawn, passive default pet, authored generation seed; fixed day/tide phase; 120 explicit setup updates, 30 warmup and 120 real render intervals per row; empty-clock page measured with game tab frozen',
       frameMetric: 'p95FrameMs = real interval between rendered frames; p95CpuMs (game loop) omits browser work; optional --gpu-timing adds query/readback overhead and is diagnostic only (p95GpuMs is otherwise null)',
       errors, frameClock, rows };
     writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
+    assert.deepEqual(errors, []);
+    assert.equal(rows.length, 18);
+    assert.equal(new Set(rows.map(r => `${r.seed}/${r.hero}/${r.scene}`)).size, 18);
     const ceiling = PERFORMANCE_BUDGET.ceilings.tidewhisper;
     if (release) {
       assert.ok(!dirty, 'commit candidate source changes before recording release evidence');

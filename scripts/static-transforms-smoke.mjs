@@ -4,6 +4,7 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { tidewhisperBrowser } from './lib/tidewhisper-browser.mjs';
+import { discardWebGL } from './lib/discard-webgl.mjs';
 const { page, errors, close } = await tidewhisperBrowser({ port: 8141 });
 try {
   await page.evaluate(async () => {
@@ -55,5 +56,11 @@ try {
       console.log(`PASS ${planet} ${width}x${height}: movement, identical matrices and canvas pixels after forced traversal; no overflow`);
     }
   }
-  assert.deepEqual(errors, []); console.log('PASS zero page/shader errors');
+  await page.evaluate(() => { window.__tideRenderer = window.__staticRender.renderer; });
+  await discardWebGL(page); await discardWebGL(page); // repeated loss is safe while the old RAF loop remains active
+  await page.evaluate(() => new Promise(resolve => { let n=0; const tick=()=>++n===5?resolve():requestAnimationFrame(tick); requestAnimationFrame(tick); }));
+  await page.reload({ waitUntil: 'domcontentloaded' }); await page.waitForFunction(() => window.LANTERNMOSS);
+  await discardWebGL(page); // the initial title renderer has not been captured by the performance probe
+  await page.evaluate(() => new Promise(resolve => { let n=0; const tick=()=>++n===5?resolve():requestAnimationFrame(tick); requestAnimationFrame(tick); }));
+  assert.deepEqual(errors, []); console.log('PASS safe captured/title context cleanup with a live RAF loop; zero page/shader errors');
 } finally { await close(); }

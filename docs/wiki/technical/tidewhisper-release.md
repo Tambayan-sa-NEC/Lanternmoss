@@ -354,7 +354,7 @@ Timing is mixed, and the owner closed unused apps during the comparison; no over
 The result supports pose/draw preservation and the unit checks prove the removed work. These paused diagnostic
 rows cannot certify release performance.
 
-The collector explicitly disposes and loses each previous WebGL context before reloading, outside setup/warmup
+The collector waits for loss of each previous WebGL context, then disposes before reloading, outside setup/warmup
 and all measured frames, and records memory before each row. This avoids relying on browser garbage collection
 for discarded GPU allocations. Memory variation alone does not establish that retained contexts caused failures.
 The target, actual GPU/profile checks, ordinary live simulation and all timing/count rules remain unchanged.
@@ -364,3 +364,10 @@ complete step 2 suites. The new browser check uses keyboard movement and compare
 before and after forcing visible immutable branches on all four planets at 720p/1080p. Dormant objects are
 excluded from forcing because the baseline intentionally leaves some poses stale. Raw canvas capture excludes
 animated DOM overlays. Integration still requires the complete suites on the synchronized final candidate.
+
+The first recheck of clean `67888f9` is [invalid](../../tidewhisper-step-3-invalid-cleanup-attempt-20261017.json):
+disposing before asynchronous context loss raced the old animation loop and produced repeated null-program
+page errors. All 18 rows ran, but the old error assertion preceded report persistence. The linked file is an
+explicitly rounded console summary, not reconstructed raw evidence or certification. The collector now waits for
+the loss event with a bounded timeout before disposal, and writes complete matrices before error assertions.
+The browser regression exercises captured and initial title contexts with live animation frames afterward.

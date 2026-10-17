@@ -4,6 +4,8 @@
 movement input and explicit simulation frames, compares world matrices and raw canvas pixels after forcing all
 visible immutable branches on all four worlds at 720p/1080p, checks overflow and page/shader errors, and saves diagnostic
 captures to the system temp folder. Tidewhisper is installed through the test-only candidate fixture.
+The same check verifies bounded context-loss/disposal ordering with live animation frames for captured and
+uncaptured title renderers, plus repeated cleanup, and requires zero resulting page/shader errors.
 
 ES modules can't be loaded from `file://`, so the game needs a local web server:
 

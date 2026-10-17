@@ -229,6 +229,10 @@ branches on all four worlds at 720p/1080p after keyboard movement. Diagnostic ca
 `docs/tidewhisper-static-comparison-20261017.json` preserves the separate 24-row immutable traversal ABBA comparison
 with source hashes, exact pose/draw assertions and changing host-load limitations.
 `docs/tidewhisper-step-3-regressions-20261017.json` records the affected checks after that change.
+`scripts/lib/discard-webgl.mjs` waits for context loss before disposing a discarded renderer; the static-transform
+smoke exercises cleanup while animation frames remain live. The performance collector saves complete reports
+before error assertions. `docs/tidewhisper-step-3-invalid-cleanup-attempt-20261017.json` is the labeled console
+summary of the earlier cleanup-race failure, not raw release evidence.
 
 `docs/tidewhisper-matrix-comparison-20261017.json` retains the 24-row ABBA render-only comparison, exact pose/draw
 checks and all 8640 sampled frames. `docs/tidewhisper-frame-trace-{before,after}-20261017.json` retain separate
