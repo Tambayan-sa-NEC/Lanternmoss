@@ -39,8 +39,10 @@ Every expansion world additionally needs:
 - At least two tree kinds and two critter kinds, its own rare creature and a unique weather kind.
 - A unique material, a rare vein, a local villager with a planet quest and first-arrival lines for every traveler.
 - A unique registered music theme and a registered mechanic.
-- Passing recorded release performance evidence for village, night and weather scenes on Intel Iris Xe at
-  1280×720, low graphics: at least 90 samples per scene, p95 frame time at or below the 60-fps budget, and peak draw
+- Passing recorded release performance evidence for every hero on seeds 1/7 in village, night and weather scenes,
+  using the [desktop reference](performance.md) (`PERFORMANCE_REFERENCE` in `config/render.js`): actual Acer RTX 4050
+  Laptop GPU, visible browser, 1920×1080 DPR1 High, clean committed source and no diagnostic GPU queries.
+  Every row needs at least 90 samples, p95 frame time at or below the 60-fps budget, and peak draw
   calls/triangles within the world-specific ceilings in `config/render.js`. The owner-approved frame-clock rule
   compares p95 against max(16.67 ms, the same run's calibrated empty-page p95); calibration requires at least 120
   samples and a median within 5% of the target. See [the collector/handoff](tidewhisper-release.md).
@@ -51,25 +53,29 @@ still apply. Main worlds cannot borrow these exceptions. No-farm worlds skip the
 
 The three original Act I ids retain their historical content mix. They still undergo common registration,
 reference, level and render-budget checks, but are not retrofitted with three exclusive enemies, local villagers
-or separate themes. Their outstanding Iris Xe 60-fps hardware validation remains documented in
+or separate themes. Their outstanding reference-device 60-fps hardware validation remains documented in
 [performance notes](performance.md); this stage makes no new hardware-performance claim for them.
 
 New-world release measurements live at `docs/releases/<planetId>.json`:
 
 ```json
 {
-  "device": "Intel Iris Xe",
-  "quality": "low",
-  "viewport": [1280, 720],
+  "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "quality": "high",
+  "viewport": [1920, 1080],
+  "candidateCommit": "<40-character Git commit hash>",
+  "dirty": false,
+  "gpuTiming": false,
+  "browser": { "headless": false },
   "rows": [
-    { "scene": "village", "samples": 90, "p95FrameMs": 0, "calls": 0, "triangles": 0 },
-    { "scene": "night", "samples": 90, "p95FrameMs": 0, "calls": 0, "triangles": 0 },
-    { "scene": "weather", "samples": 90, "p95FrameMs": 0, "calls": 0, "triangles": 0 }
+    { "hero": "witch", "seed": 1, "scene": "village", "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "quality": "high", "drawingBuffer": [1920, 1080], "samples": 120, "p95FrameMs": 0, "calls": 0, "triangles": 0 }
   ]
 }
 ```
 
-The zeroes above are placeholders and fail acceptance. Record real measurements in the owning release stage;
+This abbreviated example omits 17 required rows, uses a placeholder commit and zero timings/counts, so it fails
+acceptance. The collector writes all 18 combinations exactly once and the gate validates every row. Record real measurements in the owning release stage;
 the synthetic green reports in unit fixtures are not release evidence. Add its ceilings, complete the content,
 then flip `released` and run all checks. Do not bypass the gate to expose an unfinished destination.
 

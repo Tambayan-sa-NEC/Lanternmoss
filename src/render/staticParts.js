@@ -2,6 +2,11 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { glowVC, outlineMat, toonVC } from './materials.js';
 
+/** Only for geometry-baked decoration whose local transforms never animate; moving parents still update its world matrix. */
+export function freezeStaticTransforms(root) {
+  root.traverse(node => { node.updateMatrix(); node.matrixAutoUpdate = false; }); return root;
+}
+
 /** Merge static part() models, baking colour and local transforms. Keep independently hidden fruit separate. */
 export function batchParts(parent, exclude = null) {
   parent.updateMatrixWorld(true);
@@ -31,4 +36,28 @@ export function batchParts(parent, exclude = null) {
   }
   for (const child of originals) { parent.remove(child); child.traverse(o => o.geometry?.dispose()); }
   parent.add(group); return group;
+}
+
+/** Batch the rigid decoration between a model's named animation pivots. All returned Object3D references (and
+    extra pivots) keep their identity and ancestors. Mutable/transparent/custom materials and hidden nodes stay
+    separate. Builders must expose every independently animated part; a pincer stored in userData goes in extra. */
+export function batchRigidParts(parts, extra = []) {
+  const keep = new Set(), owned = new Set(), root = parts.root;
+  const preserve = node => {
+    if (Array.isArray(node)) { node.forEach(preserve); return; }
+    if (node?.isMaterial) { owned.add(node); return; }
+    if (!node?.isObject3D) return;
+    for (let p = node; p; p = p.parent) { keep.add(p); if (p === root) break; }
+  };
+  Object.values(parts).forEach(preserve); preserve(extra);
+  root.traverse(node => { for (const material of node.userData.ownedMaterials ?? []) owned.add(material); });
+  root.traverse(node => {
+    const m = node.material;
+    if (!node.visible || (!node.isGroup && !node.isMesh) || (node.isMesh && (node.isInstancedMesh
+      || (m !== outlineMat && (!m || Array.isArray(m) || owned.has(m) || m.transparent || m.opacity !== 1
+        || m.vertexColors || m.map || m.side !== THREE.FrontSide || !(m.isMeshToonMaterial || m.isMeshBasicMaterial)))))) preserve(node);
+  });
+  for (const pivot of keep) if (pivot.isGroup && pivot.children.some(child => !keep.has(child)))
+    freezeStaticTransforms(batchParts(pivot, keep));
+  return parts;
 }

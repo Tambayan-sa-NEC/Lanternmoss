@@ -763,7 +763,7 @@ support (40) need numbers to stay under.
 
 - [x] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
 - [x] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
-      record it as the ceiling. The target is a steady 60 fps at 1080p on integrated graphics (Iris Xe class) at the
+      record it as the ceiling. The target is a steady 60 fps at 1080p on the owner's Acer Nitro RTX 4050 at the
       default quality. Write the numbers down in `docs/wiki/technical/performance.md`.
 - [x] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
       quality preset from 2a, so lower presets draw less, not only at a lower resolution.
@@ -773,7 +773,10 @@ support (40) need numbers to stay under.
 Implemented: F3 / Graphics overlay, five live density sliders, spatial scenery/grass batches, resource and static
 prop batching, distant actor culling, and a real-WebGL per-planet regression script. See [measurements, ceilings and
 reproduction steps](docs/wiki/technical/performance.md). **Target status:** the available Intel UHD test machine remains below
-60 FPS; Iris Xe default-quality validation and further frame-time optimization remain performance work.
+60 FPS. On 2026-10-17 the owner replaced the uncertain Iris Xe device requirement with the Acer Nitro ANV15-51's
+RTX 4050 as the default desktop reference, preserving 1080p High, timing and count limits. Other machines supply
+additional functional/compatibility checks; mobile performance remains TODO 40. Default-reference validation and
+further frame-time optimization remain performance work.
 
 ---
 
@@ -1127,9 +1130,9 @@ The earlier `feat/todo-27h-release-validation` checkpoint is preserved in its hi
 Mirelure's breathing clue now shares its clock with the bubbles, and diving cancels unfinished surface attacks.
 Candidate checks use the real fourth-world id and save schema; they exposed missing forage/chest configuration,
 which is now explicit. The normal release flag remains off. Initial Intel UHD diagnostics do not meet the required
-Iris Xe evidence. Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
+Iris Xe evidence under the original reference (superseded by the owner's Acer decision below). Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
 Mirelure HP 3250), and the pacing audit covers Tidewhisper's XP, coins (new Tide forge fees) and materials.
-Iris Xe certification and the release itself remain. This is a **no-go** for
+Default-reference acceptance and the release itself remain. This is a **no-go** for
 release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/wiki/technical/tidewhisper-release.md).
 
 **27h sync/audit checkpoint (2026-10-17):** current child `feat/todo-27h-campaign-release` is synchronized from
@@ -1138,6 +1141,13 @@ content-gate rerun, campaign/encounter browser checks and 18 strict balance chec
 18 cases / 2,160 frames at 720p Low, 37.5-44.6 FPS and p95 26.4-32.8 ms; zero cases meet the fixed frame budget,
 and 8 exceed the 550-call ceiling (peak 636). Keep release/next-world approval pending; profile draw-call peaks
 and obtain target-device evidence. See the [current handoff](docs/wiki/technical/tidewhisper-release.md).
+
+**27h validation-machine decision (2026-10-17):** the owner selected the current Acer Nitro ANV15-51 / RTX 4050
+Laptop GPU as the default validation reference. Other available machines provide additional validation and
+compatibility coverage; Iris Xe access no longer blocks 27h. The collector now measures the existing desktop goal
+at 1920x1080 High rather than its earlier 720p Low diagnostic profile. The 60 FPS/frame-clock rule and 550-call /
+230,000-triangle ceilings are retained. First RTX 4050 matrix still fails timing/count acceptance; optimization
+and final clean-candidate validation are in progress. No destination release flag has changed.
 
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one

@@ -3,6 +3,7 @@
      ear 'point' | 'flop' | 'big' | 'long' | 'none'; tail 'cat' | 'curl' | 'fox' | 'puff' | 'none'; antlers; frogEyes; spines */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { batchRigidParts } from '../render/staticParts.js';
 import { buildDragon } from './dragon.js';
 
 export function buildQuad(o) {
@@ -47,7 +48,7 @@ export function buildQuad(o) {
   else { tail.rotation.x = -1.15; addTo(tail, part(G.cone(0.17, 0.7, 6), o.fur), [0, 0.35, 0], [Math.PI, 0, 0]);
     tip = addTo(tail, part(G.ico(0.15, 1), o.tip || 0xc7a8ff, { glow: true, intensity: 2.6 }), [0, 0.74, 0]); }
   if (o.spines) for (let i = 0; i < 4; i++) addTo(body, part(G.cone(0.05, 0.14, 4), o.spines), [0, hl + 0.42, 0.18 - i * 0.14 * L]);
-  return { root, body, head, legs, tail, tip };
+  return batchRigidParts({ root, body, head, legs, tail, tip });
 }
 
 /** The dragontoad: a round, squat toad with a dragon's horns, a row of back spines, little bat wings and a spade-tipped
@@ -97,7 +98,7 @@ export function buildBird(c) {
   if(c.species==='tern')for(const sx of [-1,1])addTo(body,part(G.cone(.045,.2,3),c.wing),[sx*.05,.22,-.29],[Math.PI/2,0,-sx*.2]);
   addTo(body, part(G.box(0.1, 0.03, 0.16), c.wing || c.body), [0, 0.22, -0.2], [-0.35, 0, 0]);
   for (const sx of [-1, 1]) addTo(body, part(G.cyl(0.012, 0.012, 0.1, 3), 0xffa84a, { outline: false }), [sx * 0.05, 0.05, 0]);
-  return { root, body, head, wingL: wings[0], wingR: wings[1] };
+  return batchRigidParts({ root, body, head, wingL: wings[0], wingR: wings[1] });
 }
 export function buildFish(c) {
   const root = new THREE.Group();
@@ -126,7 +127,7 @@ export function buildOwl() {
     addTo(g, part(G.box(0.36, 0.04, 0.22), 0x86664f), [sx * 0.18, 0, 0]); wings.push(g); }
   addTo(body, part(G.box(0.14, 0.04, 0.18), 0x86664f), [0, -0.18, -0.2], [-0.5, 0, 0]);
   root.scale.setScalar(0.85);
-  return { root, body, head, wingL: wings[0], wingR: wings[1] };
+  return batchRigidParts({ root, body, head, wingL: wings[0], wingR: wings[1] });
 }
 
 /** Glimmer-style pet wisp: a glowing little spirit with a face and petal wings (parts like buildOwl: body, head, wings). */

@@ -9,8 +9,10 @@ const { cullActors } = await imp('render/actorCulling.js');
 const { camera } = await imp('render/scene.js');
 const THREE = await import('three');
 const renderedGrass = () => game.world.grass.reduce((sum, g) => sum + g.children.reduce((n, m) => n + m.count, 0), 0);
+const { scene } = await imp('render/scene.js'); assert.equal(scene.matrixAutoUpdate, false);
 for (const id of ['lanternmoss', 'emberfall', 'frostveil']) {
   resetSettings(); H.goToPlanet(id);
+  for (const group of [game.world.scenery,...game.world.grass]) group.traverse(node => assert.equal(node.matrixAutoUpdate,false));
   const layout = JSON.stringify({ nodes: H.Gathering.toJSON(), spots: game.world.spots,
     colliders: H.colliders.map(c => [c.dir?.toArray(), c.r]), lair: game.world.lairDir.toArray() });
   const grass = renderedGrass(), bounds = game.world.grass.flatMap(g => g.children.map(m => m.boundingSphere.clone()));
@@ -55,3 +57,46 @@ assert.equal(actor.root.visible, false); assert.equal(actor.root.children[0].vis
 actor.dress(0); cullActors(camera);
 assert.equal(actor.root.children.length, 1);
 console.log('PASS  actor culling preserves visibility ownership, animated transforms and replacement outfits');
+const { ctx } = await imp('core/context.js');
+const nestedParent = new THREE.Group(), nestedRoot = new THREE.Group(); nestedRoot.add(new THREE.Group());
+nestedParent.position.set(1000,0,0); nestedRoot.position.set(0,20,0); nestedParent.add(nestedRoot); scene.add(nestedParent);
+ctx.npcs.push({root:nestedRoot}); camera.position.set(1000,20,0); H.player.pos.copy(camera.position); cullActors(camera);
+assert.equal(nestedRoot.children[0].visible,true,'nested actor culling uses the parent world transform');
+ctx.npcs.pop(); scene.remove(nestedParent);
+const { HERO_BUILDERS } = await imp('models/heroes.js');
+const { buildShellback, buildJellybell, buildSurfSkipper } = await imp('models/tideMonsters.js');
+const { buildChestModel } = await imp('models/chest.js');
+const { buildQuad, buildBird, buildOwl } = await imp('models/creatures.js');
+const { CHEST_KINDS } = await imp('config/chests.js');
+const { disposeTree } = await imp('render/meshes.js');
+const meshCount = root => { let count = 0; root.traverse(o => { if (o.isMesh) count++; }); return count; };
+const attached = (root, node) => { for (let p = node; p; p = p.parent) if (p === root) return true; return false; };
+for (const [build, options, limit] of [[buildQuad,{fur:0x888888,belly:0xffffff,ear:'point',tail:'cat'},16],
+  [buildBird,{body:0x888888,belly:0xffffff},8],[buildOwl,undefined,9]]) {
+  const parts = build(options); assert.ok(meshCount(parts.root) <= limit,`${build.name} retains too many rigid submissions`);
+  assert.ok(attached(parts.root,parts.head)); assert.equal(parts.body.matrixAutoUpdate,true);
+  for (const limb of parts.legs ?? [parts.wingL,parts.wingR]) assert.ok(attached(parts.body,limb));
+  disposeTree(parts.root);
+}
+for (const [hero, build] of Object.entries(HERO_BUILDERS)) {
+  const parts = build(); assert.ok(meshCount(parts.root) <= 40, `${hero} retains too many rigid submissions`);
+  for (const key of ['head','body','armL','armR','legL','legR','cape',...(hero === 'witch' ? ['hat','staff','wandTip'] : hero === 'knight' ? ['axe','axeRoll','bubble'] : ['bow','bowHold'])])
+    assert.ok(attached(parts.root, parts[key]), `${hero}.${key} disconnected`);
+  if (hero === 'knight') assert.equal(parts.bubble.visible, false);
+  if (hero === 'ranger') for (const tail of parts.tails) assert.ok(attached(parts.head, tail));
+  disposeTree(parts.root);
+}
+for (const [build, limit] of [[buildShellback,24],[buildJellybell,14],[buildSurfSkipper,16]]) {
+  const parts = build(); assert.ok(meshCount(parts.root) <= limit, `${build.name}: ${meshCount(parts.root)} meshes`);
+  if (parts.clawL) for (const claw of [parts.clawL,parts.clawR]) {
+    const pincer = claw.userData.pincer; assert.equal(pincer.parent, claw);
+    pincer.rotation.x = -.5; parts.root.updateMatrixWorld(true); assert.equal(pincer.rotation.x, -.5);
+  }
+  disposeTree(parts.root);
+}
+const chest = buildChestModel({look:CHEST_KINDS.rare.look,locked:true,beam:true});
+assert.ok(meshCount(chest.root) <= 10); assert.equal(chest.inner.visible,false);
+assert.equal(chest.lid.parent,chest.body); assert.equal(chest.lock.parent,chest.body); assert.equal(chest.beam.parent,chest.root);
+chest.lid.rotation.x = -1.95; chest.lock.visible = false; chest.inner.visible = true;
+assert.equal(chest.beam.material.transparent,true); chest.beam.material.dispose(); disposeTree(chest.root);
+console.log('PASS  hero/roster/chest batching reduces submissions while retaining every animated pivot and effect');

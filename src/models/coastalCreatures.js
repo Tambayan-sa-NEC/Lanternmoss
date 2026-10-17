@@ -1,6 +1,7 @@
 /* Ambient bodies, independent of enemy Shellbacks. All builders share the Critter animation contract. */
 import * as THREE from 'three';
 import { G, addTo, part } from '../render/meshes.js';
+import { batchRigidParts } from '../render/staticParts.js';
 const group = (parent,x,y,z) => { const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);return g; };
 const eyes = (head,w,z) => { for(const s of [-1,1])addTo(head,part(G.ico(.035,0),0x241c38,{outline:false}),[s*w,.06,z]); };
 export function buildCrab(o) {
@@ -14,7 +15,7 @@ export function buildCrab(o) {
     const claw=group(body,s*.22,.2,.36);addTo(claw,part(G.ico(.12,0),o.fur),[s*.13,0,.09],[0,0,0],[1,.6,1.5]);
     addTo(claw,part(G.cone(.07,.16,4),0xffcba0),[s*.16,.02,.22],[Math.PI/2,0,s*.4]);
   }
-  return {root,body,shell,head,tail,legs};
+  return batchRigidParts({root,body,shell,head,tail,legs});
 }
 export function buildTurtle(o) {
   const root=new THREE.Group(),body=group(root,0,.1,0),head=group(body,0,.17,.55),tail=group(body,0,.12,-.5),legs=[];
@@ -25,7 +26,7 @@ export function buildTurtle(o) {
   for(const [s,z] of [[-1,.3],[1,.3],[-1,-.3],[1,-.3]]){const leg=group(body,s*.35,.08,z);addTo(leg,part(G.ico(.2,0),o.fur),[s*.15,0,0],[0,s*.35,0],[1.8,.2,.65]);legs.push(leg);}
   addTo(tail,part(G.cone(.045,.2,4),o.fur),[0,0,-.08],[Math.PI/2,0,0]);
   if(o.pearl)addTo(body,part(G.ico(.12,1),0xe8ffff,{glow:true,intensity:2.5}),[0,.57,0]);
-  return {root,body,head,tail,legs};
+  return batchRigidParts({root,body,head,tail,legs});
 }
 export function buildSeal(o) {
   const root=new THREE.Group(),body=group(root,0,0,0),head=group(body,0,.45,.58),tail=group(body,0,.12,-.58),legs=[];
@@ -35,6 +36,6 @@ export function buildSeal(o) {
   addTo(head,part(G.ico(.04,0),0x241c38,{outline:false}),[0,0,.26]);
   for(const s of [-1,1])for(const z of [.26,-.48]){const leg=group(body,s*.3,.1,z);addTo(leg,part(G.ico(.2,0),o.fur),[s*.11,0,0],[0,s*.5,0],[1.6,.2,.75]);legs.push(leg);}
   for(const s of [-1,1])addTo(head,part(G.box(.18,.015,.015),0xf4f0da,{outline:false}),[s*.18,-.05,.21],[0,-s*.3,0]);
-  return {root,body,head,tail,legs};
+  return batchRigidParts({root,body,head,tail,legs});
 }
 export const COASTAL_BUILDERS={crab:buildCrab,turtle:buildTurtle,seal:buildSeal};

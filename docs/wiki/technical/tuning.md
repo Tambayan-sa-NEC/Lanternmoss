@@ -60,5 +60,6 @@
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
 | Frame-time target and per-world count ceilings (including Tidewhisper's 550 calls / 230,000 triangles) | `src/config/render.js` → `PERFORMANCE_BUDGET`; calibrated frame limit: `src/config/contentGate.js` → `frameLimitMs` |
+| Default desktop validation machine, GPU, viewport, quality and hero/seed/scene matrix | `src/config/render.js` → `PERFORMANCE_REFERENCE`; actual GPU/profile helpers are shared by the collector and content gate |
 | Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](lighting.md)) |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |

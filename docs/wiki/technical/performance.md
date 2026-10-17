@@ -1,17 +1,29 @@
 # Performance budget
 
 Tidewhisper 27h is currently a development candidate, with separate
-[diagnostic results](../../tidewhisper-performance.json) and an [Iris Xe handoff](tidewhisper-release.md).
-Its real fourth-world village/night/squall collector uses 1280x720 Low, 30 warmup frames and 120 samples per scene.
+[diagnostic results](../../tidewhisper-performance.json) and a [release handoff](tidewhisper-release.md).
+Its real fourth-world village/night/squall collector uses visible fullscreen Edge, 1920x1080 High at DPR 1,
+30 warmup frames and 120 samples per scene, with a fresh adventure for each row.
 It passes a scene against max(16.67 ms, the p95 of a valid empty-page 60 Hz clock measured in the same run).
 Calibration requires a median within 5% of the target; faster or slower display clocks retain the fixed 16.67 ms limit.
-Available Intel UHD results do not certify Iris Xe or the release target. Run `node scripts/tidewhisper-performance.mjs`
-for diagnostics; `--release` requires a clean candidate, an actual Iris Xe renderer and passing frame/draw budgets
+Historical Intel UHD results do not certify the current reference. Run `node scripts/tidewhisper-performance.mjs`
+for diagnostics; `--release` requires a clean candidate, a visible browser, an actual RTX 4050 Laptop GPU renderer and passing frame/draw budgets
 before it writes a release evidence file. Tidewhisper remains unreleased.
 
-The target is steady **60 FPS at a 1920 × 1080 viewport on Iris Xe class integrated graphics**, using the default
-High preset: 16.67 ms per frame. The available test machine reports Intel UHD through Edge/ANGLE/D3D11, not Iris Xe.
-It remains below 60 FPS. These measurements establish a reproducible render budget; they do not certify the target.
+The owner selected the **Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, NVIDIA RTX 4050 Laptop GPU** as the default
+desktop validation machine on 2026-10-17. The target remains **60 FPS at a 1920 × 1080 viewport**, DPR 1, default
+High preset: 16.67 ms per frame. Run on AC with Edge, request the high-performance GPU, and verify the actual WebGL
+renderer in every row. The old Iris Xe requirement is superseded because access to that device is uncertain.
+This is a desktop hardware reference, not a minimum requirement enforced by the game. Additional machines remain
+useful for functional/compatibility tests; their measured limits are reported separately. Integrated graphics and
+mid-range phones have no certified frame-rate claim from the RTX 4050 results; mobile remains TODO 40.
+
+Hidden and visible browser measurements differ materially on this host: a matched knight/squall probe submitted 473 calls in
+both modes, but measured 51.75 FPS / p95 24.3 ms hidden and 99.32 FPS / p95 16.3 ms visible. The default desktop
+validation therefore uses the visible player browser; `--headless` remains a diagnostic option. Optional
+`--gpu-timing` adds GPU query/readback instrumentation and also cannot write release evidence. Its on/off probe
+did not establish that queries caused the original shortfall (timers off: p95 25.1 ms; on: 20.0 ms), so no timing
+gain is attributed to disabling them. Both mode and instrumentation are recorded, and compared runs must match.
 
 ## Development and validation machines
 
@@ -19,17 +31,17 @@ Recommended machine roles, recorded at the owner's request on 2026-10-17:
 
 | Machine | Recommended use |
 | --- | --- |
-| Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, Intel UHD and RTX 4050 Laptop GPU (inventory recorded October 17) | Primary development: coding, full unit/simulation suites, browser checks and visual review. |
-| Lenovo 81MU, Core i3-8145U, Intel UHD Graphics 620, approximately 4 GB RAM | Occasional low-end compatibility and controlled performance diagnostics. Its measured memory pressure and slow browser rendering make it a poor primary development machine. |
-| Iris Xe laptop, when available again | Final target-device performance validation, using the required scene, preset, viewport and sampling rules. |
+| Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, Intel UHD and RTX 4050 Laptop GPU (inventory recorded October 17) | Default development and validation machine: coding, complete unit/simulation suites, browser/visual checks and desktop acceptance on the actual RTX 4050 at 1080p High. Its Intel UHD can also supply integrated-graphics diagnostics. |
+| Lenovo 81MU, Core i3-8145U, Intel UHD Graphics 620, approximately 4 GB RAM | Additional functional/compatibility checks and controlled low-end performance diagnostics. Record the actual adapter and memory pressure with results. |
+| Other available machines, including Iris Xe if available | Additional hardware/browser coverage; an Iris Xe run is optional and no longer blocks 27h. |
 
-Continue development on the higher-spec laptop while Iris Xe validation is pending. Faster-machine measurements
-are diagnostic evidence and do not certify the Iris Xe target. Keep Tidewhisper's release gate and the existing
-roadmap dependencies in place; independent work can proceed through its normal checks and stage branches.
+The Acer's RTX 4050 profile replaces the named validation hardware only. Existing frame-clock rules and render-count
+ceilings remain in force. Tidewhisper stays unreleased until this profile and the remaining 27h gates pass.
 
-On 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
+Earlier on 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
 8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
-Confirm availability before scheduling that run, and measure the synchronized final candidate when it returns.
+That historical estimate is superseded as a release dependency by the owner's Acer decision. If tested later,
+measure the synchronized candidate and record the actual hardware; it supplies additional coverage.
 The [UHD 620 diagnostic](#uhd-620-laptop-diagnostic-2026-10-17) records the evidence behind the secondary-machine recommendation.
 
 ## Measuring the game
@@ -132,6 +144,15 @@ Static crafting-station parts, farm fences, weeds and crop stages are similarly 
 separate. Distant actor render gates use 65/50/38 m camera distance for High/Medium/Low, with a 24 m player safety range.
 They preserve actor root visibility, animation references, AI and collisions.
 
+`batchRigidParts` in `render/staticParts.js` merges rigid decorations between explicitly named animation pivots.
+Hero rigs, coastal regular enemies/wildlife, NPC bodies/outfits and treasure chests use it. Animated pincer joints,
+weapons, hair/capes, opening lids, hidden effects and mutable/transparent materials retain their own objects.
+The unit test compares transformed geometry and HDR colours before/after moving a joint; the performance
+simulation asserts reduced model submissions and connected animation references. Gameplay counts and AI stay intact.
+The origin scene, baked terrain/scenery/grass and new rigid decoration retain their local matrices instead of
+recomposing them every frame. Dynamic parents still propagate their world transforms; animated roots/pivots remain
+live. This follows a CPU profile whose largest sampled JavaScript cost was matrix updates.
+
 Generation consumes the same seeded world stream at every density. Resource IDs, placement and collider counts stay
 fixed. Sparkle emission consumes the original random draws even for omitted particles, preserving combat and loot
 randomness. Simulation checks exercise all planets, regrowth, density restoration, particle randomness and actor
@@ -139,7 +160,7 @@ transform/visibility ownership. The boss simulation bot uses a separate stream s
 its steering when models are optimized.
 
 The remaining 60 FPS work is measurable: animated multi-part actors and near-field props still contribute many calls,
-while bloom, MSAA and full-resolution post-processing cost fill rate. Validate on actual Iris Xe hardware before
+while bloom, MSAA and full-resolution post-processing cost fill rate. Validate on the actual Acer RTX 4050 before
 claiming the default-quality target; these count ceilings are a regression guard, not a substitute for that validation.
 
 ## UHD 620 laptop diagnostic (2026-10-17)
@@ -180,7 +201,7 @@ validation substitute. A useful next diagnostic is the same fixed scene with mor
 attributing the whole shortfall to GPU throughput or choosing gameplay/rendering changes.
 
 Render/update CPU durations describe only the JavaScript work they wrap, not GPU time or all browser work. Neither
-passing count ceilings nor running on a weaker GPU substitutes for actual Iris Xe release evidence. These scenes,
+passing count ceilings nor running on a weaker GPU certified the then-required Iris Xe target. These historical scenes,
 resolution and source differ from the historical 1080p measurements above; this is not an optimization before/after.
 
 ## Acer Intel UHD Tidewhisper diagnostic (2026-10-17)
@@ -215,4 +236,5 @@ these omit browser work and are not additive. A trace is needed to attribute the
 Next: identify the meshes/actors behind draw-call peaks, reduce them within the existing ceiling, and repeat a
 controlled diagnostic with more memory headroom before attributing the whole shortfall to the GPU. This broader
 matrix and fixed-phase collector differ from the earlier three-scene UHD report; it is not an optimization
-before/after. Preserve the Iris Xe hardware gate and keep Tidewhisper unreleased pending real target evidence.
+before/after. The later owner decision replaces Iris Xe with the Acer RTX 4050; Tidewhisper stays unreleased pending
+passing evidence on that reference at 1080p High.

@@ -1,6 +1,7 @@
 /* Release acceptance is pure; tests inject actual runtime registrations, not a duplicate allow-list.
    The shipped Act I worlds retain their historical content mix. Every other world meets the expansion checklist. */
 import { populationProblem, validatePlanetCatalog } from './planetRules.js';
+import { PERFORMANCE_REFERENCE, referenceProfile, referenceRenderer } from './render.js';
 const ORIGINALS = new Set(['lanternmoss', 'emberfall', 'frostveil']);
 const positive = n => Number.isFinite(n) && n > 0;
 const unique = values => [...new Set(values)];
@@ -109,11 +110,22 @@ export function contentProblems(p, catalog, r) {
     require((p.unlock?.rareGifts ?? []).every(id => r.items.has(id)), 'unknown rare gift in secret unlock');
   }
   const report = r.releases[p.id];
-  require(report?.device?.includes('Iris Xe') && report.quality === 'low' && report.viewport?.[0] === 1280 && report.viewport?.[1] === 720, 'release performance needs Iris Xe at 720p low');
+  require(referenceProfile(report), 'release performance needs the Acer RTX 4050 at 1080p High');
+  require(report?.dirty === false && /^[a-f0-9]{40}$/i.test(report?.candidateCommit ?? ''), 'release performance needs a committed clean candidate');
+  require(report?.gpuTiming === false, 'release performance timing must exclude diagnostic GPU query/readback overhead');
+  require(report?.browser?.headless === false, 'desktop release performance timing needs a visible browser on the reference machine');
   const frameLimit = frameLimitMs(r.targetFrameMs, report?.frameClock);
-  for (const scene of ['village','night','weather']) {
-    const row = report?.rows?.find(row => row.scene === scene);
-    require(row?.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= frameLimit && positive(row.calls) && row.calls <= ceiling?.calls && positive(row.triangles) && row.triangles <= ceiling?.triangles, `performance fixture ${scene} must pass its frame/draw budget`);
+  const rows = report?.rows ?? [], keys = new Set(rows.map(row => `${row.hero}/${row.seed}/${row.scene}`));
+  const expected = PERFORMANCE_REFERENCE.heroes.flatMap(hero => PERFORMANCE_REFERENCE.seeds.flatMap(seed =>
+    PERFORMANCE_REFERENCE.scenes.map(scene => `${hero}/${seed}/${scene}`)));
+  require(rows.length === expected.length && keys.size === expected.length && expected.every(key => keys.has(key)),
+    'release performance needs every hero, both seeds and all three scenes exactly once');
+  for (const row of rows) {
+    require(referenceRenderer(row.gpu) && row.quality === PERFORMANCE_REFERENCE.quality
+      && row.drawingBuffer?.[0] === PERFORMANCE_REFERENCE.viewport[0] && row.drawingBuffer?.[1] === PERFORMANCE_REFERENCE.viewport[1]
+      && row.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= frameLimit
+      && positive(row.calls) && row.calls <= ceiling?.calls && positive(row.triangles) && row.triangles <= ceiling?.triangles,
+      `performance fixture ${row.hero}/${row.seed}/${row.scene} must pass its hardware/frame/draw budget`);
   }
   return errors;
 }

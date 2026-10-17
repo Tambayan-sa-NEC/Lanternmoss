@@ -1,7 +1,8 @@
 # Tidewhisper 27h: validation and hardware handoff
 
 Status: **in progress / no-go**. Tidewhisper remains `released: false`. No release tag or `master` merge is authorized
-by this checkpoint. On October 17 the owner reported a repair delay, with the next possible Iris Xe run around October 25-26. Confirm availability before scheduling.
+by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
+the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
@@ -66,9 +67,13 @@ by default it saves `docs/tidewhisper-balance.json` and exits nonzero
 with `--check` if any row misses its target. Investigate the bot's approach, reach and counter behavior alongside
 damage tuning; a large timing spread is not solved by blindly scaling HP. Do not loosen the targets to publish.
 
-## Run on the Iris Xe machine
+## Run on the Acer reference machine
 
-Run with other heavy work closed, browser hardware acceleration enabled and the intended graphics adapter active.
+Run on AC with other heavy work closed, browser hardware acceleration enabled and the RTX 4050 active.
+Default performance runs open visible fullscreen Edge. Hidden-browser (`--headless`) and GPU query
+(`--gpu-timing`) profiles are separate diagnostics and cannot write release evidence.
+The collector requests Chromium's high-performance GPU and verifies the actual WebGL renderer in all 18 rows.
+It uses the existing desktop goal of 1920x1080 DPR1 High; earlier 720p Low reports remain separate diagnostics.
 Commit candidate source changes first so the report identifies the exact code. `CHROME` can point to Chrome or Edge.
 
 ```powershell
@@ -91,14 +96,14 @@ queries (`p95GpuMs`) are recorded as diagnostics only. They omit browser composi
 test machine they read up to 4 ms under the real interval, so they are never the pass number.
 
 Default invocation (without `--release`) writes a diagnostic report only. `--release` writes
-`docs/releases/tidewhisper.json` only if the candidate was clean, the actual renderer is Iris Xe and all scenes meet
+`docs/releases/tidewhisper.json` only if the candidate was clean, the actual renderer is the RTX 4050 Laptop GPU and all scenes meet
 the frame/draw budgets. A JSON file copied from another device or synthetic test data is not certification.
 
 ## Finish 27h
 
 1. Done: duel timing bands pass on both seeds for all heroes, and the `pacing` audit now covers Tidewhisper's XP
    route, coin budget (new Tide forge fees, 280 coins) and two-day material yields (see `docs/wiki/game-design/balance.md`).
-2. Obtain passing Iris Xe evidence for the final candidate. Re-measure after material rendering changes.
+2. Obtain passing Acer RTX 4050 evidence for the final candidate. Re-measure after material rendering changes.
 3. Enable the destination only after its full gate passes. Update release-dependent tests, title/portal/journal
    expectations, player-facing tour and affected screenshots. Recheck old v1 saves and the real travel/Continue path.
 4. Run full unit/simulation suites and required browser checks on the synchronized stage branch. Do not merge or
@@ -111,6 +116,27 @@ the frame/draw budgets. A JSON file copied from another device or synthetic test
 Work started at 2026-10-14 23:57 (machine clock); step/total durations and final check results are recorded in
 [the 27h work log](../../logs/2610142357%20todo-27h-release-validation.md). Time waiting for external hardware is not
 misrepresented as completed implementation or hardware-validation time.
+
+## Recorded session cost and groundwork corrections
+
+The following are measured totals already present in the work logs. Older missing totals are not reconstructed
+from commit dates. Consequently, the whole TODO 27 cost cannot be stated as a complete measured total.
+
+| Work | Recorded elapsed cost | Evidence/limitation |
+| --- | --- | --- |
+| 27a–27e | Unrecorded totals | Their historical logs have no measured TOTAL row; preserve the original entries. |
+| 27f | 0h 28m | [Old Ironclaw log](../../logs/2610141537%20todo-27f-old-ironclaw.md) |
+| 27g | 0h 51m | [Mirelure log](../../logs/2610141608%20todo-27g-mirelure.md) |
+| Earlier 27h implementation/validation sessions | 2h 08m | Initial gate 29m, frame-clock work 41m, duels 18m, pacing 10m, October 17 synchronization/diagnostic 30m. Separate session totals, excluding external waiting. |
+| Earlier related 27h research/advice/review | 0h 07m | Cloud research 3m, independent-work advice 1m, branch review 3m. |
+| Current Acer validation session | In progress | [Clock-based session log](../../logs/2610171924%20todo-27h-acer-validation.md), started 2026-10-17 19:24:42; its final TOTAL owns the completed duration. |
+
+Groundwork corrections found during 27h include explicit forage/chest configuration, actual fourth-world save ids,
+Mirelure clue/dive consistency, and the two-sided frame-clock guard. The Acer continuation also corrects carried
+adventure state in performance rows, aligns the expansion fixture with 1080p High, verifies every hero/seed/scene,
+and distinguishes visible-browser acceptance from hidden/instrumented diagnostics. Actor batching preserves authored
+geometry, animation and gameplay rules. These integration/validation costs belong in the next world's estimate;
+Duskhollow approval and a separate optional-otter estimate remain later decisions.
 
 ## Synchronized functional checks (2026-10-17)
 
@@ -146,6 +172,22 @@ p95 26.4-32.8 ms; none meets the applicable fixed 16.67 ms budget. Empty-page me
 so it cannot provide the 60 Hz calibration allowance. Eight cases exceed 550 calls (peak 636); triangles fit
 230,000 (peak 191,804), with zero page/shader errors. See [conditions and scene table](performance.md#acer-intel-uhd-tidewhisper-diagnostic-2026-10-17).
 
-Recommendation: retain the Iris Xe gate. Profile and reduce draw-call peaks, repeat controlled diagnostics, then
-collect real Iris Xe evidence when available. Do not raise ceilings or enable the destination from this report.
+The Iris Xe hardware dependency was superseded by the owner's Acer decision later on October 17. Profile and
+reduce draw-call peaks, then collect clean Acer RTX 4050 evidence at 1080p High. Do not raise the count ceilings
+or enable the destination from the earlier UHD report.
 The synchronized functional/balance checks pass; performance acceptance and release-dependent work remain open.
+
+### Acer RTX 4050 reference baseline
+
+[Controlled reference baseline](../../tidewhisper-performance-acer-rtx4050-before-20261017.json): actual RTX 4050,
+1920x1080 High, all heroes/seeds/scenes, 2160 measured frames. 31.55-42.42 FPS, p95 28.0-37.6 ms, peak 1072 calls;
+all timing/count cases fail. Each row reloads a fresh adventure and seeds play before setup. Test-only source
+overrides replay the original model files from `b3074d5`; their paths and full commit are recorded in the JSON.
+This replaces the earlier carried-state exploratory baseline. It has `dirty: true` because the collector/profile
+edits were not committed yet, so it is not release evidence. A per-root draw probe found ranger
+119 draws, three visible Shellbacks at 72 each, and scenery only 25. Rigid actor pieces are the first batching target.
+
+The original-mode report above used a hidden browser and GPU queries. The matched visible-browser comparison uses
+`docs/tidewhisper-performance-acer-rtx4050-headed-before-20261017.json`, with every changed runtime rendering file
+replayed from `b3074d5`, plus the corrected collector/reference configuration. GPU queries are off in both final
+comparison runs. A visible-browser performance artifact is still required before enabling the destination.

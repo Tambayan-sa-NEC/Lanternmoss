@@ -72,7 +72,7 @@ keyboard movement, swimming/energy, the chip, protected plots, local drainage, r
 travel. It closes its own server/browser, refreshes the two development previews and keeps additional lagoon
 captures in the temporary directory. `tests/sim/lib/tideFixture.mjs` is never imported by production code.
 
-These checks verify this stage's rules and rendering; they do not certify the Intel Iris Xe 60-fps release
+These checks verify this stage's rules and rendering; they do not certify the current desktop 60-fps release
 target. Population, content, balance, complete-world browser traversal and measured performance remain 27h's
 requirements. Resources/weather/music are now implemented in 27c below; the village/lighthouse are implemented in 27d below; the regular enemies in 27e below.
 
@@ -88,7 +88,7 @@ Scenery is generated once with fixed upper counts: 18 palms, 12 kelp trees, 10 c
 plant clusters. Beach flora/animals reserve dry high water; kelp/coral and fish use shallow water. The static
 scenery is spatially batched, and decorative quality changes do not change placement, resource ids or colliders.
 The seeded development fixture measured **30,197 static scenery triangles in 65 batches**, including its borrowed
-village. This is a geometry-cost check, not an Iris Xe frame-rate certification.
+village. This geometry-cost check supplies triangle counts; target-device frame-rate acceptance is separate.
 
 ![Lantern palm development preview](../../screenshots/world/tidewhisper-flora.jpg)
 
@@ -156,7 +156,7 @@ The helper owns port 8109 and borrows only test encounters in `coastalResourceFi
 E gathering, reload Continue, the three-beat audio timer, 720p/1080p low squall shaders and dry farms. Captures
 are saved in the temporary directory. The simulation also covers pick tiers, low/high tide, multi-day skips,
 revisits, sea fishing, dawn transitions, crop watering and equipped Tide gear Continue. These checks do not certify
-Iris Xe frame time; that hardware measurement and campaign release remain 27h.
+reference-device frame time; that hardware measurement and campaign release remain 27h.
 
 ## Stilt village and lighthouse (27d)
 
@@ -247,7 +247,7 @@ errors. The simulations (`coastalEnemies`, `coastalDuels`) cover placement and C
 the capped turn, the pinch, rising/falling drift, the sting and dodging it, stranding and both recoveries, the skipper's
 untargetable lurk, ambush, retreat, shore fence and stranding, extra drops, and a level-8 duel per hero. Every hero
 beat every monster with no HP top-ups (3-10 s each). These are access checks; the campaign's pacing targets,
-measured performance and the Iris Xe frame-time target remain 27h.
+measured performance and the desktop reference frame-time target remain 27h.
 
 ## Old Ironclaw (27f)
 
@@ -333,4 +333,4 @@ a reload mid-drain and the reward.
 while she is up or beached; it never dodges, and HP is topped up below 50%. In 27g every hero won on two seeds in
 170-266 s, but the ranger's 171-176 s was under the 180-300 s target. 27h raised her base HP from 3000 to 3250: every
 hero now takes 188-289 s (ranger 188/191, witch 273/277, knight 281/289) with 6-26 top-ups, close to the Act I bosses
-(8-28). The release gate and the Iris Xe frame-time measurement are still pending.
+(8-28). The release gate and the desktop reference frame-time measurement are still pending.

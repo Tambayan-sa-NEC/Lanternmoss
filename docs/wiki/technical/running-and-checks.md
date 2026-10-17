@@ -74,8 +74,13 @@ quest/node Continue, revisit, quest/tide gate, one crown and 720p/1080p bounds w
 It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
-`node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 720p Low.
+`node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
+on the owner's Acer RTX 4050 reference (the collector requests the high-performance GPU).
+It opens visible fullscreen Edge for desktop acceptance. `--headless` and `--gpu-timing` are optional diagnostics;
+neither can be combined with `--release`.
 Omit `--output` for the historical default diagnostic path; use a separate output for a new device/run.
-`--release` additionally requires a clean commit, a real Iris Xe renderer and passing timing/count budgets before
+`--release` additionally requires a clean commit, the actual RTX 4050 Laptop GPU renderer and passing timing/count budgets before
 writing certification. Run performance alone, with no simulation suite or screenshot job competing for resources.
+Every performance row uses a fresh reload and empty ephemeral test storage, seeds play before hero/travel setup,
+then runs 120 setup updates, 30 warmup frames and 120 real render intervals. Previous rows cannot carry state forward.
 See the [handoff](tidewhisper-release.md).
