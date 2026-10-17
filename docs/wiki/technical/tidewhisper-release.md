@@ -1,4 +1,4 @@
-# Tidewhisper 27h: validation and hardware handoff
+﻿# Tidewhisper 27h: validation and hardware handoff
 
 Status: **in progress / no-go**. Tidewhisper remains `released: false`. No release tag or `master` merge is authorized
 by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
@@ -11,7 +11,7 @@ It preserves the three original worlds and exercises real `tidewhisper` ids, sca
 It lives under tests/scripts and is never imported by the production entry point. Borrowing an Act I save slot is
 insufficient release evidence: those earlier fixtures inherited missing configuration and could hide schema issues.
 
-## Historical checkpoint evidence (2026-10-14–15)
+## Historical checkpoint evidence (2026-10-14â€“15)
 
 - Fixed the two reviewed Mirelure defects: bubbles and the real lure now share a clock; diving cancels pending and
   active surface attacks. The simulation observes actual bubble emissions and checks both roll states and a bite.
@@ -124,12 +124,12 @@ from commit dates. Consequently, the whole TODO 27 cost cannot be stated as a co
 
 | Work | Recorded elapsed cost | Evidence/limitation |
 | --- | --- | --- |
-| 27a–27e | Unrecorded totals | Their historical logs have no measured TOTAL row; preserve the original entries. |
+| 27aâ€“27e | Unrecorded totals | Their historical logs have no measured TOTAL row; preserve the original entries. |
 | 27f | 0h 28m | [Old Ironclaw log](../../logs/2610141537%20todo-27f-old-ironclaw.md) |
 | 27g | 0h 51m | [Mirelure log](../../logs/2610141608%20todo-27g-mirelure.md) |
 | Earlier 27h implementation/validation sessions | 2h 08m | Initial gate 29m, frame-clock work 41m, duels 18m, pacing 10m, October 17 synchronization/diagnostic 30m. Separate session totals, excluding external waiting. |
 | Earlier related 27h research/advice/review | 0h 07m | Cloud research 3m, independent-work advice 1m, branch review 3m. |
-| Current Acer validation session | In progress | [Clock-based session log](../../logs/2610171924%20todo-27h-acer-validation.md), started 2026-10-17 19:24:42; its final TOTAL owns the completed duration. |
+| Current Acer validation checkpoint | 1h 15m |  [Clock-based session log](../../logs/2610171924%20todo-27h-acer-validation.md), started 2026-10-17 19:24:42; its TOTAL records elapsed time through this incomplete checkpoint. |
 
 Groundwork corrections found during 27h include explicit forage/chest configuration, actual fourth-world save ids,
 Mirelure clue/dive consistency, and the two-sided frame-clock guard. The Acer continuation also corrects carried
@@ -195,12 +195,12 @@ comparison runs. A visible-browser performance artifact is still required before
 The first clean optimized run (`8a8e432`) is preserved as
 [the loaded-host report](../../tidewhisper-performance-acer-rtx4050-loaded-after-20261017.json).
 All 18 render-count rows pass (peak 474 calls and 209111 triangles), but only one timing row passes;
-p95 spans 16.1–27.5 ms. Available RAM was approximately 1 GB with active paging during the run.
+p95 spans 16.1â€“27.5 ms. Available RAM was approximately 1 GB with active paging during the run.
 The owner is closing unused apps for a repeat. This report failed acceptance and produced no release artifact.
 
 [The repeat after closing apps](../../tidewhisper-performance-acer-rtx4050-freed-memory-20261017.json)
 started clean at `2e669a9` with 4.44 GiB free before browser launch. All 18 count rows pass (peak 483 calls,
-210141 triangles). Average rates improve to 63.14–110.45 FPS, but p95 spans 13.8–23.0 ms and only six timing
+210141 triangles). Average rates improve to 63.14â€“110.45 FPS, but p95 spans 13.8â€“23.0 ms and only six timing
 rows pass. No release artifact was written. The unchanged rendering source and profile show that freeing memory
 helped; it did not resolve the acceptance shortfall. A subsequent knight/squall CPU profile still found matrix
 updates among the largest JavaScript costs, motivating a regression-tested skip for hidden actor render branches.
@@ -209,3 +209,4 @@ The preceding CPU-instrumented probe measured 77.56 FPS, p95 21.3 ms and CPU p95
 actor motion differ, so this is diagnostic evidence rather than a controlled optimization comparison.
 The hidden-branch change has all 243 unit tests and the performance simulation passing; a complete simulation rerun,
 browser/tour review and a clean full-matrix repeat remain pending. Keep it on the stage branch with no release artifact.
+
