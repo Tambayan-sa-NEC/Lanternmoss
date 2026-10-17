@@ -131,3 +131,9 @@ the current concise overview; detailed handoff material now lives here in the wi
 This is a checkpoint. Target-device certification, destination enablement, release-dependent saves/title/portal/
 journal checks and the final affected screenshot tour still belong to completion of 27h. See the
 [session log](../../logs/2610171721%20todo-27h-sync-and-acer-diagnostic.md) for measured timings and outcomes.
+
+### Fresh two-seed balance
+
+[October 17 report](../../tidewhisper-balance-20261017.json): clean commit `2c42fce`, all 36 rows present,
+all 18 required checks pass. Roster medians 3.58?5.55 s, Ironclaw 155.4?174.1 s, Mirelure 187.8?286.6 s.
+See [the six-profile before/after table](../game-design/balance.md#tidewhisper-27h-synchronization-2026-10-17).

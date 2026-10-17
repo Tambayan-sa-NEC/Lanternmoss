@@ -205,3 +205,5 @@ content completeness. `scripts/lib/tidewhisper-browser.mjs` boots the isolated c
 `scripts/tidewhisper-performance.mjs` cover travel/Continue, two-seed balance and actual hardware diagnostics.
 The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` reports remain separate from new runs.
 The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.
+
+`docs/tidewhisper-balance-20261017.json` is the clean-commit synchronization audit; the earlier balance JSON remains historical.

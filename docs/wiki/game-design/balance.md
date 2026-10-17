@@ -264,3 +264,24 @@ wedges to once per shell (see [Tidewhisper](../world/tidewhisper.md#old-ironclaw
 Verification: 142 unit tests, all 24 gameplay/audit sims, strict profile target checks, the affected Malgrath
 mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and shop screenshots are under
 `docs/screenshots/bosses/balance-flight.jpg` and `docs/screenshots/huds/balance-shop.jpg`.
+
+## Tidewhisper 27h synchronization (2026-10-17)
+
+The [fresh report](../../tidewhisper-balance-20261017.json) measures clean synchronized commit `2c42fce`
+against the [accepted October 15 checkpoint](../../tidewhisper-balance.json). Both use level 8, starting equipment,
+default pets, counter bots and counted HP top-ups. No gameplay numbers were tuned in this synchronization.
+All 18 required checks pass: six regular-roster medians at 2?6 seconds, six Ironclaw fights at 90?180 seconds,
+and six Mirelure fights at 180?300 seconds. Individual armored/evasive monsters remain informational.
+
+| Hero | Seed | Roster median: before ? after (s) | Ironclaw: before ? after (s) | Mirelure: before ? after (s) |
+| --- | --- | ---: | ---: | ---: |
+| Witch | 1 | 3.58 ? 3.58 | 171.6 ? 171.6 | 273.4 ? 273.4 |
+| Witch | 7 | 4.77 ? 4.77 | 173.7 ? 174.1 | 276.9 ? 276 |
+| Warrior | 1 | 5.55 ? 5.55 | 172.4 ? 172.4 | 288.9 ? 286.6 |
+| Warrior | 7 | 5.03 ? 5.03 | 169.5 ? 169.5 | 281.4 ? 284.3 |
+| Ranger | 1 | 3.7 ? 3.7 | 155.4 ? 155.4 | 187.8 ? 187.8 |
+| Ranger | 7 | 4.47 ? 4.47 | 156 ? 156 | 190.8 ? 190.8 |
+
+The full synchronized pacing simulation also passes all three heroes: level 8 before Tide summon, 281?360 coins
+against a 280-coin Tide gear reserve, lighthouse materials within one day and lighthouse plus gear within two days.
+This route audit does not replace combat or target-device performance validation.
