@@ -1,0 +1,957 @@
+{
+  "version": 1,
+  "kind": "diagnostic",
+  "complete": true,
+  "certification": false,
+  "startedAt": "2026-10-16T17:56:36.032Z",
+  "sourceCommit": "b188aa464d7d55088efd2b4028686e5f3f1cf214",
+  "sourceBranch": "perf/uhd620-720p-diagnostic",
+  "trackedChanges": "",
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i3-8145U CPU @ 2.10GHz",
+    "logicalCpus": 4,
+    "totalMemoryBytes": 4169388032,
+    "freeMemoryBytesAtStart": 913506304,
+    "os": "10.0.26100",
+    "node": "v22.23.3"
+  },
+  "method": {
+    "viewport": [
+      1280,
+      720
+    ],
+    "devicePixelRatio": 1,
+    "quality": "low",
+    "bloom": true,
+    "warmupFrames": 30,
+    "samples": 90,
+    "heroes": [
+      "witch",
+      "knight",
+      "ranger"
+    ],
+    "playSeeds": [
+      1,
+      7
+    ],
+    "worldSeeds": "unchanged authored planet seeds",
+    "scenes": {
+      "village": "day clear, day fraction 0.35",
+      "night": "night clear, day fraction 0.88",
+      "weather": "night with the heaviest configured particle weather, day fraction 0.88"
+    },
+    "camera": {
+      "pitch": 0.38,
+      "distance": 8.5
+    },
+    "position": "village spawn, passive default pet",
+    "time": "fixed day phase; live simulation and real wall-clock render intervals",
+    "setup": "Generate each world once per hero/seed; 120 explicit simulation frames after travel, 2 after scene change; 30 real warmup frames before every row.",
+    "comparison": "Different viewport/scenes/source from the historical 1080p report; not an optimization before/after or a target-device certification.",
+    "scope": "All three scenes on Lanternmoss for all three heroes and play seeds 1/7 (18 rows); Emberfall/Frostveil scene comparisons use Witch seed 1 (6 rows). No cross-world hero inference.",
+    "power": "AC connected, Windows Balanced plan (queried before sampling)"
+  },
+  "rows": [
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.688947912066297,
+      "meanFrameMs": 271.07999999920526,
+      "p95FrameMs": 375.7999999523163,
+      "maxFrameMs": 404.10000002384186,
+      "meanRenderCpuMs": 17.228888885180154,
+      "meanUpdateCpuMs": 8.471111110846202,
+      "calls": 913,
+      "triangles": 241582,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.046034885811904,
+      "meanFrameMs": 247.15555555555557,
+      "p95FrameMs": 338.10000002384186,
+      "maxFrameMs": 365.89999997615814,
+      "meanRenderCpuMs": 16.2766666703754,
+      "meanUpdateCpuMs": 9.472222223546769,
+      "calls": 837,
+      "triangles": 238972,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "weather",
+      "weather": "storm",
+      "actualHero": "witch",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.370098812789823,
+      "meanFrameMs": 228.82777777777778,
+      "p95FrameMs": 328,
+      "maxFrameMs": 633,
+      "meanRenderCpuMs": 21.744444449742634,
+      "meanUpdateCpuMs": 7.015555544694265,
+      "calls": 787,
+      "triangles": 237758,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "emberfall",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "emberfall",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.117779309731386,
+      "meanFrameMs": 320.7411111103164,
+      "p95FrameMs": 533.6000000238419,
+      "maxFrameMs": 1197.2999999523163,
+      "meanRenderCpuMs": 49.94555555846956,
+      "meanUpdateCpuMs": 14.26888888809416,
+      "calls": 712,
+      "triangles": 203830,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 900,
+        "triangles": 280000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "emberfall",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "emberfall",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.262181529516903,
+      "meanFrameMs": 306.54333333439297,
+      "p95FrameMs": 416.39999997615814,
+      "maxFrameMs": 454.1999999284744,
+      "meanRenderCpuMs": 14.336666666136848,
+      "meanUpdateCpuMs": 8.335555556085374,
+      "calls": 760,
+      "triangles": 205700,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 900,
+        "triangles": 280000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "emberfall",
+      "scene": "weather",
+      "weather": "embers",
+      "actualHero": "witch",
+      "actualPlanet": "emberfall",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.0360992197151746,
+      "meanFrameMs": 329.37000000079473,
+      "p95FrameMs": 451.5,
+      "maxFrameMs": 944.2000000476837,
+      "meanRenderCpuMs": 27.122222214274935,
+      "meanUpdateCpuMs": 9.038888892862532,
+      "calls": 711,
+      "triangles": 204286,
+      "points": 797,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 900,
+        "triangles": 280000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "frostveil",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "frostveil",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.758378051072182,
+      "meanFrameMs": 266.0722222222222,
+      "p95FrameMs": 353,
+      "maxFrameMs": 628.6000000238419,
+      "meanRenderCpuMs": 25.71777777141995,
+      "meanUpdateCpuMs": 10.868888885445065,
+      "calls": 762,
+      "triangles": 213933,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 850,
+        "triangles": 280000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "frostveil",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "frostveil",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.4000755572346053,
+      "meanFrameMs": 294.1111111111111,
+      "p95FrameMs": 367.2999999523163,
+      "maxFrameMs": 772.3000000715256,
+      "meanRenderCpuMs": 25.97333333094915,
+      "meanUpdateCpuMs": 10.423333336247339,
+      "calls": 769,
+      "triangles": 214191,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 850,
+        "triangles": 280000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "planetId": "frostveil",
+      "scene": "weather",
+      "weather": "blizzard",
+      "actualHero": "witch",
+      "actualPlanet": "frostveil",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.100711096408897,
+      "meanFrameMs": 322.50666666693155,
+      "p95FrameMs": 417.39999997615814,
+      "maxFrameMs": 895.1000000238419,
+      "meanRenderCpuMs": 21.201111115349665,
+      "meanUpdateCpuMs": 19.44333334101571,
+      "calls": 666,
+      "triangles": 211247,
+      "points": 972,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 850,
+        "triangles": 280000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.238365686186646,
+      "meanFrameMs": 235.94000000026492,
+      "p95FrameMs": 310.2999999523163,
+      "maxFrameMs": 331.3000000715256,
+      "meanRenderCpuMs": 15.849999996026357,
+      "meanUpdateCpuMs": 8.394444443119896,
+      "calls": 785,
+      "triangles": 237376,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "witch",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.492541483625159,
+      "meanFrameMs": 286.3244444449743,
+      "p95FrameMs": 376.10000002384186,
+      "maxFrameMs": 575.2000000476837,
+      "meanRenderCpuMs": 25.60111111137602,
+      "meanUpdateCpuMs": 10.122222218248579,
+      "calls": 788,
+      "triangles": 237402,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "witch",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "weather",
+      "weather": "storm",
+      "actualHero": "witch",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.855429944688124,
+      "meanFrameMs": 259.37444444497424,
+      "p95FrameMs": 349.7999999523163,
+      "maxFrameMs": 592.3000000715256,
+      "meanRenderCpuMs": 22.82888889312744,
+      "meanUpdateCpuMs": 8.684444434112972,
+      "calls": 740,
+      "triangles": 236204,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "knight",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "knight",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.9432003890789145,
+      "meanFrameMs": 253.60111111005148,
+      "p95FrameMs": 354.7000000476837,
+      "maxFrameMs": 367.1999999284744,
+      "meanRenderCpuMs": 20.443333331743876,
+      "meanUpdateCpuMs": 10.22777777645323,
+      "calls": 911,
+      "triangles": 241092,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "knight",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "knight",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.803824111176932,
+      "meanFrameMs": 262.8933333330684,
+      "p95FrameMs": 350.39999997615814,
+      "maxFrameMs": 572.5,
+      "meanRenderCpuMs": 25.437777777512867,
+      "meanUpdateCpuMs": 9.07111111217075,
+      "calls": 851,
+      "triangles": 239172,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "knight",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "weather",
+      "weather": "storm",
+      "actualHero": "knight",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.193985824337233,
+      "meanFrameMs": 238.43666666613686,
+      "p95FrameMs": 358.90000009536743,
+      "maxFrameMs": 382.5,
+      "meanRenderCpuMs": 18.64666666454739,
+      "meanUpdateCpuMs": 8.712222225136227,
+      "calls": 848,
+      "triangles": 239726,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "knight",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "knight",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.649516641802943,
+      "meanFrameMs": 274.0088888883591,
+      "p95FrameMs": 399.5,
+      "maxFrameMs": 790,
+      "meanRenderCpuMs": 33.74222222566605,
+      "meanUpdateCpuMs": 14.454444440205892,
+      "calls": 807,
+      "triangles": 237742,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "knight",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "knight",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.726846963237186,
+      "meanFrameMs": 268.32333333359827,
+      "p95FrameMs": 360.7999999523163,
+      "maxFrameMs": 399.39999997615814,
+      "meanRenderCpuMs": 20.200000001324547,
+      "meanUpdateCpuMs": 11.815555557939742,
+      "calls": 808,
+      "triangles": 237744,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "knight",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "weather",
+      "weather": "storm",
+      "actualHero": "knight",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.08925480144896,
+      "meanFrameMs": 244.54333333439297,
+      "p95FrameMs": 348.10000002384186,
+      "maxFrameMs": 371.1999999284744,
+      "meanRenderCpuMs": 23.423333326975506,
+      "meanUpdateCpuMs": 13.33000000052982,
+      "calls": 751,
+      "triangles": 236458,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "ranger",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "ranger",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.370609780763569,
+      "meanFrameMs": 296.6822222219573,
+      "p95FrameMs": 366.7000000476837,
+      "maxFrameMs": 410.10000002384186,
+      "meanRenderCpuMs": 20.510000002384185,
+      "meanUpdateCpuMs": 9.645555554495918,
+      "calls": 938,
+      "triangles": 242572,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "ranger",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "ranger",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.2972467989228993,
+      "meanFrameMs": 303.28333333333336,
+      "p95FrameMs": 387.39999997615814,
+      "maxFrameMs": 916.8999999761581,
+      "meanRenderCpuMs": 32.89555556376775,
+      "meanUpdateCpuMs": 10.663333337836795,
+      "calls": 862,
+      "triangles": 239962,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "ranger",
+      "seed": 1,
+      "planetId": "lanternmoss",
+      "scene": "weather",
+      "weather": "storm",
+      "actualHero": "ranger",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.095973203241977,
+      "meanFrameMs": 244.1422222216924,
+      "p95FrameMs": 351.40000009536743,
+      "maxFrameMs": 386.39999997615814,
+      "meanRenderCpuMs": 17.742222220367857,
+      "meanUpdateCpuMs": 8.316666664017571,
+      "calls": 795,
+      "triangles": 238204,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "ranger",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "village",
+      "weather": "clear",
+      "actualHero": "ranger",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 3.9817899473118463,
+      "meanFrameMs": 251.14333333306843,
+      "p95FrameMs": 371.60000002384186,
+      "maxFrameMs": 651,
+      "meanRenderCpuMs": 29.444444447093538,
+      "meanUpdateCpuMs": 10.833333326710594,
+      "calls": 812,
+      "triangles": 238390,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "ranger",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "night",
+      "weather": "clear",
+      "actualHero": "ranger",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.038518491931771,
+      "meanFrameMs": 247.61555555529065,
+      "p95FrameMs": 327.10000002384186,
+      "maxFrameMs": 360.10000002384186,
+      "meanRenderCpuMs": 17.10000000662274,
+      "meanUpdateCpuMs": 7.948888882001241,
+      "calls": 816,
+      "triangles": 238394,
+      "points": 412,
+      "lines": 0,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    },
+    {
+      "hero": "ranger",
+      "seed": 7,
+      "planetId": "lanternmoss",
+      "scene": "weather",
+      "weather": "storm",
+      "actualHero": "ranger",
+      "actualPlanet": "lanternmoss",
+      "paused": false,
+      "hidden": false,
+      "samples": 90,
+      "fps": 4.362155874369911,
+      "meanFrameMs": 229.24444444444444,
+      "p95FrameMs": 307.7000000476837,
+      "maxFrameMs": 335.60000002384186,
+      "meanRenderCpuMs": 15.127777779102326,
+      "meanUpdateCpuMs": 7.954444444179535,
+      "calls": 768,
+      "triangles": 237200,
+      "points": 412,
+      "lines": 770,
+      "drawingBuffer": [
+        896,
+        503
+      ],
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "countCeiling": {
+        "calls": 1050,
+        "triangles": 310000
+      },
+      "withinCountCeiling": true,
+      "withinStrict60FpsBudget": false
+    }
+  ],
+  "pageErrors": [],
+  "shaderErrors": [],
+  "consoleErrors": [],
+  "segments": [
+    {
+      "startedAt": "2026-10-16T17:56:36.032Z",
+      "finishedAt": "2026-10-16T18:03:19.254Z",
+      "rows": 9,
+      "frameClock": {
+        "samples": 239,
+        "medianMs": 16.600000000000364,
+        "p95Ms": 16.800000000000182
+      },
+      "machine": {
+        "cpu": "Intel(R) Core(TM) i3-8145U CPU @ 2.10GHz",
+        "logicalCpus": 4,
+        "totalMemoryBytes": 4169388032,
+        "freeMemoryBytesAtStart": 701706240,
+        "os": "10.0.26100",
+        "node": "v22.23.3"
+      },
+      "note": "Collector deliberately stopped after three-world scene comparison; data retained unchanged. Waiting failed followed controlled browser closure, with no page/shader errors."
+    },
+    {
+      "startedAt": "2026-10-16T18:03:47.838Z",
+      "firstRow": 10,
+      "note": "Remaining hero/seed repeats on Lanternmoss, same camera/settings/sampling and source.",
+      "finishedAt": "2026-10-16T18:14:58.243Z",
+      "rows": 15
+    }
+  ],
+  "browser": {
+    "version": "Edg/154.0.4258.53",
+    "gpuDevices": [
+      {
+        "vendorId": 32902,
+        "deviceId": 16032,
+        "subSysId": 1058674602,
+        "revision": 2,
+        "vendorString": "",
+        "deviceString": "Intel(R) UHD Graphics 620",
+        "driverVendor": "Intel",
+        "driverVersion": "27.20.100.8729"
+      },
+      {
+        "vendorId": 32902,
+        "deviceId": 16032,
+        "subSysId": 1058674602,
+        "revision": 2,
+        "vendorString": "",
+        "deviceString": "Intel(R) UHD Graphics 620",
+        "driverVendor": "",
+        "driverVersion": "27.20.100.8729"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "subSysId": 0,
+        "revision": 0,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.26100.3323"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "enabled",
+      "webgl": "enabled",
+      "webgpu": "enabled",
+      "webnn": "disabled_off"
+    }
+  },
+  "frameClock": {
+    "samples": 239,
+    "medianMs": 16.600000000000364,
+    "p95Ms": 16.899999999999636
+  },
+  "activeWebGL": {
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "vendor": "Google Inc. (Intel)",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0"
+  },
+  "finishedAt": "2026-10-16T18:14:58.243Z",
+  "summary": {
+    "rows": 24,
+    "measuredFrames": 2160,
+    "fpsRange": [
+      3.0360992197151746,
+      4.370098812789823
+    ],
+    "p95FrameMsRange": [
+      307.7000000476837,
+      533.6000000238419
+    ],
+    "peakCalls": 938,
+    "peakTriangles": 242572,
+    "withinCountCeilingRows": 24,
+    "withinStrict60FpsBudgetRows": 0
+  }
+}

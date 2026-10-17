@@ -1,0 +1,7 @@
+﻿# Iris Xe repair delay and independent work
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-17 10:31 | PLAN | TODO 20 / 27h | Record user hardware-availability constraint | develop | Started 2026-10-17 10:30. User reports Iris Xe laptop is at a repair shop; next possible test is 8-9 days from now, approximately October 25-26, 2026 if that estimate holds. No repair completion or test date is guaranteed. Current develop remains 110dd97 and up to date. | 0h 01m |
+| 2026-10-17 10:31 | PLAN | TODO 20 / 29 | Identify work independent of the delayed hardware | develop | Continue current-machine functional/unit/simulation checks and diagnostic profiling; choose optimizations from measurements. 29b cave layout/traversal can proceed from completed 29a/26a, followed by 29c-29e as their prerequisites pass. Follow TODO 29 parent/stage branch rules; keep unfinished dungeon outside normal travel. 27h final target-device evidence remains pending; 30a and 29g retain their existing dependencies. Retest the synchronized final candidate on returned Iris Xe hardware rather than treating earlier diagnostics as certification. | 0h 01m |
+| 2026-10-17 10:31 | TOTAL | TODO N/A | Hardware-delay planning advice | develop | No acceptance targets, release flags or roadmap dependencies changed. No feature implementation or new benchmark started. Advice log remains uncommitted alongside the previous next-step advice log. | 0h 01m |

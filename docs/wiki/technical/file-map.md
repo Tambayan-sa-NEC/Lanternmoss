@@ -9,6 +9,7 @@ scripts/shots.mjs          which folder of docs/screenshots/ each screenshot bel
 scripts/save-smoke.mjs     checks real browser save/reload/export/import; retakes save-menu screenshots
 docs/screenshots/          the README screenshots, one folder per subject (characters, mobs, huds...)
 docs/logs/                 timestamped decisions, tasks, actions and verification
+docs/performance-uhd620-720p.json  current-machine 720p Low diagnostic; hardware/method, scene samples and errors
 docs/wiki/technical/typography.md         the type brief, the pairings compared (type-specimen.html) and the choice
 tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
                            heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,

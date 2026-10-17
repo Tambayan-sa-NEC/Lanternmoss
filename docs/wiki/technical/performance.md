@@ -4,6 +4,25 @@ The target is steady **60 FPS at a 1920 × 1080 viewport on Iris Xe class integr
 High preset: 16.67 ms per frame. The available test machine reports Intel UHD through Edge/ANGLE/D3D11, not Iris Xe.
 It remains below 60 FPS. These measurements establish a reproducible render budget; they do not certify the target.
 
+## Development and validation machines
+
+Recommended machine roles, recorded at the owner's request on 2026-10-17:
+
+| Machine | Recommended use |
+| --- | --- |
+| Owner's higher-spec laptop (exact specifications not yet recorded) | Primary development: coding, full unit/simulation suites, browser checks and visual review. |
+| Lenovo 81MU, Core i3-8145U, Intel UHD Graphics 620, approximately 4 GB RAM | Occasional low-end compatibility and controlled performance diagnostics. Its measured memory pressure and slow browser rendering make it a poor primary development machine. |
+| Iris Xe laptop, when available again | Final target-device performance validation, using the required scene, preset, viewport and sampling rules. |
+
+Continue development on the higher-spec laptop while Iris Xe validation is pending. Faster-machine measurements
+are diagnostic evidence and do not certify the Iris Xe target. Keep Tidewhisper's release gate and the existing
+roadmap dependencies in place; independent work can proceed through its normal checks and stage branches.
+
+On 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
+8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
+Confirm availability before scheduling that run, and measure the synchronized final candidate when it returns.
+The [UHD 620 diagnostic](#uhd-620-laptop-diagnostic-2026-10-17) records the evidence behind the secondary-machine recommendation.
+
 ## Measuring the game
 
 Press **F3** during play or enable Settings → Graphics → **Performance overlay**. F3 can be rebound, and works while
@@ -113,3 +132,44 @@ its steering when models are optimized.
 The remaining 60 FPS work is measurable: animated multi-part actors and near-field props still contribute many calls,
 while bloom, MSAA and full-resolution post-processing cost fill rate. Validate on actual Iris Xe hardware before
 claiming the default-quality target; these count ceilings are a regression guard, not a substitute for that validation.
+
+## UHD 620 laptop diagnostic (2026-10-17)
+
+[Separate diagnostic report](../../performance-uhd620-720p.json), recorded from game source `b188aa4`:
+Lenovo 81MU, Core i3-8145U (2 cores / 4 threads), approximately 4 GB RAM, Windows 11 and Edge 154 headless.
+The active WebGL renderer is Intel UHD Graphics 620 through ANGLE/D3D11, with no software-rendering launch flags.
+The laptop was connected to AC on the Balanced power plan. Windows reported only about 375–535 MB available RAM
+and, during the pilot, 6,093 pages input per second. Other applications were left open; memory pressure limits what
+these results say about an otherwise idle laptop.
+
+The temporary collector followed `scripts/performance.mjs`, on its own port 8124, with a 1280 × 720 viewport,
+DPR 1, the unchanged Low preset and bloom enabled. The actual drawing buffer was 896 × 503. It measured day/clear,
+night/clear and night/heaviest configured particle weather at village spawn, with a fixed camera, day phase and a
+passive pet. Each row has 30 real warmup frames followed by 90 measured render intervals; simulation time was never
+used as the FPS clock. Explicit setup updates settled travel before warmup. World-generation seeds stayed authored;
+the varied seeds are the runtime play stream.
+
+Coverage is all three scenes on Lanternmoss for Witch, Warrior and Ranger on seeds 1 and 7 (18 rows), plus all three
+scenes on Emberfall and Frostveil for Witch/seed 1 (6 rows). This is an initial machine diagnostic, not a full
+cross-world hero audit. The report retains two collection segments; completed rows were kept unchanged when the
+collector was stopped to bound its scope. The earlier four-row pilot is excluded from the final measurements.
+
+All 24 cases completed (2,160 measured frames), with zero page, shader or console errors. FPS below is the range
+over each scene's recorded rows; Emberfall/Frostveil have one row per scene, as scoped above.
+
+| World | Day / clear FPS | Night / clear FPS | Night / heavy weather FPS |
+| --- | ---: | ---: | ---: |
+| Lanternmoss | 3.4–4.2 | 3.3–4.0 | 3.9–4.4 (storm) |
+| Emberfall | 3.1 | 3.3 | 3.0 (ashfall) |
+| Frostveil | 3.8 | 3.4 | 3.1 (blizzard) |
+
+Across the report, p95 frame intervals are 307.7–533.6 ms, versus the strict 16.67 ms target. The empty-page
+frame-clock p95 is 16.8–16.9 ms across the two segments; this small pacing difference does not explain the game
+results. All rows fit the existing per-world count ceilings; overall peaks are 938 calls and 242,572 triangles.
+No scene meets the 60 FPS frame-time target. This laptop, in the recorded conditions, is unsuitable as a 60 FPS
+validation substitute. A useful next diagnostic is the same fixed scene with more memory available, before
+attributing the whole shortfall to GPU throughput or choosing gameplay/rendering changes.
+
+Render/update CPU durations describe only the JavaScript work they wrap, not GPU time or all browser work. Neither
+passing count ceilings nor running on a weaker GPU substitutes for actual Iris Xe release evidence. These scenes,
+resolution and source differ from the historical 1080p measurements above; this is not an optimization before/after.

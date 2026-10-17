@@ -60,6 +60,9 @@ Balance and performance:
 - A new world is audited by the pacing simulation: its XP route, coin budget and material yields.
 - Performance acceptance is in `docs/wiki/technical/performance.md`. Only real target hardware certifies a release. Diagnostic runs
   on other machines are recorded as diagnostics, never as certification.
+- Recommended development machines are recorded in [Development and validation machines](docs/wiki/technical/performance.md#development-and-validation-machines).
+  Prefer the owner's higher-spec laptop for coding, full test suites, browser checks and visual review; use the UHD 620 laptop
+  for occasional low-end diagnostics. Keep final Iris Xe performance validation pending until that machine is available.
 
 Commits during the task:
 
