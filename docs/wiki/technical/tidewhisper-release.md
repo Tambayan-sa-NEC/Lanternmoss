@@ -130,6 +130,7 @@ from commit dates. Consequently, the whole TODO 27 cost cannot be stated as a co
 | Earlier 27h implementation/validation sessions | 2h 08m | Initial gate 29m, frame-clock work 41m, duels 18m, pacing 10m, October 17 synchronization/diagnostic 30m. Separate session totals, excluding external waiting. |
 | Earlier related 27h research/advice/review | 0h 07m | Cloud research 3m, independent-work advice 1m, branch review 3m. |
 | Current Acer validation checkpoint | 1h 16m | [Clock-based session log](../../logs/2610171924%20todo-27h-acer-validation.md), started 2026-10-17 19:24:42; its TOTAL records elapsed time through this incomplete checkpoint. |
+| Controlled comparison and UI cleanup (step 1) | 0h 22m | [Clock-based step 1 log](../../logs/2610172143%20todo-27h-matrix-comparison.md); completed diagnostic/targeted cleanup, full 27h acceptance pending. |
 
 Groundwork corrections found during 27h include explicit forage/chest configuration, actual fourth-world save ids,
 Mirelure clue/dive consistency, and the two-sided frame-clock guard. The Acer continuation also corrects carried
