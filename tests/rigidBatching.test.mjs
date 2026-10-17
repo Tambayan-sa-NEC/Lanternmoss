@@ -7,6 +7,23 @@ globalThis.innerWidth = 1280; globalThis.innerHeight = 720;
 const { batchRigidParts } = await import('../src/render/staticParts.js');
 const { part, G, addTo } = await import('../src/render/meshes.js');
 const { outlineMat } = await import('../src/render/materials.js');
+const { ActorRenderGroup } = await import('../src/render/actorCulling.js');
+
+test('culled render branches skip matrix work and restore the current animated pose on return', () => {
+  const root = new THREE.Group(), gate = new ActorRenderGroup(), joint = new THREE.Group(), tip = new THREE.Group();
+  root.add(gate); gate.add(joint); joint.add(tip); tip.position.x = 2;
+  root.updateMatrixWorld(true);
+  let updates = 0; const original = tip.updateMatrixWorld;
+  tip.updateMatrixWorld = function(force) { updates++; return original.call(this, force); };
+  gate.visible = false; root.position.x = 10; joint.rotation.z = Math.PI / 2;
+  root.updateMatrixWorld(true); assert.equal(updates, 0);
+  gate.visible = true; root.updateMatrixWorld(true); assert.equal(updates, 1);
+  const at = new THREE.Vector3().setFromMatrixPosition(tip.matrixWorld);
+  assert.ok(at.distanceTo(new THREE.Vector3(10, 2, 0)) < 1e-9);
+  // Explicit world queries still work independently of the renderer, including while culled.
+  gate.visible = false; root.position.x = 20;
+  assert.ok(tip.getWorldPosition(new THREE.Vector3()).distanceTo(new THREE.Vector3(20, 2, 0)) < 1e-9);
+});
 
 const meshCount = root => { let n = 0; root.traverse(o => { if (o.isMesh) n++; }); return n; };
 function model() {

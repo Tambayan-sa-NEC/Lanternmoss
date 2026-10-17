@@ -210,11 +210,14 @@ The [handoff](tidewhisper-release.md) owns candidate status and reproduction ins
 `docs/tidewhisper-performance-acer-20261017.json` records the separate 18-case Acer Intel UHD diagnostic, not certification.
 `docs/tidewhisper-performance-acer-rtx4050-before-20261017.json` records the first 1080p High RTX 4050 reference
 matrix before actor batching; its dirty collector source is explicitly recorded, so it is baseline evidence only.
-It uses original model sources from `b3074d5` and the corrected fresh-adventure collector. The matching optimized
-matrix is `docs/tidewhisper-performance-acer-rtx4050-after-20261017.json`; final certification is separate.
+It uses original model sources from `b3074d5` and the corrected fresh-adventure collector.
+`docs/tidewhisper-performance-acer-rtx4050-loaded-after-20261017.json` and
+`docs/tidewhisper-performance-acer-rtx4050-freed-memory-20261017.json` preserve failed clean visible-browser
+acceptance attempts before and after closing unused apps. Final certification remains separate and pending.
 `docs/tidewhisper-performance-acer-rtx4050-headed-before-20261017.json` is the original-rendering baseline for the
 default visible-browser profile, with runtime source provenance recorded in the JSON.
 `docs/tidewhisper-performance-acer-rtx4050-headless-after-20261017.json` preserves an intermediate hidden/instrumented
 iteration after the first rigid batches and before companion/culling refinements; it is not the final reference result.
-`tests/rigidBatching.test.mjs` verifies rigid-model geometry/colour conservation and independent pivots/effects;
+`tests/rigidBatching.test.mjs` verifies rigid-model geometry/colour conservation, independent pivots/effects and
+culled-branch matrix skipping/current-pose restoration;
 `tests/sim/performance.sim.mjs` also covers the optimized hero, coastal roster and chest rigs.

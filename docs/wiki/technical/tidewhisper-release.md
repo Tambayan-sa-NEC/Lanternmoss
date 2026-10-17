@@ -197,3 +197,15 @@ The first clean optimized run (`8a8e432`) is preserved as
 All 18 render-count rows pass (peak 474 calls and 209111 triangles), but only one timing row passes;
 p95 spans 16.1–27.5 ms. Available RAM was approximately 1 GB with active paging during the run.
 The owner is closing unused apps for a repeat. This report failed acceptance and produced no release artifact.
+
+[The repeat after closing apps](../../tidewhisper-performance-acer-rtx4050-freed-memory-20261017.json)
+started clean at `2e669a9` with 4.44 GiB free before browser launch. All 18 count rows pass (peak 483 calls,
+210141 triangles). Average rates improve to 63.14–110.45 FPS, but p95 spans 13.8–23.0 ms and only six timing
+rows pass. No release artifact was written. The unchanged rendering source and profile show that freeing memory
+helped; it did not resolve the acceptance shortfall. A subsequent knight/squall CPU profile still found matrix
+updates among the largest JavaScript costs, motivating a regression-tested skip for hidden actor render branches.
+An initial 900-frame knight/squall probe after that change measured 84.11 FPS, p95 18.4 ms and CPU p95 12.0 ms.
+The preceding CPU-instrumented probe measured 77.56 FPS, p95 21.3 ms and CPU p95 15.9 ms; instrumentation and
+actor motion differ, so this is diagnostic evidence rather than a controlled optimization comparison.
+The hidden-branch change has all 243 unit tests and the performance simulation passing; a complete simulation rerun,
+browser/tour review and a clean full-matrix repeat remain pending. Keep it on the stage branch with no release artifact.

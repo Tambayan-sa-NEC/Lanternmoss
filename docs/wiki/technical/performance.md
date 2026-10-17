@@ -143,6 +143,8 @@ Resource bodies and fruit are merged separately into toon/glow/outline meshes, p
 Static crafting-station parts, farm fences, weeds and crop stages are similarly batched; animated station glows stay
 separate. Distant actor render gates use 65/50/38 m camera distance for High/Medium/Low, with a 24 m player safety range.
 They preserve actor root visibility, animation references, AI and collisions.
+Hidden actor render branches also skip descendant world-matrix traversal. Local poses keep advancing;
+the first visible traversal refreshes the complete pose, while explicit world-position queries still update normally.
 
 `batchRigidParts` in `render/staticParts.js` merges rigid decorations between explicitly named animation pivots.
 Hero rigs, coastal regular enemies/wildlife, NPC bodies/outfits and treasure chests use it. Animated pincer joints,
