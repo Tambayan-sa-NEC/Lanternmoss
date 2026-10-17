@@ -11,9 +11,10 @@ import { ringFX } from '../../fx/combatFx.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { resolveCollisions } from '../../physics/colliders.js';
 import { audio } from '../../systems/AudioSystem.js';
-import { slerpDir, projectTangent, tangentToward, turnToward } from '../../utils/sphere.js';
+import { slerpDir, projectTangent, turnToward } from '../../utils/sphere.js';
 import { groundHeight } from '../../world/terrain.js';
 import { addHazard, Blast, Zone } from '../hazards.js';
+import { pointOf, interpolate, toward, upAt } from '../space.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _to = new V3();
@@ -23,15 +24,22 @@ function leapMotion(from, to, dur, height) {
   let t = 0;
   return (P, dt) => {
     t = Math.min(dur, t + dt); const k = t / dur;
+    if (P.space) {
+      interpolate(from, to, k, P.pos); P.pos.y = P.space.origin.y + height * 4 * k * (1 - k); P.r = P.pos.y;
+    } else {
     slerpDir(from, to, k, P.up); P.up.normalize();
     const g = groundHeight(P.up);
     P.r = g + height * 4 * k * (1 - k); P.pos.copy(P.up).multiplyScalar(P.r);
+    }
     projectTangent(P.fwd, P.up).normalize();
-    if (k < 0.98) { _to.copy(tangentToward(P.up, to)); turnToward(P.fwd, _to, P.up, 0.3); }
+    if (k < 0.98) { _to.copy(toward(pointOf(P), to)); turnToward(P.fwd, _to, P.up, 0.3); }
     P.vy = 0; P.grounded = false; P.knock.set(0, 0, 0); P.vel.set(0, 0, 0); P.leapK = k;
     if (k < 1) return true;
-    resolveCollisions(P.pos, P.radius, P.selfCollider);                // never land inside a monster
-    P.up.copy(P.pos).normalize(); P.r = groundHeight(P.up); P.pos.copy(P.up).multiplyScalar(P.r);
+    if (P.space) P.space.place(P, to);
+    else {
+      resolveCollisions(P.pos, P.radius, P.selfCollider);                // never land inside a monster
+      P.up.copy(P.pos).normalize(); P.r = groundHeight(P.up); P.pos.copy(P.up).multiplyScalar(P.r);
+    }
     P.grounded = true; P.squash = -0.32; P.leapK = 0;
     return false;
   };
@@ -55,7 +63,7 @@ export const ULTIMATES = {
   leapSlam: {
     execute(s, dir, target) {
       const P = ctx.player;
-      P.motion = leapMotion(P.up.clone(), target, s.leapTime, s.leapHeight);
+      P.motion = leapMotion(pointOf(P).clone(), target, s.leapTime, s.leapHeight);
       P.invuln = Math.max(P.invuln, s.leapTime + 0.15); P.castT = 0; P.castFaceT = 0;
       sparkles.emit(P.pos, { count: 24, color: 0xe8d6c0, speed: 2.4, up: P.up, upBias: 0.6, life: 0.6, size: 0.4 });
       audio.jump(); audio.whoosh();
@@ -63,7 +71,7 @@ export const ULTIMATES = {
         knock: s.knockback, stun: s.stun, shake: 0.85, stop: 0.1, sound: 'leapSlam',
         onImpact: b => {
           ringFX(b.point, s.radius * 1.25, 0xfff0d0, 0.7);
-          sparkles.emit(b.point, { count: 40, color: 0xd8c0a0, speed: 4.5, up: b.center, upBias: 0.4, life: 0.9, size: 0.55 });
+          sparkles.emit(b.point, { count: 40, color: 0xd8c0a0, speed: 4.5, up: upAt(b.center), upBias: 0.4, life: 0.9, size: 0.55 });
           P.swingT = 0.2;                                                   // the axe bites into the ground
         } }));
     },

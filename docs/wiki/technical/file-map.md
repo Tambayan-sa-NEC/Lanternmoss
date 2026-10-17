@@ -75,7 +75,8 @@ src/
 │   └── Batcher.js         merges static scenery into a few draw calls
 ├── physics/
 │   ├── colliders.js       static, moving and camera colliders; overlap resolution
-│   └── Walker.js          surface movement under spherical gravity: cliffs, standing on rocks, wading and swimming
+│   ├── RoomSpace.js       flat cave floor: wall/body sweeps, gravity and paths through connected rooms
+│   └── Walker.js          shared actor movement: spherical surface physics or the attached flat room frame
 ├── world/                 the planet (generated once, in a fixed order, from a seeded RNG)
 │   ├── World.js           generation order, landmarks, per-frame sun / sky / ambient animation
 │   ├── caveLayout.js      cave layouts: rooms joined from a seed, the walkable floor, which room a point is in (pure)
@@ -121,6 +122,7 @@ src/
 │   └── WorldItem.js       an item stack lying on the ground (can hop out of a chest)
 ├── combat/
 │   ├── CombatSystem.js    per-frame combat update order
+│   ├── space.js           combat points, height, floor, distance, headings and visibility in either frame
 │   ├── casting.js         cooldowns, input buffering, hold-to-repeat, ability dispatch
 │   ├── abilities/         witch spells, knight (axe warrior) moves, ranger (elf archer) shots, and ultimates.js
 │   ├── aiming.js          aim mode for ground-targeted abilities (cursor -> ground marker, validity, confirm / cancel)
@@ -156,7 +158,7 @@ src/
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
-│   ├── Dungeons.js        caves: the surface mouth, entering and leaving, the cave walk, safe exits
+│   ├── Dungeons.js        caves: mouth, entry/exit, combat frame and safe surface encounter restoration
 │   ├── Talents.js         the hero's learned talents: their kit for casting, saves, Old Bramble's free reset
 │   ├── bountyRules.js     the day's jobs generated from a planet's config, progress and the saved shape (pure)
 │   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)

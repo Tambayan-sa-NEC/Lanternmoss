@@ -124,7 +124,7 @@ export class Game {
     Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
       || shopLineFor(npc, n => chat(n) || n.nextLine()) || Talents.wizardLine(npc, n => chat(n) || n.nextLine()) || chat(npc);
     Quests.init(); ShopUI.init();
-    Houses.world = this.world; Houses.onLeave = Dungeons.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
+    Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
     Home.callbacks = { inside: () => Houses.inside, refresh: () => Houses.refreshHome(), save: () => this.saves?.save({ quiet: true }) };
     Building.callbacks = { open: entry => BuildingUI.open(entry), preview: active => BuildingUI.showPreview(active), gate: () => Portals.gate?.dir, save: () => this.saves?.save({ quiet: true }) };
     installLevelFeedback();
@@ -167,18 +167,23 @@ export class Game {
     if (ctx.paused) { Building.update(); if (PetMenu.isOpen) PetMenu.update(dt); if (PhotoMode.isOpen) PhotoMode.update(dt); return; }   // pause / pet menu / photo mode: freeze everything (rendering continues)
     if (ctx.hitStop > 0) { ctx.hitStop -= dt; dt *= 0.2; }        // heavy-impact slow motion (fx/combatFx.js hitStop)
     ctx.time += dt;
-    if (ctx.started) { dayClock.update(dt); this.world.mechanics.update(dt); }
+    if (ctx.started) { dayClock.update(dt); if (!ctx.room) this.world.mechanics.update(dt); }
     this.world.syncPhysics();
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
-    for (const c of ctx.critters) c.update(dt);
-    for (const b of ctx.birds) b.update(dt);
-    updatePonds(dt,this.world);
-    for (const n of ctx.npcs) n.update(dt);
-    updateWorldItems(dt);
+    if (!ctx.room) {
+      for (const c of ctx.critters) c.update(dt);
+      for (const b of ctx.birds) b.update(dt);
+      updatePonds(dt,this.world);
+      for (const n of ctx.npcs) n.update(dt);
+      updateWorldItems(dt);
+    }
     updateCombat(dt, this.world, keys);
-    this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
-    BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
-    Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Dungeons.update(dt); Chests.update(dt); Hotbar.update(dt); Journal.update(dt);
+    if (!ctx.room) {
+      this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
+      BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
+      Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt);
+    }
+    Dungeons.update(dt); Hotbar.update(dt); Journal.update(dt);
     Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Stations.update(dt); Bounties.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
     updateKnight(dt);
     MainMenu.update(dt);                                           // showcase camera orbit while a menu is up
@@ -210,6 +215,7 @@ export class Game {
 
   /** Back to a fresh adventure: clears everything the previous character left behind. */
   resetRun() {
+    Dungeons.reset();   // restore the surface before resetting saved systems
     if (this.saves) { this.saves.suspended = true; this.saves.reset(); }
     try {
       const P = ctx.player, world = this.world;

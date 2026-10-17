@@ -1,8 +1,8 @@
 /* CAVES (TODO 29b, config/dungeons.js): entering a planet's cave from its surface mouth, walking its rooms and leaving.
    The layout comes from the planet's seed (world/caveLayout.js), so its room ids never change; the rooms are built
-   far below the planet (world/caves.js) and the hero walks their flat floor (Player.motion = the cave controller)
+   far below the planet (world/caves.js) and the hero uses the shared flat-floor Walker physics
    under the room camera, in the dark (local light: the lanterns and the hero's own light).
-   Like a house for now: no combat inside (ctx.indoors; 29c brings fights in), and the companion waits outside.
+   The room combat frame enables the existing hero kits and pets; surface enemies and pickups wait outside.
    Leave by stepping back onto the mouth (or E there). Fainting inside, travelling, or a new adventure takes the hero out
    at once; a save made inside records the surface mouth, so Continue never starts underground (the indoor pose is 29d).
    The surface mouth's spot is worked out for every planet with a cave, placed last so nothing else moves, but the mouth
@@ -11,30 +11,36 @@ import * as THREE from 'three';
 import { CAVE, CAVES } from '../config/dungeons.js';
 import { PLANETS } from '../config/planets.js';
 import { encounterEvents } from '../combat/events.js';
+import { cancelAim } from '../combat/aiming.js';
+import { clearTargets } from '../combat/targeting.js';
+import { clearHazards } from '../combat/hazards.js';
+import { RoomSpace } from '../physics/RoomSpace.js';
 import { ctx } from '../core/context.js';
-import { held } from '../core/keybinds.js';
+
 import { LocalLights } from '../render/lighting.js';
 import { addTo, disposeTree, G, part } from '../render/meshes.js';
 import { scene } from '../render/scene.js';
 import { addCollider, freeOfColliders, removeCollider } from '../physics/colliders.js';
 import { audio } from '../systems/AudioSystem.js';
 import { setRoomView, snapCamera } from '../systems/CameraSystem.js';
-import { keys } from '../systems/InputSystem.js';
+
 import { setFade } from '../ui/banner.js';
 import { Dialog } from '../ui/Dialog.js';
-import { damp } from '../utils/math.js';
-import { arcDist, matrixAt, offsetDir, projectTangent, tangentToward, turnToward } from '../utils/sphere.js';
-import { generateCave, roomAt, walkable } from '../world/caveLayout.js';
-import { buildCave, CAVE_UP } from '../world/caves.js';
+
+import { arcDist, matrixAt, offsetDir, projectTangent, tangentToward } from '../utils/sphere.js';
+import { generateCave, roomAt } from '../world/caveLayout.js';
+import { buildCave, CAVE_ORIGIN, CAVE_UP } from '../world/caves.js';
+import { Pets } from './Pets.js';
+import { petEffects } from './petAbilities.js';
 import { isFree } from '../world/placement.js';
 import { dryGround, groundHeight, slopeAt } from '../world/terrain.js';
 
-const V3 = THREE.Vector3, BACK = new V3(0, 0, 1), FADE = 0.35, WALK = 3.4, RUN = 5.2, RADIUS = 0.35;
+const V3 = THREE.Vector3, BACK = new V3(0, 0, 1), FADE = 0.35;
 const _tv = new V3(), _fwd = new V3();
 
 export const Dungeons = {
   inside: null,   // { planet, cave, layout, built, x, z, vx, vz, armed, room }
-  fade: null, mouth: null, onLeave: null, world: null, motion: null,
+  fade: null, mouth: null, world: null,
 
   /** The planet's cave (a CAVES entry) or null; and its layout, from the planet's seed (always the same). */
   caveFor(planet = ctx.planet) { return CAVES[PLANETS[planet]?.id] ?? null; },
@@ -85,11 +91,26 @@ export const Dungeons = {
   goInside(planet) {
     const P = ctx.player, cave = this.caveFor(planet), layout = generateCave(cave, PLANETS[planet].seed), built = buildCave(layout, cave.colors);
     const m = layout.mouth;
-    this.inside = { planet, cave, layout, built, x: m.x, z: m.z - 1.2, vx: 0, vz: 0, armed: false, room: layout.entrance };
+    cancelAim(); clearTargets(); clearHazards();
+    for (const p of ctx.projectiles) p.dispose(); ctx.projectiles = [];
+    const surface = { enemies: ctx.enemies, boss: ctx.boss, items: ctx.worldItems, stay: Pets.stayDir, exit: this.mouth?.dir ?? this.world.spawnDir,
+      spotted: petEffects.spotted, scent: petEffects.scent, weatherVisible: this.world.weather.group.visible, visibility: [] };
+    this.world.weather.group.visible = false;   // surface precipitation must not follow the hero into the cave
+    for (const e of [...surface.enemies, ...surface.items]) {
+      for (const mesh of [e.root, e.mesh, e.shadow, e.tele, ...(e.fxMeshes ?? [])].filter(Boolean)) {
+        surface.visibility.push([mesh, mesh.visible]); mesh.visible = false;
+      }
+      if (e.bar) { surface.visibility.push([e.bar.style, e.bar.style.display, true]); e.bar.style.display = 'none'; }
+    }
+    ctx.enemies = []; ctx.boss = null; ctx.worldItems = [];
+    petEffects.spotted = []; petEffects.scent = null;
+    ctx.room = new RoomSpace(layout, CAVE_ORIGIN); ctx.room.surface = surface;
+    this.inside = { planet, cave, layout, built, surface, x: m.x, z: m.z - 1.2, vx: 0, vz: 0, armed: false, room: layout.entrance };
     P.selfCollider.active = false; P.vel.set(0, 0, 0); P.knock.set(0, 0, 0); P.vy = 0; P.grounded = true;
-    P.up.copy(CAVE_UP); P.fwd.set(0, 0, -1); P.motion = this.motion = (p, dt) => this.walk(p, dt); this.placeHero();
+    P.motion = null; P.up.copy(CAVE_UP); P.fwd.set(0, 0, -1);
+    ctx.room.attach(P, built.toWorld(m.x, m.z - 1.2));
     ctx.indoors = cave.name;
-    if (ctx.companion) { ctx.companion.root.visible = false; if (ctx.companion.shadow) ctx.companion.shadow.visible = false; }
+    Pets.spawn();
     setRoomView({ up: CAVE_UP, back: BACK }); LocalLights.setDarkness(CAVE.darkness);
   },
   goOutside() {
@@ -101,7 +122,7 @@ export const Dungeons = {
       _fwd.copy(this.mouth?.fwd ?? P.fwd); projectTangent(_fwd, P.up).normalize(); P.fwd.copy(_fwd);   // step out, away from the mouth
       snapCamera(P.up, _fwd.clone().negate());
     }
-    this.onLeave?.();                                                    // the companion catches up (Game wires this)
+    ctx.companion?.snapToHero();                                        // teardown rebuilt it in the surface frame
   },
   /** Out at once, without a fade: fainting, travel, a new adventure. A fade under way is cancelled (input unlocked). */
   reset() {
@@ -110,37 +131,27 @@ export const Dungeons = {
   },
   /** The cave gone and the hero's own movement back. */
   teardown() {
-    if (this.inside) { this.inside.built.dispose(); this.inside = null; ctx.indoors = null; LocalLights.setDarkness(0); setRoomView(null); }
-    const P = ctx.player; if (P && this.motion && P.motion === this.motion) { P.motion = null; P.motionHs = 0; P.selfCollider.active = true; }   // only our own controller
-    this.motion = null;
-  },
-
-  // ---------------------------------------------------------------- the cave controller (Player.motion)
-  placeHero() { const P = ctx.player, s = this.inside; s.built.toWorld(s.x, s.z, 0, P.pos); P.r = P.pos.length(); },
-  walk(P, dt) {
-    const s = this.inside; if (!s) return false;
-    let f = 0, side = 0;
-    if (!ctx.transitioning && !ctx.inventoryOpen) {
-      if (held('moveForward', keys)) f += 1; if (held('moveBack', keys)) f -= 1;
-      if (held('moveRight', keys)) side += 1; if (held('moveLeft', keys)) side -= 1;
+    if (this.inside) {
+      cancelAim(); clearTargets(); clearHazards();
+      for (const p of ctx.projectiles) p.dispose(); ctx.projectiles = [];
+      for (const e of ctx.enemies) e.dispose();
+      for (const w of ctx.worldItems) w.dispose();
+      const { surface } = this.inside;
+      ctx.enemies = surface.enemies; ctx.boss = surface.boss; ctx.worldItems = surface.items;
+      this.world.weather.group.visible = surface.weatherVisible;
+      for (const [o, value, style] of surface.visibility) { if (style) o.display = value; else o.visible = value; }
+      Pets.stayDir = surface.stay; petEffects.spotted = surface.spotted; petEffects.scent = surface.scent;
+      const P = ctx.player;
+      ctx.room.detach(P); P.motion = null; P.motionHs = 0; P.leapK = 0; P.dashT = 0; P.vy = 0;
+      P.selfCollider.active = true; P.placeAt(this.mouth?.dir ?? this.world.spawnDir); P.grounded = true;
+      this.inside.built.dispose(); this.inside = null; ctx.room = null; ctx.indoors = null;
+      LocalLights.setDarkness(0); setRoomView(null);
+      Pets.spawn(); if (Pets.mode === 'stay' && surface.stay) Pets.stayDir = surface.stay;
     }
-    const len = Math.hypot(f, side) || 1, speed = held('sprint', keys) ? RUN : WALK, k = damp(12, dt);
-    s.vx += (side / len * speed - s.vx) * k; s.vz += (-f / len * speed - s.vz) * k;
-    const nx = s.x + s.vx * dt, nz = s.z + s.vz * dt, rects = s.built.rects;
-    if (walkable(rects, nx, nz, RADIUS)) { s.x = nx; s.z = nz; }        // walls: slide along whichever axis is free
-    else if (walkable(rects, nx, s.z, RADIUS)) { s.x = nx; s.vz = 0; }
-    else if (walkable(rects, s.x, nz, RADIUS)) { s.z = nz; s.vx = 0; }
-    else { s.vx = s.vz = 0; }
-    s.room = roomAt(s.layout, s.x, s.z) ?? s.room;
-    this.placeHero();
-    const v = Math.hypot(s.vx, s.vz); P.vel.set(s.vx, 0, s.vz); P.motionHs = v; P.up.copy(CAVE_UP);
-    if (v > 0.3) turnToward(P.fwd, _tv.set(s.vx / v, 0, s.vz / v), CAVE_UP, damp(12, dt));
-    const toMouth = Math.hypot(s.x - s.layout.mouth.x, s.z - s.layout.mouth.z);   // step back onto the mouth to leave
-    if (toMouth > 2.2) s.armed = true;
-    else if (s.armed && toMouth < 0.7 && s.vz > 0.5) this.leave();
-    return true;
   },
 
+  // ---------------------------------------------------------------- room placement (fixtures and future saved poses)
+  placeHero() { const s = this.inside; ctx.room.place(ctx.player, s.built.toWorld(s.x, s.z)); },
   // ---------------------------------------------------------------- what E does
   target() {
     if (this.fade || !ctx.started || Dialog.open) return null;
@@ -155,6 +166,14 @@ export const Dungeons = {
   },
 
   update(dt) {
+    if (this.inside) {
+      const s = this.inside, P = ctx.player;
+      s.x = P.pos.x - CAVE_ORIGIN.x; s.z = P.pos.z - CAVE_ORIGIN.z;
+      s.vx = P.vel.x; s.vz = P.vel.z; s.room = roomAt(s.layout, s.x, s.z) ?? s.room;
+      const d = Math.hypot(s.x - s.layout.mouth.x, s.z - s.layout.mouth.z);
+      if (d > 2.2) s.armed = true;
+      else if (s.armed && d < 0.7 && s.vz > 0.5 && P.grounded) this.leave();
+    }
     if (!this.fade) return;
     if ((this.fade.t -= dt) <= 0) {
       if (this.fade.phase === 'out') { this.fade.then?.(); this.fade.phase = 'in'; this.fade.t = FADE; setFade(false, FADE); }

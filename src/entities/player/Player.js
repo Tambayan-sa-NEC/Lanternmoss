@@ -10,6 +10,7 @@ import { NEEDS } from '../../config/survival.js';
 import { hotbarFirst, Inventory } from '../../inventory/Inventory.js';
 import { held } from '../../core/keybinds.js';
 import { ctx } from '../../core/context.js';
+import { altitude } from '../../combat/space.js';
 import { itemRegistry } from '../../items/ItemRegistry.js';
 import { HERO_BUILDERS } from '../../models/heroes.js';
 import { addDyn, supportHeight } from '../../physics/colliders.js';
@@ -19,7 +20,7 @@ import { scene } from '../../render/scene.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { projectTangent, tangentFrame, turnToward } from '../../utils/sphere.js';
 import { damp } from '../../utils/math.js';
-import { groundHeight } from '../../world/terrain.js';
+
 import { animateHero, HERO_POSES } from './poses.js';
 import { rng } from '../../utils/random.js';
 
@@ -94,7 +95,7 @@ export class Player extends Walker {
     if (this.motion) {
       if (this.dead || !this.motion(this, dt)) this.motion = null;
       const hs = this.motionHs || 0; animateHero(this, dt, hs); HERO_POSES[this.charId]?.(this, dt, hs);   // indoors walking animates too
-      this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
+      this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, altitude(this), this);
       return;
     }
     let f = 0, s = 0;
@@ -140,6 +141,6 @@ export class Player extends Walker {
       this.trail = 0.07; sparkles.emit(this.pos, { count: 1, color: buffs.feather > 0 ? 0xb8ffe0 : 0xfff0e0, speed: 0.6, up: this.up, upBias: 0.5, life: 0.5, size: 0.28 });
     }
     animateHero(this, dt, hs); HERO_POSES[this.charId]?.(this, dt, hs);
-    this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, this.r - groundHeight(this.up));
+    this.place(this.root); updateShadow(this.shadow, this.up, this.fwd, altitude(this), this);
   }
 }

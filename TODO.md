@@ -1323,7 +1323,7 @@ precedence over the old six-cave estimate. Expansion cave configs follow their w
 | --- | --- | --- | --- |
 | [x] **29a. Shared local-light rendering** | 19, 20, 26b | 3-4.5 h | Implement hero/lantern shader light radii, emissive glow/bloom and readable minimum ambient/ink outlines in a small harness. Bound real point lights to about four across all active sources, including building lamps. Check lowest-preset readability, material caches, disposal and measured rendering cost. This is the only cave prerequisite for 30a. |
 | [x] **29b. Seeded cave layout and traversal** | 29a, 26a | 3-4.5 h | Add the reusable room kit, seeded connections, surface entrance, flat-floor collisions/camera, entry/exit and safe death return. Prove deterministic room ids and no stranded player; keep the unfinished dungeon outside normal travel. |
-| [ ] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
+| [x] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
 | [ ] **29d. Cave rewards and persistence** | 29c | 2-4 h | Register room/chest/ore/enemy progress, saved indoor pose and death/revisit/Continue behavior. Prove old-save defaults, portal isolation, unique cave ore and no reward duplication after reload or regeneration. |
 | [ ] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
 | [ ] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
@@ -1347,6 +1347,16 @@ on fainting, travel, a new adventure and saves (`src/gameplay/Dungeons.js`). Eac
 surface mouth spot placed last, but the caves stay unreleased: no mouth shows and there is no combat inside yet.
 Checked by `tests/caveLayout.test.mjs`, `tests/sim/caves.sim.mjs` and `scripts/caves-smoke.mjs`. See
 [caves](docs/wiki/world/caves.md).
+
+**29c implemented (2026-10-17):** `physics/RoomSpace.js` and `combat/space.js` provide floor physics, wall/body sweeps,
+room routes and coordinates for the existing hero kits, aiming, projectiles, hazards, pets, decals and shadows.
+Goblin melee, wisp shots and slime contact work in a test encounter; houses stay peaceful. Cave entry freezes surface
+enemies/pickups; exit/fainting/travel restores them and removes cave attacks and lights, including a lethal callback
+during an update. `tests/roomSpace.test.mjs` checks geometry; `tests/sim/caveCombat.sim.mjs` exercises all three kits
+and both pet bodies on seeds 1/7. `scripts/cave-combat-smoke.mjs` checks real mouse/key casts, aiming, movement,
+health bars, camera, overflow and E exit at 720p/1080p with zero page/shader errors. Caves stay unreleased and
+encounters use test fixtures. Rewards, saved room progress and indoor Continue remain 29d; chosen cave rosters
+and guardian behavior need later-stage audits. See [cave combat](docs/wiki/world/caves.md#combat-frame-and-surface-isolation-29c).
 
 - [ ] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
       that are found nowhere else.

@@ -22,6 +22,17 @@ dialogue through `Dialog.lineProvider` instead of the dialogue importing them. L
 **Shared state** lives in `core/context.js` (`ctx.player`, `ctx.enemies`, `ctx.time`...), filled in by `Game`. That
 is the one place to look for "what is alive right now", instead of dozens of loose globals.
 
+**Cave combat (29c, unreleased):** `ctx.room` is a transient `RoomSpace`. Cave actors keep actual world positions
+and a fixed up; `combat/space.js` supplies floor points, distance, headings, altitude and visibility while the
+surface continues to use spherical geometry. `Walker.step` dispatches to the attached frame, so the same player,
+enemy and walking-pet controllers run in either place. Projectiles, hazards, aiming and decals use the same frame.
+`ctx.indoors` still names both houses and caves; only houses are peaceful (`indoors && !room`).
+
+`Dungeons` keeps the surface enemies, boss, pickups and visibility while the room owns the active combat arrays.
+It freezes surface encounter updates, clears attacks at both boundaries and restores the same surface objects
+before world-save hooks or disposal. Combat loops tolerate a lethal hit tearing down their room mid-callback.
+Cave persistence and rewards remain 29d; see [cave contracts and checks](../world/caves.md).
+
 **Build a shelter:** craft Timber Floors, walls, open doorways, window panels and Shingled Roofs. Connected tiles
 share a foundation grid; opposite walls support roofs, and furniture/storage/stations can sit on the floors.
 Walk through the doorway to see roof and near-wall cutaways. Floor support, roof ceilings and safe dismantling

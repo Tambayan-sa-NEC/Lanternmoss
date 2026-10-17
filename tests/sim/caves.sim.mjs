@@ -43,8 +43,8 @@ assert.ok(s && ctx.indoors === CAVES.lanternmoss.name, 'inside the cave');
 assert.deepEqual(s.layout.rooms.map(r => r.id), layout.rooms.map(r => r.id), 'same room ids');
 assert.equal(H.LocalLights.darkness, CAVE.darkness); assert.ok(H.LocalLights.count > lightsBefore + layout.rooms.length, 'lanterns light it');
 assert.equal(s.room, layout.entrance);
-P.mana = P.stats.maxMana; const shots = ctx.projectiles.length; H.tryCast('bolt'); step(0.1);
-assert.equal(ctx.projectiles.length, shots, 'no fighting inside yet (29c)');
+P.mana = P.stats.maxMana; const mana = P.mana; H.tryCast('bolt'); step(0.1);
+assert.ok(P.mana < mana, '29c: fighting is enabled in caves');
 pass(`entering builds ${layout.rooms.length} rooms (${layout.rooms.map(r => r.kind[0]).join('')}), dark (darkness ${H.LocalLights.darkness}) and lit by its lanterns`);
 
 // ---- every room, with real movement keys --------------------------------------------------------------------------------

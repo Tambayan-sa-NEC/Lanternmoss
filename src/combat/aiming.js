@@ -5,11 +5,12 @@
    nearest spot the hero can stand on; when there is none the marker turns red and the cast is refused.
    Cooldown and cost are only paid when the cast is confirmed (src/combat/casting.js). */
 import { ctx } from '../core/context.js';
+import { pointOf, distance, advance, toward, visible } from './space.js';
 import { emit } from '../core/events.js';
 import { GroundDecal } from '../fx/groundDecals.js';
 import { dom } from '../ui/dom.js';
 import { clamp } from '../utils/math.js';
-import { arcDist, dirAlong, tangentToward } from '../utils/sphere.js';
+
 import { clampRange, nearestLandable } from './area.js';
 import { aimDirection, targeting } from './targeting.js';
 
@@ -47,8 +48,8 @@ export function cancelAim() { aim.id = aim.s = aim.target = null; aim.valid = fa
     ahead of the hero at the chosen reach. */
 function rawTarget(s) {
   const P = ctx.player, t = targeting.aim;
-  if (t && t.alive && arcDist(P.up, t.up) <= s.range) return t.up.clone();
-  return dirAlong(P.up, aimDirection(), s.range * aim.reach);
+  if (t && t.alive && distance(pointOf(P), pointOf(t)) <= s.range) return pointOf(t).clone();
+  return advance(pointOf(P), aimDirection(), s.range * aim.reach);
 }
 
 /** Per-frame: follows the cursor and redraws the marker. Drops the aim if the hero can no longer cast. */
@@ -56,22 +57,22 @@ export function updateAiming() {
   if (!aim.id) return;
   const P = ctx.player, s = aim.s;
   if (P.dead || ctx.transitioning || ctx.inventoryOpen || !ctx.started || P.motion) { cancelAim(); return; }
-  let t = clampRange(P.up, rawTarget(s), s.range);
-  if (s.landing) { const snap = nearestLandable(P.up, t, P.radius + 0.15); aim.valid = !!snap; if (snap) t = snap; }
-  else aim.valid = true;
+  let t = clampRange(pointOf(P), rawTarget(s), s.range);
+  if (s.landing) { const snap = nearestLandable(pointOf(P), t, P.radius + 0.15); aim.valid = !!snap && visible(pointOf(P), snap, P.radius); if (snap) t = snap; }
+  else aim.valid = !ctx.room || ctx.room.contains(t) && visible(pointOf(P), t);
   aim.target = t;
   const m = ensureMarks(), color = aim.valid ? s.color : BAD, pulse = 0.5 + 0.5 * Math.sin(ctx.time * 7);
   m.fill.setColor(color, 0.6); m.edge.setColor(color, 1.8); m.dot.setColor(color, 1.6); m.range.setColor(aim.valid ? 0xffffff : BAD, 0.5);
   m.fill.place(t, null, s.radius).opacity = 0.16 + 0.06 * pulse;
   m.edge.place(t, null, s.radius).opacity = 0.75 + 0.25 * pulse;
   m.dot.place(t, null, 0.35).opacity = 0.9;
-  m.range.place(P.up, null, s.range).opacity = 0.18;
-  if (s.landing) { const len = arcDist(P.up, t); if (len > 0.5) { m.path.setColor(color, 0.7); m.path.place(P.up, tangentToward(P.up, t), 0.3, len).opacity = 0.35; } else m.path.hide(); }
+  m.range.place(pointOf(P), null, s.range).opacity = 0.18;
+  if (s.landing) { const len = distance(pointOf(P), t); if (len > 0.5) { m.path.setColor(color, 0.7); m.path.place(pointOf(P), toward(pointOf(P), t), 0.3, len).opacity = 0.35; } else m.path.hide(); }
 }
 
 /** The surface direction to cast at and the heading toward it (written to `dir`), or null when the spot is invalid. */
 export function aimedTarget(dir) {
   if (!aim.target || !aim.valid) return null;
-  const P = ctx.player; dir.copy(tangentToward(P.up, aim.target));
+  const P = ctx.player; dir.copy(toward(pointOf(P), aim.target));
   return aim.target.clone();
 }

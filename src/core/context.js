@@ -8,7 +8,8 @@ export const ctx = {
   transitioning: false,  // true while fading between planets (input is locked)
   paused: false,      // the pause menu is open: the simulation is frozen (src/ui/PauseMenu.js)
   cutscene: false,    // a boss is waking (src/gameplay/BossGate.js): the hero can't act, the camera is on the lair
-  indoors: null,      // name of the house the hero is inside (src/gameplay/Houses.js), or null
+  indoors: null,      // name of the house or cave the hero is inside, or null
+  room: null,         // transient flat combat frame in a cave (RoomSpace); houses have none
   inventoryOpen: false,  // the bag is open: abilities and talking are paused, movement still works
   building: false,    // a placement preview owns combat input; transient, never saved
   showcase: false,    // a menu holds the camera on the hero or pet (CameraSystem.setShowcase): critters keep out of the shot

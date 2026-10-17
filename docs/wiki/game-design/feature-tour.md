@@ -243,3 +243,10 @@ and frame included and the toolbar left out. `H` hides the toolbar to look at th
 
 **Your keys.** The HUD keeps the hotbar and vitals at the bottom centre, skills on the lower right and your pet on the
 lower left. Every action can be remapped in Settings → Keys, and every key hint in the game follows your bindings.
+
+**Cave combat (in development, unreleased).** The three heroes and their pets can fight on a cave's flat floor with
+their usual controls, aimed ultimates and abilities. Walls stop movement and attacks; leaving returns to the surface
+encounter. This is a test fixture preview: cave entrances, normal encounters, rewards and puzzles are not released.
+See [the cave stages](../world/caves.md).
+
+![Warrior and wolf meeting a goblin and wisp under cave lanterns](../../screenshots/world/cave-combat.jpg)
