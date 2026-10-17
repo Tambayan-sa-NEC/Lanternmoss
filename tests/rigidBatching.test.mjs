@@ -4,10 +4,38 @@ import * as THREE from 'three';
 
 globalThis.window = { devicePixelRatio: 1 };
 globalThis.innerWidth = 1280; globalThis.innerHeight = 720;
-const { batchRigidParts } = await import('../src/render/staticParts.js');
+const { batchRigidParts, freezeStaticTransforms } = await import('../src/render/staticParts.js');
 const { part, G, addTo } = await import('../src/render/meshes.js');
 const { outlineMat } = await import('../src/render/materials.js');
 const { ActorRenderGroup } = await import('../src/render/actorCulling.js');
+
+test('immutable branches skip clean descendant walks but follow moving parents and explicit queries', () => {
+  const parent = new THREE.Group(), root = new THREE.Group(), child = new THREE.Group();
+  parent.add(root); root.add(child); child.position.set(2, 3, 4);
+  freezeStaticTransforms(root); parent.updateMatrix(); parent.matrixAutoUpdate = false;
+  let walks = 0; const original = child.updateMatrixWorld;
+  child.updateMatrixWorld = function(force) { walks++; return original.call(this, force); };
+  parent.updateMatrixWorld(); assert.equal(walks, 1);
+  const initial = child.matrixWorld.clone();
+  for (let i = 0; i < 20; i++) parent.updateMatrixWorld();
+  assert.equal(walks, 1); assert.deepEqual(child.matrixWorld, initial);
+  parent.position.x = 10; parent.updateMatrix(); parent.updateMatrixWorld();
+  assert.equal(walks, 2); assert.deepEqual(child.getWorldPosition(new THREE.Vector3()).toArray(), [12, 3, 4]);
+  parent.position.x = 20; parent.updateMatrix();
+  assert.deepEqual(child.getWorldPosition(new THREE.Vector3()).toArray(), [22, 3, 4]);
+  // Reapplying the helper must not wrap its own shortcut recursively.
+  freezeStaticTransforms(root); parent.updateMatrixWorld(true); assert.equal(walks, 3);
+});
+
+test('a root-only world query cannot leave immutable descendants stale', () => {
+  const parent = new THREE.Group(), root = new THREE.Group(), child = new THREE.Group();
+  parent.add(root); root.add(child); root.position.x = 3; child.position.x = 2;
+  parent.updateMatrix(); parent.matrixAutoUpdate = false; freezeStaticTransforms(root);
+  root.getWorldPosition(new THREE.Vector3()); // A root-only query does not walk descendants.
+  parent.updateMatrixWorld(); assert.equal(child.matrixWorld.elements[12], 5);
+  parent.position.x = 10; parent.updateMatrix(); root.getWorldPosition(new THREE.Vector3());
+  parent.updateMatrixWorld(); assert.equal(child.matrixWorld.elements[12], 15);
+});
 
 test('culled render branches skip matrix work and restore the current animated pose on return', () => {
   const root = new THREE.Group(), gate = new ActorRenderGroup(), joint = new THREE.Group(), tip = new THREE.Group();

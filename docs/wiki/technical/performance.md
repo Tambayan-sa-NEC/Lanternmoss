@@ -158,6 +158,12 @@ simulation asserts reduced model submissions and connected animation references.
 The origin scene, baked terrain/scenery/grass and new rigid decoration retain their local matrices instead of
 recomposing them every frame. Dynamic parents still propagate their world transforms; animated roots/pivots remain
 live. This follows a CPU profile whose largest sampled JavaScript cost was matrix updates.
+An immutable branch also skips descendant matrix walks when its own world matrix and its parent's transform are
+unchanged. `freezeStaticTransforms` is for complete branches with fixed local transforms and child lists; do not
+attach animated descendants afterward. A forced parent update still refreshes the branch, and explicit world
+queries keep Three's normal behavior. The unit regression checks clean-walk skipping, moving parents and queries;
+the performance simulation checks real scenery/grass on every released planet. The static-transform browser
+check compares matrices and canvas pixels with a forced full traversal after keyboard movement at both resolutions.
 
 Prompt and status-chip HTML is replaced only when its contents change, following the existing tutorial/pet HUD
 cache pattern. Positioning and the chip polling cadence remain live. Edge markers use the numeric `--ui` value

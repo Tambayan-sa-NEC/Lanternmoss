@@ -13,6 +13,17 @@ const { scene } = await imp('render/scene.js'); assert.equal(scene.matrixAutoUpd
 for (const id of ['lanternmoss', 'emberfall', 'frostveil']) {
   resetSettings(); H.goToPlanet(id);
   for (const group of [game.world.scenery,...game.world.grass]) group.traverse(node => assert.equal(node.matrixAutoUpdate,false));
+  for (const group of [game.world.scenery,...game.world.grass]) {
+    group.updateMatrixWorld(true);
+    const child = group.children[0]; if (!child) continue;
+    let walks = 0; const original = child.updateMatrixWorld;
+    child.updateMatrixWorld = function(force) { walks++; return original.call(this, force); };
+    try {
+      for (let i = 0; i < 20; i++) group.updateMatrixWorld();
+      assert.equal(walks, 0, `${id}: immutable world branch still walks clean descendants`);
+      group.updateMatrixWorld(true); assert.equal(walks, 1);
+    } finally { child.updateMatrixWorld = original; }
+  }
   const layout = JSON.stringify({ nodes: H.Gathering.toJSON(), spots: game.world.spots,
     colliders: H.colliders.map(c => [c.dir?.toArray(), c.r]), lair: game.world.lairDir.toArray() });
   const grass = renderedGrass(), bounds = game.world.grass.flatMap(g => g.children.map(m => m.boundingSphere.clone()));

@@ -220,7 +220,15 @@ default visible-browser profile, with runtime source provenance recorded in the 
 iteration after the first rigid batches and before companion/culling refinements; it is not the final reference result.
 `tests/rigidBatching.test.mjs` verifies rigid-model geometry/colour conservation, independent pivots/effects and
 culled-branch matrix skipping/current-pose restoration;
+it also checks immutable subtree traversal, moving parents and explicit world queries.
 `tests/sim/performance.sim.mjs` also covers the optimized hero, coastal roster and chest rigs.
+
+`scripts/static-transforms-smoke.mjs` compares world matrices and raw canvas pixels after forcing visible immutable
+branches on all four worlds at 720p/1080p after keyboard movement. Diagnostic captures go to the system temp folder.
+`docs/tidewhisper-live-profile-20261017.json` summarizes the live Ranger/7 squall CPU profile;
+`docs/tidewhisper-static-comparison-20261017.json` preserves the separate 24-row immutable traversal ABBA comparison
+with source hashes, exact pose/draw assertions and changing host-load limitations.
+`docs/tidewhisper-step-3-regressions-20261017.json` records the affected checks after that change.
 
 `docs/tidewhisper-matrix-comparison-20261017.json` retains the 24-row ABBA render-only comparison, exact pose/draw
 checks and all 8640 sampled frames. `docs/tidewhisper-frame-trace-{before,after}-20261017.json` retain separate

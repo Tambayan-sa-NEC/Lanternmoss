@@ -325,3 +325,42 @@ No target, density, preset, release flag or runtime source was changed. Step 3 r
 scenes (starting with Ranger/7 squall), distinguish update/render/browser stalls, make evidence-backed fixes and
 rerun affected regressions plus clean normal acceptance. Step 4 enablement and step 5 tour/docs/integration wait
 for a full pass. The test run is finished; the acceptance milestone is not complete.
+
+### Step 3 continuation: immutable traversal and collector cleanup
+
+The [live Ranger/7 squall profile](../../tidewhisper-live-profile-20261017.json) samples scene projection,
+world-matrix work and draw submission among the remaining costs. Global blob-shadow instancing was rejected:
+water shares its transparent render order, so combining shadows could change coastal blending.
+
+The existing immutable-branch helper now skips clean descendant matrix walks. Moving parents still force fresh
+world matrices; animation pivots and explicit world queries keep their previous behavior. Local transforms and
+child lists must stay immutable below this helper. Unit coverage demonstrates the original 21 descendant walks
+becoming one, and checks moving parents, repeated freezing and world queries. Simulation coverage checks real
+scenery/grass on the three released planets.
+
+The [24-row render-only comparison](../../tidewhisper-static-comparison-20261017.json) preserves exact poses and
+per-frame draw sequences for both seeds/all heroes. Pooled p95 before/after milliseconds:
+
+| Hero / seed | Before | After |
+| --- | ---: | ---: |
+| Witch / 1 | 12.7 | 13.6 |
+| Knight / 1 | 11.5 | 13.3 |
+| Ranger / 1 | 13.8 | 14.7 |
+| Witch / 7 | 14.3 | 14.2 |
+| Knight / 7 | 11.7 | 11.5 |
+| Ranger / 7 | 11.1 | 12.0 |
+
+Timing is mixed, and the owner closed unused apps during the comparison; no overall frame-rate gain is claimed.
+The result supports pose/draw preservation and the unit checks prove the removed work. These paused diagnostic
+rows cannot certify release performance.
+
+The collector explicitly disposes and loses each previous WebGL context before reloading, outside setup/warmup
+and all measured frames, and records memory before each row. This avoids relying on browser garbage collection
+for discarded GPU allocations. Memory variation alone does not establish that retained contexts caused failures.
+The target, actual GPU/profile checks, ordinary live simulation and all timing/count rules remain unchanged.
+
+The [affected regression record](../../tidewhisper-step-3-regressions-20261017.json) is separate from the earlier
+complete step 2 suites. The new browser check uses keyboard movement and compares matrices/raw canvas pixels
+before and after forcing visible immutable branches on all four planets at 720p/1080p. Dormant objects are
+excluded from forcing because the baseline intentionally leaves some poses stale. Raw canvas capture excludes
+animated DOM overlays. Integration still requires the complete suites on the synchronized final candidate.

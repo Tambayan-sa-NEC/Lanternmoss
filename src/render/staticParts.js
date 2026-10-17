@@ -2,9 +2,17 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { glowVC, outlineMat, toonVC } from './materials.js';
 
-/** Only for geometry-baked decoration whose local transforms never animate; moving parents still update its world matrix. */
+const frozenUpdates = new WeakMap();
+function updateFrozenWorld(force) {
+  // Every descendant has an immutable local matrix. A clean branch under an unchanged parent is already current.
+  if (force || this.matrixWorldNeedsUpdate) frozenUpdates.get(this).call(this, force);
+}
+/** Only for complete geometry-baked branches whose local transforms and child list never animate. Moving parents
+    still force fresh world matrices; explicit updateWorldMatrix queries retain Three's normal behavior. */
 export function freezeStaticTransforms(root) {
-  root.traverse(node => { node.updateMatrix(); node.matrixAutoUpdate = false; }); return root;
+  root.traverse(node => { node.updateMatrix(); node.matrixAutoUpdate = false; });
+  if (!frozenUpdates.has(root)) { frozenUpdates.set(root, root.updateMatrixWorld); root.updateMatrixWorld = updateFrozenWorld; }
+  return root;
 }
 
 /** Merge static part() models, baking colour and local transforms. Keep independently hidden fruit separate. */

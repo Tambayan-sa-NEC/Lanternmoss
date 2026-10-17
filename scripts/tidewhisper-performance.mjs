@@ -83,7 +83,16 @@ try {
   for (const seed of PERFORMANCE_REFERENCE.seeds) for (const hero of PERFORMANCE_REFERENCE.heroes) {
     for (const [scene, phase, weather] of [['village', .4, 'clear'], ['night', .88, 'clear'], ['weather', .4, 'squall']]) {
       // A new adventure per row prevents prior heroes, visits and elapsed actor motion from changing later fixtures.
-      await page.evaluate(() => localStorage.clear());
+      // Release the previous adventure's GPU allocations before discarding its document. A reload alone leaves
+      // context destruction to browser GC. Cleanup is outside all setup/warmup/timing samples, including row one.
+      await page.evaluate(() => {
+        localStorage.clear();
+        const renderer = window.__tideRenderer;
+        renderer?.dispose();
+        const gl = renderer?.getContext() ?? document.querySelector('canvas')?.getContext('webgl2');
+        gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      });
+      const freeMemoryBeforeRowBytes = freemem();
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.LANTERNMOSS);
       await page.evaluate(installProbe, gpuTiming);
@@ -120,14 +129,15 @@ try {
       assert.deepEqual(measurement.drawingBuffer, [viewport.width,viewport.height]);
       assert.equal(measurement.heroId, hero); assert.equal(measurement.started, true);
       assert.equal(measurement.paused, false); assert.equal(measurement.hidden, false); assert.equal(measurement.samples, 120);
-      const row = { seed, hero, scene, phase, weather, ...measurement }; rows.push(row); console.log(JSON.stringify(row));
+      const row = { seed, hero, scene, phase, weather, freeMemoryBeforeRowBytes, ...measurement }; rows.push(row); console.log(JSON.stringify(row));
     }
     }
     assert.deepEqual(errors, []);
     assert.equal(rows.length, 18);
     assert.equal(new Set(rows.map(r => `${r.seed}/${r.hero}/${r.scene}`)).size, 18);
     const gpu = rows[0].gpu;
-    const report = { measuredAt: new Date().toISOString(), candidateCommit, dirty, gpuTiming, device: gpu,
+    const report = { measuredAt: new Date().toISOString(), candidateCommit, dirty, gpuTiming,
+      rowCleanup: 'dispose and lose previous WebGL context before reload, outside measured frames', device: gpu,
       target: `${PERFORMANCE_REFERENCE.machine} / ${PERFORMANCE_REFERENCE.renderer}`, host, gpuDevices: gpuInfo?.devices ?? [],
       browser: { ...device, headless: !headed }, quality, viewport: [viewport.width,viewport.height], candidate: true,
       profile: 'fresh reload and empty test storage per row; play stream seeded before hero/travel setup; stationary invulnerable hero at village spawn, passive default pet, authored generation seed; fixed day/tide phase; 120 explicit setup updates, 30 warmup and 120 real render intervals per row; empty-clock page measured with game tab frozen',

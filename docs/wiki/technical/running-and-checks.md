@@ -1,5 +1,10 @@
 # Running, checks and screenshots
 
+`node scripts/static-transforms-smoke.mjs` checks immutable branch traversal in Edge on port 8141. It uses real
+movement input and explicit simulation frames, compares world matrices and raw canvas pixels after forcing all
+visible immutable branches on all four worlds at 720p/1080p, checks overflow and page/shader errors, and saves diagnostic
+captures to the system temp folder. Tidewhisper is installed through the test-only candidate fixture.
+
 ES modules can't be loaded from `file://`, so the game needs a local web server:
 
 ```sh
