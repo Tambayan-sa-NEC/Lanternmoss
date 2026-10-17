@@ -155,6 +155,10 @@ The origin scene, baked terrain/scenery/grass and new rigid decoration retain th
 recomposing them every frame. Dynamic parents still propagate their world transforms; animated roots/pivots remain
 live. This follows a CPU profile whose largest sampled JavaScript cost was matrix updates.
 
+Prompt and status-chip HTML is replaced only when its contents change, following the existing tutorial/pet HUD
+cache pattern. Positioning and the chip polling cadence remain live. Edge markers use the numeric `--ui` value
+last applied by HUD settings/resize instead of reading computed styles between marker writes.
+
 Generation consumes the same seeded world stream at every density. Resource IDs, placement and collider counts stay
 fixed. Sparkle emission consumes the original random draws even for omitted particles, preserving combat and loot
 randomness. Simulation checks exercise all planets, regrowth, density restoration, particle randomness and actor

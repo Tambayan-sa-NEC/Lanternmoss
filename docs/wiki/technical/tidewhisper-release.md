@@ -209,3 +209,43 @@ The preceding CPU-instrumented probe measured 77.56 FPS, p95 21.3 ms and CPU p95
 actor motion differ, so this is diagnostic evidence rather than a controlled optimization comparison.
 The hidden-branch change has all 243 unit tests and the performance simulation passing; a complete simulation rerun,
 browser/tour review and a clean full-matrix repeat remain pending. Keep it on the stage branch with no release artifact.
+
+### Step 1: controlled render comparison
+
+[Raw ABBA comparison](../../tidewhisper-matrix-comparison-20261017.json): `actorCulling.js` from `2e669a9`
+versus `253f859`, visible Edge on the RTX 4050, 1080p High, both seeds and every hero. Each profile ran before,
+after, after, before: 120 setup updates, then a fixed simulation pose for 120 warmup and 360 sampled real render
+intervals. Every row asserts identical setup positions and the exact call/triangle sequence against its control.
+All 24 rows / 8640 samples pass those controls and have zero page/shader errors. Values pool 720 frames per variant/profile.
+
+| Hero / seed | Before p95 interval | After p95 interval | Before render CPU p95 | After render CPU p95 |
+| --- | ---: | ---: | ---: | ---: |
+| Witch / 1 | 12.7 ms | 16.3 ms | 9.7 ms | 11.4 ms |
+| Knight / 1 | 13.4 ms | 12.2 ms | 10.8 ms | 9.4 ms |
+| Ranger / 1 | 11.7 ms | 10.7 ms | 9.0 ms | 8.0 ms |
+| Witch / 7 | 11.6 ms | 10.6 ms | 8.7 ms | 7.8 ms |
+| Knight / 7 | 11.8 ms | 12.1 ms | 9.1 ms | 9.3 ms |
+| Ranger / 7 | 10.7 ms | 9.4 ms | 8.7 ms | 7.3 ms |
+
+Four profiles improve, two worsen. Repeat ranges and host load vary, including a clear Witch/1 slowdown, so these
+results do not support a universal timing gain or a claim that frame pacing is solved. Retain the tested matrix skip
+for the next full regression/reference run, with that uncertainty explicit. Fixed poses isolate rendering and exclude
+active gameplay cost: none of these rows certifies release performance.
+
+Earlier dynamic diagnostic attempts failed exact pose/draw equivalence and were discarded. Resetting the startup
+clock fixed initial poses, but wall-clock audio callbacks consume the play RNG and actor motion still varied.
+Even a test-only independent audio stream did not make every draw sequence identical. The final fixed-pose
+comparison leaves production audio intact. No diagnostic alters the authored release flag.
+
+Separate live knight/squall traces ([before](../../tidewhisper-frame-trace-before-20261017.json),
+[after](../../tidewhisper-frame-trace-after-20261017.json)) motivated a UI cleanup: prompt/chip HTML is cached,
+and edge markers use the applied numeric UI scale rather than computed-style reads among DOM writes.
+The new regression sim fails against the old implementation (21 prompt replacements instead of one) and passes
+with the fix. Timeline HTML parses fall from 1022 to zero. Layout counts remain approximately one per frame
+(480 before, 483 after), and the instrumented after trace is slower overall (p95 18.4 versus 14.5 ms).
+These live traces have differing motion/load and tracing overhead; no FPS gain is attributed to the UI cleanup.
+
+Targeted UI simulation and the new Edge smoke cover unchanged DOM, live coins/key changes, hide/return, HUD scale,
+real rebound keyboard interaction and bounds at 720p/1080p, with zero page/shader errors. The remaining sequence is:
+full regressions; clean ordinary 18-case acceptance; destination enablement and production saves/travel/completion;
+then tour/docs and stage/parent integration. Tidewhisper stays unreleased until the complete gate passes.

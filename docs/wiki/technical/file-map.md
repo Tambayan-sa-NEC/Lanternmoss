@@ -221,3 +221,8 @@ iteration after the first rigid batches and before companion/culling refinements
 `tests/rigidBatching.test.mjs` verifies rigid-model geometry/colour conservation, independent pivots/effects and
 culled-branch matrix skipping/current-pose restoration;
 `tests/sim/performance.sim.mjs` also covers the optimized hero, coastal roster and chest rigs.
+
+`docs/tidewhisper-matrix-comparison-20261017.json` retains the 24-row ABBA render-only comparison, exact pose/draw
+checks and all 8640 sampled frames. `docs/tidewhisper-frame-trace-{before,after}-20261017.json` retain separate
+instrumented live-scene timeline summaries; these are diagnostics, not release evidence.
+`tests/sim/hudUpdates.sim.mjs` and `scripts/hud-performance-smoke.mjs` cover DOM preservation and live UI scaling.

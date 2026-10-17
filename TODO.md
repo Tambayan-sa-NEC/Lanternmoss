@@ -1149,6 +1149,13 @@ at 1920x1080 High rather than its earlier 720p Low diagnostic profile. The 60 FP
 230,000-triangle ceilings are retained. First RTX 4050 matrix still fails timing/count acceptance; optimization
 and final clean-candidate validation are in progress. No destination release flag has changed.
 
+**27h step 1 diagnostic (2026-10-17):** completed a 24-row ABBA comparison of the hidden-actor matrix skip,
+all heroes/seeds 1/7, with identical fixed poses and per-frame draw counts. Four profiles improve p95, two worsen;
+this is render-only evidence, not a whole-game acceptance pass. Removed unchanged prompt/chip HTML rewrites and
+computed-style reads in the edge-marker loop. The new UI simulation and 720p/1080p browser check cover these
+changes; full regression suites, clean normal 18-case performance acceptance and release work remain pending.
+See [the comparison and trace findings](docs/wiki/technical/tidewhisper-release.md#step-1-controlled-render-comparison).
+
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
 1.5 m adventure-calendar cycle, low in the afternoon and high at night, with a clock chip and derived causeway

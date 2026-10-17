@@ -238,9 +238,12 @@ function updateHint(dt) {
 }
 
 /** HUD size = fitted to the window (smaller on small screens, larger on big ones) x the HUD-size setting. */
+/** Numeric value of the --ui scale last applied by settings/resize; marker placement reads it without forcing style. */
+export let uiScale = 1;
 export function applyUiScale() {
   const fit = clamp(Math.min(innerWidth / 1280, innerHeight / 720), 0.75, 1.3);
-  document.documentElement.style.setProperty('--ui', (fit * settings.uiScale / 100).toFixed(3));
+  const value = (fit * settings.uiScale / 100).toFixed(3); uiScale = Number(value);
+  document.documentElement.style.setProperty('--ui', value);
 }
 /** Sets the HUD-size setting (1 = 100%); saved with the other settings. */
 export function setUiScale(s) { setSetting('uiScale', s * 100); applyUiScale(); }

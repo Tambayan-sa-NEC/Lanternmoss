@@ -84,3 +84,8 @@ writing certification. Run performance alone, with no simulation suite or screen
 Every performance row uses a fresh reload and empty ephemeral test storage, seeds play before hero/travel setup,
 then runs 120 setup updates, 30 warmup frames and 120 real render intervals. Previous rows cannot carry state forward.
 See the [handoff](tidewhisper-release.md).
+
+`node scripts/hud-performance-smoke.mjs` owns port 8140. It checks unchanged prompt/chip DOM preservation,
+coin and rebound-key updates, the live marker scale, real rebound keyboard interaction and 720p/1080p bounds,
+with zero page/shader errors. Review captures go to the system temp folder, not the feature tour.
+`node tests/sim/hudUpdates.sim.mjs` covers the same update rules, prompt hide/return and settings/resize scale.
