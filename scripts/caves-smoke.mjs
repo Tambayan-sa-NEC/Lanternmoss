@@ -82,7 +82,7 @@ try {
   console.log('PASS  720p and 1080p: lantern light and readable dark');
 
   // ---- real E at the mouth leaves -------------------------------------------------------------------------------------
-  assert.ok(await goTo(layout.mouth.x, layout.mouth.z - 0.8), 'beside the mouth');
+  assert.ok(await goTo(layout.mouth.x, layout.mouth.z - 1.2), 'beside the mouth, outside the automatic exit patch');
   assert.match(await page.evaluate(async () => (await import('/src/gameplay/Houses.js')).currentInteraction()?.label ?? ''), /Leave the cave/);
   await page.keyboard.press('KeyE'); await frames(60);
   const out = await page.evaluate(async () => ({ inside: !!window.LANTERNMOSS.Dungeons.inside, indoors: (await import('/src/core/context.js')).ctx.indoors, dark: window.LANTERNMOSS.LocalLights.darkness }));

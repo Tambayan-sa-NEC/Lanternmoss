@@ -12,10 +12,11 @@ import { ceilingHeight, resolveCollisions, support } from './colliders.js';
 const _p = new THREE.Vector3(), _u = new THREE.Vector3(), _d = new THREE.Vector3(), _g = new THREE.Vector3();
 
 export class Walker {
-  constructor(dir, radius) {
+  constructor(dir, radius, space = null) {
     this.up = dir.clone().normalize(); this.r = groundHeight(this.up); this.vy = 0; this.grounded = true; this.radius = radius;
     this.fwd = tangentFrame(this.up)[0]; this.pos = this.up.clone().multiplyScalar(this.r); this.selfCollider = null; this.hover = 0;
-    this.waterDepth = 0; this.swimming = false;
+    this.waterDepth = 0; this.swimming = false; this.space = null;
+    if (space) space.attach(this, dir);
   }
   /** Is the move by displacement d (tangent) from here too steep to walk? (only on the ground, not on a rock) */
   tooSteep(d) {
@@ -26,6 +27,7 @@ export class Walker {
   }
   /** Move by a tangent velocity on the sphere; resolves collisions, re-aligns to gravity and transports the heading. */
   step(vel, dt, gravity = 26) {
+    if (this.space) return this.space.step(this, vel, dt, gravity);
     this.refreshWater();                                         // live levels affect speed on this frame, not the next
     const W = WORLD.water, slow = this.waterDepth > 0.15 ? (this.swimming ? W.swim : W.wade) : 1;
     _d.copy(vel).multiplyScalar(dt * slow);

@@ -8,6 +8,7 @@
        darkness    the local-light darkness inside (1 = fully dark: the hero's light and the lanterns show the way)
        lantern     each room's lanterns: their light radius (m), colour and strength
        mouthReach  how near the cave mouth (m) "Leave the cave" is offered; stepping back onto it also leaves
+       motion      sweep: maximum wall-check step (m), waypointReach: distance at which a route point is reached (m)
        entrance    where a planet's cave mouth stands on the surface: distance from the village square (m) and the
                    clearance it needs (m)
      ROOM_KIT  the room pieces: w x d (m) of floor, and how many lanterns stand in it. `entrance` starts every cave,
@@ -19,6 +20,7 @@ export const CAVE = {
   cell: 16, corridor: 2.6, wallHeight: 3.4, darkness: 1,
   lantern: { radius: 6.5, color: 0xffc77a, intensity: 1.1 },
   mouthReach: 1.6,
+  motion: { sweep: 0.2, waypointReach: 0.3 },
   entrance: { distance: [34, 60], clearance: 3 },
 };
 
