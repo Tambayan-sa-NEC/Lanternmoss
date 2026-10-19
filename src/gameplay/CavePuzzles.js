@@ -33,6 +33,7 @@ import { rng } from '../utils/random.js';
 import { caveEnding } from '../world/caveLayout.js';
 import { lootName, rollLoot } from './loot.js';
 import { grantItem } from './pickups.js';
+import { gainCoins } from './wallet.js';
 
 const OPEN_ANGLE = -1.95, KEY = 'wardenKey';
 const _v = new THREE.Vector3(), _d = new THREE.Vector3();
@@ -245,9 +246,10 @@ export const CavePuzzles = {
     const id = e?.caveGuardian; if (!id || this.beaten.has(id)) return;
     this.beaten.add(id); this.guardian = null;
     const g = this.ending?.guardian;
-    const loot = rollLoot(g?.loot ?? 'rare', ctx.planet, rng, ctx.player.charId), names = [];
+    const loot = rollLoot(g?.loot ?? 'caveGuardian', ctx.planet, rng, ctx.player.charId), names = [];
+    if (loot.coins) { gainCoins(loot.coins, ctx.player.pos.clone()); names.push(`${loot.coins} coins`); }
     for (const { item, qty, props } of loot.items) { grantItem(item, qty, props); names.push(lootName(item, qty, props)); }
-    if (this.cave?.ore) { const ore = 2; grantItem('gloomquartz', ore); names.push(lootName('gloomquartz', ore)); }
+    for (const [item, qty] of this.cave?.guardianExtra ?? []) { grantItem(item, qty); names.push(lootName(item, qty)); }
     if (this.shortcut) this.setShortcut(true);
     audio.sparkle();
     toast(`The warden falls: ${names.join(', ') || 'nothing but dust'}. A way back opens.`);

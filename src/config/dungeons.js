@@ -49,6 +49,10 @@ export const CAVE = {
 export const CAVE_VEINS = {
   gloomVein: { name: 'Gloomquartz vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 4, color: 0x9f8cff, glow: true,
     drops: [['gloomquartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
+  cinderVein: { name: 'Cinderquartz vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 4, color: 0xff9a5a, glow: true,
+    drops: [['cinderquartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
+  rimeVein: { name: 'Rimequartz vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, color: 0xbfe8ff, glow: true,
+    drops: [['rimequartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
 };
 
 export const ROOM_KIT = {
@@ -59,16 +63,22 @@ export const ROOM_KIT = {
 };
 
 export const CAVES = {
-  lanternmoss: { id: 'lanternmoss-cave', name: 'Mossroot Hollow', released: false, salt: 0x3a7e, rooms: [5, 7],
+  lanternmoss: { id: 'lanternmoss-cave', name: 'Mossroot Hollow', released: true, salt: 0x3a7e, rooms: [5, 7],
     colors: { floor: 0x55604a, wall: 0x3f4639, accent: 0x9fe08a },
     ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare',
-    puzzle: 'lanterns', guardian: 'ogre', guardianLoot: 'rare' },
-  emberfall: { id: 'emberfall-cave', name: 'Cinder Warren', released: false, salt: 0x51c3, rooms: [6, 8],
+    puzzle: 'lanterns', guardian: 'ogre', guardianLoot: 'caveGuardian', guardianExtra: [['gloomquartz', 3]],
+    lantern: 0xffc77a,
+    roster: [{ type: 'goblin', count: 3 }, { type: 'wisp', count: 2 }, { type: 'slime', count: 1 }] },
+  emberfall: { id: 'emberfall-cave', name: 'Cinder Warren', released: true, salt: 0x51c3, rooms: [6, 8],
     colors: { floor: 0x6a4a3a, wall: 0x4a3028, accent: 0xff9a5a },
-    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare',
-    puzzle: 'stones', guardian: 'ramhorn', guardianLoot: 'rare' },
-  frostveil: { id: 'frostveil-cave', name: 'Rimeglass Grotto', released: false, salt: 0x2bf1, rooms: [6, 8],
+    ore: 'cinderVein', veins: [1, 2], chest: 'common', endChest: 'rare',
+    puzzle: 'stones', guardian: 'ramhorn', guardianLoot: 'caveGuardian', guardianExtra: [['cinderquartz', 3]],
+    lantern: 0xffa05a,
+    roster: [{ type: 'goblin', count: 3 }, { type: 'puffcap', count: 3 }, { type: 'ramhorn', count: 2 }] },
+  frostveil: { id: 'frostveil-cave', name: 'Rimeglass Grotto', released: true, salt: 0x2bf1, rooms: [6, 8],
     colors: { floor: 0x5a6a7a, wall: 0x3e4a58, accent: 0xbfe8ff },
-    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare',
-    puzzle: 'lanterns', guardian: 'hexlantern', guardianLoot: 'rare' },
+    ore: 'rimeVein', veins: [1, 2], chest: 'common', endChest: 'rare',
+    puzzle: 'lanterns', guardian: 'hexlantern', guardianLoot: 'caveGuardian', guardianExtra: [['rimequartz', 3]],
+    lantern: 0xbfe0ff,
+    roster: [{ type: 'thornmole', count: 3 }, { type: 'hexlantern', count: 2 }, { type: 'goblin', count: 3 }] },
 };

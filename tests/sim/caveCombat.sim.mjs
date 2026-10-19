@@ -164,5 +164,5 @@ Houses.enter(0); step(1); assert.ok(Houses.inside && !ctx.room);
 P.mana = P.stats.maxMana; const mana = P.mana; H.tryCast('bolt'); step(0.1);
 assert.equal(ctx.projectiles.length, 0); assert.equal(P.mana, mana);
 assert.ok(!ctx.companion.root.visible); assert.equal(H.Pets.useAbility(), false); Houses.leave(); step(1);
-assert.ok(Object.values(CAVES).every(c => c.released === false));
-pass('houses remain peaceful; every cave remains unreleased');
+assert.ok(Object.values(CAVES).every(c => c.released === true), 'every original cave is released (29f)');
+pass('houses remain peaceful; every original cave is released');

@@ -2,7 +2,8 @@
    reach from it, like house interiors far above), from a layout (src/world/caveLayout.js). Local frame: x across,
    y up, z toward the camera; the walls facing the camera (+z) stay low, a dollhouse cut-away, so the hero is always
    visible. Lanterns are local-light sources (render/lighting.js): the cave is dark apart from them and the hero.
-   buildCave(layout, colors) -> { root, rects, layout, toWorld(x, z, y), dispose() }. */
+   buildCave(layout, colors, lantern) -> { root, rects, layout, toWorld(x, z, y), dispose() }. `lantern` is the
+   cave's own light colour (29f: CAVES[].lantern), defaulting to the shared one. */
 import * as THREE from 'three';
 import { CAVE, ROOM_KIT } from '../config/dungeons.js';
 import { LocalLights } from '../render/lighting.js';
@@ -16,7 +17,7 @@ export const CAVE_ORIGIN = new V3(0, -3000, 0);
 export const CAVE_UP = new V3(0, 1, 0);
 const LOW = 0.55, THICK = 0.4;   // the cut-away walls' height; wall thickness
 
-export function buildCave(layout, colors) {
+export function buildCave(layout, colors, lantern = CAVE.lantern.color) {
   const root = new THREE.Group(); root.position.copy(CAVE_ORIGIN); scene.add(root);
   const rects = floorRects(layout), H = CAVE.wallHeight, gap = CAVE.corridor;
   const lights = [], toWorld = (x, z, y = 0, out = new V3()) => out.set(x, y, z).add(CAVE_ORIGIN);
@@ -45,7 +46,7 @@ export function buildCave(layout, colors) {
     for (const [lx, lz] of spots.slice(0, k)) {
       addTo(root, part(G.cyl(0.07, 0.09, 1.6, 6), colors.wall), [lx, 0.8, lz]);
       addTo(root, part(G.ico(0.18, 0), colors.accent, { glow: true, intensity: 2.6 }), [lx, 1.75, lz]);
-      lights.push(LocalLights.add({ at: toWorld(lx, lz, 1.75), radius: CAVE.lantern.radius, color: CAVE.lantern.color, intensity: CAVE.lantern.intensity, outdoor: false }));
+      lights.push(LocalLights.add({ at: toWorld(lx, lz, 1.75), radius: CAVE.lantern.radius, color: lantern, intensity: CAVE.lantern.intensity, outdoor: false }));
     }
   }
   for (const r of rects) if (r.corridor) {                          // corridor side walls

@@ -183,6 +183,6 @@ assert.ok(!moss.stones.length, "a lantern cave records no stones");
 D.leave(); step(1);
 pass('pushed stones keep their places across a rebuild, and each planet keeps its own ending');
 
-for (const cave of Object.values(CAVES)) assert.equal(cave.released, false, `${cave.id} stays unreleased`);
-pass('every cave remains unreleased: none of this is reachable in normal play yet');
+for (const cave of Object.values(CAVES)) assert.equal(cave.released, true, `${cave.id} is released`);
+pass('every original cave is released, so this ending is reachable in normal play');
 console.log('all passed');

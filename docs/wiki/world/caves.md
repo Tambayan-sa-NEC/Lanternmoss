@@ -99,9 +99,7 @@ builds them in the room frame, hands out their loot and keeps the progress.
 
 ![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)
 
-Not yet done: the per-world ore, rosters and guardian loot that release the caves (29f, 29g). Every cave is still
-unreleased, so none of this is reachable in normal play; the checks below reach it through `Dungeons.enter` and
-test-only fixtures.
+Since 29f all three original worlds' caves are released and reachable in normal play; see the rollout below.
 
 ## Puzzles, the warden and the way home (29e)
 
@@ -135,6 +133,50 @@ or ordinary chest: it is about its puzzle.
 
 ![The cave's warden, an elite of its own kind, standing over the end room](../../screenshots/world/cave-guardian.jpg)
 
+## The three caves (29f)
+
+Each original world has a cave of its own, open to players. Everything that differs is config
+(`src/config/dungeons.js` `CAVES`); nothing about a cave is written into code per world.
+
+| | Mossroot Hollow (Lanternmoss) | Cinder Warren (Emberfall) | Rimeglass Grotto (Frostveil) |
+| --- | --- | --- | --- |
+| Rooms | 5-7 | 6-8 | 6-8 |
+| Ore | Gloomquartz (`gloomVein`) | Cinderquartz (`cinderVein`) | Rimequartz (`rimeVein`, needs a copper pick) |
+| What the ore brews | Restorative Elixir | Emberheart Tonic | Glacial Guard Tonic |
+| Puzzle | lantern switches | push stones and plates | lantern switches |
+| Monsters | goblin, wisp, slime | goblin, puffcap, ramhorn | thornmole, hexlantern, goblin |
+| Warden | Ogre | Ramhorn | Hexlantern |
+| Warden's keepsake | 3 Gloomquartz | 3 Cinderquartz | 3 Rimequartz |
+
+- **Its own ore.** Each cave's vein kind is placed by no planet surface, and each drops a gem no other cave drops.
+  A cave gem brews the same potion its world's rare surface gem does, so a cave is another way to the same bottle
+  and never a new power.
+- **Its own monsters.** A cave's roster is drawn from the kinds that already roam that world above ground, so
+  releasing the caves adds no enemy type to the bestiary or the journal's goals. A room's monsters come in the first
+  time the hero walks into it and stay gone once it is cleared. The entrance, the puzzle room and the warden's room
+  hold none. A roster must fit the smallest cave its room range can generate: that is `(rooms[0] - 3) x 3` spots.
+- **Its own warden.** Made elite by the same helper a planet's elites use — but it is **not** one of them: a warden
+  carries no boss-summon sigil, so a cave is never a way around a lair's own conditions.
+- **Its own look.** Floor, wall and accent colours, and a lantern light colour of its own.
+
+### Adding a cave to a later world
+
+Give the world an entry in `CAVES` with: a stable `id` (room ids derive from it), a `name`, a `salt`, a `rooms`
+range, a `colors` palette and `lantern` colour, an `ore` kind in `CAVE_VEINS` whose gem has a use, `veins` per room,
+`chest`/`endChest` kinds, a `puzzle` (`lanterns` or `stones`), a `guardian` and `roster` drawn from that world's own
+monsters, a `guardianLoot` table and a `guardianExtra` keepsake. Then set `released`. Nothing else is per-world: the
+layout, the rooms, the fixtures, the puzzle, the ward, the warden and the way home are all shared.
+`tests/caveRollout.test.mjs` checks each of those rules, so a new cave that breaks one fails before it is played.
+
+### What a cave costs to draw
+
+Measured at high quality, 1920x1080: **196-240 draw calls and 4.9k-6.2k triangles** for an empty cave room, and
+**303 calls / 7.2k triangles** walking a populated one. A planet's surface in its heaviest weather is 722-969 calls
+and 236k-273k triangles, so a cave is a far smaller scene. `PERFORMANCE_BUDGET.cave` (600 calls, 60k triangles) is a
+regression guard checked by `scripts/caves-smoke.mjs`; it is **not** a target. The cave mouths added to the three
+worlds leave their surface ceilings intact (969/1050, 784/900, 722/850 calls). Frame timing is certified only on the
+target device, which remains pending — see [performance](../technical/performance.md).
+
 ## Verification
 
 - `node --test tests/caveLayout.test.mjs`: the same seed gives the same rooms, ids, kinds and doors; every room is
@@ -143,8 +185,9 @@ or ordinary chest: it is about its puzzle.
 - `node tests/sim/caves.sim.mjs`: mouth spots on all three worlds, none shown while unreleased; the same seeded cave
   in the game; real movement keys through every room; a wall holds; leaving by the mouth and by E; Continue after a
   save inside starts at the mouth; fainting inside and travelling leave cleanly.
-- `node scripts/caves-smoke.mjs` (Edge, port 8124): real keys from room to room under the following camera, readable
-  dark at 720p and 1080p, real E at the mouth leaves, zero page or shader errors. It retakes the shot above.
+- `node scripts/caves-smoke.mjs` (Edge, port 8124): the mouth stands on the surface and E offers the way in; real
+  keys from room to room under the following camera; readable dark at 720p and 1080p; the cave stays inside its
+  render budget; real E at the mouth leaves; zero page or shader errors. It retakes the shot above.
 - `node --test tests/roomSpace.test.mjs`: distinct points under the same up, flat height/gravity, wall/body sweeps,
   escaping an overlapping landing, and routes through doors.
 - `node tests/sim/caveCombat.sim.mjs`: all hero kits, ultimates and both pet bodies on seeds 1/7; real enemy attacks,
@@ -177,3 +220,13 @@ or ordinary chest: it is about its puzzle.
   lantern puzzle is played at 720p on Lanternmoss and a real stone push at 1080p on Emberfall; **E** opens the chest
   and turns the key; the guardian wakes, is beaten, and real **E** takes the way back. Nothing overflows, zero
   page/shader errors; it retakes the guardian shot above.
+- `node --test tests/caveRollout.test.mjs`: every original world has a released cave; each cave's ore is its own,
+  mined nowhere else and used by a recipe; each palette, lantern colour, warden keepsake and roster is its own; a
+  roster only uses kinds that already roam that world (so the released enemy set is unchanged) and fits the smallest
+  cave its room range can generate; and no monster stands in the entrance, the puzzle room, the warden's room or on
+  top of a chest or vein.
+- `node tests/sim/caveRollout.sim.mjs`: the whole of each of the three caves as a player walks it, mouth to warden to
+  the way home - the real "Enter" prompt, the room's own monsters fought and the room cleared, the world's own ore
+  mined, a save and Continue in the middle, the world's own puzzle solved, the key through the ward, the warden
+  beaten for its purse (and carrying no boss sigil), the way home, and out by the mouth; then that each world kept
+  its own cave record.

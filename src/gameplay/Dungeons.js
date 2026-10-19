@@ -93,7 +93,7 @@ export const Dungeons = {
   fadeThen(then) { ctx.transitioning = true; setFade(true, FADE); this.fade = { phase: 'out', t: FADE, then }; Dialog.close(); audio.whoosh(); },
 
   goInside(planet) {
-    const P = ctx.player, cave = this.caveFor(planet), layout = generateCave(cave, PLANETS[planet].seed), built = buildCave(layout, cave.colors);
+    const P = ctx.player, cave = this.caveFor(planet), layout = generateCave(cave, PLANETS[planet].seed), built = buildCave(layout, cave.colors, cave.lantern ?? CAVE.lantern.color);
     const m = layout.mouth;
     cancelAim(); clearTargets(); clearHazards();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles = [];

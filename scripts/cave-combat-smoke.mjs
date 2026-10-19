@@ -1,7 +1,8 @@
 // TODO 29c, port 8125. Real mouse/key casts in an unreleased cave at 720p/1080p, all heroes, pets, aiming,
 // enemy health bars, wall movement, house peace and safe exit. Software frames are driven explicitly.
 // The fighting happens in the widest ordinary room: the entrance is the safe room and, since 29e, the end room has
-// a guardian of its own.
+// a guardian of its own. Since 29f the rooms also hold their world's own monsters, which the fixture clears away so
+// the check faces exactly the enemy it spawned.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -38,7 +39,7 @@ try {
         const { applyCharacter } = await import('/src/gameplay/characters.js');
         const { computeStats } = await import('/src/gameplay/equipment.js');
         const F = await import('/tests/sim/lib/caveFixture.mjs');
-        F.clearCaveCombat(); applyCharacter(hero); L.Talents.clear(); L.player.level = 16; L.player.stats = computeStats(L.player);
+        F.clearCaveCombat(); F.clearCaveRoster(); applyCharacter(hero); L.Talents.clear(); L.player.level = 16; L.player.stats = computeStats(L.player);
         L.player.hp = L.player.stats.maxHp; L.player.mana = L.player.stats.maxMana; L.player.invuln = 1e9; L.Pets.command('passive');
         // The widest room that is not the end room: 29e keeps a guardian standing there, and this check is about
         // the hero's own kit, not the warden.
@@ -84,7 +85,7 @@ try {
   await page.setViewport({ width: 1280, height: 720 });
   await page.evaluate(async () => {
     const L = window.LANTERNMOSS, F = await import('/tests/sim/lib/caveFixture.mjs'), { ctx } = await import('/src/core/context.js');
-    const { applyCharacter } = await import('/src/gameplay/characters.js'); F.clearCaveCombat(); applyCharacter('knight'); L.Pets.command('passive');
+    const { applyCharacter } = await import('/src/gameplay/characters.js'); F.clearCaveCombat(); F.clearCaveRoster(); applyCharacter('knight'); L.Pets.command('passive');
     const s = L.Dungeons.inside, r = s.layout.rooms.filter(r => r.id !== s.layout.end && r.id !== s.layout.entrance).sort((a, b) => b.w * b.d - a.w * a.d)[0];
     F.placeCaveHero(r.x, r.z + 2); L.cam.init = false; ctx.companion.snapToHero();
     const e = F.spawnCaveEnemy('goblin', r.x + 1.6, r.z, { static: true, hp: 500 }); e.fwd.copy(ctx.room.toward(e.pos, L.player.pos));
@@ -99,7 +100,7 @@ try {
   await page.evaluate(() => document.body.classList.remove('photo'));
   // E at the mouth exits and restores the surface. Houses continue to reject combat input.
   await page.evaluate(async () => {
-    const L = window.LANTERNMOSS, F = await import('/tests/sim/lib/caveFixture.mjs'); F.clearCaveCombat();
+    const L = window.LANTERNMOSS, F = await import('/tests/sim/lib/caveFixture.mjs'); F.clearCaveCombat(); F.clearCaveRoster();
     const m = L.Dungeons.inside.layout.mouth; F.placeCaveHero(m.x, m.z - 0.8);
   });
   await frames(2); await page.keyboard.press('KeyE'); await frames(60);
