@@ -28,7 +28,7 @@ test('version 1 remains compatible with optional tutorial state and active faint
   const raw = JSON.parse(readFileSync(new URL('fixtures/save-v1.json', import.meta.url), 'utf8'));
   const old = sanitizeSave(raw);
   assert.equal(old.version, 1); assert.equal(old.systems.tutorial.status, 'skipped');
-  assert.deepEqual(old.systems.player, raw.systems.player); assert.deepEqual(old.planets, raw.planets);
+  assert.deepEqual(old.systems.player, { ...raw.systems.player, cave: null, caveX: 0, caveZ: 0 }); assert.deepEqual(old.planets, raw.planets);
   raw.systems.tutorial = { status: 'active', done: ['move', 'camera'], seen: Object.keys(GATHERING_TIPS),
     lifeStartedAt: 4, moved: 3, remaining: 1.2, recap: { source: 'Gloomcap', amount: 100, duration: 123 } };
   assert.deepEqual(sanitizeSave(raw).systems.tutorial, raw.systems.tutorial);

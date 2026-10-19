@@ -6,9 +6,10 @@
      lane    rectangle 1 wide, from y = 0 to y = 1 (scaled by width x length) */
 import * as THREE from 'three';
 import { scene } from '../render/scene.js';
-import { dirAlong, tangentFrame } from '../utils/sphere.js';
-import { groundHeight } from '../world/terrain.js';
+import { tangentFrame } from '../utils/sphere.js';
+
 import { fxMaterial } from './combatFx.js';
+import { advance, ground, upAt } from '../combat/space.js';
 
 const V3 = THREE.Vector3;
 const _right = new V3(), _off = new V3(), _fwd = new V3();
@@ -35,13 +36,14 @@ export class GroundDecal {
   /** Lays the decal on the ground around surface direction `center`, heading `fwd` (any tangent; null = arbitrary),
       scaled sx sideways and sy forward (radius, or width x length for a lane). */
   place(center, fwd, sx, sy = sx) {
-    if (fwd) _fwd.copy(fwd); else _fwd.copy(tangentFrame(center)[1]);
-    _right.crossVectors(_fwd, center).normalize(); _fwd.crossVectors(center, _right).normalize();
+    const up = upAt(center);
+    if (fwd) _fwd.copy(fwd); else _fwd.copy(tangentFrame(up)[1]);
+    _right.crossVectors(_fwd, up).normalize(); _fwd.crossVectors(up, _right).normalize();
     const src = this.template.attributes.position, dst = this.geo.attributes.position;
     for (let i = 0; i < src.count; i++) {
       _off.copy(_right).multiplyScalar(src.getX(i) * sx).addScaledVector(_fwd, src.getY(i) * sy);
-      const arc = _off.length(), d = arc > 1e-5 ? dirAlong(center, _off.divideScalar(arc), arc) : center;
-      const h = groundHeight(d) + this.lift; dst.setXYZ(i, d.x * h, d.y * h, d.z * h);
+      const arc = _off.length(), d = arc > 1e-5 ? advance(center, _off.divideScalar(arc), arc) : center;
+      const p = ground(d, this.lift); dst.setXYZ(i, p.x, p.y, p.z);
     }
     dst.needsUpdate = true; this.mesh.visible = true;
     return this;

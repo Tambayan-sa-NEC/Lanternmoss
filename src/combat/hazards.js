@@ -16,17 +16,26 @@ import { audio } from '../systems/AudioSystem.js';
 import { shakeCamera } from '../systems/CameraSystem.js';
 import { clamp } from '../utils/math.js';
 import { mr, rng } from '../utils/random.js';
-import { dirAlong, frameQuat, projectTangent, tangentFrame } from '../utils/sphere.js';
-import { groundHeight } from '../world/terrain.js';
+import { frameQuat, projectTangent, tangentFrame } from '../utils/sphere.js';
+
 import { edgeFraction, enemiesInArea, playerInArea } from './area.js';
 import { damageEnemy, hurtPlayer } from './damage.js';
+import { advance, ground, upAt, pointOf } from './space.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3(), _up = new V3();
 
 const list = [];
 export function addHazard(h) { list.push(h); return h; }
-export function updateHazards(dt) { for (let i = list.length - 1; i >= 0; i--) if (!list[i].update(dt)) { list[i].dispose(); list.splice(i, 1); } }
+export function updateHazards(dt) {
+  const space = ctx.room;
+  for (let i = list.length - 1; i >= 0; i--) {
+    const h = list[i], live = h.update(dt), index = list.indexOf(h);
+    // A lethal hazard can clear its own list while leaving a cave. Dispose only if it still belongs to the list.
+    if (!live && index >= 0) { h.dispose(); list.splice(index, 1); }
+    if (ctx.room !== space) return;
+  }
+}
 /** Removes every hazard of `owner` (or all of them when owner is omitted). */
 export function clearHazards(owner = null) {
   for (let i = list.length - 1; i >= 0; i--) if (!owner || list[i].owner === owner) { list[i].dispose(); list.splice(i, 1); }
@@ -35,8 +44,8 @@ export function hazardsOf(owner) { return list.filter(h => h.owner === owner); }
 
 /** A random surface direction inside the circle (uniform over its area). */
 export function scatterIn(center, radius) {
-  const [t1, t2] = tangentFrame(center), a = rng() * Math.PI * 2;
-  return dirAlong(center, t1.multiplyScalar(Math.cos(a)).addScaledVector(t2, Math.sin(a)), radius * Math.sqrt(rng()));
+  const [t1, t2] = tangentFrame(upAt(center)), a = rng() * Math.PI * 2;
+  return advance(center, t1.multiplyScalar(Math.cos(a)).addScaledVector(t2, Math.sin(a)), radius * Math.sqrt(rng()));
 }
 
 /** Shake scaled by how close the hero is to the effect. */
@@ -64,7 +73,7 @@ export class Blast {
         shake, stop (hit-stop seconds on impact), sound (audio method), onImpact(blast) */
   constructor(o) {
     Object.assign(this, { falloff: 0, knock: 0, shake: 0.35, stop: 0, size: 0.5, sound: 'explode', jumpable: false, ...o });
-    this.center = o.center.clone(); this.t = 0; this.point = groundPoint(this.center, 0);
+    this.space = ctx.room; this.center = o.center.clone(); this.t = 0; this.point = groundPoint(this.center, 0);
     const warn = o.warnColor ?? o.color;
     this.fill = new GroundDecal('disc', warn, { k: 0.8 }).place(this.center, null, o.radius);
     this.edge = new GroundDecal('ring', warn, { k: 1.8, lift: 0.14 }).place(this.center, null, o.radius);
@@ -72,7 +81,7 @@ export class Blast {
     if (o.fall) {
       this.missile = makeMissile(o.fall === 'meteor' ? 'meteor' : 'orb', o.color, this.size);
       this.start = o.fall === 'lob' ? o.from.clone()
-        : dirAlong(this.center, tangentFrame(this.center)[0].applyAxisAngle(this.center, mr(0, 6.28)), 7).multiplyScalar(groundHeight(this.center) + 34);
+        : ground(advance(this.center, tangentFrame(upAt(this.center))[0].applyAxisAngle(upAt(this.center), mr(0, 6.28)), 7), 34);
     }
   }
   update(dt) {
@@ -82,7 +91,7 @@ export class Blast {
     if (this.missile) {
       if (this.fall === 'lob') {
         this.missile.position.lerpVectors(this.start, this.point, k);
-        _up.copy(this.missile.position).normalize(); this.missile.position.addScaledVector(_up, Math.sin(Math.PI * k) * 5);
+        _up.copy(upAt(this.missile.position)); this.missile.position.addScaledVector(_up, Math.sin(Math.PI * k) * 5);
       } else this.missile.position.lerpVectors(this.start, this.point, k * k);   // accelerates as it falls
       this.missile.rotation.x += dt * 3; this.missile.rotation.y += dt * 2;
       if (rng() < dt * 40) sparkles.emit(this.missile.position, { count: 2, color: this.color, speed: 0.8, life: 0.5, size: this.size * 0.9 });
@@ -93,15 +102,15 @@ export class Blast {
   detonate() {
     const c = this.center, p = this.point;
     ringFX(p, this.radius, this.color, 0.55); ringFX(p, this.radius * 0.55, 0xffffff, 0.35);
-    sparkles.emit(groundPoint(c, 0.4), { count: 24 + Math.round(this.radius * 6), color: this.color, speed: 2 + this.radius * 0.6, up: c, upBias: 0.7, life: 0.8, size: 0.45 });
-    sparkles.emit(groundPoint(c, 0.4), { count: 12, color: 0xfff0c0, speed: 1.5 + this.radius * 0.3, up: c, upBias: 1, life: 0.6, size: 0.38 });
+    sparkles.emit(groundPoint(c, 0.4), { count: 24 + Math.round(this.radius * 6), color: this.color, speed: 2 + this.radius * 0.6, up: upAt(c), upBias: 0.7, life: 0.8, size: 0.45 });
+    sparkles.emit(groundPoint(c, 0.4), { count: 12, color: 0xfff0c0, speed: 1.5 + this.radius * 0.3, up: upAt(c), upBias: 1, life: 0.6, size: 0.38 });
     shakeNear(p, this.shake); if (this.stop) hitStop(this.stop); audio[this.sound]?.();
     if (this.team === 'player') {
       for (const e of enemiesInArea(c, this.radius))
-        damageEnemy(e, this.damage * (1 - this.falloff * edgeFraction(e.up, c, this.radius)),
+        damageEnemy(e, this.damage * (1 - this.falloff * edgeFraction(pointOf(e), c, this.radius)),
           { from: p, knock: this.knock, stun: this.stun, slow: this.slow, slowTime: this.slowTime, color: this.color });
     } else if (playerInArea(c, this.radius, this.jumpable)) hurtPlayer(this.damage, p, this.knock, { lethal: this.lethal, source: this.owner });
-    this.onImpact?.(this);
+    if (ctx.room === this.space) this.onImpact?.(this);
   }
   dispose() {
     for (const d of [this.fill, this.edge, this.core]) d.dispose();
@@ -131,7 +140,7 @@ export class Zone {
     if (this.rain === 'arrows') this.updateArrows(dt);
     else if (this.live && rng() < dt * this.radius * 7) {
       const d = scatterIn(this.center, this.radius);
-      sparkles.emit(groundPoint(d, 0.2), { count: 1, color: rng() < 0.5 ? this.color : 0xffd36b, speed: 0.8, up: d, upBias: 2.2, life: 0.7, size: 0.4 });
+      sparkles.emit(groundPoint(d, 0.2), { count: 1, color: rng() < 0.5 ? this.color : 0xffd36b, speed: 0.8, up: upAt(d), upBias: 2.2, life: 0.7, size: 0.4 });
     }
     if (this.live && (this.next -= dt) <= 0) { this.next += this.tick; this.pulse(); }
     return this.live || this.arrows.length > 0;
@@ -144,11 +153,11 @@ export class Zone {
   updateArrows(dt) {
     if (this.live) for (this.spawnT += dt * ARROW_RATE; this.spawnT >= 1; this.spawnT--) {
       const land = scatterIn(this.center, this.radius), mesh = takeArrow(this.color);
-      const end = land.clone().multiplyScalar(groundHeight(land) + 0.25);
-      const start = dirAlong(land, tangentFrame(land)[0].applyAxisAngle(land, this.t * 0.7), 1.6).multiplyScalar(groundHeight(land) + 9);
-      const fwd = _tv.copy(end).sub(start).normalize(), up = projectTangent(_tv2.copy(land), fwd).normalize();
+      const end = ground(land, 0.25);
+      const start = ground(advance(land, tangentFrame(upAt(land))[0].applyAxisAngle(upAt(land), this.t * 0.7), 1.6), 9);
+      const fwd = _tv.copy(end).sub(start).normalize(), up = projectTangent(_tv2.copy(upAt(land)), fwd).normalize();
       frameQuat(up, fwd, mesh.quaternion); mesh.position.copy(start);
-      this.arrows.push({ mesh, start, end, land, t: 0 });
+      this.arrows.push({ mesh, start, end, land: upAt(land).clone(), t: 0 });
     }
     for (let i = this.arrows.length - 1; i >= 0; i--) {
       const a = this.arrows[i]; a.t += dt;

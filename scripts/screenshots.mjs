@@ -17,7 +17,7 @@ const puppeteer = (await import(process.env.PUPPETEER ? pathToFileURL(process.en
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(PORT)], { cwd: root, stdio: 'ignore' });
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage(); await page.setViewport({ width: 1280, height: 720 });
-const errors = []; page.on('pageerror', e => errors.push(String(e)));
+const errors = []; page.on('pageerror', e => { errors.push(String(e)); console.error('PAGE ERROR', String(e)); });
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const shot = async (name, { keepToast = false, keepBanner = false } = {}) => {
   if (only && !only.has(name)) return;
@@ -274,5 +274,8 @@ try {
   await run(() => { const L = window.LANTERNMOSS; document.body.classList.remove('talent-proof'); L.TalentUI.close(); L.PauseMenu.close(); });
   console.log('errors:', errors.length ? errors : 'none');
 } finally {
-  await browser.close(); server.kill();
+  server.kill();
+  let timer;
+  try { await Promise.race([browser.close(), new Promise(r => { timer = setTimeout(() => { browser.process()?.kill(); r(); }, 10000); })]); }
+  finally { clearTimeout(timer); }
 }

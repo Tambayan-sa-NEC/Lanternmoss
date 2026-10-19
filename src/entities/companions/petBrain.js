@@ -5,9 +5,10 @@ import { ctx } from '../../core/context.js';
 import { damageEnemy } from '../../combat/damage.js';
 import { targeting } from '../../combat/targeting.js';
 import { Pets } from '../../gameplay/Pets.js';
-import { arcDist } from '../../utils/sphere.js';
+
 import { ENGAGED } from '../enemies/states.js';
 import { rng } from '../../utils/random.js';
+import { pointOf, distance, visible } from '../../combat/space.js';
 
 const fightable = e => e && e.alive && !e.hidden;
 
@@ -19,14 +20,14 @@ const fightable = e => e && e.alive && !e.hidden;
 export function pickTarget(pet) {
   const mode = Pets.mode, range = pet.def.attack.range, P = ctx.player;
   if (mode === 'passive' || Pets.fainted || P.dead) return null;
-  if (mode === 'attack') return [targeting.aim, targeting.lastHit].find(e => fightable(e) && arcDist(P.up, e.up) < range * 1.8) ?? null;
-  const anchor = mode === 'stay' && Pets.stayDir ? Pets.stayDir : P.up;
+  if (mode === 'attack') return [targeting.aim, targeting.lastHit].find(e => fightable(e) && distance(pointOf(P), pointOf(e)) < range * 1.8) ?? null;
+  const anchor = mode === 'stay' && Pets.stayDir ? Pets.stayDir : pointOf(P);
   const last = targeting.lastHit;
-  if (mode === 'follow' && fightable(last) && ctx.time - targeting.lastHitT < 5 && arcDist(anchor, last.up) < range) return last;
+  if (mode === 'follow' && fightable(last) && ctx.time - targeting.lastHitT < 5 && distance(anchor, pointOf(last)) < range) return last;
   let best = null, bd = range;
   for (const e of ctx.enemies) {
     if (!fightable(e) || !ENGAGED.has(e.state)) continue;
-    const d = arcDist(anchor, e.up); if (d < bd) { bd = d; best = e; }
+    const d = distance(anchor, pointOf(e)); if (d < bd) { bd = d; best = e; }
   }
   return best;
 }
@@ -34,12 +35,13 @@ export function pickTarget(pet) {
 /** Is this target still worth chasing? (alive, and not dragged too far from where the pet belongs) */
 export function keepTarget(pet, e) {
   if (!fightable(e) || Pets.mode === 'passive' || Pets.fainted || ctx.player.dead) return false;
-  const anchor = Pets.mode === 'stay' && Pets.stayDir ? Pets.stayDir : ctx.player.up;
-  return arcDist(anchor, e.up) < pet.def.attack.range * (Pets.mode === 'attack' ? 2.2 : 1.6);
+  const anchor = Pets.mode === 'stay' && Pets.stayDir ? Pets.stayDir : pointOf(ctx.player);
+  return distance(anchor, pointOf(e)) < pet.def.attack.range * (Pets.mode === 'attack' ? 2.2 : 1.6);
 }
 
 /** Lands the pet's attack on e (damage grows with the pet's level); the monster may hit back. */
 export function strike(pet, e) {
+  if (!visible(pet.pos, e.pos)) return;
   const a = pet.def.attack;
   damageEnemy(e, Pets.damage(), { source: 'pet', mark: a.mark, stagger: a.stagger, slow: a.slow, slowTime: a.slowTime, knock: a.knock, from: pet.pos, color: pet.color });
   if (e.alive && rng() < PET_CARE.retaliate) Pets.hurt((e.def.damage ?? 5) * PET_CARE.retaliateDamage);

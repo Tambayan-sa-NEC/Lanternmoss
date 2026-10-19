@@ -218,6 +218,12 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xd8844a, art: 'ore' }, maxStack: 30, value: 4 },
   { id: 'ironOre', name: 'Iron Ore', description: 'Heavy, dark iron from deep veins (a copper pickaxe gets it out). Helmets and boots.', category: 'material',
     icon: { shape: 'gem', color: 0x8a8fa8, art: 'ore' }, maxStack: 30, rarity: 'uncommon', value: 7 },
+  { id: 'gloomquartz', name: 'Gloomquartz', description: 'Violet quartz that keeps a little lantern-light of its own. It grows only in the dark of a cave.', category: 'material',
+    icon: { shape: 'gem', color: 0x9f8cff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'cinderquartz', name: 'Cinderquartz', description: "Amber quartz from the warren under Emberfall. It holds a coal's last heat long after the fire is out.", category: 'material',
+    icon: { shape: 'gem', color: 0xff9a5a, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'rimequartz', name: 'Rimequartz', description: 'Pale quartz from the grotto under Frostveil, so cold it frosts over in the hand.', category: 'material',
+    icon: { shape: 'gem', color: 0xbfe8ff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
   // ---- smelted at the forge (config/crafting.js: ore + fuel -> ingots); fuel burns in the forge (FUEL)
   { id: 'copperIngot', name: 'Copper Ingot', description: 'Copper ore, smelted bright at the forge. Watering cans, copper picks, rings and staves.', category: 'material',
     icon: { shape: 'gem', color: 0xe08a4a, art: 'ingot' }, maxStack: 20, value: 10 },
@@ -332,6 +338,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'key', color: 0x9fe9ff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },
   { id: 'lanternKey', name: 'Lantern Key', description: 'A little brass key with a glowing bow. It opens one locked Lantern chest.', category: 'misc',
     icon: { shape: 'key', color: 0xffd36b, art: 'key' }, maxStack: 5, rarity: 'rare', value: 12, tags: ['key'] },
+  { id: 'wardenKey', name: "Warden's Key", description: "A heavy key of dark stone, sealed away behind a cave's own puzzle. It opens the warded door at the end of that cave.", category: 'misc',
+    icon: { shape: 'key', color: 0x9f8cff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },
   // ---- sigils: carried by elites, offered at a boss's lair (config/bossSummon.js) ----
   { id: 'emberSigil', name: 'Ember Sigil', description: 'A warm, humming seal-stone carried by an Emberfall elite. Three of them wake Pyrrhax.', category: 'quest',
     icon: { shape: 'gem', color: 0xff7a3a, art: 'shard' }, maxStack: 9, rarity: 'rare', value: 0 },
