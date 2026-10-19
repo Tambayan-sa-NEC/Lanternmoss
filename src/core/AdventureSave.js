@@ -10,6 +10,8 @@ import { BuffState } from '../gameplay/buffs.js';
 import { BossGate } from '../gameplay/BossGate.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { Chests } from '../gameplay/Chests.js';
+import { CaveRewards } from '../gameplay/CaveRewards.js';
+import { CavePuzzles } from '../gameplay/CavePuzzles.js';
 import { dayClock } from '../gameplay/dayClock.js';
 import { Equipment, computeStats } from '../gameplay/equipment.js';
 import { Farm } from '../gameplay/Farm.js';
@@ -27,6 +29,7 @@ import { Home } from '../gameplay/Home.js';
 import { Building } from '../gameplay/Building.js';
 import { Bounties } from '../gameplay/Bounties.js';
 import { Talents } from '../gameplay/Talents.js';
+import { Dungeons } from '../gameplay/Dungeons.js';
 import { applyCharacter } from '../gameplay/characters.js';
 import { audio } from '../systems/AudioSystem.js';
 import { resetView, snapCamera } from '../systems/CameraSystem.js';
@@ -39,19 +42,29 @@ import { toast } from '../ui/toast.js';
 import { dom } from '../ui/dom.js';
 import { projectTangent } from '../utils/sphere.js';
 
+/** Saved inside a cave (29d): the surface pose still points at the cave mouth, so a save that cannot go back inside
+    (an old file, a cave since unreleased) puts the hero down safely above ground; `cave` and the room coordinates
+    carry the indoor pose, and restore() walks back in. */
+const cavePose = () => {
+  const s = Dungeons.inside; if (!s) return {};
+  const m = Dungeons.mouth?.dir ?? Dungeons.world?.spawnDir;
+  return { ...(m ? { up: m.toArray(), fwd: (Dungeons.mouth?.fwd ?? ctx.player.fwd).toArray() } : {}),
+    cave: s.cave.id, caveX: s.x, caveZ: s.z };
+};
+
 export class AdventureSave {
   constructor(game) {
     this.game = game; this.store = new SaveStore(); this.registry = new SaveRegistry();
     this.restoring = false; this.suspended = false; this.timer = AUTOSAVE_SECONDS; this.errorShown = false;
     const player = {
-      toJSON: () => ({ ...ctx.player.toJSON(), indoors: Houses.inside?.index ?? null,
+      toJSON: () => ({ ...ctx.player.toJSON(), ...cavePose(), indoors: Houses.inside?.index ?? null,
         roomX: Houses.inside?.x ?? 0, roomZ: Houses.inside?.z ?? 0 }),
       load: data => ctx.player.load(data),
     };
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook, talents: Talents,
-      home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, bossGate: BossGate, pickups: Pickups, building: Building,
+      home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, caves: CaveRewards, cavePuzzles: CavePuzzles, bossGate: BossGate, pickups: Pickups, building: Building,
       mechanics: game.world.mechanics })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.world.mechanics.snapshotForPlanet = id => this.registry.planets[id]?.mechanics;
@@ -122,6 +135,13 @@ export class AdventureSave {
       if (saved.indoors !== null) {
         Houses.goInside(saved.indoors, houseDef(saved.indoors));
         Houses.inside.x = saved.roomX; Houses.inside.z = saved.roomZ; Houses.placeHero();
+      }
+      // Back into the cave the hero was standing in, at the room pose. A cave that is no longer this planet's (or no
+      // longer released) is skipped, and the surface pose at its mouth stands instead.
+      else if (saved.cave && Dungeons.caveFor(ctx.planet)?.id === saved.cave) {
+        Dungeons.goInside(ctx.planet);
+        Dungeons.inside.x = saved.caveX; Dungeons.inside.z = saved.caveZ; Dungeons.placeHero();
+        snapCamera(ctx.player.up, ctx.player.fwd);
       }
       this.game.world.setDaylight(dayClock.light());
       releaseAllKeys(); this.game.renderSystem.canvas.focus(); this.timer = AUTOSAVE_SECONDS;

@@ -9,7 +9,9 @@ const shadowMat = new THREE.MeshBasicMaterial({ color: 0x4a2a50, transparent: tr
 
 export function makeShadow(s) { const m = new THREE.Mesh(shadowGeo, shadowMat); m.userData.s = s; m.renderOrder = 1; scene.add(m); return m; }
 /** alt = height above the ground; the shadow shrinks as its owner rises. It lies on whatever is below (ground, a rock, water). */
-export function updateShadow(m, up, fwd, alt) {
-  m.position.copy(up).multiplyScalar(supportHeight(up) + 0.07); frameQuat(up, fwd, m.quaternion);
+export function updateShadow(m, up, fwd, alt, actor = null) {
+  if (actor?.space) actor.space.ground(actor.pos, 0.07, m.position);
+  else m.position.copy(up).multiplyScalar(supportHeight(up) + 0.07);
+  frameQuat(up, fwd, m.quaternion);
   m.scale.setScalar(m.userData.s * Math.max(0.35, 1 - alt * 0.13));
 }

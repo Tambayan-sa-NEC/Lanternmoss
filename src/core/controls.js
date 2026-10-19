@@ -8,6 +8,7 @@ import { boundCodes, is } from './keybinds.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
 import { cancelAim, isAiming, nudgeAim } from '../combat/aiming.js';
 import { groundUnderScreen } from '../combat/area.js';
+import { distance, pointOf, toward } from '../combat/space.js';
 import { Fishing } from '../gameplay/Fishing.js';
 import { Hotbar } from '../gameplay/hotbar.js';
 import { currentInteraction } from '../gameplay/Houses.js';
@@ -15,7 +16,7 @@ import { Pets } from '../gameplay/Pets.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
 import { initInput, pointer } from '../systems/InputSystem.js';
-import { arcDist, tangentToward } from '../utils/sphere.js';
+
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { Dialog } from '../ui/Dialog.js';
@@ -96,7 +97,7 @@ function onClick() {
 }
 function faceClick() {
   const P = ctx.player; if (!pointer.over || P.dead || P.motion || !ctx.started || ctx.cutscene) return;
-  const d = groundUnderScreen(pointer.x, pointer.y); if (d && arcDist(P.up, d) > 0.4) P.fwd.copy(tangentToward(P.up, d));
+  const d = groundUnderScreen(pointer.x, pointer.y); if (d && distance(pointOf(P), d) > 0.4) P.fwd.copy(toward(pointOf(P), d));
 }
 /** Right click: cancels aiming, otherwise uses the held hotbar item. */
 function onRightClick() {

@@ -30,6 +30,10 @@ export const PERFORMANCE_BUDGET = {
     frostveil: { calls: 850, triangles: 280000 },
     tidewhisper: { calls: 550, triangles: 230000 }, // Retained through the owner-approved Acer reference change; 27h must fit them.
   },
+  // A cave room is a far smaller scene than a planet's surface (measured 196-240 calls and 4.9k-6.2k triangles at
+  // high across the three caves, TODO 29f). This is a regression guard with room to spare, not a target: it catches
+  // a cave suddenly costing several times what it does, long before it could approach a surface budget.
+  cave: { calls: 600, triangles: 60000 },
 };
 
 /** Desktop acceptance reference, chosen by the owner on 2026-10-17.

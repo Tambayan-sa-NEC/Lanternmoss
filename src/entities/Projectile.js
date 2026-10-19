@@ -18,6 +18,7 @@ import { damp } from '../utils/math.js';
 import { frameQuat, projectTangent, tangentTo, turnToward } from '../utils/sphere.js';
 import { groundHeight } from '../world/terrain.js';
 import { seaLevelAt } from '../world/physics.js';
+import { CAVE } from '../config/dungeons.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _p = new V3(), _hu = new V3(), _sea = new V3();
@@ -30,22 +31,28 @@ const overSea = p => { if (!p) return null; const d = _sea.copy(p).normalize(), 
 export function touchesEnemy(e, pos, radius) {
   if (e.center().distanceTo(pos) < radius + e.hitR) return true;
   if (!e.def.tallHitbox) return false;
-  const h = pos.length() - e.r;                                    // height above the enemy's feet
+  const h = e.space ? pos.y - e.pos.y : pos.length() - e.r;
   return h > e.hover - radius - 0.8 && h < e.hover + e.height + radius && tangentTo(e.pos, e.up, pos, _hu) < radius + e.hitR;
 }
 
 export class Projectile {
   constructor(o) {
-    Object.assign(this, o); this.up = o.up.clone().normalize(); this.fwd = o.dir.clone(); projectTangent(this.fwd, this.up).normalize();
+    Object.assign(this, o); this.space = o.space ?? ctx.room;
+    this.up = (this.space ? this.space.up : o.up).clone().normalize(); this.fwd = o.dir.clone(); projectTangent(this.fwd, this.up).normalize();
+    if (this.space) { this.pos = this.space.ground(o.up, o.startAlt ?? o.alt); this.r = this.pos.y; }
+    else {
     const aimAt = this.team === 'player' && o.startAlt == null ? overSea(this.homeTo?.()) : null;   // the hero aims at a lower target's height
     if (aimAt) { this.alt = Math.min(this.alt, Math.max(0.35, aimAt.length() - surface(_hu.copy(aimAt).normalize()))); this.altRate = Math.max(this.altRate ?? 10, 40); }   // and settles to it fast
-    this.r = surface(this.up) + (o.startAlt ?? o.alt); this.pos = this.up.clone().multiplyScalar(this.r); this.life = o.range / o.speed; this.trailT = 0;
+    this.r = surface(this.up) + (o.startAlt ?? o.alt); this.pos = this.up.clone().multiplyScalar(this.r);
+    }
+    this.life = o.range / o.speed; this.trailT = 0;
     this.mesh = o.shape === 'arrow' ? buildArrow(o.color) : part(G.ico(o.size, 1), o.color, { glow: true, intensity: 2.8 });
     this.mesh.position.copy(this.pos); if (o.shape === 'arrow') frameQuat(this.up, this.fwd, this.mesh.quaternion); scene.add(this.mesh);
   }
   /** Returns false once the projectile is spent (hit something or ran out of range). */
   update(dt) {
     if ((this.life -= dt) <= 0) return this.finish(null);
+    if (this.space) return this.updateRoom(dt);
     const home = this.homeTo && this.homeTo();
     if (home) {
       tangentTo(this.pos, this.up, home, _tv); turnToward(this.fwd, _tv, this.up, damp(this.homing, dt));
@@ -66,5 +73,28 @@ export class Projectile {
     return true;
   }
   finish(hit) { this.onHit(this, hit); this.dispose(); return false; }
-  dispose() { scene.remove(this.mesh); disposeTree(this.mesh); }
+  /** A flat flight uses the same homing and hit callbacks; swept checks stop fast arrows at walls and bodies. */
+  updateRoom(dt) {
+    const home = this.homeTo?.();
+    if (home) {
+      tangentTo(this.pos, this.up, home, _tv); turnToward(this.fwd, _tv, this.up, damp(this.homing, dt));
+      const h = this.space.height(home);
+      if (h > this.alt) this.alt += (Math.min(h, 9) - this.alt) * damp(this.homing * 0.8, dt);
+    }
+    const n = Math.max(1, Math.ceil(this.speed * dt / CAVE.motion.sweep));
+    for (let i = 0; i < n; i++) {
+      _p.copy(this.pos).addScaledVector(this.fwd, this.speed * dt / n);
+      if (!this.space.contains(this.pos, this.radius) || !this.space.contains(_p, this.radius)) return this.finish(null);
+      this.pos.copy(_p); this.pos.y += (this.space.origin.y + this.alt - this.pos.y) * damp(this.altRate ?? 10, dt / n);
+      if (this.team === 'player') {
+        for (const e of ctx.enemies) if (e.space === this.space && e.alive && !e.hidden && touchesEnemy(e, this.pos, this.radius)) return this.finish(e);
+      } else if (!ctx.player.dead && ctx.player.space === this.space && _tv.copy(ctx.player.pos).addScaledVector(this.up, 1).distanceTo(this.pos) < this.radius + 0.55) return this.finish(ctx.player);
+    }
+    this.mesh.position.copy(this.pos);
+    if (this.shape === 'arrow') frameQuat(this.up, this.fwd, this.mesh.quaternion);
+    else { this.mesh.rotation.x += dt * 9; this.mesh.rotation.y += dt * 7; }
+    if ((this.trailT -= dt) < 0) { this.trailT = 0.018; sparkles.emit(this.pos, { count: 1, color: this.color, speed: 0.5, life: 0.35, size: this.size * 1.6, up: this.up }); }
+    return true;
+  }
+  dispose() { if (this.disposed) return; this.disposed = true; scene.remove(this.mesh); disposeTree(this.mesh); }
 }

@@ -15,6 +15,7 @@ import { ULTIMATES } from './abilities/ultimates.js';
 import { WITCH_ABILITIES } from './abilities/witch.js';
 import { aim, aimedTarget, beginAim, cancelAim, isAiming, updateAiming } from './aiming.js';
 import { aimDirection } from './targeting.js';
+import { peaceful } from './space.js';
 
 const CAST = { ...WITCH_ABILITIES, ...KNIGHT_ABILITIES, ...RANGER_ABILITIES, ...ULTIMATES };
 
@@ -51,7 +52,7 @@ function pay(id, s) {
 }
 
 export function tryCast(id) {
-  const player = ctx.player, s = kit()[id]; if (!ctx.started || ctx.transitioning || ctx.cutscene || ctx.inventoryOpen || ctx.building || ctx.indoors || player.dead || player.petrifyT > 0 || !s || player.motion) return;   // no fighting indoors
+  const player = ctx.player, s = kit()[id]; if (!ctx.started || ctx.transitioning || ctx.cutscene || ctx.inventoryOpen || ctx.building || peaceful() || player.dead || player.petrifyT > 0 || !s || player.motion) return;
   if (isAiming() && !isAiming(id)) cancelAim();                        // another ability drops the aim
   if (s.target === 'ground') {
     if (isAiming(id)) { confirmAim(); return; }
@@ -69,6 +70,7 @@ export function tryCast(id) {
 
 /** Casts the ability being aimed at the marked spot (click, or its key again). An invalid spot keeps the aim open. */
 export function confirmAim() {
+  if (!ctx.started || ctx.transitioning || ctx.cutscene || ctx.inventoryOpen || ctx.building || peaceful() || ctx.player.dead || ctx.player.petrifyT > 0 || ctx.player.motion) { cancelAim(); return; }
   const id = aim.id, s = aim.s; if (!id) return;
   const dir = aimDirection(), target = aimedTarget(dir);
   if (!target) { audio.fizzle(); flashSlot(id, 'deny'); return; }

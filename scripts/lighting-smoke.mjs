@@ -65,6 +65,15 @@ try {
   await frames(5);
   const sample = () => page.evaluate(async () => {
     const { ctx } = await import('/src/core/context.js'), L = window.LANTERNMOSS, { camera } = await import('/src/render/scene.js');
+    // Measure terrain, not a foreground prop or a wandering actor at the projected pixel. The unmodified parent
+    // also fails when a village object obscures a lantern sample. Keep the actual ground, lights and shaders.
+    const { scene } = await import('/src/render/scene.js'), world = L.planets.world;
+    world.scenery.visible = false; world.fireflies.visible = false;
+    for (const g of world.grass) g.visible = false;
+    for (const a of [ctx.player, ctx.companion, ...ctx.npcs, ...ctx.critters, ...ctx.birds, ...ctx.enemies].filter(Boolean)) {
+      scene.remove(a.root, a.shadow);
+      if (a.tele) scene.remove(a.tele);
+    }
     const bmp = await createImageBitmap(await L.PhotoMode.render.capture(ctx.time));
     const cv = new OffscreenCanvas(bmp.width, bmp.height), g = cv.getContext('2d'); g.drawImage(bmp, 0, 0);
     const lum = (x, y) => { const d = g.getImageData(Math.round(x * (bmp.width - 1)), Math.round(y * (bmp.height - 1)), 1, 1).data; return 0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2]; };

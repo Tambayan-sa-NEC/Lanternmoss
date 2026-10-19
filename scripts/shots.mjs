@@ -23,7 +23,7 @@ export const SHOT_FOLDERS = {
   building: ['home-claim', 'home-furnishings', 'home-interior', 'building-preview', 'building-storage',
     'structures-exterior', 'structures-interior'],
   world: ['mesas', 'storm', 'blizzard', 'tidewhisper-high', 'tidewhisper-low', 'tidewhisper-flora', 'lighting-harness',
-    'tidewhisper-campaign-720', 'tidewhisper-campaign-1080'],
+    'tidewhisper-campaign-720', 'tidewhisper-campaign-1080', 'cave', 'cave-combat', 'cave-rewards', 'cave-guardian'],
   activities: ['fishing', 'gathering', 'chest', 'photo-mode', 'photo-storybook'],
   huds: ['title', 'continue', 'save-menu', 'controls', 'keys', 'help', 'tutorial', 'fainted', 'bag', 'journal', 'bestiary',
     'achievement', 'crafting', 'enchanting', 'bounty-window', 'portal-destinations', 'portal-one-way', 'balance-shop',

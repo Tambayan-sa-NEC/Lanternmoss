@@ -51,6 +51,26 @@ That historical estimate is superseded as a release dependency by the owner's Ac
 measure the synchronized candidate and record the actual hardware; it supplies additional coverage.
 The [UHD 620 diagnostic](#uhd-620-laptop-diagnostic-2026-10-17) records the evidence behind the secondary-machine recommendation.
 
+## Caves (TODO 29f)
+
+A cave room is a far smaller scene than a planet's surface. Measured at high quality, 1920x1080, on a development
+machine (Intel HD Graphics 4600 — a diagnostic, not a certification):
+
+| Scene | Draw calls | Triangles |
+| --- | --- | --- |
+| Mossroot Hollow, empty room | 240 | 6,243 |
+| Cinder Warren, empty room | 202 | 5,573 |
+| Rimeglass Grotto, empty room | 196 | 4,864 |
+| A populated cave room, walked | 303 | 7,203 |
+| Lanternmoss surface, storm, high | 969 | 272,870 |
+
+`PERFORMANCE_BUDGET.cave` (600 calls, 60,000 triangles) guards against a cave suddenly costing several times what it
+does; `scripts/caves-smoke.mjs` checks it at 720p and 1080p. It is a regression guard, not a frame-time target.
+
+Releasing the three caves adds a mouth arch to each original world. Their surface ceilings still hold with room to
+spare: Lanternmoss 969/1050, Emberfall 784/900, Frostveil 722/850 draw calls. Frame timing on these worlds is
+unchanged by the caves and remains uncertified until the Iris Xe machine is available.
+
 ## Measuring the game
 
 Press **F3** during play or enable Settings → Graphics → **Performance overlay**. F3 can be rebound, and works while

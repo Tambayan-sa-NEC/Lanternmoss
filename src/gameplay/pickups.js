@@ -25,7 +25,7 @@ export function spawnWorldItem(itemId, quantity, dir, options) {
 export function clearWorldItems() { for (const w of ctx.worldItems) w.dispose(); ctx.worldItems.length = 0; }
 
 export const Pickups = {
-  toJSON() { return ctx.worldItems.map(w => ({ itemId: w.itemId, quantity: w.quantity, props: w.props, up: w.up.toArray(),
+  toJSON() { return (ctx.room?.surface.items ?? ctx.worldItems).map(w => ({ itemId: w.itemId, quantity: w.quantity, props: w.props, up: w.up.toArray(),
     bossLoot: !!w.bossLoot, delay: Math.max(0, w.delay), stepAway: w.stepAway, armed: w.armed })); },
   load(data) {
     clearWorldItems();
