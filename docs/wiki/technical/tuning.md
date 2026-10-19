@@ -64,4 +64,7 @@
 | Cave puzzles: how near E works a switch or the door, how many switches/stones a room holds, plate and stone sizes, push speed, how far off the walls they sit | `src/config/dungeons.js` → `CAVE.puzzle` |
 | The cave guardian's toughness and halo, and how near E takes the way home | `src/config/dungeons.js` → `CAVE.guardian`, `CAVE.shortcut` |
 | Which puzzle, guardian and guardian loot each cave gets | `src/config/dungeons.js` → `CAVES` (`puzzle`, `guardian`, `guardianLoot`) |
+| A cave's wandering monsters, its warden's keepsake, its lantern colour, and whether it is open to players | `src/config/dungeons.js` → `CAVES` (`roster`, `guardianExtra`, `lantern`, `released`) |
+| What a cave warden's purse holds | `src/config/chests.js` → `LOOT_TABLES.caveGuardian` |
+| The cave render regression guard (draw calls, triangles) | `src/config/render.js` → `PERFORMANCE_BUDGET.cave` |
 | Player settings (what the Settings screen offers, defaults, ranges) | `src/config/settings.js` |

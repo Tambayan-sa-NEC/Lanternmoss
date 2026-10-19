@@ -22,6 +22,12 @@ try {
   await page.waitForFunction(() => window.LANTERNMOSS, { timeout: 60000 });
   await page.click('[data-act="play"]');
   await page.evaluate(async () => {
+    const { RenderSystem } = await import('/src/systems/RenderSystem.js');   // for the cave render budget below
+    const original = RenderSystem.prototype.render;
+    RenderSystem.prototype.render = function (t) {
+      this.renderer.info.autoReset = false; this.renderer.info.reset();
+      original.call(this, t); window.__renderer = this.renderer;
+    };
     const { setSetting } = await import('/src/core/settings.js'); setSetting('pauseOnBlur', false); setSetting('quality', 'low');
     const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); L.Tutorial.skip(); L.Pets.command('passive'); L.player.invuln = 1e9;
   });
@@ -31,7 +37,10 @@ try {
   const frames = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.LANTERNMOSS.update(1 / 60); }, n);
   const state = () => page.evaluate(() => { const s = window.LANTERNMOSS.Dungeons.inside; return s ? { x: s.x, z: s.z, room: s.room } : null; });
   await frames(10);
-  assert.equal(await page.evaluate(() => window.LANTERNMOSS.Dungeons.mouth?.parts ?? null), null, 'unreleased: no mouth on the surface');
+  // 29f released the original worlds' caves: the arch stands on the surface and E offers the way in.
+  assert.ok(await page.evaluate(() => !!window.LANTERNMOSS.Dungeons.mouth?.parts), 'the cave mouth stands on the surface');
+  await page.evaluate(() => { const L = window.LANTERNMOSS; L.player.placeAt(L.Dungeons.mouth.dir); }); await frames(6);
+  assert.match(await page.evaluate(async () => (await import('/src/gameplay/Houses.js')).currentInteraction()?.label ?? ''), /Enter /);
 
   // ---- in: the cave, the room camera, the dark ------------------------------------------------------------------------
   await page.evaluate(() => window.LANTERNMOSS.Dungeons.enter()); await frames(60);
@@ -74,6 +83,15 @@ try {
       return { max, nonBlack: nonBlack / n, w: bmp.width };
     });
     assert.ok(px.max > 120 && px.nonBlack > 0.25, `${w}x${h}: lanterns light the cave, and it is not black (max ${px.max.toFixed(0)}, ${(px.nonBlack * 100).toFixed(0)}% visible)`);
+    // A cave room must stay a small scene (29f). This is a regression guard, not a target: real timing is certified
+    // only on the target device (docs/wiki/technical/performance.md).
+    const budget = await page.evaluate(async () => {
+      const { PERFORMANCE_BUDGET } = await import('/src/config/render.js'), r = window.__renderer;
+      return { calls: r.info.render.calls, triangles: r.info.render.triangles, limit: PERFORMANCE_BUDGET.cave };
+    });
+    assert.ok(budget.calls <= budget.limit.calls && budget.triangles <= budget.limit.triangles,
+      `${w}x${h}: the cave stays within its render budget (${budget.calls}/${budget.limit.calls} calls, ${budget.triangles}/${budget.limit.triangles} triangles)`);
+    console.log(`  ${w}x${h} cave render: ${budget.calls} calls, ${budget.triangles} triangles`);
     if (w === 1280) {
       await page.evaluate(() => { document.getElementById('toast').style.opacity = 0; document.getElementById('hint').classList.add('collapsed'); });
       await page.screenshot({ path: shotPath('cave'), type: 'jpeg', quality: 86 });

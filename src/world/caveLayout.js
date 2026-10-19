@@ -99,7 +99,7 @@ export function caveFixtures(layout, cave) {
   const path = routeToEnd(layout), puzzleRoom = path[path.length - 2] ?? null;   // 29e: the puzzle room is its own
   for (const r of layout.rooms) {
     if (r.id === layout.entrance) continue;                       // the way in stays a safe, empty room
-    if (r.id === puzzleRoom) { for (const [x, z] of spawnSpots(r)) spawns.push({ room: r.id, x, z }); continue; }
+    if (r.id === puzzleRoom) continue;                            // and the puzzle room keeps to its puzzle
     const rng = mulberry32(hash(`${r.id}:rewards`));
     const kind = r.id === layout.end ? cave.endChest : r.kind === 'chamber' ? cave.chest : null;
     if (kind) chests.push({ id: `${r.id}:chest`, room: r.id, kind, x: r.x, z: r.z });
@@ -162,6 +162,20 @@ export function caveEnding(layout, cave) {
     x: end.x, z: end.z - end.d / 2 + CAVE.puzzle.inset };
   const shortcut = { id: `${end.id}:shortcut`, room: end.id, x: end.x + end.w / 2 - CAVE.puzzle.inset, z: end.z };
   return { puzzle, door, keyChest, guardian, shortcut };
+}
+
+/** A cave's wandering monsters (29f): the roster spread over the ordinary rooms' spawn spots, in a fixed order, so a
+    room always holds the same few. The entrance (safe), the puzzle room and the end room (its guardian's) hold none. */
+export function caveMonsters(layout, cave) {
+  const roster = cave.roster ?? []; if (!roster.length) return [];
+  const path = routeToEnd(layout), puzzleRoom = path[path.length - 2] ?? null;
+  const spots = [];
+  for (const r of layout.rooms) {
+    if (r.id === layout.entrance || r.id === puzzleRoom || r.id === layout.end) continue;
+    for (const [x, z] of spawnSpots(r)) spots.push({ room: r.id, x, z });
+  }
+  const wanted = roster.flatMap(({ type, count }) => Array.from({ length: count }, () => type));
+  return spots.slice(0, wanted.length).map((spot, i) => ({ id: `${spot.room}:m${i}`, type: wanted[i], ...spot }));
 }
 
 /** How far a fixture of `kind` reaches out (m), for placement checks. */

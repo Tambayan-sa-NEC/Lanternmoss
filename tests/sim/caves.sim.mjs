@@ -1,5 +1,5 @@
 // TODO 29b (seeded cave layout and traversal): each original world works out its cave mouth (placed last, clear of the
-// village, gate and nodes) but shows none while the cave is unreleased; entering builds the same seeded cave every
+// village, gate and nodes) and, since 29f, shows its arch there; entering builds the same seeded cave every
 // time, dark but lit by its lanterns and the hero; real movement keys reach every room and walls stop the hero; stepping
 // back onto the mouth (or E there) leaves; a save made inside continues at the mouth; fainting inside and travelling
 // take the hero out at once. Nothing here releases a cave: the sim enters through Dungeons.enter directly.
@@ -19,19 +19,19 @@ const pass = m => console.log(`PASS  ${m}`);
 H.Tutorial.skip(); H.Pets.command('passive'); P.invuln = 1e9; step(0.3);
 const clearKeys = () => { for (const k of ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft']) K[k] = false; };
 
-// ---- the mouth on every original world: worked out, but hidden while the cave is unreleased ---------------------------
+// ---- the mouth on every original world: placed clear of everything, and standing open since 29f ----------------------
 for (let i = 0; i < 3; i++) {
   if (i) H.goToPlanet(i); step(0.2);
   const m = D.mouth, cave = CAVES[PLANETS[i].id], E = CAVE.entrance;
-  assert.ok(m && cave && !cave.released, `${PLANETS[i].id}: a mouth spot for an unreleased cave`);
+  assert.ok(m && cave?.released, `${PLANETS[i].id}: a released cave with a mouth spot`);
   const d = arcDist(m.dir, game.world.spawnDir);
   assert.ok(d >= E.distance[0] - 0.5 && d <= E.distance[1] + 0.5, `${d} m from the square`);
   assert.ok(arcDist(m.dir, H.Portals.gate.dir) > 3 && !H.Gathering.nodes.some(n => arcDist(n.up, m.dir) < n.def.r + 0.5));
-  assert.equal(m.parts, null, 'no mouth in the world'); P.placeAt(m.dir); step(0.1);
-  assert.ok(!/cave|Hollow|Warren|Grotto/i.test(currentInteraction()?.label ?? ''), 'and nothing to enter');
+  assert.ok(m.parts, 'its arch stands in the world'); P.placeAt(m.dir); step(0.1);
+  assert.equal(currentInteraction()?.label, `Enter ${cave.name}`, 'and E offers the way in');
 }
 H.goToPlanet(0); step(0.5);
-pass('Lanternmoss, Emberfall and Frostveil each have a mouth spot (clear of the square, gate and nodes); unreleased, none shows');
+pass('Lanternmoss, Emberfall and Frostveil each have a mouth spot (clear of the square, gate and nodes), standing open');
 
 // ---- in: the same seeded cave every time, dark and lit by its lanterns -------------------------------------------------
 const layout = generateCave(CAVES.lanternmoss, PLANETS[0].seed);
@@ -70,8 +70,11 @@ const go = target => {                                                 // centre
     assert.ok(walkTo(a.x, a.z) && walkTo((a.x + b.x) / 2, (a.z + b.z) / 2) && walkTo(b.x, b.z), `reached ${b.id}`);
   }
 };
-// 29e wards the doorway into the end room. This sim's subject is traversal, so open it the way the puzzle would.
-assert.ok((await import('./lib/caveFixture.mjs')).openCaveWard(), 'the ward is open for the traversal walk');
+// 29e wards the doorway into the end room and 29f fills the rooms with monsters. This sim's subject is traversal,
+// so open the ward the way the puzzle would and keep the roster out of the walk.
+const caveFix = await import('./lib/caveFixture.mjs');
+assert.ok(caveFix.openCaveWard(), 'the ward is open for the traversal walk');
+caveFix.clearCaveRoster();
 for (const r of layout.rooms) go(r.id);
 assert.equal(visited.size, layout.rooms.length, 'every room visited');
 // a wall: from the entrance's centre, push west where there is no door (or north, if west has one)

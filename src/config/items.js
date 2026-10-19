@@ -220,6 +220,10 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0x8a8fa8, art: 'ore' }, maxStack: 30, rarity: 'uncommon', value: 7 },
   { id: 'gloomquartz', name: 'Gloomquartz', description: 'Violet quartz that keeps a little lantern-light of its own. It grows only in the dark of a cave.', category: 'material',
     icon: { shape: 'gem', color: 0x9f8cff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'cinderquartz', name: 'Cinderquartz', description: "Amber quartz from the warren under Emberfall. It holds a coal's last heat long after the fire is out.", category: 'material',
+    icon: { shape: 'gem', color: 0xff9a5a, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'rimequartz', name: 'Rimequartz', description: 'Pale quartz from the grotto under Frostveil, so cold it frosts over in the hand.', category: 'material',
+    icon: { shape: 'gem', color: 0xbfe8ff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
   // ---- smelted at the forge (config/crafting.js: ore + fuel -> ingots); fuel burns in the forge (FUEL)
   { id: 'copperIngot', name: 'Copper Ingot', description: 'Copper ore, smelted bright at the forge. Watering cans, copper picks, rings and staves.', category: 'material',
     icon: { shape: 'gem', color: 0xe08a4a, art: 'ingot' }, maxStack: 20, value: 10 },

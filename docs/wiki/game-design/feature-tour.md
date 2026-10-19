@@ -244,27 +244,32 @@ and frame included and the toolbar left out. `H` hides the toolbar to look at th
 **Your keys.** The HUD keeps the hotbar and vitals at the bottom centre, skills on the lower right and your pet on the
 lower left. Every action can be remapped in Settings → Keys, and every key hint in the game follows your bindings.
 
-**Cave combat (in development, unreleased).** The three heroes and their pets can fight on a cave's flat floor with
-their usual controls, aimed ultimates and abilities. Walls stop movement and attacks; leaving returns to the surface
-encounter. This is a test fixture preview: cave entrances, normal encounters and puzzles are not released.
-See [the cave stages](../world/caves.md).
+**Down into the caves.** Every original world now has a cave of its own, its mouth a rocky arch out past the village:
+**Mossroot Hollow** under Lanternmoss, the **Cinder Warren** under Emberfall, the **Rimeglass Grotto** under
+Frostveil. Each is laid out from its world's own seed, so it is the same cave every time you go down, and each has
+its own colours, its own lantern light and its own monsters, drawn from the kinds that already roam that world.
+See [caves](../world/caves.md).
+
+**Fighting in the dark.** All three heroes and their pets fight underground with their usual controls, aimed
+ultimates and abilities. Walls stop movement and attacks alike, and leaving puts you back exactly where you were on
+the surface.
 
 ![Warrior and wolf meeting a goblin and wisp under cave lanterns](../../screenshots/world/cave-combat.jpg)
 
-**Cave treasure (in development, unreleased).** Past the entrance, a cave's rooms hold chests and veins of
-**Gloomquartz**, a violet quartz that grows nowhere above ground. A chest pays straight into your bag, a vein takes a
-few swings of a pickaxe, and the cave remembers: come back, faint, or Continue a save made underground, and the chests
-you emptied stay open and the veins you worked out stay gone. Each planet's cave keeps its own record. The puzzles,
-the locked door and the guardian at the end are still to come, and no cave is released yet.
+**Cave treasure.** Past the entrance, the rooms hold chests and veins of a gem that grows nowhere above ground —
+**Gloomquartz** under Lanternmoss, **Cinderquartz** under Emberfall, **Rimequartz** under Frostveil, each brewing the
+same potion its world's rare gem does. A chest pays straight into your bag, a vein takes a few swings of a pickaxe,
+and the cave remembers: come back, faint, or Continue a save made underground, and the chests you emptied stay open
+and the veins you worked out stay gone. Each world keeps its own record.
 See [cave rewards](../world/caves.md#rewards-and-persistence-29d).
 
 ![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)
 
-**The warden of the cave (in development, unreleased).** The last room of a cave is warded shut. The room before it
-holds a puzzle — a row of lanterns to light, or stones to shoulder onto pressure plates — and solving it unseals the
-chest the **Warden's Key** waits in. The key turns the ward once. Past it stands the cave's keeper: one of that cave's
-own monsters, grown larger and haloed, with loot of its own. Beat it and a worn stair lights up to carry you back to
-the mouth. No cave is released yet.
+**The warden of the cave.** The last room is warded shut. The room before it holds a puzzle — a row of lanterns to
+light under Lanternmoss and Frostveil, stones to shoulder onto pressure plates under Emberfall — and solving it
+unseals the chest the **Warden's Key** waits in. The key turns the ward once. Past it stands the cave's keeper: one
+of that world's own monsters, grown larger and haloed, with a purse of its own. Beat it and a worn stair lights up to
+carry you back to the mouth, so the walk out is not the walk in.
 See [the warden](../world/caves.md#puzzles-the-warden-and-the-way-home-29e).
 
 ![The cave's warden, an elite of its own kind, standing over the end room](../../screenshots/world/cave-guardian.jpg)

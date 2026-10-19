@@ -13,7 +13,7 @@ const { caveFixtures, generateCave } = await imp('world/caveLayout.js');
 const { currentInteraction } = await imp('gameplay/Houses.js');
 const { damageEnemy, hurtPlayer } = await imp('combat/damage.js');
 const { arcDist } = await imp('utils/sphere.js');
-const { spawnCaveEnemy, clearCaveCombat, openCaveWard } = await import('./lib/caveFixture.mjs');
+const { spawnCaveEnemy, clearCaveCombat, openCaveWard, clearCaveRoster } = await import('./lib/caveFixture.mjs');
 const { H, game, step } = await boot('witch', { wake: false });
 const P = H.player, D = H.Dungeons, R = H.CaveRewards, K = H.keys;
 const pass = m => console.log(`PASS  ${m}`);
@@ -52,7 +52,7 @@ const layout = generateCave(CAVES.lanternmoss, PLANETS[0].seed), F = caveFixture
 H.inventory.add('stonePick', 1); H.Hotbar.selected = 0;
 
 // ---- the cave is furnished exactly where the layout says ----------------------------------------------------------
-assert.ok(D.enter()); step(1); openCaveWard();   // 29e wards the end room; the rewards behind it are this sim's subject
+assert.ok(D.enter()); step(1); openCaveWard(); clearCaveRoster();   // 29e wards the end room; the rewards behind it are this sim's subject
 assert.equal(R.chests.length, F.chests.length); assert.equal(R.veins.length, F.veins.length);
 assert.ok(F.veins.length > 0 && F.chests.length > 0, 'there is something to find');
 for (const v of R.veins) assert.ok(!v.mined && v.root.visible, `${v.id} is untouched`);
@@ -110,7 +110,7 @@ pass('a room registers as visited, and as cleared when its monsters fall');
 
 // ---- leaving and coming back: nothing is handed out twice -----------------------------------------------------------
 D.leave(); step(1); assert.equal(D.inside, null);
-assert.ok(D.enter()); step(1); openCaveWard();
+assert.ok(D.enter()); step(1); openCaveWard(); clearCaveRoster();
 assert.ok(R.veins.find(v => v.id === vein.id).mined, 'the vein is still worked out');
 assert.ok(!R.veins.find(v => v.id === vein.id).root.visible);
 assert.ok(R.chests.find(c => c.id === chest.id).opened, 'the chest is still open');
@@ -136,7 +136,7 @@ assert.equal(D.inside, null, 'fainting takes the hero out at once'); step(4);
 assert.ok(!P.dead && arcDist(P.up, game.world.spawnDir) < 3, 'and home to the village'); P.invuln = 1e9;
 assert.ok(game.saves.save().ok); assert.ok(game.saves.continue()); step(1);
 assert.equal(D.inside, null, 'a save made after fainting starts on the surface, not underground');
-assert.ok(D.enter()); step(1); openCaveWard();
+assert.ok(D.enter()); step(1); openCaveWard(); clearCaveRoster();
 assert.ok(R.mined.has(vein.id) && R.opened.has(chest.id), 'the cave kept what was already taken from it');
 pass('fainting inside leaves the cave and keeps its progress; the save that follows starts safely on the surface');
 
@@ -145,14 +145,16 @@ const lanternmossMined = [...R.mined], lanternmossOpened = [...R.opened];
 D.leave(); step(1);
 H.goToPlanet(1); step(0.5);
 const emberLayout = generateCave(CAVES.emberfall, PLANETS[1].seed), emberF = caveFixtures(emberLayout, CAVES.emberfall);
-assert.ok(D.enter()); step(1); openCaveWard();
+assert.ok(D.enter()); step(1); openCaveWard(); clearCaveRoster();
 assert.equal(ctx.indoors, CAVES.emberfall.name);
 for (const v of R.veins) assert.ok(!v.mined, `${v.id} is untouched on Emberfall`);
 for (const c of R.chests) assert.ok(!c.opened, `${c.id} is shut on Emberfall`);
 assert.ok(emberF.veins.every(v => !R.mined.has(v.id)), 'no Lanternmoss progress leaked across the portal');
 const emberVein = emberF.veins[0];
 goTo(emberLayout, emberVein.room, ...approachOf(emberVein, emberLayout));
-assert.ok(/Mine the gloomquartz vein/.test(promptFor() ?? ''), 'Emberfall has its own untouched vein');
+// 29f gives each world its own ore: Emberfall's veins are Cinderquartz, not Lanternmoss's Gloomquartz.
+assert.ok(/Mine the cinderquartz vein/.test(promptFor() ?? ''), `Emberfall has its own untouched vein (got ${promptFor()})`);
+assert.ok(!/gloomquartz/.test(promptFor() ?? ''), "and it is not Lanternmoss's ore");
 currentInteraction().run(); for (let i = 0; i < 600 && R.job; i++) step(1 / 60);
 assert.ok(R.mined.has(emberVein.id), "and mining it records Emberfall's own progress");
 // Isolation is enforced where it is saved: each planet's snapshot holds only its own cave's rows.
@@ -162,7 +164,7 @@ assert.ok(emberSnap.mined.includes(emberVein.id));
 assert.ok(emberSnap.mined.every(id => id.startsWith(`${CAVES.emberfall.id}:`)), "Emberfall's snapshot holds no other cave");
 assert.ok(!emberSnap.mined.some(id => lanternmossMined.includes(id)));
 D.leave(); step(1);
-H.goToPlanet(0); step(0.5); assert.ok(D.enter()); step(1); openCaveWard();
+H.goToPlanet(0); step(0.5); assert.ok(D.enter()); step(1); openCaveWard(); clearCaveRoster();
 for (const id of lanternmossMined) assert.ok(R.mined.has(id), `${id} came back with Lanternmoss`);
 for (const id of lanternmossOpened) assert.ok(R.opened.has(id), `${id} came back with Lanternmoss`);
 const mossSnap = game.saves.registry.snapshot('lanternmoss').planets.lanternmoss.caves;
@@ -174,8 +176,8 @@ assert.ok(R.veins.find(v => v.id === vein.id).mined && R.chests.find(c => c.id =
 D.leave(); step(1);
 pass('each planet keeps its own cave: progress travels with its planet and never crosses a portal');
 
-// ---- the caves are still unreleased ------------------------------------------------------------------------------------
-for (const cave of Object.values(CAVES)) assert.equal(cave.released, false, `${cave.id} stays unreleased`);
-assert.equal(D.mouth?.parts ?? null, null, 'and no mouth stands in the world');
-pass('every cave remains unreleased: none of this is reachable in normal play yet');
+// ---- the caves are open to players (29f) ---------------------------------------------------------------------------
+for (const cave of Object.values(CAVES)) assert.equal(cave.released, true, `${cave.id} is released`);
+assert.ok(D.mouth?.parts, 'and its mouth stands in the world');
+pass('every original cave is released, so these rewards are reachable in normal play');
 console.log('all passed');

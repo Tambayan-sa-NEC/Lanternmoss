@@ -4,6 +4,8 @@
    the progress that must survive leaving, fainting, reloading and the cave being rebuilt:
      opened   chest ids already emptied            mined    vein ids already worked out
      cleared  rooms whose monsters have fallen     visited  rooms the hero has walked into
+   A room's wandering monsters (29f, CAVES[].roster) come in the first time the hero steps into it, and stay gone
+   once the room is cleared.
    Progress is saved per planet (core/save.js `caves`), keyed by cave id, so each planet's cave is its own: travelling
    by portal never carries one cave's progress into another. Nothing is handed out twice, because a chest or a vein
    that is already in `opened` / `mined` is rebuilt empty.
@@ -25,7 +27,9 @@ import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
 import { damp } from '../utils/math.js';
 import { rng } from '../utils/random.js';
-import { caveFixtures, roomAt } from '../world/caveLayout.js';
+import { caveFixtures, caveMonsters, roomAt } from '../world/caveLayout.js';
+import { Enemy } from '../entities/enemies/Enemy.js';
+import { enemyDef } from '../combat/enemyDefs.js';
 import { Gathering } from './Gathering.js';
 import { holdTool, releaseTool } from './heldTool.js';
 import { Hotbar } from './hotbar.js';
@@ -37,7 +41,7 @@ import { gainCoins } from './wallet.js';
 const OPEN_ANGLE = -1.95;
 
 export const CaveRewards = {
-  cave: null, built: null, layout: null, chests: [], veins: [], spawns: [], job: null,
+  cave: null, built: null, layout: null, chests: [], veins: [], spawns: [], monsters: [], populated: new Set(), job: null,
   opened: new Set(), mined: new Set(), cleared: new Set(), visited: new Set(),
 
   // ---------------------------------------------------------------- the saved progress (planet scope)
@@ -65,7 +69,20 @@ export const CaveRewards = {
     const f = caveFixtures(layout, cave);
     for (const c of f.chests) this.chests.push(this.buildChest(c));
     for (const v of f.veins) this.veins.push(this.buildVein(v));
-    this.spawns = f.spawns;
+    this.spawns = f.spawns; this.monsters = caveMonsters(layout, cave); this.populated.clear();
+  },
+
+  /** The wandering monsters this room holds (29f), once, and never in a room already cleared of them. */
+  populate(roomId) {
+    if (!this.cave || !ctx.room || this.populated.has(roomId) || this.cleared.has(roomId)) return 0;
+    this.populated.add(roomId);
+    const here = this.monsters.filter(m => m.room === roomId);
+    for (const m of here) {
+      const def = { ...enemyDef(m.type), respawn: 0 };               // a cave monster stays beaten for this visit
+      const e = new Enemy(m.type, this.built.toWorld(m.x, m.z), def, ctx.room);
+      e.caveRoom = roomId; ctx.enemies.push(e);
+    }
+    return here.length;
   },
   buildChest(c) {
     const def = CHEST_KINDS[c.kind], opened = this.opened.has(c.id);
@@ -94,13 +111,16 @@ export const CaveRewards = {
     this.stop();
     for (const c of this.chests) { c.glow?.remove(); c.parts.root.parent?.remove(c.parts.root); disposeTree(c.parts.root); }
     for (const v of this.veins) { v.light?.remove(); v.root.parent?.remove(v.root); disposeTree(v.root); }
-    this.chests = []; this.veins = []; this.spawns = []; this.cave = null; this.built = null; this.layout = null;
+    this.chests = []; this.veins = []; this.spawns = []; this.monsters = []; this.populated.clear();
+    this.cave = null; this.built = null; this.layout = null;
   },
 
   // ---------------------------------------------------------------- walking the rooms
   /** The hero has entered `roomId` (Dungeons.update). A room counts as visited the first time it is stood in. */
   visit(roomId) {
-    if (!roomId || this.visited.has(roomId)) return false;
+    if (!roomId) return false;
+    this.populate(roomId);
+    if (this.visited.has(roomId)) return false;
     this.visited.add(roomId); emit('caveroomentered', { room: roomId, cave: this.cave?.id ?? null }); return true;
   },
   /** A cave monster has fallen: its room is cleared once CAVE.reward.clearedBy of them have. */

@@ -7,6 +7,7 @@ import { clearHazards } from '../../../src/combat/hazards.js';
 import { clearTargets } from '../../../src/combat/targeting.js';
 import { kit, resetCooldowns } from '../../../src/combat/casting.js';
 import { CavePuzzles } from '../../../src/gameplay/CavePuzzles.js';
+import { CaveRewards } from '../../../src/gameplay/CaveRewards.js';
 
 export function placeCaveHero(x, z) {
   const s = Dungeons.inside;
@@ -42,4 +43,15 @@ export function openCaveWard() {
   Q.checkPlates();
   Q.openKeyChest(); Q.turnDoor();
   return Q.door.open;
+}
+
+/** Test-only: keep this cave's wandering monsters (29f) out of the way, for checks whose subject is not combat.
+    Clears the roster so no room populates, and disposes any already standing. Changes no release flag. */
+export function clearCaveRoster() {
+  CaveRewards.monsters = [];
+  for (let i = ctx.enemies.length - 1; i >= 0; i--) {
+    const e = ctx.enemies[i];
+    if (e.caveRoom || e.caveGuardian) { e.dispose(); ctx.enemies.splice(i, 1); }
+  }
+  CavePuzzles.guardian = null;
 }
