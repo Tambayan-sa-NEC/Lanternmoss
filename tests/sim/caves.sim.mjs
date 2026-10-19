@@ -39,6 +39,7 @@ assert.deepEqual(D.layoutFor(0), layout, 'the layout comes from the planet seed'
 const lightsBefore = H.LocalLights.count;
 assert.ok(D.enter()); step(1);
 const s = D.inside;
+const now = () => D.inside;      // leaving and entering again makes a fresh `inside`: the walkers read the live one
 assert.ok(s && ctx.indoors === CAVES.lanternmoss.name, 'inside the cave');
 assert.deepEqual(s.layout.rooms.map(r => r.id), layout.rooms.map(r => r.id), 'same room ids');
 assert.equal(H.LocalLights.darkness, CAVE.darkness); assert.ok(H.LocalLights.count > lightsBefore + layout.rooms.length, 'lanterns light it');
@@ -51,9 +52,9 @@ pass(`entering builds ${layout.rooms.length} rooms (${layout.rooms.map(r => r.ki
 const byId = new Map(layout.rooms.map(r => [r.id, r])), visited = new Set([s.room]);
 const walkTo = (x, z, budget = 600) => {
   for (let i = 0; i < budget; i++) {
-    const dx = x - s.x, dz = z - s.z; if (Math.hypot(dx, dz) < 0.35) { clearKeys(); return true; }
+    const dx = x - now().x, dz = z - now().z; if (Math.hypot(dx, dz) < 0.35) { clearKeys(); return true; }
     clearKeys(); if (dx > 0.15) K.KeyD = true; if (dx < -0.15) K.KeyA = true; if (dz < -0.15) K.KeyW = true; if (dz > 0.15) K.KeyS = true;
-    step(1 / 60); visited.add(s.room);
+    step(1 / 60); visited.add(now().room);
   }
   clearKeys(); return false;
 };
@@ -63,7 +64,7 @@ const route = (from, to) => {                                          // rooms 
   const path = []; for (let id = to; id; id = prev.get(id)) path.unshift(id); return path;
 };
 const go = target => {                                                 // centre to centre, through each doorway's middle
-  const path = route(s.room, target);
+  const path = route(now().room, target);
   for (let i = 1; i < path.length; i++) {
     const a = byId.get(path[i - 1]), b = byId.get(path[i]);
     assert.ok(walkTo(a.x, a.z) && walkTo((a.x + b.x) / 2, (a.z + b.z) / 2) && walkTo(b.x, b.z), `reached ${b.id}`);
@@ -86,16 +87,21 @@ assert.ok(P.selfCollider.active); assert.equal(H.LocalLights.darkness, 0); asser
 assert.ok(arcDist(P.up, D.mouth.dir) < 1.5 && Math.abs(P.r - groundHeight(P.up)) < 1, 'standing at the mouth on the surface');
 pass('stepping back onto the mouth leaves: on the surface at the mouth, daylight back, no lanterns left over');
 
-// ---- E at the mouth also leaves; a save inside continues at the mouth -----------------------------------------------
+// ---- E at the mouth also leaves; a save inside continues inside, at the saved room pose (29d) ------------------------
 D.enter(); step(1); assert.ok(D.inside);
 assert.equal(currentInteraction()?.label, 'Leave the cave', 'E at the mouth');
-walkTo(byId.get(layout.entrance).x, byId.get(layout.entrance).z);
+const deep = byId.get(layout.end); go(deep.id);                        // through the doors, not through the walls
+const poseX = now().x, poseZ = now().z;
 assert.ok(game.saves.save().ok); assert.ok(game.saves.continue()); step(1);
-assert.equal(D.inside, null); assert.equal(ctx.indoors, null);
-assert.ok(arcDist(P.up, D.mouth.dir) < 1.5 && Math.abs(P.r - groundHeight(P.up)) < 1, `Continue starts at the mouth, not underground (r ${P.r.toFixed(1)})`);
-D.enter(); step(1); assert.equal(currentInteraction()?.label, 'Leave the cave'); currentInteraction().run(); step(1);
+assert.ok(D.inside, 'Continue went back into the cave');
+assert.equal(ctx.indoors, CAVES.lanternmoss.name); assert.equal(H.LocalLights.darkness, CAVE.darkness);
+assert.ok(Math.hypot(D.inside.x - poseX, D.inside.z - poseZ) < 0.6,
+  `Continue restored the room pose (${D.inside.x.toFixed(2)}, ${D.inside.z.toFixed(2)} vs ${poseX.toFixed(2)}, ${poseZ.toFixed(2)})`);
+assert.equal(D.inside.room, deep.id, 'in the room it was saved in');
+go(layout.entrance); walkTo(layout.mouth.x, layout.mouth.z - 1);        // back out to the mouth itself
+assert.equal(currentInteraction()?.label, 'Leave the cave'); currentInteraction().run(); step(1);
 assert.equal(D.inside, null, 'E at the mouth left the cave');
-pass('E at the mouth leaves too; a save made inside continues at the surface mouth');
+pass('E at the mouth leaves too; a save made inside continues underground at the saved room pose');
 
 // ---- fainting inside and travelling take the hero out at once ---------------------------------------------------------
 if (!D.inside) { D.enter(); step(1); }

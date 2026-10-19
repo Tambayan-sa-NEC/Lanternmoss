@@ -44,9 +44,10 @@ in) are `src/world/caveLayout.js`; the 3D rooms are `src/world/caves.js`.
   spends no cooldown. Houses remain peaceful and pets still wait outside them.
 - **Leaving.** Step back onto the bright patch at the mouth, or press **E** there ("Leave the cave"). You come out at
   the surface mouth, facing away from it.
+- **Treasure (29d).** Rooms other than the entrance hold chests and gloomquartz veins; see below.
 - **Never stranded.** Fainting inside takes the hero out at once; the usual respawn brings them home to the village.
-  Travelling to another world or starting a new adventure leaves the cave too. A save made inside records the surface
-  mouth, so Continue never starts underground (keeping the indoor position is 29d).
+  Travelling to another world or starting a new adventure leaves the cave too. A save made inside records the cave and
+  the room position, so Continue goes back in where you stood (29d); a save made after fainting starts on the surface.
 
 ![Inside a cave: lantern light and the hero's own light in the dark](../../screenshots/world/cave.jpg)
 
@@ -62,14 +63,44 @@ surface boss, village safety, lair and challenge systems do not drive cave comba
 outside. Leaving restores the same surface
 objects and health, returns hero/pet to the planet, and removes cave attacks, lights and actors. A lethal hit can
 leave during a projectile, melee or hazard callback safely. Travel/new-adventure resets restore surface ownership
-before save hooks and disposal. Saves inside still record the surface mouth, pickups and pet stay point;
-persistent cave rewards and indoor Continue are 29d.
+before save hooks and disposal. Saves inside record the cave, the room position, pickups and the pet stay point.
 
 Representative encounters cover goblin melee, wisp shots, slime hopping/contact and ogre slams, plus both pet bodies.
 Bespoke planet-boss and coastal behavior kits are not certified for room use; later rosters/guardian stages must
 audit their chosen encounters before rollout.
 
 ![Warrior and wolf facing a goblin and wisp on the cave floor](../../screenshots/world/cave-combat.jpg)
+
+## Rewards and persistence (29d)
+
+What a cave holds is decided by `caveFixtures` (`src/world/caveLayout.js`) from each **room's own id**, so a room
+always keeps the same chest and the same veins however the rest of the cave changes. `src/gameplay/CaveRewards.js`
+builds them in the room frame, hands out their loot and keeps the progress.
+
+- **The entrance stays empty.** It is the safe room: no chest, no vein, no monster spawn.
+- **Chests.** A `chamber` room holds the cave's ordinary chest kind; the end room holds its better one. Loot is
+  rolled by the usual table (`src/gameplay/loot.js`) and goes **straight into the bag**, with coins to the wallet:
+  underground there is no surface to pop items onto, so nothing can be left behind on a floor about to be disposed.
+- **Gloomquartz veins.** `CAVE_VEINS` are mining nodes that no planet surface ever places, so **Gloomquartz** can only
+  be dug out of a cave. Mining follows the surface rules (a pickaxe, a few swings, a better pick needs fewer); walking
+  away cancels the job. Gloomquartz brews the Restorative Elixir in place of amethyst (`gloomElixir`).
+- **Placement.** Fixtures hug the walls, inset by `CAVE.reward.veinInset`, and keep clear of every doorway, so nothing
+  a cave gives out can block the way through. Chests stand at the room's centre.
+- **Room progress.** A room registers as **visited** the moment the hero stands in it, and as **cleared** once its
+  monsters have fallen (`CAVE.reward.clearedBy`), so a revisit does not repopulate it.
+- **Never twice.** `opened`, `mined`, `cleared` and `visited` are kept per cave and saved with the **planet**
+  (`caves` in `src/core/save.js`). A chest or vein already in that record is rebuilt already claimed, so leaving,
+  fainting, Continue or the cave being regenerated can never pay it out again.
+- **Each cave is its own.** Every id begins with the cave's id, and a planet's snapshot is cleaned down to that one
+  cave, so portal travel never carries one planet's cave progress into another's.
+- **Older saves.** A save written before 29d simply has no cave rows and no cave pose: it starts on the surface with
+  every cave untouched. A pose naming a cave this planet does not have is ignored, and the hero stands at the mouth.
+
+![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)
+
+Not yet done: the puzzles, locked door and end guardian (29e), and the per-world ore, rosters and guardian loot that
+release the caves (29f, 29g). Every cave is still unreleased, so none of this is reachable in normal play; the checks
+below reach it through `Dungeons.enter` and test-only fixtures.
 
 ## Verification
 
@@ -88,3 +119,15 @@ audit their chosen encounters before rollout.
 - `node scripts/cave-combat-smoke.mjs` (Edge, port 8125): all heroes at 720p/1080p; real mouse/key casts and ground
   markers, movement after an ultimate, walls, following camera, health bars, no overflow, E exit and house peace.
   Zero page/shader errors; retakes the combat shot above. No release flag changes in any check.
+- `node --test tests/caveRewards.test.mjs`: fixtures are deterministic and owned by their room, the entrance stays
+  empty and the end room keeps the better chest, nothing stands in a wall or reaches into a doorway, cave ore is on no
+  surface node and is worth carrying home, and the `caves` and player cleaners drop other caves' rows and default an
+  older save to the surface (all three caves, ten seeds).
+- `node tests/sim/caveRewards.sim.mjs`: the cave is furnished from its layout; a real prompt mines a vein for
+  gloomquartz and opens a chest into the bag; a room registers as visited and as cleared when its monster falls;
+  leaving, re-entering, Continue underground and fainting all keep the progress without a second payout; and each
+  planet's snapshot holds only its own cave.
+- `node scripts/cave-rewards-smoke.mjs` (Edge, port 8126): real movement keys walk up to a vein and a chest until the
+  game offers them, real **E** mines and opens, the bag and wallet change once, leaving and entering rebuilds them
+  already claimed, and leaving disposes every fixture while keeping the record. 720p and 1080p, nothing overflowing,
+  zero page/shader errors; it retakes the rewards shot above.

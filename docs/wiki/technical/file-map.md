@@ -79,7 +79,8 @@ src/
 │   └── Walker.js          shared actor movement: spherical surface physics or the attached flat room frame
 ├── world/                 the planet (generated once, in a fixed order, from a seeded RNG)
 │   ├── World.js           generation order, landmarks, per-frame sun / sky / ambient animation
-│   ├── caveLayout.js      cave layouts: rooms joined from a seed, the walkable floor, which room a point is in (pure)
+│   ├── caveLayout.js      cave layouts: rooms joined from a seed, the walkable floor, which room a point is in,
+│   │                      and where each room's chest, veins and monster spawns stand (pure)
 │   ├── caves.js           a cave's rooms, corridors and lanterns, built far below the planet
 │   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
 │   ├── physics.js         planet gravity, live pond/sea levels and declared maximum-water queries
@@ -169,6 +170,7 @@ src/
 │   ├── Houses.js          entering / leaving houses, walking indoors, using furniture, the E-prompt target
 │   ├── quests/            quest runtime (offers, steps, tracker, rewards)
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
+│   ├── CaveRewards.js     a cave's chests and gloomquartz veins, their loot, and the room/chest/ore progress it keeps
 │   ├── Chests.js          placing a planet's chests, opening them, keys from monsters, the boss chest
 │   ├── loot.js            rolling a loot table into coins and item stacks (gear with a rolled rarity)
 │   ├── drops.js           monster drops

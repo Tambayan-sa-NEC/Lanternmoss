@@ -13,6 +13,7 @@ import { CROPS, FARM, NODE_KINDS, SCENERY } from '../config/resources.js';
 import { NEEDS } from '../config/survival.js';
 import { DAY } from '../config/day.js';
 import { HOUSES, resolveHouse } from '../config/houses.js';
+import { CAVES } from '../config/dungeons.js';
 import { COMBAT } from '../config/combat.js';
 import { TUTORIAL_STEPS, HELP_TOPICS, GATHERING_TIPS } from '../config/tutorial.js';
 import { CRITTER_DEFS } from '../config/critters.js';
@@ -40,11 +41,11 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
-  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
+  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
-  'gameplay/Dungeons.js': 'Being inside a cave is not saved yet: a save made inside records the surface mouth (29d keeps the indoor pose).',
+  'gameplay/Dungeons.js': 'The cave itself is rebuilt from the planet seed; which cave the hero is in and where they stand is saved with the player, and its chests, veins and rooms by CaveRewards.',
   'gameplay/Stations.js': 'Station models and proximity are rebuilt from the planet.',
   'gameplay/petAbilities.js': 'Visual scouting/fetch targets are transient; lasting buffs and cooldowns are saved.',
 };
@@ -60,7 +61,7 @@ export const SAVE_OWNERS = {
   'gameplay/buffs.js:buffs': 'buffs', 'gameplay/buffs.js:BuffState': 'buffs', 'gameplay/Needs.js:Needs': 'buffs',
   'gameplay/Houses.js:Houses': 'houses', 'gameplay/PlanetProgression.js:PlanetProgression': 'progression',
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
-  'gameplay/Chests.js:Chests': 'chests', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
+  'gameplay/Chests.js:Chests': 'chests', 'gameplay/CaveRewards.js:CaveRewards': 'caves', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
   'gameplay/Portals.js:Portals': 'portals',
@@ -138,6 +139,8 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
         time: number(s.time), up: direction(s.up), fwd: direction(s.fwd),
         lastHurt: number(s.lastHurt, -99, -99),
         indoors: Number.isInteger(s.indoors) && HOUSES[s.indoors] ? s.indoors : null,
+        cave: Object.values(CAVES).some(c => c.id === s.cave) ? s.cave : null,
+        caveX: number(s.caveX, 0, -400, 400), caveZ: number(s.caveZ, 0, -400, 400),
         roomX: number(s.roomX, 0, -50, 50), roomZ: number(s.roomZ, 0, -50, 50) };
     }
     case 'inventory': return Array.from({ length: HOTBAR.size + INVENTORY.slots }, (_, i) => cleanStack(list(value)[i]));
@@ -216,6 +219,14 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
     case 'chests': return { ...(s.delta ? { delta: true } : {}), opened: stringIds(s.opened, chestId), sinceKey: integer(s.sinceKey, 0, 0, 100),
       list: list(s.list, 128).map(c => ({ id: c?.id, kind: choice(c?.kind, ['common', 'rare', 'boss'], null), dir: direction(c?.dir), fwd: direction(c?.fwd) }))
         .filter(c => chestId(c.id) && c.kind && c.dir && c.fwd) };
+    case 'caves': {
+      const cave = Object.values(CAVES).find(c => c.id === s.cave) ?? null;
+      const owned = id => typeof id === 'string' && !!cave && id.startsWith(`${cave.id}:r`);
+      return { cave: cave?.id ?? null, opened: stringIds(s.opened, id => owned(id) && id.endsWith(':chest')),
+        mined: stringIds(s.mined, id => owned(id) && /:v\d{1,3}$/.test(id)),
+        cleared: stringIds(s.cleared, id => owned(id) && /:r\d{1,4}$/.test(id)),
+        visited: stringIds(s.visited, id => owned(id) && /:r\d{1,4}$/.test(id)) };
+    }
     case 'bossGate': return { awake: bool(s.awake), beaten: bool(s.beaten), broken: stringIds(s.broken, n => Number.isInteger(n) && n >= 0 && n < 10),
       hinted: stringIds(s.hinted, name => typeof name === 'string' && name.length < 80), praised: stringIds(s.praised, name => typeof name === 'string' && name.length < 80) };
     case 'pickups': return list(value, 4096).map(w => {
