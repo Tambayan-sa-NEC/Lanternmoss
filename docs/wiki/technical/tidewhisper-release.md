@@ -567,8 +567,12 @@ after visual review, and incidental unrelated recaptures were restored.
 
 **Go for functional integration to `develop`; no-go for Tidewhisper destination enablement or a `master` release.**
 The release flag stays false. Duskhollow's 30a can start from integrated `develop` because its 27h, 28a-28e and
-29a functional prerequisites are satisfied. 29g still waits on 30i. The optional otter remains **no-go** until it
-receives a separate estimate and the public performance gate has headroom; no optional pet was added in 27h.
+29a functional prerequisites are satisfied. 29g still waits on 30i. No optional pet was added in 27h.
+
+**Otter priority update (2026-10-20):** the owner placed the pearl-diving otter in TODO 27i, the first pending
+Tidewhisper stage, with a separate 3-5 h estimate. It can be developed with the unreleased world fixture. Its public
+unlock requires a fresh, passing Acer release matrix including the otter; the present 0/18 timing result provides no
+headroom. Stage 27i does not block the already integrated 27h functional gate, 29g or Duskhollow work.
 
 TODO 26 supplied the catalog, mechanic lifecycle and save infrastructure needed to build a fourth world, but it
 did not prove a complete real fourth-world campaign path: 27h found missing explicit forage/chest fields, save ids
