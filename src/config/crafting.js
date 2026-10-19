@@ -89,6 +89,9 @@ export const RECIPES = [
   { id: 'snowstepBoots', group: 'Armour', station: 'forge', result: 'snowstepBoots', needs: [['frostPetal', 4], ['ironIngot', 1]], coins: 50, rarity: 'rare' },
   // ---- trinkets (two can be worn)
   { id: 'lanternPendant', group: 'Trinkets', station: 'forge', result: 'lanternPendant', needs: [['glowcap', 4], ['copperIngot', 1]], coins: 15, rarity: 'uncommon' },
+  // The cave gem brews the same elixir amethyst does. Like the coastal recipes, it waits on its content: gloomquartz
+  // can only be mined underground (config/dungeons.js CAVE_VEINS), so no cave means no way to brew this one.
+  { id: 'gloomElixir', group: 'Potions', station: 'brew', result: 'restorativeElixir', needs: [['sweetleaf', 3], ['springWater', 2], ['gloomquartz', 1]] },
   { id: 'amethystBand', group: 'Trinkets', station: 'forge', result: 'amethystBand', needs: [['amethyst', 1], ['copperIngot', 1]], coins: 20, rarity: 'rare' },
   { id: 'emberRing', group: 'Trinkets', station: 'forge', result: 'emberRing', needs: [['emberShard', 5]], coins: 30, rarity: 'uncommon' },
   { id: 'opalBrooch', group: 'Trinkets', station: 'forge', result: 'opalBrooch', needs: [['fireOpal', 1], ['ironIngot', 1]], coins: 30, rarity: 'rare' },

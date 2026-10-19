@@ -246,7 +246,16 @@ lower left. Every action can be remapped in Settings → Keys, and every key hin
 
 **Cave combat (in development, unreleased).** The three heroes and their pets can fight on a cave's flat floor with
 their usual controls, aimed ultimates and abilities. Walls stop movement and attacks; leaving returns to the surface
-encounter. This is a test fixture preview: cave entrances, normal encounters, rewards and puzzles are not released.
+encounter. This is a test fixture preview: cave entrances, normal encounters and puzzles are not released.
 See [the cave stages](../world/caves.md).
 
 ![Warrior and wolf meeting a goblin and wisp under cave lanterns](../../screenshots/world/cave-combat.jpg)
+
+**Cave treasure (in development, unreleased).** Past the entrance, a cave's rooms hold chests and veins of
+**Gloomquartz**, a violet quartz that grows nowhere above ground. A chest pays straight into your bag, a vein takes a
+few swings of a pickaxe, and the cave remembers: come back, faint, or Continue a save made underground, and the chests
+you emptied stay open and the veins you worked out stay gone. Each planet's cave keeps its own record. The puzzles,
+the locked door and the guardian at the end are still to come, and no cave is released yet.
+See [cave rewards](../world/caves.md#rewards-and-persistence-29d).
+
+![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)

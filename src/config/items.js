@@ -218,6 +218,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xd8844a, art: 'ore' }, maxStack: 30, value: 4 },
   { id: 'ironOre', name: 'Iron Ore', description: 'Heavy, dark iron from deep veins (a copper pickaxe gets it out). Helmets and boots.', category: 'material',
     icon: { shape: 'gem', color: 0x8a8fa8, art: 'ore' }, maxStack: 30, rarity: 'uncommon', value: 7 },
+  { id: 'gloomquartz', name: 'Gloomquartz', description: 'Violet quartz that keeps a little lantern-light of its own. It grows only in the dark of a cave.', category: 'material',
+    icon: { shape: 'gem', color: 0x9f8cff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
   // ---- smelted at the forge (config/crafting.js: ore + fuel -> ingots); fuel burns in the forge (FUEL)
   { id: 'copperIngot', name: 'Copper Ingot', description: 'Copper ore, smelted bright at the forge. Watering cans, copper picks, rings and staves.', category: 'material',
     icon: { shape: 'gem', color: 0xe08a4a, art: 'ingot' }, maxStack: 20, value: 10 },

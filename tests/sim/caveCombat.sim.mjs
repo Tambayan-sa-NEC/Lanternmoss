@@ -136,7 +136,12 @@ clearCaveCombat(); placeCaveHero(room.x, room.z); const lightCount = H.LocalLigh
 addHazard(new Zone({ owner: 'player', team: 'player', center: pointOf(P), radius: 2, duration: 10, tick: 1, damage: 10, color: 0xff0000 }));
 P.fwd.set(0, 0, -1); H.tryCast('meteor'); assert.ok(aim.id); D.leave(); step(1);
 assert.equal(aim.id, null); assert.equal(hazardsOf('player').length, 0); assert.equal(ctx.room, null); assert.ok(H.LocalLights.count < lightCount);
-D.enter(); step(1); assert.ok(game.saves.save().ok); assert.ok(game.saves.continue()); step(1); assert.equal(ctx.room, null);
+// 29d: Continue goes back into the cave, so the room frame is rebuilt rather than torn down.
+D.enter(); step(1); assert.ok(game.saves.save().ok); assert.ok(game.saves.continue()); step(1);
+assert.ok(ctx.room && D.inside, 'Continue resumed inside the cave');
+assert.equal(aim.id, null); assert.equal(hazardsOf('player').length, 0); assert.equal(ctx.projectiles.length, 0);
+assert.ok(ctx.enemies.every(e => e.space === ctx.room), 'no surface monster leaked into the rebuilt room');
+D.leave(); step(1); assert.equal(ctx.room, null);
 D.enter(); step(1); P.invuln = 0; hurtPlayer(99999, null, 0, { lethal: true, source: 'cave test' });
 assert.equal(ctx.room, null); assert.ok(P.selfCollider.active); step(4); assert.ok(!P.dead && P.r < 200);
 // The actual update callbacks may tear down the list they are iterating (a direct hurtPlayer call cannot prove this).

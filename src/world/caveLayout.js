@@ -2,7 +2,7 @@
    and the same seed always gives the same cave (room ids, kinds, positions, doors). Pure (no scene / DOM),
    unit-tested in tests/caveLayout.test.mjs. Coordinates are the cave's own flat floor: x across, z down the screen;
    the entrance room is at (0, 0) and its mouth on its +z (south) wall. */
-import { CAVE, ROOM_KIT } from '../config/dungeons.js';
+import { CAVE, CAVE_VEINS, ROOM_KIT } from '../config/dungeons.js';
 import { mulberry32 } from '../utils/random.js';
 
 const OVERLAP = 0.6;
@@ -64,6 +64,53 @@ export function walkable(rects, x, z, radius = 0.35) {
   return rects.some(r => r.corridor && inside(r, 0) &&
     ((r.x1 - r.x0 > r.z1 - r.z0) ? z >= r.z0 + radius && z <= r.z1 - radius : x >= r.x0 + radius && x <= r.x1 - radius));
 }
+
+/* ---------------------------------------------------------------- the rewards in the rooms (29d)
+   Fixtures are placed from the room's own id, not from the generation order, so a room keeps its chest and its
+   veins whatever else changes, and a saved cave rebuilds exactly the same ones. Spots hug the walls at
+   CAVE.reward.veinInset and stay clear of every doorway (a door gap is CAVE.corridor wide, centred on its wall),
+   so nothing a cave gives out can block the way through. The entrance room stays empty: it is the safe room. */
+
+/** A small stable hash of a string, for a per-room random stream. */
+function hash(text) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  return h >>> 0;
+}
+
+/** The six wall spots a room can put a vein in, clear of its doorways: [x, z] in cave coordinates. */
+function veinSpots(r) {
+  const m = CAVE.reward.veinInset, hw = r.w / 2 - m, hd = r.d / 2 - m;
+  return [[r.x - r.w * 0.3, r.z - hd], [r.x + r.w * 0.3, r.z - hd],
+    [r.x - hw, r.z - r.d * 0.34], [r.x - hw, r.z + r.d * 0.34],
+    [r.x + hw, r.z - r.d * 0.34], [r.x + hw, r.z + r.d * 0.34]];
+}
+
+/** Where a room's monsters come in: clear of its chest at the centre and of its walls. */
+function spawnSpots(r) {
+  const m = CAVE.reward.spawnInset, hw = Math.max(0, r.w / 2 - m), hd = Math.max(0, r.d / 2 - m);
+  return [[r.x - hw * 0.8, r.z + hd * 0.6], [r.x + hw * 0.8, r.z + hd * 0.6], [r.x, r.z - hd * 0.8]];
+}
+
+/** Every reward a cave holds: { chests, veins, spawns }, each entry with a stable id and room coordinates.
+    Pure and deterministic: the same cave and layout always give the same fixtures. */
+export function caveFixtures(layout, cave) {
+  const chests = [], veins = [], spawns = [], [lo, hi] = cave.veins ?? [0, 0];
+  for (const r of layout.rooms) {
+    if (r.id === layout.entrance) continue;                       // the way in stays a safe, empty room
+    const rng = mulberry32(hash(`${r.id}:rewards`));
+    const kind = r.id === layout.end ? cave.endChest : r.kind === 'chamber' ? cave.chest : null;
+    if (kind) chests.push({ id: `${r.id}:chest`, room: r.id, kind, x: r.x, z: r.z });
+    const spots = veinSpots(r), n = Math.min(spots.length, lo + Math.floor(rng() * (hi - lo + 1)));
+    for (let i = spots.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [spots[i], spots[j]] = [spots[j], spots[i]]; }
+    for (let i = 0; i < n && cave.ore; i++) veins.push({ id: `${r.id}:v${i}`, room: r.id, kind: cave.ore, x: spots[i][0], z: spots[i][1] });
+    for (const [x, z] of spawnSpots(r)) spawns.push({ room: r.id, x, z });
+  }
+  return { chests, veins, spawns };
+}
+
+/** How far a fixture of `kind` reaches out (m), for placement checks. */
+export const veinRadius = kind => CAVE_VEINS[kind]?.r ?? 1;
 
 /** The room (id) containing (x, z), or null in a corridor. */
 export function roomAt(layout, x, z) {
