@@ -1801,6 +1801,28 @@ than running alongside it.
 
 ---
 
+# Phase H: Enemy pursuit and faction combat
+
+## 45. Unbounded mob pursuit and provoked faction fights **(suggested)**
+
+**Goal:** ordinary mobs keep pursuing the player without a leash, evolved mini bosses stop returning home once they reach their final form/state, and mobs can damage and provoke one another into fights.
+Code: `src/entities/enemies/Enemy.js`, `src/config/combat.js`, `src/combat/` (targeting, damage and projectiles), `src/entities/enemies/behaviors/`, and `tests/sim/`.
+**Size:** L across three stages. **Needs:** 18, 23. These are foundations for repeatable combat simulations and the current leash/aggro and balance rules.
+**Risk:** removing return limits can strand enemies behind unreachable terrain or leave encounters active across world transitions; cross-faction hits can credit or reward the wrong attacker. **Recommendation:** pursue indefinitely within the current world using reachable paths; let normal world-transition/reset cleanup end the pursuit. Keep mini-boss leash rules through earlier phases, then disable the leash when the final form/state begins. Preserve one clear damage owner and award each defeat once.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [ ] **45a. Pursuit and final-form leash rules** | 18, 23 | 2-4 h | Remove home-distance and aggro-distance give-up/return behavior for ordinary mobs: they continue to pursue the player indefinitely within their current world, including after the player outruns their current aggro radius. Do not add another leash or quiet distance cutoff. Keep mini-boss leash/return behavior during earlier forms/phases; remove it when the encounter enters its final form/state, and keep pursuit active until the existing encounter ends or the world resets. Define unreachable-route and world-transition cleanup explicitly. Test ordinary archetypes, long chases, obstacles, phase transitions, encounter resets and travel/Continue. |
+| [ ] **45b. Mob damage and provoked retaliation** | 45a | 3-4.5 h | Allow mob-owned attacks, including ghost projectiles, to hit other mobs. A lesser mob damaged by another lesser mob can target and retaliate against its attacker; their attacks can continue the fight. Main-boss and mini-boss attacks must not damage lesser mobs, including through projectiles, melee or area effects. Cover same-world targeting, damage and aggro outcomes for each attacker/target class, death during retaliation, and interaction with existing boss summons/pack behavior. Preserve correct damage attribution and prevent duplicate XP, drops or defeat events. |
+| [ ] **45c. Integrated acceptance and documentation** | 45a-45b | 2-4.5 h | Add deterministic simulations for pursuit beyond every old cutoff, final-form mini-boss leash removal (with earlier phases still leashed), ghost-to-goblin projectile damage, lesser-mob provocation/retaliation, and main/mini-boss attacks that overlap lesser mobs without damaging or provoking them. Cover cleanup on death/travel/reset/Continue. Run the full required checks and relevant browser smokes, inspect affected combat visuals, update the combat wiki and this TODO's implementation note, and verify ordinary surface AI/balance remains within documented targets without weakening them. |
+
+- [ ] **Ordinary mobs never give up the chase:** no home leash, return-home state, or aggro-distance timeout while the player remains in the same world; pursue around reachable obstacles.
+- [ ] **Mini-boss final form:** retain the existing leash before the final form/state, then remove it for the remainder of that encounter. Regression-check each phased mini-boss and reset/retry behavior.
+- [ ] **Mob-on-mob combat:** lesser mobs can damage and provoke other lesser mobs; a goblin can retaliate after a ghost projectile. Main bosses and mini bosses cannot damage lesser mobs with any attack. Test both damage and aggro, and credit damage/rewards once to the correct source.
+- [ ] **No stranded fights:** unreachable paths, death, travel, save/Continue and encounter teardown cannot leave stale targets or active enemies; preserve existing house/cave safety rules and documented balance targets.
+
+---
+
 ## Suggested additions
 
 Smaller ideas, and where the promoted ones went.
@@ -1826,6 +1848,7 @@ Smaller ideas, and where the promoted ones went.
       storage into 25b (done).
 - [x] **Gameplay checks in the repo (suggested):** promoted to item 18 (done).
 - [~] **Performance budget (suggested):** promoted to item 20.
+- [~] **Mob pursuit and faction combat (suggested):** promoted to item 45; ordinary mobs pursue without a leash, phased mini bosses lose theirs on entering their final form/state, and mobs can damage and provoke one another into fights.
 - [ ] **Small fixes (suggested):** add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`). (The `favicon.ico` was done in 18.)
 - [ ] **A fourth new world, Windward (suggested, parked):** tall mesas above a sea of clouds, with updrafts and a leaf
       glider. Parked because gliding needs new movement, a new camera and falling rules, and the clouds below need a
