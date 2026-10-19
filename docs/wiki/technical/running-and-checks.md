@@ -62,6 +62,7 @@ node scripts/lighting-smoke.mjs    # local light harness: shaders compile, no re
 node scripts/caves-smoke.mjs       # caves (unreleased): real keys room to room, readable dark, real E leaves; retakes its shot
 node scripts/cave-combat-smoke.mjs  # cave combat: all heroes, real clicks/ultimate keys, walls, bars, exit, peaceful houses; 720p/1080p
 node scripts/cave-rewards-smoke.mjs # cave rewards: real keys and E mine a vein and open a chest, no second payout; retakes its shot
+node scripts/cave-puzzles-smoke.mjs # cave puzzles: the ward stops real keys, both puzzle kinds played, guardian and way home
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 ```
 

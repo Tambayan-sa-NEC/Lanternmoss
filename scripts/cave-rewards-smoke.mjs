@@ -122,6 +122,9 @@ try {
     const { applyCharacter } = await import('/src/gameplay/characters.js');
     applyCharacter('knight'); L.Pets.command('passive');          // the knight reads clearly against a dark cave
     L.CaveRewards.resetRun(); L.Dungeons.leave();
+    // This picture's subject is a room's treasure. 29e puts a guardian in the end room, where this cave's only chest
+    // stands, so for the staged frame alone it is taken as already beaten. Nothing here is saved: the page ends next.
+    L.CavePuzzles.beaten.add(`${L.Dungeons.layoutFor().end}:guardian`);
   });
   await frames(60); await page.evaluate(() => window.LANTERNMOSS.Dungeons.enter()); await frames(60);
   await page.evaluate(async () => {
@@ -138,7 +141,8 @@ try {
     document.body.classList.add('photo');
   });
   await frames(120);
-  await page.addStyleTag({ content: '#toast, #achv, #banner { display: none !important; }' });
+  // #cresult carries pet/planet cards and #save-notice the autosave tick: neither belongs in the picture.
+  await page.addStyleTag({ content: '#toast, #achv, #banner, #cresult, #save-notice { display: none !important; }' });
   await page.screenshot({ path: shotPath('cave-rewards'), type: 'jpeg', quality: 88 });
   await page.evaluate(() => document.body.classList.remove('photo'));
 

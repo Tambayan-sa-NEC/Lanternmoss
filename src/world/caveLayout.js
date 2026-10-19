@@ -96,8 +96,10 @@ function spawnSpots(r) {
     Pure and deterministic: the same cave and layout always give the same fixtures. */
 export function caveFixtures(layout, cave) {
   const chests = [], veins = [], spawns = [], [lo, hi] = cave.veins ?? [0, 0];
+  const path = routeToEnd(layout), puzzleRoom = path[path.length - 2] ?? null;   // 29e: the puzzle room is its own
   for (const r of layout.rooms) {
     if (r.id === layout.entrance) continue;                       // the way in stays a safe, empty room
+    if (r.id === puzzleRoom) { for (const [x, z] of spawnSpots(r)) spawns.push({ room: r.id, x, z }); continue; }
     const rng = mulberry32(hash(`${r.id}:rewards`));
     const kind = r.id === layout.end ? cave.endChest : r.kind === 'chamber' ? cave.chest : null;
     if (kind) chests.push({ id: `${r.id}:chest`, room: r.id, kind, x: r.x, z: r.z });
@@ -107,6 +109,59 @@ export function caveFixtures(layout, cave) {
     for (const [x, z] of spawnSpots(r)) spawns.push({ room: r.id, x, z });
   }
   return { chests, veins, spawns };
+}
+
+/* ---------------------------------------------------------------- the way to the end room (29e)
+   The route from the entrance to the end room always passes through the end's parent (the end is never next to the
+   entrance: its depth is at least 2 for every cave and seed, which tests/cavePuzzles.test.mjs checks). That parent is
+   the puzzle room: it holds the cave's puzzle and the chest the Warden's Key waits in, and the doorway from it into
+   the end room is warded until that key turns. The end room holds the guardian and, once it falls, the way home. */
+
+/** The rooms from the entrance to the end, through the doors. */
+export function routeToEnd(layout) {
+  const byId = new Map(layout.rooms.map(r => [r.id, r])), prev = new Map([[layout.entrance, null]]), queue = [layout.entrance];
+  for (let i = 0; i < queue.length && !prev.has(layout.end); i++)
+    for (const next of Object.values(byId.get(queue[i]).doors)) if (next && !prev.has(next)) { prev.set(next, queue[i]); queue.push(next); }
+  const path = []; for (let id = layout.end; id; id = prev.get(id)) path.unshift(id);
+  return path;
+}
+
+/** The room's usable half-extents: `inset` clear of every wall, which also keeps everything out of the doorways. */
+const usable = r => [Math.max(0.5, r.w / 2 - CAVE.puzzle.inset), Math.max(0.5, r.d / 2 - CAVE.puzzle.inset)];
+
+/** `n` spots spread across the room at depth `z`, so a push always runs straight down a clear lane. */
+function puzzleSpots(r, n, z) {
+  const [hw] = usable(r), out = [];
+  for (let i = 0; i < n; i++) out.push([r.x + (n === 1 ? 0 : (i / (n - 1)) * 2 - 1) * hw, z]);
+  return out;
+}
+
+/** The puzzle, the warded door, the key chest, the guardian and the way home: the end of a cave (29e). */
+export function caveEnding(layout, cave) {
+  const byId = new Map(layout.rooms.map(r => [r.id, r])), path = routeToEnd(layout);
+  const end = byId.get(layout.end), room = byId.get(path[path.length - 2] ?? layout.entrance);
+  const dir = Object.entries(room.doors).find(([, id]) => id === end.id)?.[0] ?? 'n';
+  const [dx, dz] = DIRS[dir], half = CAVE.corridor / 2;
+  // The ward sits in the doorway itself, between the two rooms, and is as wide as the corridor.
+  const at = { x: room.x + dx * room.w / 2, z: room.z + dz * room.d / 2 };
+  const door = { id: `${room.id}:door`, room: room.id, to: end.id, dir, x: at.x, z: at.z,
+    x0: at.x - (dx ? 0.5 : half), x1: at.x + (dx ? 0.5 : half), z0: at.z - (dz ? 0.5 : half), z1: at.z + (dz ? 0.5 : half) };
+  const kind = cave.puzzle === 'stones' ? 'stones' : 'lanterns';
+  const count = kind === 'stones' ? CAVE.puzzle.stones : CAVE.puzzle.switches;
+  const [, hd] = usable(room);
+  // The puzzle line sits in the room's far half and the stones start on its near edge, so every push is a straight
+  // lane down the room; the key chest waits on the near edge too, on the middle line the stones leave free.
+  const far = room.z - hd * 0.6, near = room.z + hd;
+  const spots = puzzleSpots(room, count, far);
+  const puzzle = { kind, room: room.id,
+    switches: kind === 'lanterns' ? spots.map(([x, z], i) => ({ id: `${room.id}:sw${i}`, room: room.id, x, z })) : [],
+    plates: kind === 'stones' ? spots.map(([x, z], i) => ({ id: `${room.id}:pl${i}`, room: room.id, x, z })) : [],
+    stones: kind === 'stones' ? spots.map(([x], i) => ({ id: `${room.id}:st${i}`, room: room.id, x, z: near })) : [] };
+  const keyChest = { id: `${room.id}:keychest`, room: room.id, kind: 'rare', item: 'wardenKey', x: room.x, z: near };
+  const guardian = { id: `${end.id}:guardian`, room: end.id, type: cave.guardian, loot: cave.guardianLoot,
+    x: end.x, z: end.z - end.d / 2 + CAVE.puzzle.inset };
+  const shortcut = { id: `${end.id}:shortcut`, room: end.id, x: end.x + end.w / 2 - CAVE.puzzle.inset, z: end.z };
+  return { puzzle, door, keyChest, guardian, shortcut };
 }
 
 /** How far a fixture of `kind` reaches out (m), for placement checks. */

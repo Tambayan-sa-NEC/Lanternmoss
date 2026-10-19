@@ -1325,7 +1325,7 @@ precedence over the old six-cave estimate. Expansion cave configs follow their w
 | [x] **29b. Seeded cave layout and traversal** | 29a, 26a | 3-4.5 h | Add the reusable room kit, seeded connections, surface entrance, flat-floor collisions/camera, entry/exit and safe death return. Prove deterministic room ids and no stranded player; keep the unfinished dungeon outside normal travel. |
 | [x] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
 | [x] **29d. Cave rewards and persistence** | 29c | 2-4 h | Register room/chest/ore/enemy progress, saved indoor pose and death/revisit/Continue behavior. Prove old-save defaults, portal isolation, unique cave ore and no reward duplication after reload or regeneration. |
-| [ ] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
+| [x] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
 | [ ] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
 | [ ] **29g. Expansion cave rollout** | 29f, 27h, 30i | 2-4 h | Configure/release Tidewhisper and Duskhollow caves from the proven kit, including tide-safe entrances and lantern readability. Check both complete paths and saved progress. No Moon cave or extra room technology; if either config needs new mechanics, split this rollout before coding. |
 
@@ -1376,10 +1376,30 @@ Not done here: puzzles, the locked door and the guardian (29e), and per-world or
 room monster rosters are configured but no cave spawns them in normal play yet. See
 [cave rewards](docs/wiki/world/caves.md#rewards-and-persistence-29d).
 
+**29e implemented (2026-10-19):** `world/caveLayout.js` `caveEnding` lays out the last stretch and
+`gameplay/CavePuzzles.js` runs it. The end room is never next to the entrance (depth >= 2 for every cave and seed,
+asserted over 600 seeds each), so its parent is always the **puzzle room** and the route to the end always passes
+through it; that room keeps no veins or ordinary chest. Each cave picks its puzzle in config: **lantern switches**
+(E lights each, light them all) or **push stones and pressure plates** (walk into a stone to shoulder it; each stone
+starts on a clear lane straight down the room from its plate, and the layout test walks that whole lane to prove it
+solvable). Solving it unseals the **key chest**, which gives the **Warden's Key**. The key turns the **warded door**
+once and is spent: while the ward is up it is a `RoomSpace` blocker, so because every reach, swept move and room route
+goes through `contains()`, it stops the hero, pets, monsters and their pathing alike, not just a prompt. Stepping into
+the end room wakes its **guardian**, one of the cave's own monsters made tougher by the existing `makeElite`, so no
+cave needs a boss AI of its own; beating it pays its loot into the bag and lights a **way home** back to the cave
+mouth. Lit switches, where stones were left, turned doors, beaten guardians and the open way home save per planet
+(`cavePuzzles`). A latent gap was fixed on the way: a monster that fell in a cave spawned its drops in the planet's
+sphere frame, so they were lost when the cave was torn down; underground, drops and Lantern Keys now go straight to
+the bag (`drops.js`, `Chests.js`), as cave chests already did. Checked by `tests/cavePuzzles.test.mjs`,
+`tests/sim/cavePuzzles.sim.mjs` and `scripts/cave-puzzles-smoke.mjs` (a real lantern puzzle at 720p and a real stone
+push at 1080p, zero page/shader errors). Caves stay unreleased. Not done here: the per-world ore, rosters and guardian
+loot that release the caves (29f/29g); ordinary room monsters still only come from test fixtures. See
+[the warden](docs/wiki/world/caves.md#puzzles-the-warden-and-the-way-home-29e).
+
 - [ ] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
       that are found nowhere else.
-- [ ] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
-- [ ] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
+- [x] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
+- [x] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
 - [ ] Caves are dark: lanterns and glowcaps light the way.
   - **The light tech:** a light radius around the hero and around lanterns, done in the shaders (a few light positions
     passed to the materials) plus emissive glow and bloom. At most about four real point lights (risk 6).

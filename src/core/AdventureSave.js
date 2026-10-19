@@ -11,6 +11,7 @@ import { BossGate } from '../gameplay/BossGate.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { Chests } from '../gameplay/Chests.js';
 import { CaveRewards } from '../gameplay/CaveRewards.js';
+import { CavePuzzles } from '../gameplay/CavePuzzles.js';
 import { dayClock } from '../gameplay/dayClock.js';
 import { Equipment, computeStats } from '../gameplay/equipment.js';
 import { Farm } from '../gameplay/Farm.js';
@@ -63,7 +64,7 @@ export class AdventureSave {
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook, talents: Talents,
-      home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, caves: CaveRewards, bossGate: BossGate, pickups: Pickups, building: Building,
+      home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, caves: CaveRewards, cavePuzzles: CavePuzzles, bossGate: BossGate, pickups: Pickups, building: Building,
       mechanics: game.world.mechanics })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.world.mechanics.snapshotForPlanet = id => this.registry.planets[id]?.mechanics;

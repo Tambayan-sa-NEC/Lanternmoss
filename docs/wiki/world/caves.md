@@ -45,6 +45,7 @@ in) are `src/world/caveLayout.js`; the 3D rooms are `src/world/caves.js`.
 - **Leaving.** Step back onto the bright patch at the mouth, or press **E** there ("Leave the cave"). You come out at
   the surface mouth, facing away from it.
 - **Treasure (29d).** Rooms other than the entrance hold chests and gloomquartz veins; see below.
+- **The way to the end (29e).** A puzzle room, a warded door, a guardian and a way home; see below.
 - **Never stranded.** Fainting inside takes the hero out at once; the usual respawn brings them home to the village.
   Travelling to another world or starting a new adventure leaves the cave too. A save made inside records the cave and
   the room position, so Continue goes back in where you stood (29d); a save made after fainting starts on the surface.
@@ -98,9 +99,41 @@ builds them in the room frame, hands out their loot and keeps the progress.
 
 ![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)
 
-Not yet done: the puzzles, locked door and end guardian (29e), and the per-world ore, rosters and guardian loot that
-release the caves (29f, 29g). Every cave is still unreleased, so none of this is reachable in normal play; the checks
-below reach it through `Dungeons.enter` and test-only fixtures.
+Not yet done: the per-world ore, rosters and guardian loot that release the caves (29f, 29g). Every cave is still
+unreleased, so none of this is reachable in normal play; the checks below reach it through `Dungeons.enter` and
+test-only fixtures.
+
+## Puzzles, the warden and the way home (29e)
+
+`caveEnding` (`src/world/caveLayout.js`) lays out the last stretch, and `src/gameplay/CavePuzzles.js` runs it. The
+end room is never next to the entrance (its depth is at least 2 for every cave and seed), so its **parent room** is
+always free to be the puzzle room, and the route to the end always passes through it. That room keeps no ore veins
+or ordinary chest: it is about its puzzle.
+
+- **The puzzle.** Each cave picks a kind in config (`puzzle`):
+  - **lantern switches** — a row of unlit lanterns. **E** lights one; light them all.
+  - **push stones and pressure plates** — walk into a stone to shoulder it along; a plate is pressed while a stone
+    rests on it. Each stone starts on a clear lane straight down the room from its own plate, so the push is always
+    possible. The layout test walks that whole lane to prove it.
+- **The key chest.** Sealed until the puzzle is solved ("Every lantern in this room must burn"). Opened, it gives the
+  **Warden's Key**, which exists nowhere else.
+- **The warded door.** The doorway from the puzzle room into the end room. While the ward is up it is a
+  `RoomSpace` **blocker**: because every reach, swept move and room route goes through `contains()`, the ward stops
+  the hero, pets, monsters and their pathing alike — not just a prompt. The key turns it once and is spent doing it.
+- **The guardian.** Stepping into the end room wakes its keeper: one of the cave's own monsters (`guardian` in
+  config) made tougher by `makeElite`, exactly as a planet's elites are. **No cave needs a boss AI of its own**; the
+  existing kits do the fighting. It drops its loot table into the bag and does not come back once beaten.
+- **The way home.** The guardian's fall lights a worn stair in the end room. **E** there carries the hero back to the
+  cave mouth, so the walk out is not the walk in.
+- **Underground loot goes to the bag.** A monster that falls in a cave hands its drops straight over, and so does a
+  Lantern Key dropped underground (`src/gameplay/drops.js`, `src/gameplay/Chests.js`). On the surface they still hop
+  out onto the ground. Underground there is nowhere to hop to, and the floor is thrown away with the cave.
+- **What is remembered.** Lit switches, where each stone was left, doors already turned, guardians already beaten and
+  the open way home are saved per planet (`cavePuzzles` in `src/core/save.js`), keyed by cave id like the rewards
+  beside them. A solved puzzle, a turned ward and a beaten guardian never come back, and one planet's ending never
+  crosses a portal into another's.
+
+![The cave's warden, an elite of its own kind, standing over the end room](../../screenshots/world/cave-guardian.jpg)
 
 ## Verification
 
@@ -131,3 +164,16 @@ below reach it through `Dungeons.enter` and test-only fixtures.
   game offers them, real **E** mines and opens, the bag and wallet change once, leaving and entering rebuilds them
   already claimed, and leaving disposes every fixture while keeping the record. 720p and 1080p, nothing overflowing,
   zero page/shader errors; it retakes the rewards shot above.
+- `node --test tests/cavePuzzles.test.mjs`: the end room is never next to the entrance (600 seeds a cave); the ending
+  is deterministic and sits on the only route to the end; the ward spans the doorway it closes and nothing else; every
+  puzzle written can be solved (each stone's whole lane to its plate is walkable and stays in the room) and nothing
+  blocks a doorway or crowds the key chest or the 29d rewards; both puzzle kinds are used across the caves; and the
+  `cavePuzzles` cleaner drops other caves' rows and clamps a damaged stone position.
+- `node tests/sim/cavePuzzles.sim.mjs`: the ward refuses standing, swept paths, room routes and real movement keys;
+  the chest and door refuse until the puzzle is done; real prompts light every switch and push every stone onto its
+  plate; the key turns the ward once and is spent; the end room wakes an elite of the cave's own kind that pays its
+  loot into the bag and opens the way home; and all of it survives leaving, re-entering and Continue, per planet.
+- `node scripts/cave-puzzles-smoke.mjs` (Edge, port 8127): real movement keys cannot walk through the ward; a real
+  lantern puzzle is played at 720p on Lanternmoss and a real stone push at 1080p on Emberfall; **E** opens the chest
+  and turns the key; the guardian wakes, is beaten, and real **E** takes the way back. Nothing overflows, zero
+  page/shader errors; it retakes the guardian shot above.
