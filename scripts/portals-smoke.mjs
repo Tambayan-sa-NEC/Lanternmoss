@@ -12,6 +12,7 @@ try {
   browser = await puppeteer.launch({ executablePath: process.env.CHROME ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
     headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage(), errors = []; page.on('pageerror', e => errors.push(String(e)));
+  page.on('console', m => { if (m.type() === 'error' && /shader|WebGLProgram|VALIDATE_STATUS/i.test(m.text())) errors.push(m.text()); });
   page.setDefaultTimeout(90000); await page.setViewport({ width: 1280, height: 720 });
   const ready = async () => { await page.waitForFunction(() => window.LANTERNMOSS); };
   const pickGate = async () => {
@@ -68,5 +69,10 @@ try {
   await page.setViewport({ width: 1920, height: 1080 }); await pickGate();
   const layout = await page.$eval('.portal-panel', e => ({ h: e.getBoundingClientRect().height, sh: e.scrollHeight, ch: e.clientHeight }));
   assert.ok(layout.h < 1080); assert.equal(layout.sh, layout.ch);
-  assert.deepEqual(errors, []); console.log('All portal browser checks passed (720p/1080p, real WebGL, no page errors).');
-} finally { if (browser) await browser.close(); server.kill(); }
+  assert.deepEqual(errors, []); console.log('All portal browser checks passed (720p/1080p, real WebGL, zero page/shader errors).');
+} finally {
+  server.kill(); server.stdout?.destroy(); server.stderr?.destroy(); server.unref();
+  if (browser) { let timer; try { await Promise.race([browser.close(), new Promise(resolve => { timer = setTimeout(() => {
+    const child = browser.process(); child?.kill(); browser.disconnect(); for (const stream of child?.stdio ?? []) stream?.destroy?.(); child?.unref(); resolve();
+  }, 10000); })]); } finally { clearTimeout(timer); } }
+}

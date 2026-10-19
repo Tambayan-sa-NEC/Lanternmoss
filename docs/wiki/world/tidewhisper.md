@@ -1,6 +1,12 @@
 # Tidewhisper terrain and tides
 
-## In brief (unreleased)
+## In brief (functionally complete, unreleased)
+
+TODO 27h's functional content, balance, pacing and test-only campaign travel/Continue path passed again after the
+TODO 29 cave merge on 2026-10-19. The clean Acer RTX 4050 acceptance matrix still failed the unchanged p95 frame
+gate in all 18 cases at 1080p High on a 60 Hz display (17.4–18.2 ms versus 16.80 ms). The owner-approved gate split
+allows the functional work to join `develop` while `released: false` remains in force. Performance certification,
+destination enablement and the confirmed public `master` release are still pending.
 
 These summaries moved here from the root README; each is detailed in its section below.
 
@@ -72,7 +78,7 @@ keyboard movement, swimming/energy, the chip, protected plots, local drainage, r
 travel. It closes its own server/browser, refreshes the two development previews and keeps additional lagoon
 captures in the temporary directory. `tests/sim/lib/tideFixture.mjs` is never imported by production code.
 
-These checks verify this stage's rules and rendering; they do not certify the Intel Iris Xe 60-fps release
+These checks verify this stage's rules and rendering; they do not certify the current desktop 60-fps release
 target. Population, content, balance, complete-world browser traversal and measured performance remain 27h's
 requirements. Resources/weather/music are now implemented in 27c below; the village/lighthouse are implemented in 27d below; the regular enemies in 27e below.
 
@@ -88,7 +94,7 @@ Scenery is generated once with fixed upper counts: 18 palms, 12 kelp trees, 10 c
 plant clusters. Beach flora/animals reserve dry high water; kelp/coral and fish use shallow water. The static
 scenery is spatially batched, and decorative quality changes do not change placement, resource ids or colliders.
 The seeded development fixture measured **30,197 static scenery triangles in 65 batches**, including its borrowed
-village. This is a geometry-cost check, not an Iris Xe frame-rate certification.
+village. This geometry-cost check supplies triangle counts; target-device frame-rate acceptance is separate.
 
 ![Lantern palm development preview](../../screenshots/world/tidewhisper-flora.jpg)
 
@@ -140,7 +146,8 @@ With a rod on the hotbar, **E** near seawater fishes using the existing bite/ree
 common coastal catch and golden koi remain rare. The float follows the live tide and cancels if its water dries.
 At a cooking pot, make salted fish (sprat + salt), seaweed rolls (seaweed + sprat) and coastal chowder (clams +
 sprat + salt). At a forge, craft the Tide Circlet, Mantle and Boots from glass, pearls, coral and shells; a Tide
-Pendant uses a black pearl, glass and shells. These pieces use the existing equip/save/stat rules and are
+Pendant uses a black pearl, glass and shells. Since 27h they also carry forge fees (circlet 70, mantle 80, boots 70,
+pendant 60 coins: 280 for the set), which Tidewhisper's chests and lighthouse quest reserve. These pieces use the existing equip/save/stat rules and are
 explicitly crafted, so they cannot leak into Act I random gear rewards. Their set identity is recorded; bonuses
 remain TODO 28a.
 
@@ -155,7 +162,7 @@ The helper owns port 8109 and borrows only test encounters in `coastalResourceFi
 E gathering, reload Continue, the three-beat audio timer, 720p/1080p low squall shaders and dry farms. Captures
 are saved in the temporary directory. The simulation also covers pick tiers, low/high tide, multi-day skips,
 revisits, sea fishing, dawn transitions, crop watering and equipped Tide gear Continue. These checks do not certify
-Iris Xe frame time; that hardware measurement and campaign release remain 27h.
+reference-device frame time; that hardware measurement and campaign release remain 27h.
 
 ## Stilt village and lighthouse (27d)
 
@@ -246,7 +253,7 @@ errors. The simulations (`coastalEnemies`, `coastalDuels`) cover placement and C
 the capped turn, the pinch, rising/falling drift, the sting and dodging it, stranding and both recoveries, the skipper's
 untargetable lurk, ambush, retreat, shore fence and stranding, extra drops, and a level-8 duel per hero. Every hero
 beat every monster with no HP top-ups (3-10 s each). These are access checks; the campaign's pacing targets,
-measured performance and the Iris Xe frame-time target remain 27h.
+measured performance and the desktop reference frame-time target remain 27h.
 
 ## Old Ironclaw (27f)
 
@@ -264,7 +271,9 @@ Its kit is `src/entities/enemies/behaviors/boss/ironclaw.js` on the shared boss 
   - *Shell swaps* at 66% and 33%: it crawls out and scuttles about for 5.5 s, then climbs into a new shell (bronze,
     then verdigris, then a dark old bell).
   - *Wedged*: a charge that crosses wet tidal sand (dry now but under high water: the flats at low tide) ploughs it
-    into the sand for 5 s. At high tide the flats are flooded, so it never wedges.
+    into the sand for 5 s. At high tide the flats are flooded, so it never wedges. It only falls for this once per
+    shell: afterwards it is wary, and its charges skid to a stop at the edge of the wet sand (still shut in its shell)
+    until it climbs into a new one. So a fight has at most three wedges (27h).
 - **Moves**: pinch (a marked wedge in front), charge (a marked lane), and from the second shell, toll (it rears and
   slams the bell down: a shockwave to jump). Every move has a wind-up warning and a recovery.
 - **Reward**: two black pearls where it falls, plus the usual mini boss treasure roll, and the beds are free. Its
@@ -285,9 +294,9 @@ low- versus high-tide wedging, both shell swaps and the toll, the reset after a 
 
 `ironclawDuels` gives each hero a level-8 bot using the bestiary's plan: bait charges across the wet sand at low tide,
 strike the face, and hit anywhere while it is open. It never jumps a shockwave or dodges; HP is topped up below 50%.
-Every hero beat it on two seeds. Most fights took 148-195 s with 8-13 top-ups, against the 90-180 s mini boss target
-(the existing mini bosses take 95-135 s with 6-13). One ranger fight took 41 s after four early wedges. Final
-three-hero pacing is 27h's balance pass.
+Every hero beat it on two seeds. In 27f most fights took 148-195 s with 8-13 top-ups, and one ranger fight took 41 s
+after four early wedges. The 27h balance pass made it wary after one wedge per shell and lowered its base HP from 1000
+to 800: every hero now takes 156-174 s with 6-12 top-ups, inside the 90-180 s mini boss target.
 
 ## Mirelure, the Lantern Angler (27g)
 
@@ -327,6 +336,7 @@ false and real lures, geysers, the sluice break and creeping reflood, beached mo
 a reload mid-drain and the reward.
 
 `mirelureDuels` gives each hero a level-8 bot that watches her breath, strikes the lure that dims on it, and attacks her
-while she is up or beached; it never dodges, and HP is topped up below 50%. Every hero won on two seeds in 175-265 s
-(target 180-300 s) with 8-23 top-ups, close to the Act I bosses (8-28). Final three-hero pacing and the release gate are
-27h; the Iris Xe frame-time target remains unmeasured.
+while she is up or beached; it never dodges, and HP is topped up below 50%. In 27g every hero won on two seeds in
+170-266 s, but the ranger's 171-176 s was under the 180-300 s target. 27h raised her base HP from 3000 to 3250: every
+hero now takes 188-289 s (ranger 188/191, witch 273/277, knight 281/289) with 6-26 top-ups, close to the Act I bosses
+(8-28). The release gate and the desktop reference frame-time measurement are still pending.

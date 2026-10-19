@@ -1,5 +1,15 @@
 # Running, checks and screenshots
 
+`node scripts/static-transforms-smoke.mjs` checks immutable branch traversal in Edge on port 8141. It uses real
+movement input and explicit simulation frames, compares world matrices and raw canvas pixels after forcing all
+visible immutable branches on all four worlds and a locally lit cave at 720p/1080p, checks overflow and page/shader errors, and saves diagnostic
+captures to the system temp folder. Tidewhisper is installed through the test-only candidate fixture.
+It also restores distance-only actor gates and requires identical raw canvas pixels, checking that frustum-gated
+rigs contribute no visible geometry in those fixtures. The cave fixture places an enemy behind the room camera
+within the distance gate and requires at least one branch to be restored before comparing pixels.
+The same check verifies bounded context-loss/disposal ordering with live animation frames for captured and
+uncaptured title renderers, plus repeated cleanup, and requires zero resulting page/shader errors.
+
 ES modules can't be loaded from `file://`, so the game needs a local web server:
 
 ```sh
@@ -69,3 +79,33 @@ node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downl
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
 gets a scene in `scripts/screenshots.mjs` and a spot in the tour above; every new shot is first given a folder in
 `scripts/shots.mjs` (saving one without a folder stops the script).
+
+## Tidewhisper candidate checks (27h)
+
+These use a test catalog substitute; the authored destination stays unreleased. Install optional Puppeteer Core
+as above. `node scripts/tidewhisper-campaign-smoke.mjs` owns port 8114 and checks the real fourth-world portal UI,
+quest/node Continue, revisit, quest/tide gate, one crown and 720p/1080p bounds with zero page/shader errors.
+After the approved 2026-10-19 gate split, these functional checks may pass and merge to `develop` while hardware
+performance remains a public-release blocker. They never enable the authored Tidewhisper release flag.
+It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
+
+`node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
+`node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
+on the owner's Acer RTX 4050 reference (the collector requests the high-performance GPU).
+It opens visible fullscreen Edge for desktop acceptance. `--headless` and `--gpu-timing` are optional diagnostics;
+neither can be combined with `--release`.
+Omit `--output` for the historical default diagnostic path; use a separate output for a new device/run.
+`--release` additionally requires a clean commit, the actual RTX 4050 Laptop GPU renderer and passing timing/count budgets before
+writing certification. Run performance alone, with no simulation suite or screenshot job competing for resources.
+Every performance row uses a fresh reload and empty ephemeral test storage, seeds play before hero/travel setup,
+then runs 120 setup updates, 30 warmup frames and 120 real render intervals. Previous rows cannot carry state forward.
+See the [handoff](tidewhisper-release.md).
+
+`node scripts/hud-performance-smoke.mjs` owns port 8140. It checks unchanged prompt/chip DOM preservation,
+coin and rebound-key updates, the live marker scale, real rebound keyboard interaction and 720p/1080p bounds,
+with zero page/shader errors. Review captures go to the system temp folder, not the feature tour.
+`node tests/sim/hudUpdates.sim.mjs` covers the same update rules, prompt hide/return and settings/resize scale.
+
+Save, portal and tutorial browser checks collect both page and shader errors and use bounded browser cleanup.
+Save defaults to Edge; its final menu checks assert viewport and content fit at 720p/1080p and place review captures
+in the system temp folder. Tutorial waits for the pause-page opening animation before asserting content fit.

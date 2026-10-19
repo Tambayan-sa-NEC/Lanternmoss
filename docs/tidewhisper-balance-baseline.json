@@ -1,0 +1,478 @@
+{
+  "measuredAt": "2026-10-14T16:15:33.268Z",
+  "candidateCommit": "67a16473aa261380a66b6982951d268e309b2446",
+  "dirty": true,
+  "note": "Initial 27h working-tree baseline before the coastal melee-bot reach/approach correction; see tidewhisper-release.md for affected reruns. Not release acceptance.",
+  "profile": "level 8, starting equipment, default pet, HP top-ups; counter-based bots include approach time",
+  "accepted": false,
+  "rows": [
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 188.2,
+      "left": 0,
+      "topUps": 8,
+      "deaths": 0,
+      "wedges": 2,
+      "swaps": 2,
+      "rings": 0,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "jellybell",
+      "time": 16.33,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "mirelure",
+      "level": 8,
+      "time": 265.8,
+      "left": 0,
+      "topUps": 23,
+      "deaths": 0,
+      "surfaced": 22,
+      "falseHits": 1,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "shellback",
+      "time": 6.6,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "surfSkipper",
+      "time": 5.22,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 147.8,
+      "left": 0,
+      "topUps": 12,
+      "deaths": 0,
+      "wedges": 2,
+      "swaps": 2,
+      "rings": 6,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "jellybell",
+      "time": 3.37,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "mirelure",
+      "level": 8,
+      "time": 170.5,
+      "left": 0,
+      "topUps": 7,
+      "deaths": 0,
+      "surfaced": 14,
+      "falseHits": 0,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "shellback",
+      "time": 5.57,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "surfSkipper",
+      "time": 3.7,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 180.8,
+      "left": 0,
+      "topUps": 11,
+      "deaths": 0,
+      "wedges": 2,
+      "swaps": 2,
+      "rings": 4,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "jellybell",
+      "time": 3.58,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "mirelure",
+      "level": 8,
+      "time": 253.8,
+      "left": 0,
+      "topUps": 10,
+      "deaths": 0,
+      "surfaced": 22,
+      "falseHits": 2,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "shellback",
+      "time": 7.72,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "surfSkipper",
+      "time": 3.35,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 194.5,
+      "left": 0,
+      "topUps": 8,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 0,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "jellybell",
+      "time": 24.2,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "mirelure",
+      "level": 8,
+      "time": 265.5,
+      "left": 0,
+      "topUps": 24,
+      "deaths": 0,
+      "surfaced": 21,
+      "falseHits": 5,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "shellback",
+      "time": 7.23,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "surfSkipper",
+      "time": 5.88,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 41.3,
+      "left": 0,
+      "topUps": 1,
+      "deaths": 0,
+      "wedges": 4,
+      "swaps": 2,
+      "rings": 4,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "jellybell",
+      "time": 2.58,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "mirelure",
+      "level": 8,
+      "time": 176.1,
+      "left": 0,
+      "topUps": 6,
+      "deaths": 0,
+      "surfaced": 14,
+      "falseHits": 3,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "shellback",
+      "time": 4.47,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "surfSkipper",
+      "time": 4.65,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 177.3,
+      "left": 0,
+      "topUps": 13,
+      "deaths": 0,
+      "wedges": 2,
+      "swaps": 2,
+      "rings": 2,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "jellybell",
+      "time": 3.23,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "mirelure",
+      "level": 8,
+      "time": 251.2,
+      "left": 0,
+      "topUps": 7,
+      "deaths": 0,
+      "surfaced": 22,
+      "falseHits": 3,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "shellback",
+      "time": 6.37,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "surfSkipper",
+      "time": 4.77,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "recordedAt": "2026-10-17T15:48:32.607Z",
+  "candidateCommit": "67888f96c8f38ad67dfff3da5052d014d146f84c",
+  "invalid": true,
+  "source": "Rounded summary transcribed from collector console output; not the absent raw report or certification",
+  "localClockWindow": "2026-10-17 23:43 to 23:46",
+  "profile": "Visible Edge, actual RTX 4050, 1920x1080 High DPR1, 18 live cases/2160 samples, AC",
+  "failure": "Repeated page errors: TypeError: Cannot read properties of null (reading 'trim'); collector asserted errors before writing report",
+  "diagnosis": "New collector cleanup disposed live shader programs before asynchronous context loss, racing the old RAF loop. Fix awaits loss before disposal; runtime feature checks remain separate.",
+  "result": "All counts pass; three timing passes, fifteen timing failures, but entire attempt invalid due page errors. No release artifact.",
+  "rows": [
+    {
+      "hero": "witch",
+      "seed": 1,
+      "scene": "village",
+      "fps": 70.23,
+      "p95FrameMs": 24,
+      "p95CpuMs": 12.8,
+      "calls": 390,
+      "triangles": 203451
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "scene": "night",
+      "fps": 76.16,
+      "p95FrameMs": 21.6,
+      "p95CpuMs": 13.5,
+      "calls": 329,
+      "triangles": 198829
+    },
+    {
+      "hero": "witch",
+      "seed": 1,
+      "scene": "weather",
+      "fps": 71.81,
+      "p95FrameMs": 21.4,
+      "p95CpuMs": 15.3,
+      "calls": 391,
+      "triangles": 203451
+    },
+    {
+      "hero": "knight",
+      "seed": 1,
+      "scene": "village",
+      "fps": 95.05,
+      "p95FrameMs": 18.7,
+      "p95CpuMs": 13.4,
+      "calls": 472,
+      "triangles": 209111
+    },
+    {
+      "hero": "knight",
+      "seed": 1,
+      "scene": "night",
+      "fps": 94.22,
+      "p95FrameMs": 19,
+      "p95CpuMs": 13.7,
+      "calls": 411,
+      "triangles": 203755
+    },
+    {
+      "hero": "knight",
+      "seed": 1,
+      "scene": "weather",
+      "fps": 62.7,
+      "p95FrameMs": 23.3,
+      "p95CpuMs": 15.6,
+      "calls": 473,
+      "triangles": 209111
+    },
+    {
+      "hero": "ranger",
+      "seed": 1,
+      "scene": "village",
+      "fps": 72.82,
+      "p95FrameMs": 21.1,
+      "p95CpuMs": 15.3,
+      "calls": 390,
+      "triangles": 204441
+    },
+    {
+      "hero": "ranger",
+      "seed": 1,
+      "scene": "night",
+      "fps": 73.29,
+      "p95FrameMs": 21.5,
+      "p95CpuMs": 15.7,
+      "calls": 329,
+      "triangles": 199829
+    },
+    {
+      "hero": "ranger",
+      "seed": 1,
+      "scene": "weather",
+      "fps": 71.37,
+      "p95FrameMs": 22.1,
+      "p95CpuMs": 15.1,
+      "calls": 391,
+      "triangles": 204441
+    },
+    {
+      "hero": "witch",
+      "seed": 7,
+      "scene": "village",
+      "fps": 60.28,
+      "p95FrameMs": 26.8,
+      "p95CpuMs": 19.8,
+      "calls": 400,
+      "triangles": 204039
+    },
+    {
+      "hero": "witch",
+      "seed": 7,
+      "scene": "night",
+      "fps": 77.61,
+      "p95FrameMs": 14.7,
+      "p95CpuMs": 12,
+      "calls": 337,
+      "triangles": 198667
+    },
+    {
+      "hero": "witch",
+      "seed": 7,
+      "scene": "weather",
+      "fps": 67.85,
+      "p95FrameMs": 18.8,
+      "p95CpuMs": 14.3,
+      "calls": 401,
+      "triangles": 204039
+    },
+    {
+      "hero": "knight",
+      "seed": 7,
+      "scene": "village",
+      "fps": 74.13,
+      "p95FrameMs": 15.7,
+      "p95CpuMs": 12.4,
+      "calls": 453,
+      "triangles": 206823
+    },
+    {
+      "hero": "knight",
+      "seed": 7,
+      "scene": "night",
+      "fps": 66.91,
+      "p95FrameMs": 21.3,
+      "p95CpuMs": 14,
+      "calls": 399,
+      "triangles": 202033
+    },
+    {
+      "hero": "knight",
+      "seed": 7,
+      "scene": "weather",
+      "fps": 63.88,
+      "p95FrameMs": 19.5,
+      "p95CpuMs": 16.1,
+      "calls": 473,
+      "triangles": 208017
+    },
+    {
+      "hero": "ranger",
+      "seed": 7,
+      "scene": "village",
+      "fps": 73.98,
+      "p95FrameMs": 16.8,
+      "p95CpuMs": 12.9,
+      "calls": 400,
+      "triangles": 205029
+    },
+    {
+      "hero": "ranger",
+      "seed": 7,
+      "scene": "night",
+      "fps": 77.67,
+      "p95FrameMs": 16.7,
+      "p95CpuMs": 12.3,
+      "calls": 338,
+      "triangles": 199659
+    },
+    {
+      "hero": "ranger",
+      "seed": 7,
+      "scene": "weather",
+      "fps": 73.94,
+      "p95FrameMs": 16.3,
+      "p95CpuMs": 12.5,
+      "calls": 401,
+      "triangles": 205029
+    }
+  ]
+}

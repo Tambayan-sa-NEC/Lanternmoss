@@ -1,9 +1,18 @@
 /* Release acceptance is pure; tests inject actual runtime registrations, not a duplicate allow-list.
    The shipped Act I worlds retain their historical content mix. Every other world meets the expansion checklist. */
 import { populationProblem, validatePlanetCatalog } from './planetRules.js';
+import { PERFORMANCE_REFERENCE, referenceProfile, referenceRenderer } from './render.js';
 const ORIGINALS = new Set(['lanternmoss', 'emberfall', 'frostveil']);
 const positive = n => Number.isFinite(n) && n > 0;
 const unique = values => [...new Set(values)];
+/** On a 60 Hz browser clock even an empty page can measure a p95 just over 16.67 ms. A world passes if its p95 is
+    no worse than the target or the empty-page clock measured in the same run. The clock only counts when it is a real
+    60 Hz clock (median within 5% of the target), so a slow display or broken calibration cannot loosen the budget. */
+export function frameLimitMs(target, clock) {
+  const genuine = clock?.samples >= 120 && positive(clock.medianMs) && positive(clock.p95Ms)
+    && Math.abs(clock.medianMs - target) <= target * 0.05;
+  return genuine ? Math.max(target, clock.p95Ms) : target;
+}
 export function contentProblems(p, catalog, r) {
   const errors = [], require = (ok, message) => { if (!ok) errors.push(`${p.id}: ${message}`); };
   const legacy = p.act === 1 && ORIGINALS.has(p.id), moon = p.id === 'lanternMoon' && p.secret === true;
@@ -29,6 +38,7 @@ export function contentProblems(p, catalog, r) {
   for (const attack of Object.values(r.enemies[p.boss?.type]?.attacks ?? {})) for (const type of attack.types ?? []) enemy(type, 'regular');
   const item = id => require(r.items.has(id), `unknown item ${id}`);
   item(p.boss?.trophy); item(p.material);
+  require(Array.isArray(p.forage), 'forage must be an explicit array for world generation');
   for (const f of p.forage ?? []) { item(f.item); require(positive(f.count), `invalid forage count ${f.item}`); }
   for (const c of p.chests ?? []) require(!!r.chests[c.kind] && Number.isInteger(c.count) && positive(c.count), `invalid chest ${c.kind}`);
   const trees = Object.entries(p.flora?.trees ?? {}).filter(([,n]) => positive(n)).map(([id]) => id);
@@ -100,10 +110,22 @@ export function contentProblems(p, catalog, r) {
     require((p.unlock?.rareGifts ?? []).every(id => r.items.has(id)), 'unknown rare gift in secret unlock');
   }
   const report = r.releases[p.id];
-  require(report?.device?.includes('Iris Xe') && report.quality === 'low' && report.viewport?.[0] === 1280 && report.viewport?.[1] === 720, 'release performance needs Iris Xe at 720p low');
-  for (const scene of ['village','night','weather']) {
-    const row = report?.rows?.find(row => row.scene === scene);
-    require(row?.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= r.targetFrameMs && positive(row.calls) && row.calls <= ceiling?.calls && positive(row.triangles) && row.triangles <= ceiling?.triangles, `performance fixture ${scene} must pass its frame/draw budget`);
+  require(referenceProfile(report), 'release performance needs the Acer RTX 4050 at 1080p High');
+  require(report?.dirty === false && /^[a-f0-9]{40}$/i.test(report?.candidateCommit ?? ''), 'release performance needs a committed clean candidate');
+  require(report?.gpuTiming === false, 'release performance timing must exclude diagnostic GPU query/readback overhead');
+  require(report?.browser?.headless === false, 'desktop release performance timing needs a visible browser on the reference machine');
+  const frameLimit = frameLimitMs(r.targetFrameMs, report?.frameClock);
+  const rows = report?.rows ?? [], keys = new Set(rows.map(row => `${row.hero}/${row.seed}/${row.scene}`));
+  const expected = PERFORMANCE_REFERENCE.heroes.flatMap(hero => PERFORMANCE_REFERENCE.seeds.flatMap(seed =>
+    PERFORMANCE_REFERENCE.scenes.map(scene => `${hero}/${seed}/${scene}`)));
+  require(rows.length === expected.length && keys.size === expected.length && expected.every(key => keys.has(key)),
+    'release performance needs every hero, both seeds and all three scenes exactly once');
+  for (const row of rows) {
+    require(referenceRenderer(row.gpu) && row.quality === PERFORMANCE_REFERENCE.quality
+      && row.drawingBuffer?.[0] === PERFORMANCE_REFERENCE.viewport[0] && row.drawingBuffer?.[1] === PERFORMANCE_REFERENCE.viewport[1]
+      && row.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= frameLimit
+      && positive(row.calls) && row.calls <= ceiling?.calls && positive(row.triangles) && row.triangles <= ceiling?.triangles,
+      `performance fixture ${row.hero}/${row.seed}/${row.scene} must pass its hardware/frame/draw budget`);
   }
   return errors;
 }

@@ -17,12 +17,16 @@ import { addXp } from '../../src/progression/leveling.js';
 import { scaleEnemyDef } from '../../src/combat/enemyDefs.js';
 import { rollLoot } from '../../src/gameplay/loot.js';
 import { mulberry32 } from '../../src/utils/random.js';
+import { MINI_BOSS_LOOT } from '../../src/config/chests.js';
+import { installTidewhisperCandidate } from './lib/tidewhisperCandidate.mjs';
 const items = new Map(ITEM_DEFINITIONS.map(d => [d.id, d]));
 const recipe = id => RECIPES.find(r => r.id === id);
 const sell = id => Math.max(1, Math.floor(items.get(id).value * SHOP.sellRate));
 const check = (ok, message) => { assert.ok(ok, message); console.log(`PASS  ${message}`); };
 const mean = v => Array.isArray(v) ? (v[0] + v[1]) / 2 : v;
 
+// The audit continues through the unreleased fourth world (TODO 27h) with its real id, index and scaling.
+const candidate = installTidewhisperCandidate();
 for (const hero of ['witch', 'knight', 'ranger']) {
   let state = { level: 1, xp: 0 };
   for (const [p, planet] of PLANETS.entries()) {
@@ -63,6 +67,26 @@ for (const hero of ['witch', 'knight', 'ranger']) {
     console.log(`INFO  ${hero}/${planet.name}: route monsters +${monsterCoins}, selling every chest item +${sellMin}–${sellMax} (100 seeds; sacrifices supplies/gear)`);
     state = addXp(state.level, state.xp, def(planet.boss.type).xp);
   }
+}
+const tide = PLANETS.find(p => p.id === 'tidewhisper');
+candidate.restore();
+
+// Tidewhisper materials: washups return once per day (300 s), low-tide nodes are reachable once per day, the black
+// pearl bed regrows slower than a visit. Minimum yields only: the lens fits the first day, lens + Tide set two days.
+{
+  const need = new Map(), add = (id, n) => need.set(id, (need.get(id) ?? 0) + n);
+  for (const step of QUESTS.darkLighthouse.steps) if (step.kind === 'collect') add(step.item, step.count);
+  const lens = new Map(need);
+  for (const id of BALANCE.budgets[3]) { const r = recipe(id); for (const [item, n] of r.needs) add(item, n); add('wood', (r.fuel ?? 0) / FUEL.wood); }
+  const daily = new Map(), once = new Map(), low = qty => (Array.isArray(qty) ? qty[0] : qty);
+  for (const [kind, count] of [...tide.resources.nodes, ...tide.resources.rare]) {
+    const k = NODE_KINDS[kind], into = k.regrow > DAY.length ? once : daily;
+    for (const [item, qty] of k.drops) into.set(item, (into.get(item) ?? 0) + low(qty) * count);
+  }
+  for (const [item, qty] of MINI_BOSS_LOOT.extra.ironclaw) once.set(item, (once.get(item) ?? 0) + qty);
+  const yieldOf = (item, days) => (daily.get(item) ?? 0) * days + (once.get(item) ?? 0);
+  for (const [item, n] of lens) check(yieldOf(item, 1) >= n, `Tidewhisper lens: ${n} ${item} within one day's minimum yield (${yieldOf(item, 1)})`);
+  for (const [item, n] of need) check(yieldOf(item, 2) >= n, `Tidewhisper lens + Tide set: ${n} ${item} within two days' minimum yield (${yieldOf(item, 2)})`);
 }
 
 for (const stock of SHOP.stock) {

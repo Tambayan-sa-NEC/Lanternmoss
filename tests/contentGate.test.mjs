@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { contentProblems, assertReleasedContent } from '../src/config/contentGate.js';
+import { contentProblems, assertReleasedContent, frameLimitMs } from '../src/config/contentGate.js';
+import { PERFORMANCE_REFERENCE, referenceProfile } from '../src/config/render.js';
 import { PLANET_CATALOG, PLANETS } from '../src/config/planets.js';
 import { COMBAT } from '../src/config/combat.js';
 import { ITEM_DEFINITIONS } from '../src/config/items.js';
@@ -34,7 +35,10 @@ function fixture(id='newWorld') {
     locals:{smith(){}},music:{...MUSIC_THEMES,probeScore:{pad:[100,200],notes:[300],interval:[1000,2000]}},
     bestiary:{...BESTIARY_ENTRIES,...Object.fromEntries(['probeA','probeB','probeC','probeBoss','probeMini'].map(id=>[id,{blurb:'An original creature.',counters:['Step aside.']}]))},
     travelers:['Old Bramble','Pim','Lio','Fern'],chests:CHEST_KINDS,mechanicKnown:id=>id==='probeMode',
-    ceilings:{[id]:{calls:1000,triangles:300000}},targetFrameMs:1000/60,releases:{[id]:{device:'Intel Iris Xe (synthetic test fixture)',quality:'low',viewport:[1280,720],rows:['village','night','weather'].map(scene=>({scene,samples:90,p95FrameMs:16,calls:900,triangles:200000}))}}};
+    ceilings:{[id]:{calls:1000,triangles:300000}},targetFrameMs:1000/60,releases:{[id]:{
+      device:`${PERFORMANCE_REFERENCE.renderer} (synthetic test fixture)`,quality:'high',viewport:[1920,1080],dirty:false,gpuTiming:false,browser:{headless:false},candidateCommit:'a'.repeat(40),
+      rows:PERFORMANCE_REFERENCE.heroes.flatMap(hero=>PERFORMANCE_REFERENCE.seeds.flatMap(seed=>PERFORMANCE_REFERENCE.scenes.map(scene=>
+        ({hero,seed,scene,gpu:PERFORMANCE_REFERENCE.renderer,quality:'high',drawingBuffer:[1920,1080],samples:90,p95FrameMs:16,calls:900,triangles:200000}))))}}};
   return {p,r,catalog:[PLANETS[0],p],check:()=>contentProblems(p,[PLANETS[0],p],r)};
 }
 
@@ -58,9 +62,33 @@ test('new worlds cannot waive distinct content or performance readiness',()=>{
     f=>f.p.boss.type='gloomcap',f=>f.r.behaviors[f.r.enemies.gloomcap.behavior]=f.r.behaviors.probeBoss,
     f=>f.p.miniBosses=[],f=>f.p.flora.trees={pine:1},f=>f.p.wildlife.critters=[['bunny',3]],
     f=>f.p.wildlife.rare='goldBunny',f=>f.p.weather={clear:1},f=>f.p.material='glowcap',f=>f.p.resources.rare=[],
-    f=>f.p.npcs.locals=[],f=>f.p.npcs.arrivals={},f=>f.p.music='cozy',f=>delete f.r.releases.newWorld,
+    f=>f.p.npcs.locals=[],f=>f.p.npcs.arrivals={},f=>f.p.music='cozy',f=>delete f.p.forage,f=>delete f.r.releases.newWorld,
     f=>f.r.releases.newWorld.rows[1].p95FrameMs=30,f=>f.r.releases.newWorld.rows.pop(),
     f=>f.r.releases.newWorld.device='Software renderer',f=>f.r.releases.newWorld.rows[0].calls=2000];
+  for(const mutate of cases){const f=fixture();mutate(f);assert.ok(f.check().length>0,mutate.toString());}
+});
+test('frame budget allows the measured 60 Hz frame clock, never a slow or missing one',()=>{
+  const target=1000/60,clock={samples:240,medianMs:16.7,p95Ms:16.8};
+  assert.equal(frameLimitMs(target,undefined),target);assert.equal(frameLimitMs(target,clock),16.8);
+  assert.equal(frameLimitMs(target,{...clock,p95Ms:16}),target,'a tight clock never lowers below the target');
+  assert.equal(frameLimitMs(target,{samples:240,medianMs:33.3,p95Ms:33.5}),target,'a 30 Hz clock cannot loosen the budget');
+  assert.equal(frameLimitMs(target,{samples:240,medianMs:8.3,p95Ms:33.5}),target,'a jittery 120 Hz clock is outside the approved 60 Hz calibration band');
+  assert.equal(frameLimitMs(target,{...clock,samples:60}),target,'a short calibration is ignored');
+  const f=fixture(),report=f.r.releases.newWorld;for(const row of report.rows)row.p95FrameMs=16.8;
+  assert.ok(f.check().length>0,'16.8 ms fails without a recorded clock');
+  report.frameClock=clock;assert.deepEqual(f.check(),[]);
+  report.rows[2].p95FrameMs=16.9;assert.ok(f.check().length>0,'slower than the empty-page clock fails');
+});
+
+test('desktop reference requires the measured RTX 4050, full matrix and clean 1080p High candidate',()=>{
+  const cases=[f=>f.r.releases.newWorld.device='Intel Iris Xe',f=>f.r.releases.newWorld.quality='low',
+    f=>f.r.releases.newWorld.viewport=[1280,720],f=>f.r.releases.newWorld.dirty=true,
+    f=>delete f.r.releases.newWorld.candidateCommit,f=>f.r.releases.newWorld.gpuTiming=true,
+    f=>f.r.releases.newWorld.browser.headless=true,f=>f.r.releases.newWorld.rows[17].gpu='Intel UHD',
+    f=>f.r.releases.newWorld.rows[17].quality='low',f=>f.r.releases.newWorld.rows[17].drawingBuffer=[1280,720],
+    f=>f.r.releases.newWorld.rows[17].p95FrameMs=30,f=>f.r.releases.newWorld.rows[17].calls=2000,
+    f=>f.r.releases.newWorld.rows[17]=f.r.releases.newWorld.rows[0]];
+  assert.equal(referenceProfile(undefined),false);
   for(const mutate of cases){const f=fixture();mutate(f);assert.ok(f.check().length>0,mutate.toString());}
 });
 test('only the secret Moon waives its mini boss and requires no farm/cave plus a small population floor',()=>{

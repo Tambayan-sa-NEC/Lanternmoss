@@ -28,9 +28,28 @@ export const PERFORMANCE_BUDGET = {
     lanternmoss: { calls: 1050, triangles: 310000 },
     emberfall: { calls: 900, triangles: 280000 },
     frostveil: { calls: 850, triangles: 280000 },
+    tidewhisper: { calls: 550, triangles: 230000 }, // Retained through the owner-approved Acer reference change; 27h must fit them.
   },
   // A cave room is a far smaller scene than a planet's surface (measured 196-240 calls and 4.9k-6.2k triangles at
   // high across the three caves, TODO 29f). This is a regression guard with room to spare, not a target: it catches
   // a cave suddenly costing several times what it does, long before it could approach a surface budget.
   cave: { calls: 600, triangles: 60000 },
 };
+
+/** Desktop acceptance reference, chosen by the owner on 2026-10-17.
+    machine names the available laptop; renderer is the actual WebGL GPU, not an adapter merely installed in the host.
+    viewport is in CSS pixels at DPR 1; quality is the existing default High preset.
+    heroes/seeds/scenes define the complete fourth-world campaign measurement matrix. Other hardware is additional
+    compatibility evidence; this reference makes no integrated-graphics or mobile frame-rate claim. */
+export const PERFORMANCE_REFERENCE = {
+  machine: 'Acer Nitro ANV15-51', renderer: 'NVIDIA GeForce RTX 4050 Laptop GPU',
+  viewport: [1920, 1080], quality: 'high',
+  heroes: ['witch', 'knight', 'ranger'], seeds: [1, 7], scenes: ['village', 'night', 'weather'],
+};
+export function referenceRenderer(renderer) {
+  return typeof renderer === 'string' && renderer.toLowerCase().includes(PERFORMANCE_REFERENCE.renderer.toLowerCase());
+}
+export function referenceProfile(report) {
+  return referenceRenderer(report?.device) && report.quality === PERFORMANCE_REFERENCE.quality
+    && report.viewport?.[0] === PERFORMANCE_REFERENCE.viewport[0] && report.viewport?.[1] === PERFORMANCE_REFERENCE.viewport[1];
+}

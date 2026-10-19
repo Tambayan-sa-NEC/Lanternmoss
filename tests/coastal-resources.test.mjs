@@ -23,11 +23,14 @@ test('washup save claims are optional v1 fields, bounded and idempotently cleane
   assert.deepEqual(cleanState('gathering',clean),clean);
   delete base.nodes[0].claimedCycle;assert.ok(!Object.hasOwn(cleanState('gathering',base).nodes[0],'claimedCycle'));
 });
-test('coastal food and every Tide piece consume real ingredients and enforce their station',()=>{
+test('coastal food and every Tide piece consume real ingredients and enforce their station and fee',()=>{
   for(const recipe of COASTAL_RECIPES){
     const inv=new Inventory(24,itemRegistry);for(const [id,n] of recipe.needs)inv.add(id,n);if(recipe.fuel)inv.add('wood',recipe.fuel);
-    const before=inv.getSlots();assert.equal(craft(recipe,inv,0,()=>false,null).problem,'station');assert.deepEqual(inv.getSlots(),before);
-    assert.ok(craft(recipe,inv,0,()=>false,recipe.station).ok);assert.equal(inv.count(recipe.result),1);
+    const fee=recipe.coins??0,paid=[],pay=n=>{paid.push(n);return true;};
+    const before=inv.getSlots();assert.equal(craft(recipe,inv,fee,pay,null).problem,'station');assert.deepEqual(inv.getSlots(),before);
+    if(fee){assert.equal(craft(recipe,inv,fee-1,pay,recipe.station).problem,'coins');assert.deepEqual(inv.getSlots(),before);}
+    assert.ok(craft(recipe,inv,fee,pay,recipe.station).ok);assert.equal(inv.count(recipe.result),1);
+    assert.deepEqual(paid,fee?[fee]:[],'the forge fee is paid once, only on success');
     for(const [id] of recipe.needs)assert.equal(inv.count(id),0);
     const item=itemRegistry.get(recipe.result);if(item.equip)assert.equal(item.props.set,'tide');else assert.ok(item.use.length);
   }

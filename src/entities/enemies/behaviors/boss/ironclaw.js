@@ -7,7 +7,8 @@
                     - shell swap: at 66% and 33% it crawls out of its shell and scuttles about, then climbs back into a
                       new one (phase change, def.swap seconds);
                     - wedged: a charge across wet tidal sand (dry now, under water at high tide: the flats at low
-                      tide) ploughs it into the sand for def.wedge seconds.
+                      tide) ploughs it into the sand for def.wedge seconds. Once per shell: afterwards it is wary and
+                      skids to a stop at the wet sand until it climbs into its next shell.
    Moves: pinch (a claw snap over a marked wedge in front), charge (a marked lane; the wedge chance), toll (from the
    second shell: it rears and slams the bell down, a shockwave to jump). Fallback: pinch up close, else charge. */
 import * as THREE from 'three';
@@ -31,7 +32,7 @@ const WARN = 0xff4d6d, BRONZE = 0xffc86a, SAND = 0xd8c08a;
 const SHELLS = [0xc8913a, 0x6fae8e, 0x5a5f7a];                       // bronze, verdigris, a dark old bell: one per shell
 const A = (e, id) => e.def.attacks[id];
 const _to = new THREE.Vector3(), _c = new THREE.Vector3();
-let wedgeHint = false, bellHint = false;
+let wedgeHint = false, bellHint = false, skidHint = false;
 
 /** Ironclaw is soft right now (out of its shell, or stuck in the sand). */
 export const isOpen = e => e.state === 'transition' || e.openT > 0;
@@ -97,7 +98,10 @@ const moves = {
       if (!e.hitPlayer && !P.dead && dist < e.radius + P.radius + a.width * 0.5) { e.hitPlayer = true; hurtPlayer(a.damage, e.pos, a.knockback, { source: e }); }
       if (rng() < dt * 25) sparkles.emit(groundPoint(e.pos, 0.2), { count: 1, color: SAND, speed: 1.2, up: e.up, upBias: 0.6, life: 0.4, size: 0.32 });
       const run = a.distance - (e.chargeT -= dt) * a.speed;                // metres covered so far
-      if (run > 2 && wedgeable(e.up)) { wedge(e); return 0; }               // ploughed into the wet sand
+      if (run > 2 && wedgeable(e.up)) {                                     // ploughed into the wet sand,
+        if (e.wary) { skid(e); return 0; }                                  // unless it already learned in this shell
+        wedge(e); return 0;
+      }
       if (e.chargeT <= 0 || arcDist(e.up, e.home) > e.def.leash - 3) finish(e);
       return a.speed;
     },
@@ -113,10 +117,17 @@ const moves = {
 
 /** Driven into the wet sand by its own charge: stuck and soft for def.wedge seconds. */
 function wedge(e) {
-  finish(e, e.def.wedge); e.openT = e.def.wedge; e.stunnedT = 0;
+  finish(e, e.def.wedge); e.openT = e.def.wedge; e.stunnedT = 0; e.wary = true;
   emote(e, '?', '#ffd24a'); audio.slam(); shakeCamera(0.35);
   sparkles.emit(groundPoint(e.pos, 0.3), { count: 40, color: SAND, speed: 3, up: e.up, upBias: 1, life: 0.9, size: 0.42 });
   if (!wedgeHint) { wedgeHint = true; toast('Old Ironclaw is stuck in the wet sand: strike now, from any side!'); }
+}
+
+/** Wary after a wedge: it digs its legs in at the edge of the wet sand and stops, still shut in its shell. */
+function skid(e) {
+  finish(e); emote(e, '!', '#ffd24a');
+  sparkles.emit(groundPoint(e.pos, 0.2), { count: 14, color: SAND, speed: 2, up: e.up, upBias: 0.5, life: 0.5, size: 0.34 });
+  if (!skidHint) { skidHint = true; toast('Old Ironclaw skids to a stop: it won\'t fall for the wet sand again in this shell.'); }
 }
 
 /** The bell was struck: after a short glow it rings out a shockwave (once per def.bellRing.cooldown). */
@@ -140,7 +151,7 @@ export const ironclaw = defineBoss({
   },
   reset(e) {
     for (const w of e.waves) hideDots(w.slot); e.waves.length = 0;
-    Object.assign(e, { openT: 0, ringCd: 0, ringAt: 0, bellFlash: 0, rear: 0, snapT: 0, swapT: 0, out: 0 });
+    Object.assign(e, { openT: 0, ringCd: 0, ringAt: 0, bellFlash: 0, rear: 0, snapT: 0, swapT: 0, out: 0, wary: false });
     e.bellGlow.visible = false; setShell(e, 0);
   },
   cancel(e) { for (const w of e.waves) hideDots(w.slot); e.waves.length = 0; e.ringAt = 0; e.bellGlow.visible = false; e.openT = 0; e.rear = 0; },
@@ -158,7 +169,7 @@ export const ironclaw = defineBoss({
   transition(e, dt) {
     e.swapT -= dt;
     if (e.swapT <= 0) {
-      setShell(e, e.bossPhase); e.state = 'chase'; e.cool = Math.max(e.cool, 0.8);
+      setShell(e, e.bossPhase); e.state = 'chase'; e.cool = Math.max(e.cool, 0.8); e.wary = false;   // a new shell, a short memory
       sparkles.emit(e.center(), { count: 30, color: SHELLS[e.bossPhase % SHELLS.length], speed: 2.5, up: e.up, upBias: 0.8, life: 0.9, size: 0.45 });
       audio.clang(); toast(e.bossPhase >= 2 ? 'Old Ironclaw squeezes into its last shell!' : 'Old Ironclaw climbs into a new shell.');
       return 0;

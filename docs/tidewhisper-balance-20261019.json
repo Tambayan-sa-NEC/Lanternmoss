@@ -1,0 +1,639 @@
+{
+  "measuredAt": "2026-10-19T11:36:04.872Z",
+  "candidateCommit": "92d02e2d27dc0aeaca5228adf9f84b9d2150237e",
+  "dirty": true,
+  "profile": "level 8, starting equipment, default pet, HP top-ups; counter-based bots include approach time",
+  "accepted": true,
+  "rows": [
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 172.4,
+      "left": 0,
+      "topUps": 6,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 0,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "jellybell",
+      "time": 3.22,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "mirelure",
+      "level": 8,
+      "time": 286.6,
+      "left": 0,
+      "topUps": 24,
+      "deaths": 0,
+      "surfaced": 24,
+      "falseHits": 2,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "monsterMedian",
+      "time": 5.55,
+      "of": [
+        "shellback",
+        "jellybell",
+        "surfSkipper"
+      ],
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "shellback",
+      "time": 6.6,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "knight",
+      "type": "surfSkipper",
+      "time": 5.55,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 155.4,
+      "left": 0,
+      "topUps": 10,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 6,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "jellybell",
+      "time": 3.37,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "mirelure",
+      "level": 8,
+      "time": 187.8,
+      "left": 0,
+      "topUps": 7,
+      "deaths": 0,
+      "surfaced": 16,
+      "falseHits": 1,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "monsterMedian",
+      "time": 3.7,
+      "of": [
+        "shellback",
+        "jellybell",
+        "surfSkipper"
+      ],
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "shellback",
+      "time": 5.57,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "ranger",
+      "type": "surfSkipper",
+      "time": 3.7,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 171.6,
+      "left": 0,
+      "topUps": 12,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 3,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "jellybell",
+      "time": 3.58,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "mirelure",
+      "level": 8,
+      "time": 273.4,
+      "left": 0,
+      "topUps": 11,
+      "deaths": 0,
+      "surfaced": 24,
+      "falseHits": 7,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "monsterMedian",
+      "time": 3.58,
+      "of": [
+        "shellback",
+        "jellybell",
+        "surfSkipper"
+      ],
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "checked": true
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "shellback",
+      "time": 7.72,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 1,
+      "hero": "witch",
+      "type": "surfSkipper",
+      "time": 3.35,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 169.5,
+      "left": 0,
+      "topUps": 6,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 0,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "jellybell",
+      "time": 3.8,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "mirelure",
+      "level": 8,
+      "time": 284.3,
+      "left": 0,
+      "topUps": 26,
+      "deaths": 0,
+      "surfaced": 23,
+      "falseHits": 3,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "monsterMedian",
+      "time": 5.03,
+      "of": [
+        "shellback",
+        "jellybell",
+        "surfSkipper"
+      ],
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "shellback",
+      "time": 7.23,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "knight",
+      "type": "surfSkipper",
+      "time": 5.03,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 156,
+      "left": 0,
+      "topUps": 10,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 5,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "jellybell",
+      "time": 2.58,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "mirelure",
+      "level": 8,
+      "time": 190.8,
+      "left": 0,
+      "topUps": 10,
+      "deaths": 0,
+      "surfaced": 16,
+      "falseHits": 4,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "monsterMedian",
+      "time": 4.47,
+      "of": [
+        "shellback",
+        "jellybell",
+        "surfSkipper"
+      ],
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "shellback",
+      "time": 4.47,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "ranger",
+      "type": "surfSkipper",
+      "time": 4.65,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "ironclaw",
+      "level": 8,
+      "time": 174.1,
+      "left": 0,
+      "topUps": 11,
+      "deaths": 0,
+      "wedges": 1,
+      "swaps": 2,
+      "rings": 5,
+      "target": [
+        90,
+        180
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "jellybell",
+      "time": 3.23,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "mirelure",
+      "level": 8,
+      "time": 276,
+      "left": 0,
+      "topUps": 15,
+      "deaths": 0,
+      "surfaced": 23,
+      "falseHits": 8,
+      "drained": true,
+      "target": [
+        180,
+        300
+      ],
+      "withinTarget": true,
+      "monster": false,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "monsterMedian",
+      "time": 4.77,
+      "of": [
+        "shellback",
+        "jellybell",
+        "surfSkipper"
+      ],
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "checked": true
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "shellback",
+      "time": 6.37,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": false,
+      "monster": true,
+      "checked": false
+    },
+    {
+      "seed": 7,
+      "hero": "witch",
+      "type": "surfSkipper",
+      "time": 4.77,
+      "left": 0,
+      "topUps": 0,
+      "deaths": 0,
+      "target": [
+        2,
+        6
+      ],
+      "withinTarget": true,
+      "monster": true,
+      "checked": false
+    }
+  ]
+}

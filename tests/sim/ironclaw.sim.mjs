@@ -67,12 +67,17 @@ try{
   // ---- wedging: a charge across wet sand at low tide sticks it; at high tide it never does -------------------------------
   const flat=game.world.coast.pearlBeach,toSea=tangentToward(ic.home,flat);
   const wetSand=dirAlong(flat,toSea,1);phase(.4);assert.ok(wedgeable(flat)||wedgeable(wetSand),'the pearl flat is wet sand at low tide');
-  const tryCharge=()=>{park();ic.spawn(ic.home);ic.aggro();P.invuln=10000;P.placeAt(dirAlong(flat,toSea,2.5));ic.state='chase';ic.cool=0;ic.moveCd={pinch:99,toll:99};
-    let stuck=false;for(let i=0;i<60*6&&!stuck;i++){step(1/60);if(ic.openT>0&&ic.state==='recover')stuck=true;}return stuck;};
+  const tryCharge=(fresh=true)=>{park();if(fresh)ic.spawn(ic.home);else{ic.openT=0;ic.up.copy(ic.home);ic.pos.copy(ic.up).multiplyScalar(ic.r);}ic.aggro();P.invuln=10000;P.placeAt(dirAlong(flat,toSea,2.5));ic.state='chase';ic.cool=0;ic.moveCd={pinch:99,toll:99};
+    let stuck=false,skidded=false;for(let i=0;i<60*6&&!stuck&&!skidded;i++){const was=ic.state;step(1/60);if(ic.openT>0&&ic.state==='recover')stuck=true;else if(was==='active'&&ic.state==='recover')skidded=true;}
+    return stuck;};
   assert.equal(tryCharge(),true,'low tide: the charge ploughs into the wet sand');assert.ok(isOpen(ic));
   hp=ic.hp;damageEnemy(ic,100,{from:ground(dirAlong(ic.up,ic.fwd.clone().negate(),3))});assert.ok(ic.hp<hp,'stuck: open from behind');
+  // once per shell: wary afterwards, the next charge stops at the wet sand, still shut; a new shell forgets
+  assert.equal(tryCharge(false),false,'wary: the second charge in the same shell skids to a stop');assert.equal(ic.state,'recover','it did charge, and stopped');assert.ok(!isOpen(ic));
+  ic.state='transition';ic.swapT=0;step(1/60);assert.equal(ic.wary,false,'a new shell forgets the wet sand');
+  assert.equal(tryCharge(false),true,'in the new shell a charge wedges it again');
   phase(.9);assert.ok(waterAt(flat),'the flat floods at high tide');assert.equal(tryCharge(),false,'high tide: no wet sand to stick in');
-  console.log(`PASS  a low-tide charge across wet sand wedges it for ${D.wedge} s (open from any side); at high tide it never wedges`);
+  console.log(`PASS  a low-tide charge across wet sand wedges it for ${D.wedge} s (open from any side), once per shell; at high tide it never wedges`);
 
   // ---- shell swaps at 66% and 33%: out, soft, then a new shell; toll from the second shell ------------------------------
   phase(.4);park();ic.spawn(ic.home);ic.aggro();P.placeAt(dirAlong(ic.up,ic.fwd,6));step(.1);

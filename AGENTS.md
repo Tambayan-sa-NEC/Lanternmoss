@@ -61,8 +61,10 @@ Balance and performance:
 - Performance acceptance is in `docs/wiki/technical/performance.md`. Only real target hardware certifies a release. Diagnostic runs
   on other machines are recorded as diagnostics, never as certification.
 - Recommended development machines are recorded in [Development and validation machines](docs/wiki/technical/performance.md#development-and-validation-machines).
-  Prefer the owner's higher-spec laptop for coding, full test suites, browser checks and visual review; use the UHD 620 laptop
-  for occasional low-end diagnostics. Keep final Iris Xe performance validation pending until that machine is available.
+  Use the owner's Acer Nitro ANV15-51 for coding, full test suites, browser checks, visual review and default desktop
+  performance validation on its actual RTX 4050 Laptop GPU. Other available machines, including the UHD 620 laptop,
+  provide additional functional and compatibility checks. Follow the named profile in the performance wiki; Iris Xe
+  availability no longer blocks validation. Desktop results do not establish phone performance (TODO 40).
 
 Commits during the task:
 
