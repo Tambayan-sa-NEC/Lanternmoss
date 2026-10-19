@@ -70,8 +70,10 @@ try{
         const out=ic.body.position.z;if(pose==='swap'){ic.state='chase';ic.swapT=0;}
         return {visible:ic.root.visible,out:pose==='swap'?out>0.8:out<0.2};
       },pose);assert.deepEqual(shown,{visible:true,out:true});
+      await page.evaluate(() => { for (const id of ['hud','compass','combat']) document.getElementById(id).style.visibility='hidden'; });
       await page.screenshot({path:join(tmpdir(),`lanternmoss-27f-ironclaw-${pose}-${height}.png`)});
       if(height===720&&pose==='shell')await page.screenshot({path:shotPath('tidewhisper-ironclaw'),type:'jpeg',quality:88});
+      await page.evaluate(() => { for (const id of ['hud','compass','combat']) document.getElementById(id).style.visibility=''; });
     }
     console.log(`PASS ${width}x${height} low: Old Ironclaw in its bell and out of it`);
   }

@@ -285,3 +285,23 @@ and six Mirelure fights at 180-300 seconds. Individual armored/evasive monsters 
 The full synchronized pacing simulation also passes all three heroes: level 8 before Tide summon, 281-360 coins
 against a 280-coin Tide gear reserve, lighthouse materials within one day and lighthouse plus gear within two days.
 This route audit does not replace combat or target-device performance validation.
+
+### Tidewhisper after the 29a-29f cave merge (2026-10-19)
+
+The [new six-profile report](../../tidewhisper-balance-20261019.json) reruns the same level-8, starting-equipment
+bot on the cave-synchronized 27h candidate. Every required timing is unchanged from the
+[October 17 report](../../tidewhisper-balance-20261017.json); **0/18 checked rows** miss a target. The individual
+Shellback bouts above six seconds are informational under the existing regular-roster median rule.
+
+| Hero / seed | Roster median before → after (s) | Ironclaw before → after (s) | Mirelure before → after (s) |
+| --- | ---: | ---: | ---: |
+| Witch / 1 | 3.58 → 3.58 | 171.6 → 171.6 | 273.4 → 273.4 |
+| Witch / 7 | 4.77 → 4.77 | 174.1 → 174.1 | 276 → 276 |
+| Warrior / 1 | 5.55 → 5.55 | 172.4 → 172.4 | 286.6 → 286.6 |
+| Warrior / 7 | 5.03 → 5.03 | 169.5 → 169.5 | 284.3 → 284.3 |
+| Ranger / 1 | 3.7 → 3.7 | 155.4 → 155.4 | 187.8 → 187.8 |
+| Ranger / 7 | 4.47 → 4.47 | 156 → 156 | 190.8 → 190.8 |
+
+The synchronized pacing simulation also keeps the Tidewhisper route at level 8 before summon, **281–360 coins**
+against the 280-coin Tide set reserve, and sufficient lighthouse materials in one day and lighthouse plus gear
+materials in two days. No gameplay numbers or target bands changed for this rerun.

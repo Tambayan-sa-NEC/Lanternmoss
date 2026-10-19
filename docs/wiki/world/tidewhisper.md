@@ -1,6 +1,12 @@
 # Tidewhisper terrain and tides
 
-## In brief (unreleased)
+## In brief (functionally complete, unreleased)
+
+TODO 27h's functional content, balance, pacing and test-only campaign travel/Continue path passed again after the
+TODO 29 cave merge on 2026-10-19. The clean Acer RTX 4050 acceptance matrix still failed the unchanged p95 frame
+gate in all 18 cases at 1080p High on a 60 Hz display (17.4–18.2 ms versus 16.80 ms). The owner-approved gate split
+allows the functional work to join `develop` while `released: false` remains in force. Performance certification,
+destination enablement and the confirmed public `master` release are still pending.
 
 These summaries moved here from the root README; each is detailed in its section below.
 

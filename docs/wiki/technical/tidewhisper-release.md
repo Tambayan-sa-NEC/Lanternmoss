@@ -1,16 +1,18 @@
 # Tidewhisper 27h: validation and hardware handoff
 
-Status: **in progress / no-go**. Tidewhisper remains `released: false`. No release tag or `master` merge is authorized
-by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
+Status: **functional 27h checks pass; public release no-go**. Tidewhisper remains `released: false`. No release tag or
+`master` merge is authorized by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
 the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
-The earlier complete [step 2 checkpoint](#step-2-full-regression-checks) passed 243 units, all 53 simulations and
-17 Edge browser checks. After subsequent render changes, the latest affected checks pass **248 units, six simulations
-and three browser scripts**. Complete integration suites remain required on the final synchronized candidate.
+The synchronized 2026-10-19 candidate passed **275 unit tests, all 58 simulations, 25 relevant Edge browser
+scripts**, the three-hero duel and pacing audits, and the full screenshot tour (`errors: none`). The browser
+campaign script exercises real portal, travel, Continue, return, boss gate and one-time completion paths through
+the test-only fourth-world candidate at 720p and 1080p. The source release flag remains off.
 
-Latest ordinary hardware attempt: **5/18 timing cases pass; all 18 render-count cases pass**. See
-[the live frustum recheck](#step-3-live-recheck-after-frustum-gating). The collector failed acceptance and produced no release
-artifact. Step 3 remains open; production enablement still depends on passing it.
+Latest synchronized hardware attempt: **0/18 timing cases pass; all 18 render-count cases pass**. See
+[the 60 Hz matrix](#synchronized-60-hz-acceptance-matrix-2026-10-19). The collector failed acceptance and
+produced no release artifact. The owner-approved gate split permits functional integration to `develop`; production
+enablement and public release still depend on a passing Acer matrix.
 
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
@@ -89,7 +91,7 @@ $env:CHROME = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 node scripts/tidewhisper-performance.mjs --release
 ```
 
-The collector uses the actual fourth world, a 1280x720 viewport, Low preset, fixed village camera, daytime clear,
+The collector uses the actual fourth world, a 1920x1080 viewport, High preset, fixed village camera, daytime clear,
 night clear and daytime squall. Each scene has 30 warmup frames and 120 measured frames, repeated for all three heroes on runtime seeds 1 and 7
 (18 rows). World generation retains its authored seed. Light/tide phase is held fixed; real render time continues. It records the browser's
 actual WebGL GPU string, candidate commit, working-tree state, p95 frame interval and peak full-composer counts.
@@ -108,6 +110,11 @@ Default invocation (without `--release`) writes a diagnostic report only. `--rel
 the frame/draw budgets. A JSON file copied from another device or synthetic test data is not certification.
 
 ## Finish 27h
+
+This historical sequence preceded the approved 2026-10-19 gate split. Functional steps 1 and the candidate paths
+in step 3 now pass on the cave-synchronized branch; the release-flag and public-release parts of steps 2-3 remain
+gated by the failing hardware matrix. The stage can merge to `develop` under the approved functional scope while
+`released: false` stays in place.
 
 1. Done: duel timing bands pass on both seeds for all heroes, and the `pacing` audit now covers Tidewhisper's XP
    route, coin budget (new Tide forge fees, 280 coins) and two-day material yields (see `docs/wiki/game-design/balance.md`).
@@ -531,3 +538,48 @@ The same 1920 × 1080 panel was temporarily switched to its supported **60 Hz** 
 the gate. A second visible Edge session still used the RTX 4050 and measured **16.7 ms median, 16.9 ms p95** over
 240 empty-page frames. This is the calibrated display mode for the next clean acceptance matrix. The original
 165 Hz mode will be restored after that run.
+
+### Synchronized 60 Hz acceptance matrix (2026-10-19)
+
+The clean candidate `92d02e2` includes the 29a-29f cave merge and the cave render regression. On the Acer, connected
+to AC with the Acer power plan and other editor windows closed, visible Edge used the RTX 4050 at 1920 × 1080 DPR1
+High. The empty-page clock was 16.7 ms median / 16.8 ms p95, so the unchanged frame limit was **16.80 ms**.
+All 18 hero/seed/scene rows completed with zero page or shader errors, no paused/hidden samples and no GPU timer
+instrumentation. Every frame p95 was **17.4–18.2 ms**; thus **0/18 timing rows passed**. Average cadence was
+59.04–60.03 FPS. All 18 render-count rows passed, peaking at 474/550 calls and 209,113/230,000 triangles.
+The complete [matrix](../../tidewhisper-performance.json) is a **no-go**, and no `docs/releases/tidewhisper.json`
+certification was written. The original 165 Hz display mode was restored afterward. This removes the high-refresh
+measurement defect from the comparison, but the strict p95 interval gate still fails. The approved functional versus
+public-release performance split now applies; Tidewhisper stays unreleased.
+
+### Functional completion and next-work verdict (2026-10-19)
+
+The cave-synchronized candidate passes its non-performance content readiness checks: the readiness test reports
+only missing release performance evidence. [Fresh balance](../../tidewhisper-balance-20261019.json) passes all 18
+checked roster/duel bands on all three heroes and seeds 1/7, with the same values as October 17; the full pacing
+audit still reaches level 8, funds one Tide set from 281–360 coins, and yields lighthouse materials within one day
+and lighthouse plus gear materials within two. The campaign browser check passed portal travel, partial save and
+Continue, return, the low-tide/quest gate, completion and one crown after reload through the test-only fourth-world
+candidate at 720p and 1080p. **275/275 units, 58/58 simulations and 25 relevant Edge browser scripts pass.** The
+cave browser regression proves identical world matrices and pixels after forced traversal and after restoring a
+genuinely culled cave enemy branch. The tour completed in Edge with `errors: none`; the boss frames were restaged
+after visual review, and incidental unrelated recaptures were restored.
+
+**Go for functional integration to `develop`; no-go for Tidewhisper destination enablement or a `master` release.**
+The release flag stays false. Duskhollow's 30a can start from integrated `develop` because its 27h, 28a-28e and
+29a functional prerequisites are satisfied. 29g still waits on 30i. The optional otter remains **no-go** until it
+receives a separate estimate and the public performance gate has headroom; no optional pet was added in 27h.
+
+TODO 26 supplied the catalog, mechanic lifecycle and save infrastructure needed to build a fourth world, but it
+did not prove a complete real fourth-world campaign path: 27h found missing explicit forage/chest fields, save ids
+and borrowed Act I fixture metadata that could mask fourth-world gaps. It also left release validation coupled to
+hardware and frame-clock assumptions that had not been checked on the named display. 27h had to add the true-id
+content/Continue path, the full hero/seed matrix and frame-clock calibration, then repeat them after the cave merge.
+For Duskhollow, reserve explicit time for these integrations and for a fresh hardware audit after later branches land.
+
+The 27 checklist was **too large for one acceptance session**. Eight implementation stages were appropriate, but
+27h's 1–3.5 h estimate still bundled functional integration, full regression/tour work and uncertain reference
+performance certification. The approved split makes those two outcomes independently reviewable without relaxing
+the public 60 FPS rule. Recorded earlier 27h sessions total at least **5h 48m** before this session; the current
+session's machine-clock duration is in [its work log](../../logs/2610191920%20todo-27h-synchronized-acceptance.md).
+Stages 27a–27e have no measured TOTAL entries, so a whole-TODO actual cost cannot be claimed.

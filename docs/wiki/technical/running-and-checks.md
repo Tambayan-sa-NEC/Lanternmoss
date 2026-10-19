@@ -85,6 +85,8 @@ gets a scene in `scripts/screenshots.mjs` and a spot in the tour above; every ne
 These use a test catalog substitute; the authored destination stays unreleased. Install optional Puppeteer Core
 as above. `node scripts/tidewhisper-campaign-smoke.mjs` owns port 8114 and checks the real fourth-world portal UI,
 quest/node Continue, revisit, quest/tide gate, one crown and 720p/1080p bounds with zero page/shader errors.
+After the approved 2026-10-19 gate split, these functional checks may pass and merge to `develop` while hardware
+performance remains a public-release blocker. They never enable the authored Tidewhisper release flag.
 It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).

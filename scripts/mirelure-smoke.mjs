@@ -61,16 +61,19 @@ try{
         if(pose==='beached'&&B.mode!=='beached'){const {damageEnemy}=await import('/src/combat/damage.js');B.hp=B.def.hp*.51;B.mode='surfaced';B.hidden=false;damageEnemy(B,B.def.hp*.03,{});
           for(let i=0;i<60*15&&!B.sluice.broken;i++)L.update(1/60);}
         if(pose==='lures')for(let i=0;i<60*12&&!(B.mode==='deep'&&B.lures.length>=3);i++)L.update(1/60);
-        const view=offsetDir(B.home,.3,21),look=tangentToward(view,pose==='beached'?B.up:B.home);   // on the rim, inside the ring
-        L.player.placeAt(view);L.player.invuln=1e5;resetView(look);L.cam.pitch=.55;
+        const view=pose==='beached'?offsetDir(B.up,.3,9):offsetDir(B.home,.3,21);
+        const look=tangentToward(view,pose==='beached'?B.up:B.home);   // close to the beached boss, wide over the lures
+        L.player.placeAt(view);L.player.invuln=1e5;resetView(look);L.cam.pitch=pose==='beached'?.8:.55;
         for(let i=0;i<40;i++){L.player.fwd.copy(look);L.cam.fwd.copy(look);L.player.hp=L.player.stats.maxHp;B.cool=9;if(pose==='beached'){B.state='recover';B.timer=9;}L.update(1/60);}ctx.paused=true;   // posed: no new moves
         dom.hint.style.display='none';dom.prompt.style.display='none';dom.toast.style.opacity=0;
         for(const o of [L.player.root,L.player.shadow,L.companion?.root,L.companion?.shadow])if(o)o.visible=false;
         await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
         return pose==='lures'?{ok:B.lures.length>=3&&B.hidden&&L.BossGate.posts.some(p=>p.post.visible)}:{ok:B.mode==='beached'&&B.root.visible&&activeTides().status.lagoonDrained&&B.sluice.broken};
       },pose);assert.deepEqual(shown,{ok:true},`${pose} pose`);
+      await page.evaluate(() => { for (const id of ['hud','compass','combat']) document.getElementById(id).style.visibility='hidden'; });
       await page.screenshot({path:join(tmpdir(),`lanternmoss-27g-mirelure-${pose}-${height}.png`)});
       if(height===720)await page.screenshot({path:shotPath(`tidewhisper-mirelure-${pose}`),type:'jpeg',quality:88});
+      await page.evaluate(() => { for (const id of ['hud','compass','combat']) document.getElementById(id).style.visibility=''; });
       console.log(`PASS ${width}x${height} low: ${pose==='lures'?'the lit lagoon in its ring of surf':'Mirelure beached on the drained floor'}`);
     }
   }
