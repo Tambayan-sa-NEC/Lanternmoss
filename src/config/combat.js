@@ -10,9 +10,12 @@ export const COMBAT = {
   autoAimAngle: 40,            // soft lock-on cone (degrees either side of where the hero faces; the camera doesn't aim)
   autoAimRange: 20,
   castFaceTime: 0.35,          // seconds the magician keeps facing her target after casting
-  // A monster that gives up a chase (past its leash, or the hero ran off) walks home healing `heal` of its health per
-  // second, and is whole once home. A mini boss keeps its damage on the way: it only starts healing once it has been out
-  // of combat for more than `miniBossHealDelay` seconds, so a fight that drifts past its short leash can be resumed.
+  // A monster that gives up a chase walks home healing `heal` of its health per second, and is whole once home. A mini
+  // boss keeps its damage on the way: it only starts healing once it has been out of combat for more than
+  // `miniBossHealDelay` seconds, so a fight that drifts past its short leash can be resumed.
+  // Who still gives up (TODO 45a, Enemy.leashed): a mini boss during its earlier forms, and a main boss. An ordinary
+  // monster never does - it keeps coming until the hero is safe, faints, travels or starts again - so its `aggro` is
+  // only how far away it first notices the hero, and its `leash` applies to wandering and to the forms above.
   leashReturn: { heal: 0.3, miniBossHealDelay: 5 },
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,

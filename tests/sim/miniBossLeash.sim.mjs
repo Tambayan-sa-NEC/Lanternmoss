@@ -1,6 +1,7 @@
 // Mini bosses and their leash (COMBAT.leashReturn): a mini boss that gives up a chase past its leash keeps its damage
 // on the way home and at home, so a fight that drifted can be resumed; only after more than miniBossHealDelay seconds
-// out of combat does it heal back. Ordinary monsters still heal on their way home and are whole once there.
+// out of combat does it heal back. Since TODO 45a an ordinary monster has no leash to pass at all: it keeps coming
+// instead of walking home, so it never heals itself whole either.
 import assert from 'node:assert/strict';
 import { boot, imp } from './lib/boot.mjs';
 const { ctx } = await imp('core/context.js');
@@ -45,11 +46,17 @@ step(1.5); assert.ok(hydra.hp > before, `healing after ${L.miniBossHealDelay} s 
 step(6); assert.equal(hydra.hp, full, 'whole again');
 pass(`after more than ${L.miniBossHealDelay} s out of combat it heals back to ${full}`);
 
-// ---- ordinary monsters: unchanged ---------------------------------------------------------------------------------------
+// ---- ordinary monsters: since 45a they do not walk home at all ----------------------------------------------------------
+// The healing-on-the-way-home rule above is a mini boss rule now. An ordinary monster dragged past its old leash keeps
+// coming, so it never reaches the 'return' state and never heals itself whole (tests/sim/pursuit.sim.mjs covers the
+// chase itself; what matters here is that it does not quietly restore its health instead).
 P.placeAt(offsetDir(game.world.spawnDir, 0.4, 40)); step(0.1);
 const g = H.spawnEnemy('goblin', 4); g.temporary = true; g.hp = 10; dragOut(g); step(1 / 60);
-assert.equal(g.state, 'return'); away(); step(1);
-assert.ok(g.hp > 10, `a goblin heals on its way home (${Math.round(g.hp)})`);
-for (let i = 0; i < 600 && g.state === 'return'; i++) step(1 / 30);
-assert.equal(g.hp, g.def.hp, 'and is whole once home');
-pass('an ordinary goblin still heals on its way home and is whole once there');
+assert.equal(g.leashed, false, 'an ordinary monster has no leash to pass');
+assert.notEqual(g.state, 'return', 'so being dragged past its old leash does not send it home');
+away(); step(1);
+assert.ok(g.hp <= 10, `and it does not heal on the way (${Math.round(g.hp)} HP)`);
+for (let i = 0; i < 600; i++) step(1 / 30);
+assert.notEqual(g.state, 'return', 'it is still not going home a long way out');
+assert.ok(g.hp <= 10, `and is still hurt (${Math.round(g.hp)} HP): only a mini boss heals its way out of a fight`);
+pass('an ordinary goblin no longer walks home or heals itself: it keeps coming (45a)');
