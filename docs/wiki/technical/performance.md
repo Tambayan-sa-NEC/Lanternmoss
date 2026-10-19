@@ -12,7 +12,10 @@ before it writes a release evidence file. Tidewhisper remains unreleased.
 
 The [latest ordinary reference attempt](tidewhisper-release.md#step-3-live-recheck-after-frustum-gating),
 clean `c3375f0`, passes all 18 count budgets but only 5/18 timing cases (p95 14.4-23.6 ms). Acceptance remains a no-go;
-the raw matrix is retained and no release artifact was written.
+the raw matrix is retained and no release artifact was written. Before the next attempt, confirm the reference
+display's refresh rate: the empty-page clock measured 6.1 ms median, suggesting a high-refresh panel on which the
+fixed 16.67 ms interval limit is far stricter than the 60 FPS goal it stands for. See
+[the refresh-rate finding](tidewhisper-release.md#step-3-finding-the-reference-displays-refresh-rate-and-the-frame-interval-gate-2026-10-19).
 
 The owner selected the **Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, NVIDIA RTX 4050 Laptop GPU** as the default
 desktop validation machine on 2026-10-17. The target remains **60 FPS at a 1920 × 1080 viewport**, DPR 1, default

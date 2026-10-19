@@ -440,3 +440,81 @@ acceptance simulation, loosen the target or treat the paused comparison as certi
 **4**, enable the destination and verify production travel/saves/completion; **5**, final tour/docs, complete
 synchronized integration checks and stage/parent merges. No stage merge, deletion, destination enablement or public
 release is performed by this checkpoint.
+
+### Step 3 finding: the reference display's refresh rate and the frame-interval gate (2026-10-19)
+
+Desk analysis of the existing raw reports, performed on a non-reference machine. No measurement, code change or
+acceptance run was made for this section; every number below is read from the step 3 reports already recorded above.
+
+**Evidence.** The acceptance gate is `p95FrameMs`, the real interval between rendered frames, compared against
+`frameLimitMs(16.67, frameClock)`. That helper only lets the measured empty-page clock raise the limit when the
+clock is a genuine 60 Hz one (median within 5% of 16.67 ms); otherwise the fixed 16.67 ms applies. On the Acer the
+240-sample empty-page clock measured **6.1 ms median / 6.3 ms p95**, far outside the 5% calibration window, so every
+step 3 run was judged against the fixed 16.67 ms.
+
+**Hypothesis.** A 6.1 ms empty-page interval is a display refreshing at about **164 Hz** (1000 / 6.1). Acer Nitro
+ANV15-51 panels are commonly 144 Hz or 165 Hz, and 165 Hz is 6.06 ms. The rule's own comment records that it was
+written against a 60 Hz host, where "even an empty page measures ~16.7 ms"; the high-refresh fallback keeps the
+fixed limit but was never checked against what that limit means on a high-refresh panel.
+
+**Consequence, if the hypothesis holds.** `requestAnimationFrame` delivers frames on refresh boundaries, so on a
+165 Hz display the only intervals available are about 6.06, 12.12, 18.18 and 24.24 ms. For `p95FrameMs` to land at
+or below 16.67 ms, 95% of frames must arrive within 12.12 ms, which is a sustained **82.5 FPS**. A game pacing
+perfectly at 60 FPS would report intervals of 18.18 ms and **fail the gate by definition**. The nominal
+"60 FPS at 1080p High" target is therefore being enforced on this machine as roughly "82 FPS for 95% of frames",
+about 37% stricter than intended, as an artifact of the validation display rather than of the game.
+
+The recorded data is consistent with this model without proving it: average FPS across the two clean runs spans
+59.41-102.24, which is what a mix of 6.06 / 12.12 / 18.18 ms intervals produces, and the observed p95 values
+cluster near 12-16 ms (passing rows) and 18-24 ms (failing rows) rather than spreading evenly.
+
+**This is a hypothesis, not a result.** It is consistent with the recorded numbers and with the helper's own
+documented assumption, and it has not been confirmed on the hardware. Confirm it before acting on it.
+
+**Verify first, on the Acer, before any other 27h work:**
+
+1. Read the panel's actual refresh rate (Windows display settings, and `screen.refreshRate` or the collector's own
+   `frameClock` median in a browser console). Record the value with the monitor/mode in use.
+2. If it is not 60 Hz, note whether the game tab is vsync-paced at that rate.
+
+**Remedies, if the panel is high-refresh.** Preferred first, and none of them relaxes the 60 FPS goal:
+
+| Option | What it does | Cost | Effect on the rule |
+| --- | --- | ---: | --- |
+| **Set the display to 60 Hz for acceptance runs** | Makes the measurement context the one the rule was written for; the empty-page clock then calibrates and `max(16.67, clock p95)` applies as designed | None, a display setting | No rule change at all |
+| Make the limit refresh-aware | Pass when p95 is no worse than the first refresh boundary at or above 16.67 ms (18.18 ms at 165 Hz) | Small change to `frameLimitMs` | Changes the helper; preserves the 60 FPS intent exactly |
+| Gate on `p95CpuMs` instead | Measures the game loop only | Small | Rejected: the collector documents that CPU time omits browser compositing and GC and reads up to 4 ms under the real interval, so it must never be the pass number |
+
+The first option is recommended because it needs no code and no rule change: it simply measures 60 FPS on a 60 Hz
+display, which is what the acceptance text already says.
+
+**This supersedes the 60 FPS frame-cap idea.** Capping the game at 60 FPS while measuring on a 165 Hz panel would
+force every interval to 18.18 ms and make the gate fail harder. Do not add a cap before the refresh rate is
+confirmed and the measurement context is settled.
+
+### Acer session runbook (queued, 2026-10-19)
+
+Run in this order. Steps 1-2 are free and may remove the shortfall without changing anything.
+
+1. **Confirm the refresh rate** as above, and record it in this page.
+2. **Quiet-host acceptance rerun.** The two clean step 3 runs were taken with only about 3797-3808 MiB of 16 GB
+   available and per-row memory swinging between about 325 and 3303 MiB; between them average FPS moved from
+   76.02-102.24 down to 59.41-80.85 *after* two optimizations landed, so host noise currently exceeds the signal.
+   Before rerunning: close other applications, run no git or file activity during the run, stay on AC with the
+   high-performance power plan, confirm the RTX 4050 is the active renderer, and use a clean committed candidate.
+   Then `node scripts/tidewhisper-performance.mjs --release` for the full 18 cases.
+3. **If it passes:** continue with the existing [Finish 27h](#finish-27h) steps 3-5.
+4. **If it still fails:** record the matrix as another no-go, then decide between the remedy table above and the
+   gate split below. Do not cherry-pick passing rows, freeze the acceptance simulation, relabel a diagnostic as
+   certification or loosen the 60 FPS target.
+5. **Screenshot tour and final visual review** belong in this same session, on the reference machine.
+
+**Agreed fallback: split the gate.** The owner approved, on 2026-10-19, separating 27h's functional completion
+(content gate, three-hero pacing, travel/Continue, tour, docs) from its performance certification, so that
+performance gates only the public `master` release and not the roadmap items that depend on 27h (28, 29g, 30).
+This loosens no target. The roadmap restructure is not yet written into `TODO.md`; it is recorded here first.
+
+**Work that can be done away from the reference machine:** everything except the acceptance matrix itself and the
+final visual review, namely algorithmic optimization proven by deterministic simulations, the full unit/simulation
+suites, the functional browser checks, the three-hero pacing pass, the production-path verification behind the
+release flag, and all documentation. Measurements taken elsewhere are diagnostics and never certification.
