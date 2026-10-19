@@ -10,6 +10,7 @@ import { clearStaticColliders } from '../physics/colliders.js';
 import { Batcher, setSceneryDensity } from '../render/Batcher.js';
 import { releasePointsMaterial } from '../render/materials.js';
 import { disposeTree, G, part } from '../render/meshes.js';
+import { freezeStaticTransforms } from '../render/staticParts.js';
 import { scene, setFogColor } from '../render/scene.js';
 import { rand, rr, seedWorld } from '../utils/random.js';
 import { arcDist, frameQuat, offsetDir, projectTangent, randomDir, tangentFrame } from '../utils/sphere.js';
@@ -99,7 +100,7 @@ export class World {
     bakeTerrain();
     ponds.forEach(computeWaterLevel);
 
-    this.add(buildPlanet(palette));                                   // (the height field is baked: placement may sample it now)
+    this.add(freezeStaticTransforms(buildPlanet(palette)));            // baked terrain is static; placement may sample it now
 
     const B = new Batcher({ cellSize: 48 });
     this.pier=null;this.lighthouseLamp=null;
@@ -110,10 +111,10 @@ export class World {
     B.decorative = true; decoratePonds(B); B.decorative = false;
     this.spots = { trees: [], rocks: [] };                            // every tree and rock, to chop and mine (gameplay/Gathering.js)
     this.trees = scatterFlora(B, planet.flora, this.spots);           // { kind: count }
-    this.scenery = B.build(); this.add(this.scenery);
+    this.scenery = freezeStaticTransforms(B.build()); this.add(this.scenery);
     const fl = planet.flora ?? {}, grass = createGrass(palette.grass, fl.grass ?? 1), tall = createTallGrass(fl.tallGrass ?? palette.grass, spawnDir, fl.tallCount ?? 1);
     const [stems, heads] = createMeadowFlowers(fl.flowers ?? [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff], fl.meadow ?? 1);
-    this.grass = [grass, tall, stems, heads].map(mesh => chunkInstances(mesh)); this.add(...this.grass);
+    this.grass = [grass, tall, stems, heads].map(mesh => freezeStaticTransforms(chunkInstances(mesh))); this.add(...this.grass);
 
     this.water = createWater(palette.water, o => { this.add(o); this.ownMaterials.push(o.material); });
     this.waterMat = this.water.material; this.add(...this.water.meshes);

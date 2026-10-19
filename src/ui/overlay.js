@@ -18,6 +18,7 @@ import { dom } from './dom.js';
 const _tv = new THREE.Vector3();
 const TREATS = itemRegistry.all().filter(d => d.tags.includes('treat')).map(d => d.id);
 let chipsT = 0;
+let promptHtml = '', chipsHtml = '';
 
 /** The "E ..." bubble over whatever E would use: a villager, a door, furniture (src/gameplay/Houses.js currentInteraction). */
 function updatePrompt() {
@@ -25,7 +26,9 @@ function updatePrompt() {
   if (!t) { dom.prompt.style.display = 'none'; return; }
   _tv.copy(t.at).project(camera);
   if (_tv.z < 1) {
-    dom.prompt.style.display = 'block'; dom.prompt.innerHTML = `${bindKbd('interact')} ${t.label}`;
+    dom.prompt.style.display = 'block';
+    const html = `${bindKbd('interact')} ${t.label}`;
+    if (html !== promptHtml) { dom.prompt.innerHTML = html; promptHtml = html; }
     dom.prompt.style.left = ((_tv.x * 0.5 + 0.5) * innerWidth) + 'px'; dom.prompt.style.top = ((-_tv.y * 0.5 + 0.5) * innerHeight) + 'px';
   } else dom.prompt.style.display = 'none';
 }
@@ -47,7 +50,7 @@ function updateChips(dt) {
   if (treats) h += `<div class="chip">Treats: ${treats}</div>`;
   const cleared = Challenges.clearedCount();
   if (cleared) h += `<div class="chip" style="background:#fff0c8">Challenges: ${cleared} / ${Object.keys(CHALLENGES).length}</div>`;
-  dom.hud.innerHTML = h;
+  if (h !== chipsHtml) { dom.hud.innerHTML = h; chipsHtml = h; }
 }
 
 let world = null;

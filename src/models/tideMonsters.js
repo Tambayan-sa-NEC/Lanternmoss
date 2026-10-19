@@ -2,6 +2,7 @@
    their behaviour modules drive (src/entities/enemies/behaviors/armoured.js, drifter.js, amphibian.js). */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { batchRigidParts } from '../render/staticParts.js';
 
 const group = (parent, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; };
 
@@ -40,7 +41,7 @@ export function buildShellback() {
   };
   const clawL = claw(-1), clawR = claw(1);
   root.scale.setScalar(1.1);
-  return { root, body, plate, clawL, clawR, legs };
+  return batchRigidParts({ root, body, plate, clawL, clawR, legs }, [clawL.userData.pincer, clawR.userData.pincer]);
 }
 
 /** Jellybell: a floating bell-shaped jellyfish with a glowing heart and trailing tentacles that sit below the water.
@@ -57,7 +58,7 @@ export function buildJellybell(def = {}) {
     const a = i / 5 * Math.PI * 2 + 0.3, t = group(body, Math.cos(a) * 0.25, -0.02, Math.sin(a) * 0.25);
     addTo(t, part(G.cone(0.05, 0.75, 4), 0x9fe0f0), [0, -0.38, 0], [Math.PI, 0, 0]); tentacles.push(t);
   }
-  return { root, body, core, tentacles };
+  return batchRigidParts({ root, body, core, tentacles });
 }
 
 /** Surf skipper: a goggle-eyed mudskipper raider with a sail fin and a shell dagger. Parts: body, fin (the only part
@@ -80,7 +81,7 @@ export function buildSurfSkipper() {
   const pectoral = sx => { const f = group(body, sx * 0.28, 0.18, 0.28); addTo(f, part(G.ico(0.12, 0), 0x6f8a4c), [sx * 0.08, -0.06, 0.04], [0, 0, 0], [1.4, 0.4, 1]); return f; };
   const finL = pectoral(-1), finR = pectoral(1);
   addTo(finR, part(G.cone(0.05, 0.32, 4), 0xf5e6c8), [0.12, 0, 0.2], [Math.PI / 2, 0, 0]);                // shell dagger
-  return { root, body, fin, tail, finL, finR };
+  return batchRigidParts({ root, body, fin, tail, finL, finR });
 }
 
 /** Old Ironclaw (mini boss): a giant hermit crab living in a sunken bronze bell that lies on its side, mouth forward.

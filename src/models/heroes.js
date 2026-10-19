@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { fxMaterial } from '../fx/combatFx.js';
 import { addTo, G, part } from '../render/meshes.js';
+import { batchRigidParts } from '../render/staticParts.js';
 import { addSkirt, buildHumanoid } from './humanoid.js';
 
 /** A flat fan (pie slice) in the local YZ plane, centred on angle `at` (0 = +Z, PI/2 = +Y): axe blades. */
@@ -52,7 +53,7 @@ export function buildWitch() {
   addTo(staff, part(new THREE.TorusGeometry(0.17, 0.03, 4, 10, Math.PI * 1.4), gold), [0, 1.44, 0], [0, 0, -Math.PI * 1.2]);
   for (const sx of [-1, 1]) addTo(staff, part(G.cone(0.03, 0.14, 4), gold), [sx * 0.15, 1.62, 0], [0, 0, -sx * 0.5]);
   h.wandTip = addTo(staff, part(G.ico(0.11, 1), 0xd8a8ff, { glow: true, intensity: 2.6 }), [0, 1.44, 0]);
-  Object.assign(h, { cape, staff, staffTilt: 0, hat }); return h;
+  Object.assign(h, { cape, staff, staffTilt: 0, hat }); return batchRigidParts(h);
 }
 
 export function buildKnight() {
@@ -93,7 +94,7 @@ export function buildKnight() {
   addTo(axeRoll, part(G.cone(0.05, 0.22, 4), steel), [0, 0, 1.22], [Math.PI / 2, 0, 0]);
   const bubble = new THREE.Mesh(new THREE.IcosahedronGeometry(1.1, 1), fxMaterial(0x9fe8ff, 0.45));
   bubble.position.y = 1.0; bubble.visible = false; bubble.renderOrder = 4; h.root.add(bubble);
-  Object.assign(h, { cape, axe, axeRoll, axeGrip: 0, armHoldR: -0.3, bubble }); return h;
+  Object.assign(h, { cape, axe, axeRoll, axeGrip: 0, armHoldR: -0.3, bubble }); return batchRigidParts(h);
 }
 
 export function buildRanger() {
@@ -147,7 +148,7 @@ export function buildRanger() {
     addTo(bow, part(G.oct(0.035), 0x8fffb0, { glow: true, intensity: 2 }), [0, sy * 0.24, 0.035]);
   }
   addTo(bow, part(G.box(0.018, tipY * 2, 0.018), 0xfff8ee, { outline: false }), [0, 0, tipZ]);
-  Object.assign(h, { cape, bowHold, bow, tails }); return h;
+  Object.assign(h, { cape, bowHold, bow, tails }); return batchRigidParts(h);
 }
 
 /** The ranger's arrow (Projectile shape 'arrow'): points along local +Z. */
