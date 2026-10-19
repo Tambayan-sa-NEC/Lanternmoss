@@ -6,6 +6,7 @@ import { enemyDef } from '../../../src/combat/enemyDefs.js';
 import { clearHazards } from '../../../src/combat/hazards.js';
 import { clearTargets } from '../../../src/combat/targeting.js';
 import { kit, resetCooldowns } from '../../../src/combat/casting.js';
+import { CavePuzzles } from '../../../src/gameplay/CavePuzzles.js';
 
 export function placeCaveHero(x, z) {
   const s = Dungeons.inside;
@@ -25,4 +26,20 @@ export function clearCaveCombat() {
   for (const p of ctx.projectiles) p.dispose(); ctx.projectiles = [];
   clearHazards(); clearTargets(); ctx.player.clearTimers(); ctx.player.knock.set(0, 0, 0);
   ctx.player.hp = ctx.player.stats.maxHp; ctx.player.mana = ctx.player.stats.maxMana; resetCooldowns(kit());
+}
+
+/** Test-only: solve whichever puzzle this cave set, take its key and turn the ward, so a sim whose subject is not the
+    puzzle (traversal, rewards) can reach the end room. Uses the real runtime steps; changes no release flag. */
+export function openCaveWard() {
+  const Q = CavePuzzles;
+  if (!Q.built) throw new Error('openCaveWard needs a cave to be entered');
+  for (const sw of Q.switches) Q.light(sw);
+  for (const st of Q.stones) {                                   // set each stone down on its own plate
+    const pl = Q.plates.find(p => Math.abs(p.x - st.x) < 1e-6) ?? Q.plates[0];
+    st.root.position.set(pl.x, 0, pl.z); Q.built.toWorld(pl.x, pl.z, 0, st.body.pos);
+    Q.placed.set(st.id, { x: pl.x, z: pl.z });
+  }
+  Q.checkPlates();
+  Q.openKeyChest(); Q.turnDoor();
+  return Q.door.open;
 }

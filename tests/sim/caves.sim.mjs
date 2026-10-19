@@ -70,6 +70,8 @@ const go = target => {                                                 // centre
     assert.ok(walkTo(a.x, a.z) && walkTo((a.x + b.x) / 2, (a.z + b.z) / 2) && walkTo(b.x, b.z), `reached ${b.id}`);
   }
 };
+// 29e wards the doorway into the end room. This sim's subject is traversal, so open it the way the puzzle would.
+assert.ok((await import('./lib/caveFixture.mjs')).openCaveWard(), 'the ward is open for the traversal walk');
 for (const r of layout.rooms) go(r.id);
 assert.equal(visited.size, layout.rooms.length, 'every room visited');
 // a wall: from the entrance's centre, push west where there is no door (or north, if west has one)

@@ -259,3 +259,12 @@ the locked door and the guardian at the end are still to come, and no cave is re
 See [cave rewards](../world/caves.md#rewards-and-persistence-29d).
 
 ![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)
+
+**The warden of the cave (in development, unreleased).** The last room of a cave is warded shut. The room before it
+holds a puzzle — a row of lanterns to light, or stones to shoulder onto pressure plates — and solving it unseals the
+chest the **Warden's Key** waits in. The key turns the ward once. Past it stands the cave's keeper: one of that cave's
+own monsters, grown larger and haloed, with loot of its own. Beat it and a worn stair lights up to carry you back to
+the mouth. No cave is released yet.
+See [the warden](../world/caves.md#puzzles-the-warden-and-the-way-home-29e).
+
+![The cave's warden, an elite of its own kind, standing over the end room](../../screenshots/world/cave-guardian.jpg)

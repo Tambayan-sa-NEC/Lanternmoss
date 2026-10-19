@@ -41,7 +41,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
-  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
+  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', cavePuzzles: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
@@ -61,7 +61,7 @@ export const SAVE_OWNERS = {
   'gameplay/buffs.js:buffs': 'buffs', 'gameplay/buffs.js:BuffState': 'buffs', 'gameplay/Needs.js:Needs': 'buffs',
   'gameplay/Houses.js:Houses': 'houses', 'gameplay/PlanetProgression.js:PlanetProgression': 'progression',
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
-  'gameplay/Chests.js:Chests': 'chests', 'gameplay/CaveRewards.js:CaveRewards': 'caves', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
+  'gameplay/Chests.js:Chests': 'chests', 'gameplay/CaveRewards.js:CaveRewards': 'caves', 'gameplay/CavePuzzles.js:CavePuzzles': 'cavePuzzles', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
   'gameplay/Portals.js:Portals': 'portals',
@@ -226,6 +226,17 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
         mined: stringIds(s.mined, id => owned(id) && /:v\d{1,3}$/.test(id)),
         cleared: stringIds(s.cleared, id => owned(id) && /:r\d{1,4}$/.test(id)),
         visited: stringIds(s.visited, id => owned(id) && /:r\d{1,4}$/.test(id)) };
+    }
+    case 'cavePuzzles': {
+      const cave = Object.values(CAVES).find(c => c.id === s.cave) ?? null;
+      const owned = id => typeof id === 'string' && !!cave && id.startsWith(`${cave.id}:r`);
+      return { cave: cave?.id ?? null,
+        lit: stringIds(s.lit, id => owned(id) && /:sw\d{1,3}$/.test(id)),
+        unlocked: stringIds(s.unlocked, id => owned(id) && id.endsWith(':door')),
+        beaten: stringIds(s.beaten, id => owned(id) && id.endsWith(':guardian')),
+        opened: stringIds(s.opened, id => owned(id) && (id.endsWith(':keychest') || id.endsWith(':shortcut'))),
+        stones: list(s.stones, 32).map(st => ({ id: record(st).id, x: number(record(st).x, 0, -400, 400), z: number(record(st).z, 0, -400, 400) }))
+          .filter(st => owned(st.id) && /:st\d{1,3}$/.test(st.id)) };
     }
     case 'bossGate': return { awake: bool(s.awake), beaten: bool(s.beaten), broken: stringIds(s.broken, n => Number.isInteger(n) && n >= 0 && n < 10),
       hinted: stringIds(s.hinted, name => typeof name === 'string' && name.length < 80), praised: stringIds(s.praised, name => typeof name === 'string' && name.length < 80) };

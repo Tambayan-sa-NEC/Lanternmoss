@@ -6,7 +6,7 @@
    Leave by stepping back onto the mouth (or E there). Fainting inside, travelling, or a new adventure takes the hero out
    at once. A save made inside records the cave and the room pose, so Continue goes back in where the hero stood (29d);
    fainting is the exception, and puts the hero back at the mouth. The cave's chests, veins and room progress are
-   CaveRewards (29d).
+   CaveRewards (29d). Its puzzle room, warded door, guardian and way home are CavePuzzles (29e).
    The surface mouth's spot is worked out for every planet with a cave, placed last so nothing else moves, but the mouth
    only appears for a released cave: unreleased caves stay out of normal play. */
 import * as THREE from 'three';
@@ -33,6 +33,7 @@ import { arcDist, matrixAt, offsetDir, projectTangent, tangentToward } from '../
 import { generateCave, roomAt } from '../world/caveLayout.js';
 import { buildCave, CAVE_ORIGIN, CAVE_UP } from '../world/caves.js';
 import { CaveRewards } from './CaveRewards.js';
+import { CavePuzzles } from './CavePuzzles.js';
 import { Pets } from './Pets.js';
 import { petEffects } from './petAbilities.js';
 import { isFree } from '../world/placement.js';
@@ -114,6 +115,7 @@ export const Dungeons = {
     ctx.room.attach(P, built.toWorld(m.x, m.z - 1.2));
     ctx.indoors = cave.name;
     CaveRewards.spawnFor(layout, cave, built);
+    CavePuzzles.spawnFor(layout, cave, built, this.inside);
     CaveRewards.visit(layout.entrance);
     Pets.spawn();
     setRoomView({ up: CAVE_UP, back: BACK }); LocalLights.setDarkness(CAVE.darkness);
@@ -149,7 +151,7 @@ export const Dungeons = {
       const P = ctx.player;
       ctx.room.detach(P); P.motion = null; P.motionHs = 0; P.leapK = 0; P.dashT = 0; P.vy = 0;
       P.selfCollider.active = true; P.placeAt(this.mouth?.dir ?? this.world.spawnDir); P.grounded = true;
-      CaveRewards.clear();
+      CaveRewards.clear(); CavePuzzles.clear();
       this.inside.built.dispose(); this.inside = null; ctx.room = null; ctx.indoors = null;
       LocalLights.setDarkness(0); setRoomView(null);
       Pets.spawn(); if (Pets.mode === 'stay' && surface.stay) Pets.stayDir = surface.stay;
@@ -159,7 +161,7 @@ export const Dungeons = {
   // ---------------------------------------------------------------- room placement (fixtures and future saved poses)
   placeHero() {
     const s = this.inside; ctx.room.place(ctx.player, s.built.toWorld(s.x, s.z));
-    const room = roomAt(s.layout, s.x, s.z); if (room) { s.room = room; CaveRewards.visit(room); }
+    const room = roomAt(s.layout, s.x, s.z); if (room) { s.room = room; CaveRewards.visit(room); CavePuzzles.wake(room); }
   },
   // ---------------------------------------------------------------- what E does
   target() {
@@ -168,8 +170,9 @@ export const Dungeons = {
     if (s) {
       const m = s.layout.mouth, d = Math.hypot(s.x - m.x, s.z - m.z);
       const out = d < CAVE.mouthReach ? { dist: d, label: 'Leave the cave', at: s.built.toWorld(m.x, m.z, 1.4), run: () => this.leave() } : null;
-      const reward = CaveRewards.target();                             // a chest or a vein in reach comes first when nearer
-      return reward && (!out || reward.dist < out.dist) ? reward : out;
+      let best = out;                                                  // whatever is nearest: the mouth, a reward, a puzzle
+      for (const c of [CaveRewards.target(), CavePuzzles.target()]) if (c && (!best || c.dist < best.dist)) best = c;
+      return best;
     }
     const mo = this.mouth; if (!mo?.parts || mo.planet !== ctx.planet || ctx.indoors) return null;
     const d = arcDist(P.up, mo.dir); if (d > 2.6) return null;
@@ -181,8 +184,8 @@ export const Dungeons = {
       const s = this.inside, P = ctx.player;
       s.x = P.pos.x - CAVE_ORIGIN.x; s.z = P.pos.z - CAVE_ORIGIN.z;
       s.vx = P.vel.x; s.vz = P.vel.z;
-      const room = roomAt(s.layout, s.x, s.z); if (room) { s.room = room; CaveRewards.visit(room); }
-      CaveRewards.update(dt);
+      const room = roomAt(s.layout, s.x, s.z); if (room) { s.room = room; CaveRewards.visit(room); CavePuzzles.wake(room); }
+      CaveRewards.update(dt); CavePuzzles.update(dt);
       const d = Math.hypot(s.x - s.layout.mouth.x, s.z - s.layout.mouth.z);
       if (d > 2.2) s.armed = true;
       else if (s.armed && d < 0.7 && s.vz > 0.5 && P.grounded) this.leave();

@@ -14,14 +14,23 @@
        reward    cave rewards (29d, runtime src/gameplay/CaveRewards.js): chestReach/veinReach are how near (m) E
                  offers a chest or a vein; veinInset keeps a room's fixtures off its walls (m) and spawnInset does
                  the same for its monsters; clearedBy is how many monsters must fall for a room to count as cleared
+       puzzle    the way to the end room (29e, runtime src/gameplay/CavePuzzles.js): reach is how near (m) E lights a
+                 lantern switch or works the locked door; switches/stones is how many a puzzle room holds; plateRadius
+                 is how near a stone's centre must be to press a plate (m); stoneRadius is a push stone's footprint
+                 and pushSpeed how fast it slides; inset keeps the puzzle off the room's walls (m)
+       guardian  the end room's keeper: how much tougher it is than its ordinary kind (the same shape as the planets'
+                 ELITE), and the halo that marks it
+       shortcut  the way home the guardian's fall opens: how near (m) E takes it
      ROOM_KIT  the room pieces: w x d (m) of floor, and how many lanterns stand in it. `entrance` starts every cave,
                `end` is its farthest room, `hall` and `chamber` fill the rest (picked by the seed).
      CAVE_VEINS  the ore veins that only grow in caves (the mining fields of config/resources.js NODE_KINDS:
                  verb, tool, tier, hits, drops). Cave ore is found nowhere on the surface.
      CAVES     per planet: id (stable: room ids derive from it), name, released (the surface mouth only appears for
                a released cave; 29f releases the original worlds' caves), seed salt, rooms [min, max] and colours,
-               and its rewards: `ore` (a CAVE_VEINS kind), `veins` [min, max] per room, `chest` (a CHEST_KINDS kind
-               for an ordinary room) and `endChest` (the end room's). 29f gives each world its own ore and roster.
+               its rewards: `ore` (a CAVE_VEINS kind), `veins` [min, max] per room, `chest` (a CHEST_KINDS kind
+               for an ordinary room) and `endChest` (the end room's); and its way in to the end (29e): `puzzle`
+               ('lanterns' or 'stones'), `guardian` (a COMBAT.enemies type, made into the cave's keeper) and
+               `guardianLoot` (a LOOT_TABLES id). 29f gives each world its own ore and roster.
    Room ids are `${cave.id}:r${n}`, numbered in generation order, so the same planet always builds the same cave. */
 export const CAVE = {
   cell: 16, corridor: 2.6, wallHeight: 3.4, darkness: 1,
@@ -30,6 +39,9 @@ export const CAVE = {
   motion: { sweep: 0.2, waypointReach: 0.3 },
   entrance: { distance: [34, 60], clearance: 3 },
   reward: { chestReach: 2.2, veinReach: 2.2, veinInset: 1.9, spawnInset: 2.4, clearedBy: 1 },
+  puzzle: { reach: 1.8, switches: 3, stones: 2, plateRadius: 0.9, stoneRadius: 0.55, pushSpeed: 1.9, inset: 2.0 },
+  guardian: { hp: 2.6, damage: 1.3, xp: 2.5, scale: 1.3, halo: 0xbf7aff },
+  shortcut: { reach: 1.8 },
 };
 
 /* Cave ore: mined with a pickaxe, like a surface vein, but these kinds are never placed on a planet's surface
@@ -49,11 +61,14 @@ export const ROOM_KIT = {
 export const CAVES = {
   lanternmoss: { id: 'lanternmoss-cave', name: 'Mossroot Hollow', released: false, salt: 0x3a7e, rooms: [5, 7],
     colors: { floor: 0x55604a, wall: 0x3f4639, accent: 0x9fe08a },
-    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare' },
+    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare',
+    puzzle: 'lanterns', guardian: 'ogre', guardianLoot: 'rare' },
   emberfall: { id: 'emberfall-cave', name: 'Cinder Warren', released: false, salt: 0x51c3, rooms: [6, 8],
     colors: { floor: 0x6a4a3a, wall: 0x4a3028, accent: 0xff9a5a },
-    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare' },
+    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare',
+    puzzle: 'stones', guardian: 'ramhorn', guardianLoot: 'rare' },
   frostveil: { id: 'frostveil-cave', name: 'Rimeglass Grotto', released: false, salt: 0x2bf1, rooms: [6, 8],
     colors: { floor: 0x5a6a7a, wall: 0x3e4a58, accent: 0xbfe8ff },
-    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare' },
+    ore: 'gloomVein', veins: [1, 2], chest: 'common', endChest: 'rare',
+    puzzle: 'lanterns', guardian: 'hexlantern', guardianLoot: 'rare' },
 };

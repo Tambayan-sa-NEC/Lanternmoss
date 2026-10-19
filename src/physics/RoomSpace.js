@@ -10,6 +10,9 @@ export class RoomSpace {
   constructor(layout, origin) {
     this.layout = layout; this.origin = origin.clone(); this.up = new V3(0, 1, 0);
     this.rects = floorRects(layout); this.bodies = new Set();
+    // Warded doorways (29e): local-space rectangles nothing may stand in or cross while they are up. Because every
+    // reach, sweep and room route goes through contains(), a ward stops the hero, pets, monsters and their paths alike.
+    this.blockers = [];
   }
   ground(p, lift = 0, out = new V3()) { return out.set(p.x, this.origin.y + lift, p.z); }
   point(actor) { return this.ground(actor.pos); }
@@ -19,6 +22,8 @@ export class RoomSpace {
   toward(a, b) { const v = b.clone().sub(a); v.y = 0; return v.lengthSq() > 1e-10 ? v.normalize() : new V3(0, 0, -1); }
   contains(p, radius = 0) {
     const x = p.x - this.origin.x, z = p.z - this.origin.z;
+    for (const b of this.blockers)
+      if (x + radius > b.x0 && x - radius < b.x1 && z + radius > b.z0 && z - radius < b.z1) return false;
     if (walkable(this.rects, x, z, radius)) return true;
     // A large body can straddle two overlapping floor rectangles without fitting inside either one.
     // Check that the union covers its entire square footprint, using exact rectangle-edge slices.
