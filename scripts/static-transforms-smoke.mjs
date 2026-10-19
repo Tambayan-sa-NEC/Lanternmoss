@@ -1,4 +1,5 @@
-// Immutable matrix traversal regression: Edge, real movement, 720p/1080p; owns port 8141.
+// Immutable matrix and actor-frustum regression in four surface worlds and a local-light cave:
+// Edge, real movement, raw pixel equivalence, 720p/1080p; owns port 8141.
 import assert from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -17,14 +18,29 @@ try {
   });
   for (const [width, height] of [[1280,720], [1920,1080]]) {
     await page.setViewport({ width, height });
-    for (const planet of ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper']) {
+    for (const planet of ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper', 'cave']) {
       await page.evaluate(async planet => {
         const { ctx } = await import('/src/core/context.js'); ctx.paused = false;
-        const L = window.LANTERNMOSS; L.goToPlanet(planet); L.setWeather('clear'); L.player.invuln = 1e9;
+        const L = window.LANTERNMOSS; L.goToPlanet(planet === 'cave' ? 'lanternmoss' : planet);
+        L.setWeather('clear'); L.player.invuln = 1e9;
+        if (planet === 'cave') {
+          L.Dungeons.goInside(0);
+          const { clearCaveRoster, spawnCaveEnemy } = await import('/tests/sim/lib/caveFixture.mjs');
+          clearCaveRoster();
+          const s = L.Dungeons.inside;
+          spawnCaveEnemy('goblin', s.x + 2, s.z - 2, { held: true });
+        }
       }, planet);
       await page.keyboard.down('KeyW');
       await page.evaluate(() => { for (let i = 0; i < 90; i++) window.LANTERNMOSS.update(1/60); });
       await page.keyboard.up('KeyW');
+      if (planet === 'cave') await page.evaluate(async () => {
+        const s = window.LANTERNMOSS.Dungeons.inside;
+        const { spawnCaveEnemy } = await import('/tests/sim/lib/caveFixture.mjs');
+        // Keep a real rig close enough for the distance gate, but behind the room camera.
+        spawnCaveEnemy('goblin', s.x, s.z + 16, { held: true });
+        for (let i = 0; i < 2; i++) window.LANTERNMOSS.update(1/60);
+      });
       const before = await page.evaluate(async () => {
         const { ctx } = await import('/src/core/context.js'); ctx.paused = true;
         const { scene } = await import('/src/render/scene.js');
@@ -67,6 +83,7 @@ try {
         return {png:window.__staticRender.canvas.toDataURL('image/png'),restored};
       });
       assert.equal(distanceOnly.png === after, true, `${planet}: frustum gating changes canvas pixels at ${width}x${height}`);
+      if (planet === 'cave') assert.ok(distanceOnly.restored > 0, 'cave: off-screen actor branch was actually gated');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       console.log(`PASS ${planet} ${width}x${height}: movement, identical matrices/pixels after forced traversal and restoring ${distanceOnly.restored} off-screen branches; no overflow`);
     }
