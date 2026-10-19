@@ -518,3 +518,16 @@ This loosens no target. The roadmap restructure is not yet written into `TODO.md
 final visual review, namely algorithmic optimization proven by deterministic simulations, the full unit/simulation
 suites, the functional browser checks, the three-hero pacing pass, the production-path verification behind the
 release flag, and all documentation. Measurements taken elsewhere are diagnostics and never certification.
+
+### Acer refresh verification (2026-10-19)
+
+The actual primary 1920 × 1080 display mode was **165 Hz** (Windows display mode API; Intel UHD is the panel's
+connected adapter). A visible Edge session with `--force-high-performance-gpu` reported the active WebGL renderer as
+**ANGLE / NVIDIA GeForce RTX 4050 Laptop GPU / D3D11**. Its 240-frame empty-page clock measured **6.1 ms median,
+6.3 ms p95**, confirming the earlier refresh-rate hypothesis. The acceptance rule on that mode requires p95 intervals
+within 16.67 ms even though the next 165 Hz refresh boundary is 18.18 ms.
+
+The same 1920 × 1080 panel was temporarily switched to its supported **60 Hz** mode without changing game code or
+the gate. A second visible Edge session still used the RTX 4050 and measured **16.7 ms median, 16.9 ms p95** over
+240 empty-page frames. This is the calibrated display mode for the next clean acceptance matrix. The original
+165 Hz mode will be restored after that run.
