@@ -50,6 +50,7 @@ src/
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   ├── talents.js         talent points, the reset wizard and each hero's tree (Witch, Warrior and Ranger)
+│   ├── dungeons.js        caves: the room kit, cave rules and each planet's (unreleased) cave
 │   └── critters.js        ambient animal looks
 ├── core/
 │   ├── Game.js            startup order, per-frame update order, run lifecycle (begin / reset)
@@ -74,9 +75,14 @@ src/
 │   └── Batcher.js         merges static scenery into a few draw calls
 ├── physics/
 │   ├── colliders.js       static, moving and camera colliders; overlap resolution
-│   └── Walker.js          surface movement under spherical gravity: cliffs, standing on rocks, wading and swimming
+│   ├── RoomSpace.js       flat cave floor: wall/body sweeps, gravity and paths through connected rooms
+│   └── Walker.js          shared actor movement: spherical surface physics or the attached flat room frame
 ├── world/                 the planet (generated once, in a fixed order, from a seeded RNG)
 │   ├── World.js           generation order, landmarks, per-frame sun / sky / ambient animation
+│   ├── caveLayout.js      cave layouts: rooms joined from a seed, the walkable floor, which room a point is in,
+│   │                      where each room's chest, veins and monster spawns stand, and the puzzle, warded door,
+│   │                      guardian and way home at the end of it (pure)
+│   ├── caves.js           a cave's rooms, corridors and lanterns, built far below the planet
 │   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
 │   ├── physics.js         planet gravity, live pond/sea levels and declared maximum-water queries
 │   ├── terrain.js         each planet's shape (seeded hills / ridges / plateaus), flats, the baked height field, ponds,
@@ -118,6 +124,7 @@ src/
 │   └── WorldItem.js       an item stack lying on the ground (can hop out of a chest)
 ├── combat/
 │   ├── CombatSystem.js    per-frame combat update order
+│   ├── space.js           combat points, height, floor, distance, headings and visibility in either frame
 │   ├── casting.js         cooldowns, input buffering, hold-to-repeat, ability dispatch
 │   ├── abilities/         witch spells, knight (axe warrior) moves, ranger (elf archer) shots, and ultimates.js
 │   ├── aiming.js          aim mode for ground-targeted abilities (cursor -> ground marker, validity, confirm / cancel)
@@ -153,6 +160,7 @@ src/
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
+│   ├── Dungeons.js        caves: mouth, entry/exit, combat frame and safe surface encounter restoration
 │   ├── Talents.js         the hero's learned talents: their kit for casting, saves, Old Bramble's free reset
 │   ├── bountyRules.js     the day's jobs generated from a planet's config, progress and the saved shape (pure)
 │   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)
@@ -163,6 +171,8 @@ src/
 │   ├── Houses.js          entering / leaving houses, walking indoors, using furniture, the E-prompt target
 │   ├── quests/            quest runtime (offers, steps, tracker, rewards)
 │   ├── pickups.js         world <-> bag: walk-over pickup, granting, dropping, forage
+│   ├── CavePuzzles.js     a cave's puzzle room, warded door, end guardian and way home, and what it remembers
+│   ├── CaveRewards.js     a cave's chests and gloomquartz veins, their loot, and the room/chest/ore progress it keeps
 │   ├── Chests.js          placing a planet's chests, opening them, keys from monsters, the boss chest
 │   ├── loot.js            rolling a loot table into coins and item stacks (gear with a rolled rarity)
 │   ├── drops.js           monster drops

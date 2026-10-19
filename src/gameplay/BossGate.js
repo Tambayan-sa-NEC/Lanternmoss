@@ -290,7 +290,9 @@ export const BossGate = {
 // an elite's sigil, a seal's crumbling, the boss's fall
 encounterEvents.addEventListener('enemydefeated', ev => {
   const e = ev.detail.enemy, g = BossGate;
-  if (e.elite && g.summon.sigils) spawnWorldItem(g.summon.sigils.item, 1, e.up, { from: e.up, popTime: 0.5, stepAway: false });
+  // Only the planet's own elites carry a sigil. A cave warden (TODO 29f) is made elite by the same helper but
+  // belongs to its cave, so it neither drops a sigil into a room it cannot lie in nor shortcuts the boss gate.
+  if (e.elite && !e.space && !e.caveGuardian && g.summon.sigils) spawnWorldItem(g.summon.sigils.item, 1, e.up, { from: e.up, popTime: 0.5, stepAway: false });
   if (e.lairSeal) {
     const left = g.seals.filter(s => s.alive).length;
     audio.chestOpen?.(true); shakeCamera(0.3);

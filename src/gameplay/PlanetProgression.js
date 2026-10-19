@@ -32,6 +32,7 @@ import { Fishing } from './Fishing.js';
 import { Gathering } from './Gathering.js';
 import { Stations } from './Stations.js';
 import { Bounties } from './Bounties.js';
+import { Dungeons } from './Dungeons.js';
 import { Portals } from './Portals.js';
 import { PortalUI } from '../ui/PortalUI.js';
 import { cancelAim } from '../combat/aiming.js';
@@ -79,6 +80,8 @@ export class PlanetProgression {
     // the board goes up last, around what was already there: saved ids and positions (nodes, the gate) never move for it
     const board = Bounties.setup(this.world, ctx.planet, [...village, [Portals.gate.dir, 3], ...Gathering.nodes.map(n => [n.up, n.def.r + 0.5])]);
     Home.setup(this.world, [[Portals.gate.dir, 3], ...village, board].filter(Boolean));
+    // the cave mouth's spot comes last, so no saved position moves for it (unreleased caves show no mouth)
+    Dungeons.setup(this.world, ctx.planet, [...village, [Portals.gate.dir, 3], board, ...Gathering.nodes.map(n => [n.up, n.def.r + 0.5])].filter(Boolean));
     Building.setup(this.world);
   }
 
@@ -167,13 +170,14 @@ export class PlanetProgression {
     const arriving = this.state === 'fadeOut' && this.#authorizedDestination === PLANETS[index].id;
     if (!restoring && !arriving && !this.canTravelTo(PLANETS[index].id)) throw new Error('The secret planet is locked');
     this.#authorizedDestination = null;
+    Dungeons.reset();   // restore the surface actors before save hooks and world disposal
     this.beforeLoad?.(); BuildingUI.close(); Building.clear(); HomeUI.close(); Home.clear(); PortalUI.close(); Portals.clear();
     const P = ctx.player, world = this.world;
     ctx.planet = index; ctx.planetId = PLANETS[index].id; this.state = 'playing'; this.pendingClear = false;
     Dialog.close(); Challenges.cancel(); Houses.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
-    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear(); Stations.clear(); Bounties.clear();
+    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear(); Stations.clear(); Bounties.clear(); Dungeons.clear();
     world.dispose(); world.generate(this.planet);
     audio.setTheme(this.planet.music);
     Object.assign(P, { dead: false, deadT: 0, vy: 0 }); P.clearTimers();

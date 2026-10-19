@@ -9,6 +9,7 @@
 import { CHARACTERS } from '../config/characters.js';
 import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_SWAP, PETS } from '../config/pets.js';
 import { ctx } from '../core/context.js';
+import { peaceful, pointOf, distance } from '../combat/space.js';
 import { emit, gameEvents } from '../core/events.js';
 import { bindLabel } from '../core/keybinds.js';
 import { FlyingPet } from '../entities/companions/FlyingPet.js';
@@ -22,7 +23,7 @@ import { audio } from '../systems/AudioSystem.js';
 import { showBanner } from '../ui/banner.js';
 import { toast } from '../ui/toast.js';
 import { mpick } from '../utils/random.js';
-import { arcDist } from '../utils/sphere.js';
+
 import { PET_ABILITIES, petEffects, resetPetAbilities, updatePetAbilities } from './petAbilities.js';
 import { loadPicks, savePicks } from './petPicks.js';
 
@@ -37,8 +38,9 @@ export const Pets = {
   presenting: false,     // a menu is showing the pet off: it comes round in front of the hero (PET_SHOWCASE)
 
   toJSON() {
+    const stay = ctx.room ? ctx.room.surface.stay ?? ctx.room.surface.exit : this.stayDir;
     return { unlocked: [...this.unlocked], active: this.id, names: { ...this.names }, mode: this.mode,
-      stayDir: this.stayDir?.toArray() ?? null, hp: this.hp, faintT: this.faintT, hurtAt: this.hurtAt,
+      stayDir: this.mode === 'stay' ? stay?.toArray() ?? null : null, hp: this.hp, faintT: this.faintT, hurtAt: this.hurtAt,
       abilityCd: this.abilityCd, petCool: this.petCool, swapCool: this.swapCool, mend: petEffects.mend ? { ...petEffects.mend } : null };
   },
   load(data) {
@@ -74,8 +76,8 @@ export const Pets = {
     if (this.hpFor !== this.id) { this.hpFor = this.id; this.hp = this.maxHp(); this.faintT = 0; }
     const Body = this.def.body === 'fly' ? FlyingPet : WalkingPet;
     ctx.companion = new Body(this.id);
-    ctx.companion.setVisible(!this.fainted && !ctx.indoors);
-    if (this.mode === 'stay') this.stayDir = ctx.companion.up.clone();   // a new place: wait here instead
+    ctx.companion.setVisible(!this.fainted && !peaceful());
+    if (this.mode === 'stay') this.stayDir = pointOf(ctx.companion).clone();   // a new place: wait here instead
     return ctx.companion;
   },
   /** Takes pet `id` along instead (it must be unlocked), and remembers it for this hero. quiet = no toast. */
@@ -84,13 +86,13 @@ export const Pets = {
     this.remember(id);
     if (id === this.id) return true;
     this.active = id; this.spawn();
-    if (!this.fainted && !ctx.indoors) { emote(ctx.companion, 'heart'); audio.sparkle(); }
+    if (!this.fainted && !peaceful()) { emote(ctx.companion, 'heart'); audio.sparkle(); }
     if (!quiet) toast(`${this.nameOf()} the ${PETS[id].name.toLowerCase()} comes along now.`);
     return true;
   },
   /** Swap key: the next unlocked pet (in PETS order) comes out right away, with a puff. */
   cycle() {
-    if (ctx.indoors || ctx.player.dead) return false;
+    if (peaceful() || ctx.player.dead) return false;
     const ids = Object.keys(PETS).filter(id => this.unlocked.has(id));
     if (ids.length < 2) { toast('No other pets yet: find more out in the wilds!'); audio.fizzle(); return false; }
     if (this.swapCool > 0) return false;
@@ -115,7 +117,7 @@ export const Pets = {
   command(mode) {
     if (!PET_COMMANDS[mode]) return;
     this.mode = mode; const pet = ctx.companion;
-    this.stayDir = mode === 'stay' && pet ? pet.up.clone() : null;
+    this.stayDir = mode === 'stay' && pet ? pointOf(pet).clone() : null;
     pet?.onCommand?.(mode);
     toast(`${PET_COMMANDS[mode].label}: ${this.nameOf()} ${PET_COMMANDS[mode].text}${this.fainted ? ' (once back on their feet)' : ''}.`);
     audio.blip();
@@ -125,7 +127,7 @@ export const Pets = {
   // ---------------------------------------------------------------- the ability (key V)
   useAbility() {
     const pet = ctx.companion, a = this.def.ability;
-    if (!pet || ctx.indoors || ctx.player.dead) return false;
+    if (!pet || peaceful() || ctx.player.dead) return false;
     if (this.fainted) { toast(`${this.nameOf()} is resting (${Math.ceil(this.faintT)}s).`); audio.fizzle(); return false; }
     if (this.abilityCd > 0) { audio.fizzle(); return false; }
     if (PET_ABILITIES[a.id](this, pet, a) === false) { audio.fizzle(); return false; }
@@ -160,7 +162,7 @@ export const Pets = {
   target() {
     const pet = ctx.companion, P = ctx.player;
     if (!pet || this.fainted || this.petCool > 0 || P.vel.lengthSq() > 1 || pet.busy) return null;
-    const d = arcDist(P.up, pet.up); if (d > PET_CARE.petReach) return null;
+    const d = distance(pointOf(P), pointOf(pet)); if (d > PET_CARE.petReach) return null;
     return { dist: d + 1.2, label: `Pet ${this.nameOf()}`, at: pet.pos.clone().addScaledVector(pet.up, pet.height + 0.9), run: () => this.pat() };   // (+1.2: villagers and doors come first)
   },
   pat() {
@@ -181,7 +183,7 @@ export const Pets = {
 
   update(dt) {
     this.abilityCd = Math.max(0, this.abilityCd - dt); this.petCool = Math.max(0, this.petCool - dt); this.swapCool = Math.max(0, this.swapCool - dt);
-    if (this.fainted) { if ((this.faintT -= dt) <= 0) { if (ctx.indoors) this.faintT = 0.01; else this.revive(); } }   // (back outside, not in a room)
+    if (this.fainted) { if ((this.faintT -= dt) <= 0) { if (peaceful()) this.faintT = 0.01; else this.revive(); } }   // (back outside, not in a room)
     else if (this.hp !== null && ctx.time - this.hurtAt > PET_CARE.regenDelay) this.heal(PET_CARE.regen * dt);
     updatePetAbilities(dt);
   },

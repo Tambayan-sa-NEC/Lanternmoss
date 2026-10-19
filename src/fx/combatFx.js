@@ -6,7 +6,8 @@ import { scene } from '../render/scene.js';
 import { smoothstep } from '../utils/math.js';
 import { mr } from '../utils/random.js';
 import { frameQuat, tangentFrame } from '../utils/sphere.js';
-import { groundHeight } from '../world/terrain.js';
+
+import { ground, upAt } from '../combat/space.js';
 
 const ringGeo = new THREE.RingGeometry(0.82, 1, 36).rotateX(-Math.PI / 2);
 export const discGeo = new THREE.CircleGeometry(1, 28).rotateX(-Math.PI / 2);
@@ -17,14 +18,14 @@ export function fxMaterial(color, k = 2) {
   return new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), transparent: true,
     blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
 }
-export function groundPoint(pos, lift = 0.12) { const up = pos.clone().normalize(); return up.multiplyScalar(groundHeight(up) + lift); }
+export function groundPoint(pos, lift = 0.12) { return ground(pos, lift); }
 
 /** Animates mesh m out to `radius` over `dur` seconds while fading it, then disposes its material. */
 function playRing(m, dur, radius) { ringFxList.push({ m, t: 0, dur, radius }); }
 
 /** surface: draw it at that distance from the planet centre instead of on the ground (a ring on the water). */
 export function ringFX(pos, radius, color, dur = 0.45, surface = null) {
-  const up = pos.clone().normalize(), m = new THREE.Mesh(ringGeo, fxMaterial(color));
+  const up = upAt(pos), m = new THREE.Mesh(ringGeo, fxMaterial(color));
   if (surface) m.position.copy(up).multiplyScalar(surface + 0.08); else m.position.copy(groundPoint(pos)); frameQuat(up, tangentFrame(up)[0], m.quaternion); m.renderOrder = 3; scene.add(m);
   playRing(m, dur, radius);
 }
@@ -48,7 +49,7 @@ export function floatText(pos, text, color = '#ffffff', scale = 1) {
   g.lineWidth = 9; g.lineJoin = 'round'; g.strokeStyle = '#3a2340'; g.strokeText(text, 64, 34); g.fillStyle = color; g.fillText(text, 64, 34);
   const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, fog: false })); s.renderOrder = 6; scene.add(s);
-  floatTexts.push({ s, t: 0, base: pos.clone(), up: pos.clone().normalize(), side: mr(-0.4, 0.4), scale });
+  floatTexts.push({ s, t: 0, base: pos.clone(), up: upAt(pos).clone(), side: mr(-0.4, 0.4), scale });
 }
 
 export function updateFx(dt) {

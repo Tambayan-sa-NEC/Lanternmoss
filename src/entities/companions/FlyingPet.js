@@ -16,6 +16,7 @@ import { mr } from '../../utils/random.js';
 import { frameQuat, projectTangent, turnToward } from '../../utils/sphere.js';
 import { groundHeight } from '../../world/terrain.js';
 import { keepTarget, pickTarget, strike } from './petBrain.js';
+import { ground, visible } from '../../combat/space.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3();
@@ -32,7 +33,7 @@ export class FlyingPet {
     this.vel = new V3(); this.fwd = P.fwd.clone(); this.goal = new V3(); this.side = new V3();
     this.state = 'follow'; this.cool = 2; this.target = null; this.t = 0; this.height = 0.45; this.voiceT = mr(12, 25);
     this.spinT = 0; this.flinchT = 0; this.visible = true;
-    this.voice = audio[VOICE[this.def.model]];
+    this.voice = audio[VOICE[this.def.model]]; this.space = ctx.room;
   }
   get busy() { return this.state === 'swoop'; }
   setVisible(on) { this.visible = on; this.root.visible = this.shadow.visible = on; if (!on) { this.state = 'follow'; this.target = null; } }
@@ -52,7 +53,7 @@ export class FlyingPet {
   home(out) {
     const P = ctx.player, M = PET_MOTION.fly, bob = Math.sin(ctx.time * 1.7) * 0.18;
     if (Pets.presenting) { const S = PET_SHOWCASE.fly; return out.copy(P.pos).addScaledVector(P.up, S.height).addScaledVector(P.fwd, S.ahead); }
-    if (Pets.mode === 'stay' && Pets.stayDir) return out.copy(Pets.stayDir).multiplyScalar(groundHeight(Pets.stayDir) + M.height * 0.8 + bob);
+    if (Pets.mode === 'stay' && Pets.stayDir) return ground(Pets.stayDir, M.height * 0.8 + bob, out);
     this.side.crossVectors(P.fwd, P.up);
     return out.copy(P.pos).addScaledVector(P.up, M.height + bob).addScaledVector(this.side, 0.95).addScaledVector(P.fwd, -0.6);
   }
@@ -62,14 +63,14 @@ export class FlyingPet {
     if (!this.visible) return;
     const t = this.poseT = (this.poseT ?? 0) + dt;
     this.home(this.goal).addScaledVector(this.up, Math.sin(t * 1.7) * 0.15);
-    this.pos.lerp(this.goal, damp(4, dt)); const len = this.pos.length(); this.up.copy(this.pos).divideScalar(len);
+    this.pos.lerp(this.goal, damp(4, dt)); const len = this.pos.length(); if (this.space) this.up.copy(this.space.up); else this.up.copy(this.pos).divideScalar(len);
     if (this.spinT > 0) { this.spinT -= dt; this.fwd.applyAxisAngle(this.up, 14 * dt); }
     else { _tv2.copy(ctx.player.fwd); projectTangent(_tv2, this.up).normalize(); turnToward(this.fwd, _tv2, this.up, damp(4, dt)); }
     projectTangent(this.fwd, this.up).normalize();
     const flap = Math.sin(t * 9) * 0.45; this.wingL.rotation.z = -flap; this.wingR.rotation.z = flap;
     this.body.rotation.set(0, 0, 0); this.head.rotation.y = Math.sin(t * 0.6) * 0.5;
     this.root.position.copy(this.pos); frameQuat(this.up, this.fwd, this.root.quaternion);
-    updateShadow(this.shadow, this.up, this.fwd, len - groundHeight(this.up));
+    updateShadow(this.shadow, this.up, this.fwd, this.space ? this.space.height(this.pos) : len - groundHeight(this.up), this);
   }
   update(dt) {
     if (!this.visible) return;
@@ -77,12 +78,19 @@ export class FlyingPet {
     if (this.state === 'swoop') {
       this.t += dt;
       if (!keepTarget(this, this.target) || this.t > 2.5) { this.state = 'return'; this.cool = this.def.attack.cooldown * 0.5; }
-      else { _tv.copy(this.target.center()).sub(this.pos); const d = _tv.length();
+      else { const goal = this.target.center().clone();
+        if (this.space) { const path = this.space.waypoint(this.pos, goal); goal.x = path.x; goal.z = path.z; }
+        _tv.copy(goal).sub(this.pos); const d = this.pos.distanceTo(this.target.center());
         this.vel.lerp(_tv.divideScalar(Math.max(d, 1e-4)).multiplyScalar(M.swoopSpeed), damp(7, dt));
-        if (d < this.target.hitR + 0.45) this.hit(); }
+        if (d < this.target.hitR + 0.45 && visible(this.pos, this.target.pos)) this.hit(); }
     }
     if (this.state !== 'swoop') {
-      this.home(this.goal); _tv.copy(this.goal).sub(this.pos); const d = _tv.length();
+      this.home(this.goal);
+      if (this.space) {
+        const at = this.space.contains(this.goal) ? this.goal : ctx.player.pos;
+        const path = this.space.waypoint(this.pos, at); this.goal.x = path.x; this.goal.z = path.z;
+      }
+      _tv.copy(this.goal).sub(this.pos); const d = _tv.length();
       if (d > M.teleportDist && Pets.mode !== 'stay') { this.pos.copy(this.goal); this.vel.set(0, 0, 0); }   // catch up after a respawn
       const k = this.state === 'return' ? 40 : 22, c = this.state === 'return' ? 9 : 7.5;
       this.vel.addScaledVector(_tv, k * dt).multiplyScalar(Math.exp(-c * dt));
@@ -90,9 +98,12 @@ export class FlyingPet {
       if (this.state === 'follow' && this.cool <= 0) { const e = pickTarget(this); if (e) { this.target = e; this.state = 'swoop'; this.t = 0; } }
       if (this.state === 'follow' && this.voiceT < 0) { this.voiceT = mr(20, 40); emote(this, '♪', this.def.color); this.voice.call(audio); }
     }
-    this.pos.addScaledVector(this.vel, dt);
-    const len = this.pos.length(); this.up.copy(this.pos).divideScalar(len);
-    const minR = groundHeight(this.up) + 0.6; if (len < minR) this.pos.copy(this.up).multiplyScalar(minR);
+    if (this.space) {
+      this.space.move(this.pos, _tv.copy(this.vel).multiplyScalar(dt).setY(0), 0); this.pos.y += this.vel.y * dt;
+    } else this.pos.addScaledVector(this.vel, dt);
+    const len = this.pos.length(); if (this.space) this.up.copy(this.space.up); else this.up.copy(this.pos).divideScalar(len);
+    if (this.space) this.pos.y = Math.max(this.pos.y, this.space.origin.y + 0.6);
+    else { const minR = groundHeight(this.up) + 0.6; if (len < minR) this.pos.copy(this.up).multiplyScalar(minR); }
     _tv.copy(this.vel); projectTangent(_tv, this.up); const hs = _tv.length();
     if (this.spinT > 0) this.fwd.applyAxisAngle(this.up, 14 * dt);
     else if (hs > 1.5) turnToward(this.fwd, _tv.divideScalar(hs), this.up, damp(8, dt));
@@ -104,6 +115,6 @@ export class FlyingPet {
     this.body.rotation.z = this.flinchT > 0 ? Math.sin(this.flinchT * 60) * 0.3 : 0;
     this.head.rotation.y = this.state === 'follow' ? Math.sin(ctx.time * 0.6) * 0.5 : 0;
     this.root.position.copy(this.pos); frameQuat(this.up, this.fwd, this.root.quaternion);
-    updateShadow(this.shadow, this.up, this.fwd, len - groundHeight(this.up));
+    updateShadow(this.shadow, this.up, this.fwd, this.space ? this.space.height(this.pos) : len - groundHeight(this.up), this);
   }
 }

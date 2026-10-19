@@ -28,8 +28,8 @@ built in and switched by a uniform.
 
 ## The harness and checks
 
-There is no cave yet, so the harness is the Lanternmoss village at night with darkness 1 and three glowing lanterns
-(bloomed, each a real source).
+The original harness is the Lanternmoss village at night with darkness 1 and three glowing lanterns (bloomed,
+each a real source). The unreleased [caves](../world/caves.md) now use the same lighting in their room combat frame.
 
 - `node tests/sim/lighting.sim.mjs`: the patch lands before the toon output in the real three.js 0.160 shader (a
   chunk rename in a three.js update would fail it), on every toon material, clones, grass and kelp, with one cache
@@ -38,7 +38,8 @@ There is no cave yet, so the harness is the Lanternmoss village at night with da
   on travel.
 - `node scripts/lighting-smoke.mjs` (Edge, port 8123): every patched shader compiles in real WebGL with zero shader
   errors, and darkness 0 → 1 → 0 compiles no new program. On Low and High the ground under each lantern is clearly
-  brighter than unlit ground, which stays readable (luminance 27-55 of 255, not black). The pool switches together,
+  brighter than unlit ground, which stays readable. Pixel assertions hide foreground props and actors so an
+  occluding object cannot replace the ground sample. The pool switches together,
   and 720p/1080p show zero page errors. It retakes the shot above.
 - `tests/sim/building.sim.mjs`: every home lamp is a source; at most four real point lights.
 

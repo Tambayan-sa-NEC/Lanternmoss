@@ -6,16 +6,17 @@ import { ctx } from '../../core/context.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { Projectile } from '../../entities/Projectile.js';
 import { audio } from '../../systems/AudioSystem.js';
-import { dirAlong } from '../../utils/sphere.js';
+
 import { damageEnemy } from '../damage.js';
 import { targeting } from '../targeting.js';
+import { advance, pointOf } from '../space.js';
 
 const _tv = new THREE.Vector3(), _d = new THREE.Vector3();
 
 /** One arrow along dir; s supplies speed / range / radius / damage and the optional knockback, slow and stagger. */
 function loose(s, dir, target = null) {
   const P = ctx.player;
-  ctx.projectiles.push(new Projectile({ team: 'player', shape: 'arrow', up: dirAlong(P.up, dir, 0.6), dir, alt: 1.3, speed: s.speed, range: s.range,
+  ctx.projectiles.push(new Projectile({ team: 'player', shape: 'arrow', up: advance(pointOf(P), dir, 0.6), dir, alt: 1.3, speed: s.speed, range: s.range,
     radius: s.radius, size: 0.12, color: s.color, homing: s.homing || 0, homeTo: target ? () => (target.alive ? target.center() : null) : null,
     onHit: (p, e) => { if (e) damageEnemy(e, s.damage, { from: p.pos, knock: s.knockback, slow: s.slow, slowTime: s.slowTime, stagger: s.stagger });
       sparkles.emit(p.pos, { count: 10, color: s.color, speed: 2.2, life: 0.4, size: 0.28 }); } }));

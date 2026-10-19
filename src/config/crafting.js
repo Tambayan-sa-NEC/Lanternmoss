@@ -89,6 +89,11 @@ export const RECIPES = [
   { id: 'snowstepBoots', group: 'Armour', station: 'forge', result: 'snowstepBoots', needs: [['frostPetal', 4], ['ironIngot', 1]], coins: 50, rarity: 'rare' },
   // ---- trinkets (two can be worn)
   { id: 'lanternPendant', group: 'Trinkets', station: 'forge', result: 'lanternPendant', needs: [['glowcap', 4], ['copperIngot', 1]], coins: 15, rarity: 'uncommon' },
+  // Each cave's gem brews the same potion its world's rare gem does, so a cave is another way to the same bottle and
+  // never a new power. The gems themselves are only mined underground (config/dungeons.js CAVE_VEINS).
+  { id: 'gloomElixir', group: 'Potions', station: 'brew', result: 'restorativeElixir', needs: [['sweetleaf', 3], ['springWater', 2], ['gloomquartz', 1]] },
+  { id: 'cinderElixir', group: 'Potions', station: 'brew', result: 'emberTonic', needs: [['sweetleaf', 3], ['springWater', 1], ['emberShard', 2], ['cinderquartz', 1]] },
+  { id: 'rimeElixir', group: 'Potions', station: 'brew', result: 'glacialTonic', needs: [['sweetleaf', 3], ['springWater', 1], ['frostPetal', 2], ['rimequartz', 1]] },
   { id: 'amethystBand', group: 'Trinkets', station: 'forge', result: 'amethystBand', needs: [['amethyst', 1], ['copperIngot', 1]], coins: 20, rarity: 'rare' },
   { id: 'emberRing', group: 'Trinkets', station: 'forge', result: 'emberRing', needs: [['emberShard', 5]], coins: 30, rarity: 'uncommon' },
   { id: 'opalBrooch', group: 'Trinkets', station: 'forge', result: 'opalBrooch', needs: [['fireOpal', 1], ['ironIngot', 1]], coins: 30, rarity: 'rare' },
