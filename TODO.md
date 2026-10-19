@@ -1329,6 +1329,16 @@ precedence over the old six-cave estimate. Expansion cave configs follow their w
 | [x] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
 | [ ] **29g. Expansion cave rollout** | 29f, 27h, 30i | 2-4 h | Configure/release Tidewhisper and Duskhollow caves from the proven kit, including tide-safe entrances and lantern readability. Check both complete paths and saved progress. No Moon cave or extra room technology; if either config needs new mechanics, split this rollout before coding. |
 
+**29a-29f merged into `develop` (2026-10-19), 29g deferred.** The six finished stages were merged on the owner's
+decision rather than held until the whole TODO was done: 29g needs **27h**, whose hardware performance acceptance is
+a recorded no-go, and **30i**, which has not been built, so waiting would have kept finished work out of integration
+for dependencies that are not its own. The `feat/todo-29` parent was deleted after the merge; when 29g becomes
+possible it takes a **fresh parent from `develop`**, which the branch rules allow for a partially completed TODO.
+Note that 29f put caves into worlds that are already released, so the next `develop` into `master` release would ship
+them; that release is unchanged by the merge and still needs confirmation. Cave frame timing is measured but **not
+certified**, because the Iris Xe target device is still unavailable, exactly as for 27h. The merge and its reasons
+are recorded in `docs/logs/2610191629 todo-29-merge-to-develop.md`.
+
 **29a implemented (2026-10-16):** `src/render/lighting.js` (`RENDER.localLight`): light radii in every toon shader
 (patched on the material prototype, grass and kelp chained), up to 8 spots for the nearest sources, toon-banded and
 scaled by a place's darkness, so the surface (darkness 0) is unchanged; a minimum ambient keeps the dark readable; a
