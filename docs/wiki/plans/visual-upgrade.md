@@ -437,7 +437,7 @@ essential information does not depend only on hover or color; no layout overlap 
 | [ ] **V14.1 Island kit** | After accepted 27a, style sandbars, tidal pools, ocean/lagoon shores, causeways and lighthouse forms; verify low/high tide and drained lagoon presentation from shared queries. |
 | [ ] **V14.2 Ecosystem and economy kit** | Follow 27b–27c for palms, kelp/coral, wildlife/rare creature, resources/crops, gear and mist/squall art. Keep material families and new effects within budgets. |
 | [ ] **V14.3 Village and encounters** | Follow 27d–27g for Marlo, homes/quest props, the original roster, Old Ironclaw and Mirelure. Preserve bell armor, lure, sluice and arena readability. |
-| [ ] **V14.4 Release alignment** | With 27h, complete inventory/visual checks and real release measurements; refresh affected images. The optional otter requires a separate scope decision and demonstrated budget headroom. |
+| [ ] **V14.4 Release alignment** | With 27h, complete inventory/visual checks and real release measurements; refresh affected images. TODO 27i now scopes the otter follow-up; its public unlock still requires demonstrated budget headroom. |
 
 **Acceptance:** every required Tidewhisper visual state covered; tide and encounter cues are clear;
 27h and its actual hardware/content requirements pass before release.

@@ -172,7 +172,7 @@ gameplay, visual and performance checks are complete.
 - [ ] Confirm which expansions are part of the release you are reviewing. You can release the original
       worlds' visual update without waiting for every expansion.
 - [ ] Review each world in its intended conditions, using the prompts below.
-- [ ] Decide on optional additions, such as an otter pet, separately from the required work.
+- [x] Decide on extra additions separately from the required world work: the otter is queued as TODO 27i, with public unlock subject to the release budget.
 - [ ] Check that public images and menus do not reveal the secret world early.
 
 **Good looks like**
