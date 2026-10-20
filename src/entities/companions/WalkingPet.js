@@ -13,14 +13,14 @@ import { audio } from '../../systems/AudioSystem.js';
 import { damp } from '../../utils/math.js';
 import { mr } from '../../utils/random.js';
 import { dirAlong, projectTangent, tangentTo, turnToward } from '../../utils/sphere.js';
-import { groundHeight } from '../../world/terrain.js';
+import { groundHeight, waterAt } from '../../world/terrain.js';
 import { Critter } from '../wildlife/Critter.js';
 import { keepTarget, pickTarget, strike } from './petBrain.js';
 import { pointOf, distance, ground, altitude, visible } from '../../combat/space.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3();
-const SCALE = { wolf: 1.15, fox: 1.0, dragontoad: 1.0 };
+const SCALE = { wolf: 1.15, fox: 1.0, dragontoad: 1.0, otter: 1.1 };
 const W_POSE = 4;              // trotting speed into the show-off spot while the world is paused
 
 export class WalkingPet extends Critter {
@@ -32,11 +32,11 @@ export class WalkingPet extends Critter {
     this.root.scale.setScalar(SCALE[id] ?? 1); this.height = 1.0; this.state = 'idle'; this.idleT = 0; this.voiceT = mr(15, 30);
     this.goal = new V3(); this.toGoal = new V3(); this.fwd.copy(P.fwd); projectTangent(this.fwd, this.up).normalize();
     this.target = null; this.atkCool = 1.5; this.spinT = 0; this.visible = true;
-    this.voice = this.kind === 'wolf' ? audio.bark : this.kind === 'toad' ? audio.plip : audio.meow; this.hopT = 0;
+    this.voice = this.kind === 'wolf' ? audio.bark : this.kind === 'toad' || this.kind === 'otter' ? audio.plip : audio.meow; this.hopT = 0; this.diveT = 0;
     if (ctx.room) { ctx.room.attach(this, P.pos, { solid: false }); this.snapToHero(); }
   }
   get busy() { return this.state === 'chase'; }
-  setVisible(on) { this.visible = on; this.root.visible = this.shadow.visible = on; if (!on) { this.state = 'idle'; this.target = null; } }
+  setVisible(on) { this.visible = on; this.root.visible = this.shadow.visible = on; if (!on) { this.state = 'idle'; this.target = null; this.diveT = 0; } }
   snapToHero() {
     const P = ctx.player; _tv.crossVectors(P.up, P.fwd).normalize();
     if (this.space) { const at = this.space.advance(pointOf(P), _tv, PET_MOTION.walk.sideOffset); this.space.place(this, this.space.contains(at, this.radius) ? at : P.pos); }
@@ -45,6 +45,12 @@ export class WalkingPet extends Critter {
   }
   celebrate() { this.spinT = 0.7; if (this.grounded) { this.vy = 4.5; this.grounded = false; } }
   flourish(kind) { if (kind === 'howl') { this.state = 'sit'; this.idleT = 99; } else this.celebrate(); }
+  /** A brief visible plunge at the selected submerged bed. Body state is transient; travel/Continue rebuilds it. */
+  diveAt(dir) {
+    const level = waterAt(dir)?.level; if (this.petId !== 'otter' || level == null) return;
+    this.diveT = 0.8; this.state = 'dive'; this.target = null; this.up.copy(dir); this.pos.copy(dir).multiplyScalar(level + 0.25);
+    this.root.visible = true; this.shadow.visible = false; this.place(this.root);
+  }
   flinch() { if (this.grounded) { this.vy = 2.5; this.grounded = false; } }
   onCommand(mode) {
     if (mode === 'passive' || mode === 'stay') { this.target = null; if (this.state === 'chase') this.state = 'idle'; }
@@ -63,6 +69,7 @@ export class WalkingPet extends Critter {
       facing the same way, wagging and hopping on the menu's own clock. */
   pose(dt) {
     if (!this.visible) return;
+    if (this.diveT > 0) { this.diveT = 0; this.snapToHero(); this.shadow.visible = true; }
     const t = this.poseT = (this.poseT ?? 0) + dt, P = ctx.player;
     if (this.state === 'chase') { this.state = 'idle'; this.target = null; }
     const d = tangentTo(this.pos, this.up, this.showSpot(this.goal), this.toGoal), target = d > 0.35 ? Math.min(W_POSE, d * 3) : 0;
@@ -76,6 +83,12 @@ export class WalkingPet extends Critter {
   }
   update(dt) {
     if (!this.visible) return;
+    if (this.diveT > 0) {
+      this.diveT = Math.max(0, this.diveT - dt);
+      this.pos.addScaledVector(this.up, -dt * 1.4); this.place(this.root);
+      if (this.diveT <= 0) { this.snapToHero(); this.shadow.visible = true; this.place(this.root); }
+      return;
+    }
     const W = PET_MOTION.walk, P = ctx.player;
     const dist = tangentTo(this.pos, this.up, P.pos, this.toP);             // this.toP is also read by Critter.animate (head look)
     this.atkCool -= dt; this.spinT -= dt;

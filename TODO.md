@@ -984,7 +984,7 @@ counts across planets, which conflicts with a deliberately small Moon. These are
 | TODO | Whole-item estimate | Fits one five-hour session? | Replacement stages |
 | --- | --- | --- | --- |
 | 26 Groundwork | 9-16 h | No: registry, mechanic lifecycle, physics and progression are separate integration changes | 26a-26d |
-| 27 Tidewhisper | 18-33 h core; 3-5 h otter follow-up | No: moving water plus a complete ecosystem and two original fights | 27a-27h; 27i next |
+| 27 Tidewhisper | 18-33 h core; 3-5 h otter follow-up | No: moving water plus a complete ecosystem and two original fights | 27a-27i functionally complete; public performance gate pending |
 | 28 Gear sets / hero depth | 12-21 h | No: set procs and three saved ability trees exceed the original M label | 28a-28e |
 | 29 Caves | 18-30 h | No: lighting, flat-space combat, saves, puzzles and five planet configurations | 29a-29g |
 | 30 Duskhollow | 20-37 h | No: lantern rules, four behaviors, accessibility and two light-dependent fights | 30a-30i |
@@ -1126,11 +1126,19 @@ after the 27h functional merge; it has a separate estimate and public-release pe
 | [x] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
 | [x] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
 | [x] **27h. Functional integration and go/no-go** | 27a-27g | 1-3.5 h | Complete the non-performance content gate, three-hero pacing/balance, full travel/Continue/save/completion browser path through the test-only candidate, and affected screenshots/tour. Record the reference performance matrix and its verdict, actual session costs and groundwork fixes. Merge tested functional work to `develop` with Tidewhisper unreleased if the public-release performance gate is still failing. The otter needs a separate estimate. |
-| [ ] **27i. Pearl-diving otter pet** | 27b, 27c, 27h | 3-5 h | First pending Tidewhisper stage: add an otter companion, its pearl-dive ability and Tidewhisper unlock using the existing pet system. Check bounded pearl yields, save/Continue, travel, menu and selection, all three heroes, a reviewed feature shot and rendering cost. Build behind the unreleased world fixture; include the otter in a fresh full Acer acceptance matrix before public enablement. The current 0/18 timing result gives no release headroom. |
+| [x] **27i. Pearl-diving otter pet** | 27b, 27c, 27h | 3-5 h | Add an otter companion, its pearl-dive ability and Tidewhisper unlock using the existing pet system. Check bounded pearl yields, save/Continue, travel, menu and selection, all three heroes, a reviewed feature shot and rendering cost. Built behind the unreleased world fixture; include the otter in a fresh full Acer acceptance matrix before public enablement. The current 0/18 timing result gives no release headroom. |
 
 **27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
 27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
 Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.
+
+**27i implemented (2026-10-20):** The Dark Lighthouse now unlocks a walking otter. Pearl Dive consumes a submerged,
+ready clam bed for one pearl, with a 90-second cooldown and two successful dives per day. Its count and cooldown
+survive Continue and travel. Candidate simulation checks all three heroes, yields, daily renewal and reset; the
+browser smoke checks real menu/ability input, 720p/1080p fit, Continue and error-free rendering. The reviewed
+feature shot is `docs/screenshots/pets/otter.jpg`; the model adds 14 meshes and 1,068 triangles. The authored
+Tidewhisper release flag stays off. A fresh full Acer 18-case acceptance run including the otter is still required
+before public enablement; the prior 0/18 timing result is not a pass.
 
 **27h gate split (approved 2026-10-19):** the owner's approved fallback separates functional completion from
 hardware certification after a clean 18-case Acer RTX 4050 rerun. Functional completion of 27h unblocks 28, 29g
@@ -1307,7 +1315,7 @@ See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 - [x] **People:** Marlo the lighthouse keeper (lines, tips for Mirelure, and the quest "The Dark Lighthouse": seaglass for a
       new lens and fuel to light it); stilt houses with two interiors; beach outfits for the travelling villagers.
 - [x] **Music:** a slow waltz over a sea-swell pad, made in code.
-- [ ] An otter pet that dives for pearls (27i, first pending stage; public unlock requires a passing release budget).
+- [x] An otter pet that dives for pearls (27i; public unlock requires a passing release budget).
 - [ ] **Go / no-go check** once it plays end to end: how long it took, what the groundwork (26) got wrong, and whether
       the checklist was too much. Fix 26 before starting 30, or cut Duskhollow down to fit.
 

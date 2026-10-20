@@ -14,7 +14,10 @@ import { toast } from '../ui/toast.js';
 import { arcDist, offsetDir } from '../utils/sphere.js';
 import { buff } from './buffs.js';
 import { Chests } from './Chests.js';
+import { dayClock } from './dayClock.js';
+import { grantItem } from './pickups.js';
 import { rng } from '../utils/random.js';
+import { dryGround } from '../world/terrain.js';
 
 /** Lasting effects: spotted = [{ enemy, until }], scent = { dir, until } | null, mend = { left, perSec }. */
 export const petEffects = { spotted: [], scent: null, mend: null };
@@ -51,6 +54,22 @@ export const PET_ABILITIES = {
     const got = items.length ? `fetches ${items.length} thing${items.length > 1 ? 's' : ''}` : 'finds nothing lying about';
     toast(`${Pets.nameOf()} ${got}${best ? ` and sniffs out a chest ${Math.round(bd)}m away (on your compass)` : ''}!`);
     return items.length > 0 || !!best;
+  },
+  /** Otter: harvest one ordinary clam bed while it is submerged; the bed's usual regrowth and a saved daily cap bound the yield. */
+  pearlDive(Pets, pet, a) {
+    if (ctx.planetId !== 'tidewhisper' || ctx.room) { toast(`${Pets.nameOf()} can dive for pearls only off Tidewhisper's shore.`); return false; }
+    const used = Pets.diveDay === dayClock.day ? Pets.divesToday : 0;
+    if (used >= a.perDay) { toast(`${Pets.nameOf()} has found enough pearls for today.`); return false; }
+    const bed = ctx.resourceNodes.filter(n => n.kind === 'clamBed' && n.regrowT <= 0 && !dryGround(n.up) && arcDist(ctx.player.up, n.up) <= a.radius)
+      .sort((a, b) => arcDist(ctx.player.up, a.up) - arcDist(ctx.player.up, b.up))[0];
+    if (!bed) { toast('Find a submerged clam bed near the shore for Pearl Dive.'); return false; }
+    bed.deplete(); Pets.diveDay = dayClock.day; Pets.divesToday = used + 1;
+    grantItem('pearl', a.yield);
+    ringFX(bed.top(0.2), 1.2, 0x70dfd7);
+    sparkles.emit(bed.top(0.4), { count: 18, color: 0xdffcff, speed: 1.4, up: bed.up, upBias: 1, life: 0.8, size: 0.3 });
+    pet.diveAt?.(bed.up); emote(pet, 'heart', '#70dfd7'); audio.plip();
+    toast(`${Pets.nameOf()} dives beneath the tide and brings back a pearl! (${Pets.divesToday}/${a.perDay} today)`);
+    return true;
   },
   /** Wisp: warm healing over a few seconds (the wisp mends a little too). */
   mend(Pets, pet, a) {

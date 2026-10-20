@@ -1,7 +1,7 @@
 /* What a pet looks like on the menus: its card in a picker list and its detail panel (stats, ability, how to find a
    locked one). Shared by the pet step of character select (src/ui/CharacterSelect.js) and the pet menu during play
    (src/ui/PetMenu.js). Everything comes from PETS (config/pets.js) and the live Pets state. */
-import { PET_COMMANDS, PETS } from '../config/pets.js';
+import { PET_COMMANDS, PETS, availablePetIds } from '../config/pets.js';
 import { COMBAT } from '../config/combat.js';
 import { ctx } from '../core/context.js';
 import { bindKbd } from '../core/keybinds.js';
@@ -27,7 +27,7 @@ export function petCardHtml(id, { sel = false } = {}) {
     `<div class="pc-face">${open ? icon(id) : '?'}</div><div class="pk"><h3>${open ? esc(Pets.nameOf(id)) : '???'}</h3>` +
     `<div class="sub">${open ? `${p.name} · ${p.role}` : 'Not found yet'}</div></div>${out ? '<span class="with">with you</span>' : ''}</button>`;
 }
-export const petCardsHtml = sel => Object.keys(PETS).map(id => petCardHtml(id, { sel: id === sel })).join('');
+export const petCardsHtml = sel => availablePetIds().map(id => petCardHtml(id, { sel: id === sel })).join('');
 
 /** The detail panel. opts.rename = a name field; opts.play = live health and the command buttons (the pet menu). */
 export function petDetailHtml(id, { rename = true, play = false } = {}) {

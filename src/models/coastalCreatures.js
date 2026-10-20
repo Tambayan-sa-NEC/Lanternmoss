@@ -38,4 +38,21 @@ export function buildSeal(o) {
   for(const s of [-1,1])addTo(head,part(G.box(.18,.015,.015),0xf4f0da,{outline:false}),[s*.18,-.05,.21],[0,-s*.3,0]);
   return batchRigidParts({root,body,head,tail,legs});
 }
-export const COASTAL_BUILDERS={crab:buildCrab,turtle:buildTurtle,seal:buildSeal};
+/** A long, low otter with rounded ears, webbed paws, whiskers and a broad swimming tail. */
+export function buildOtter(o) {
+  const root=new THREE.Group(),body=group(root,0,0,0),head=group(body,0,.37,.43),tail=group(body,0,.24,-.58),legs=[];
+  addTo(body,part(G.ico(.31,1),o.fur),[0,.28,0],[0,0,0],[.78,.7,1.55]);
+  addTo(body,part(G.ico(.25,1),o.belly),[0,.19,.12],[0,0,0],[.72,.4,1.2]);
+  addTo(head,part(G.ico(.22,1),o.fur),[0,0,0],[0,0,0],[1,.9,1.1]);
+  addTo(head,part(G.ico(.13,0),o.belly),[0,-.08,.17],[0,0,0],[1.35,.6,.7]);
+  addTo(head,part(G.ico(.045,0),0x30202a,{outline:false}),[0,-.03,.26]);
+  for(const s of [-1,1]){
+    addTo(head,part(G.ico(.055,0),o.fur),[s*.17,.16,-.03]);
+    addTo(head,part(G.ico(.029,0),0x241c38,{outline:false}),[s*.11,.04,.19]);
+    for(const k of [-1,1])addTo(head,part(G.box(.18,.009,.009),0xf4e7d5,{outline:false}),[s*.22,-.09+k*.025,.22],[0,s*.25,k*.12]);
+    for(const z of [.28,-.3]){const leg=group(body,s*.21,.17,z);addTo(leg,part(G.ico(.1,0),o.fur),[s*.05,-.11,0]);addTo(leg,part(G.ico(.105,0),o.accent),[s*.07,-.2,.045],[0,0,0],[1.1,.3,1.3]);legs.push(leg);}
+  }
+  addTo(tail,part(G.ico(.14,0),o.fur),[0,-.03,-.25],[-.2,0,0],[.9,.45,2.8]);
+  return batchRigidParts({root,body,head,tail,legs});
+}
+export const COASTAL_BUILDERS={crab:buildCrab,turtle:buildTurtle,seal:buildSeal,otter:buildOtter};

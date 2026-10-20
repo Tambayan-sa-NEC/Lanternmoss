@@ -7,7 +7,7 @@
    The body asks Pets what to do (mode, stay spot, damage); Pets tells the body to show / hide and to celebrate.
    Unlocks come from game events: a quest finished, a chest opened (core/events.js). */
 import { CHARACTERS } from '../config/characters.js';
-import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_SWAP, PETS } from '../config/pets.js';
+import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_SWAP, PETS, petAvailable, availablePetIds } from '../config/pets.js';
 import { ctx } from '../core/context.js';
 import { peaceful, pointOf, distance } from '../combat/space.js';
 import { emit, gameEvents } from '../core/events.js';
@@ -35,13 +35,15 @@ const PET_LINES = ['{name} leans into the scratch.', '{name} looks very pleased 
 export const Pets = {
   unlocked: new Set(STARTERS), active: null, names: {}, mode: 'follow', stayDir: null, picks: loadPicks(),
   hp: null, hpFor: null, faintT: 0, hurtAt: -99, abilityCd: 0, petCool: 0, swapCool: 0,
+  diveDay: 0, divesToday: 0,
   presenting: false,     // a menu is showing the pet off: it comes round in front of the hero (PET_SHOWCASE)
 
   toJSON() {
     const stay = ctx.room ? ctx.room.surface.stay ?? ctx.room.surface.exit : this.stayDir;
     return { unlocked: [...this.unlocked], active: this.id, names: { ...this.names }, mode: this.mode,
       stayDir: this.mode === 'stay' ? stay?.toArray() ?? null : null, hp: this.hp, faintT: this.faintT, hurtAt: this.hurtAt,
-      abilityCd: this.abilityCd, petCool: this.petCool, swapCool: this.swapCool, mend: petEffects.mend ? { ...petEffects.mend } : null };
+      abilityCd: this.abilityCd, petCool: this.petCool, swapCool: this.swapCool, diveDay: this.diveDay,
+      divesToday: this.divesToday, mend: petEffects.mend ? { ...petEffects.mend } : null };
   },
   load(data) {
     const { unlocked, stayDir, mend, ...state } = data;
@@ -82,7 +84,7 @@ export const Pets = {
   },
   /** Takes pet `id` along instead (it must be unlocked), and remembers it for this hero. quiet = no toast. */
   choose(id, quiet = false) {
-    if (!this.unlocked.has(id) || !PETS[id]) return false;
+    if (!this.unlocked.has(id) || !petAvailable(id)) return false;
     this.remember(id);
     if (id === this.id) return true;
     this.active = id; this.spawn();
@@ -93,7 +95,7 @@ export const Pets = {
   /** Swap key: the next unlocked pet (in PETS order) comes out right away, with a puff. */
   cycle() {
     if (peaceful() || ctx.player.dead) return false;
-    const ids = Object.keys(PETS).filter(id => this.unlocked.has(id));
+    const ids = availablePetIds().filter(id => this.unlocked.has(id));
     if (ids.length < 2) { toast('No other pets yet: find more out in the wilds!'); audio.fizzle(); return false; }
     if (this.swapCool > 0) return false;
     const next = ids[(ids.indexOf(this.id) + 1) % ids.length], old = ctx.companion;
@@ -174,7 +176,7 @@ export const Pets = {
 
   // ---------------------------------------------------------------- unlocking
   unlock(id) {
-    if (!PETS[id] || this.unlocked.has(id)) return false;
+    if (!petAvailable(id) || this.unlocked.has(id)) return false;
     this.unlocked.add(id); emit('petfound', { id });
     showBanner(`New pet: ${this.nameOf(id)} the ${PETS[id].name.toLowerCase()}!`, `Open the pet menu (${bindLabel('petMenu')}, or click the pet card) to bring them along.`);
     audio.melody();
@@ -191,6 +193,7 @@ export const Pets = {
   reset() {
     this.unlocked = new Set(STARTERS); this.active = null; this.names = {}; this.mode = 'follow'; this.stayDir = null;
     this.hp = null; this.hpFor = null; this.faintT = 0; this.hurtAt = -99; this.abilityCd = 0; this.petCool = 0;
+    this.diveDay = 0; this.divesToday = 0;
     resetPetAbilities();
   },
 };

@@ -273,3 +273,9 @@ carry you back to the mouth, so the walk out is not the walk in.
 See [the warden](../world/caves.md#puzzles-the-warden-and-the-way-home-29e).
 
 ![The cave's warden, an elite of its own kind, standing over the end room](../../screenshots/world/cave-guardian.jpg)
+
+**A companion for the coast.** In the unreleased Tidewhisper candidate, completing The Dark Lighthouse unlocks an
+otter. When a clam bed lies below the tide, Pearl Dive brings back one pearl, up to twice a day. The otter joins the
+other pets in the menu and follows the same commands. See [Tidewhisper](../world/tidewhisper.md#pearl-diving-otter-27i).
+
+![The otter companion in the Tidewhisper pet menu](../../screenshots/pets/otter.jpg)

@@ -92,6 +92,11 @@ After the approved 2026-10-19 gate split, these functional checks may pass and m
 performance remains a public-release blocker. They never enable the authored Tidewhisper release flag.
 It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
 
+`node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
+`B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
+zero page/shader errors. It captures `pets/otter.jpg` through `shots.mjs`.
+`node tests/sim/otter.sim.mjs` covers all three heroes, the daily cap, bed state, travel and saved dive state.
+
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
 on the owner's Acer RTX 4050 reference (the collector requests the high-performance GPU).
