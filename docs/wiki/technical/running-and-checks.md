@@ -75,6 +75,8 @@ node scripts/cave-combat-smoke.mjs  # cave combat: all heroes, real clicks/ultim
 node scripts/cave-rewards-smoke.mjs # cave rewards: real keys and E mine a vein and open a chest, no second payout; retakes its shot
 node scripts/cave-puzzles-smoke.mjs # cave puzzles: the ward stops real keys, both puzzle kinds played, guardian and way home
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
+node scripts/mob-combat-smoke.mjs  # monsters fighting each other (45b/45c): brawl damage, a ghost's orb, no damage numbers,
+                                   # the hero reclaiming a monster, a boss harmless to them; retakes docs/screenshots/mobs/mob-brawl.jpg
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing

@@ -31,7 +31,7 @@ export const charger = {
         const k = 1 - e.timer / d.windup;
         if (k < 0.6) { turnToward(e.fwd, toP, e.up, damp(10, dt)); e.chargeDir.copy(e.fwd); e.laneFrom.copy(e.up); }   // aims, then commits
         layLane(e.lane, e.laneFrom, e.chargeDir, d.chargeSpeed * d.chargeTime, d.width, 0.2 + 0.5 * k);
-        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.chargeTime; e.hitPlayer = false; e.hideTele(); audio.whoosh(); }
+        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.chargeTime; e.hitPlayer = false; e.hideTele(); if (e.heard) audio.whoosh(); }
         return 0;
       }
       case 'charge':

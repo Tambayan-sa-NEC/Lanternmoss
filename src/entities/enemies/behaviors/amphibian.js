@@ -41,7 +41,7 @@ export const amphibian = {
         const k = 1 - e.timer / d.windup;
         if (k < 0.6) { turnToward(e.fwd, e.toP, e.up, damp(10, dt)); e.leapDir.copy(e.fwd); e.leapFrom.copy(e.up); }
         layLane(e.lane, e.leapFrom, e.leapDir, d.leapSpeed * d.leapTime, d.width, 0.2 + 0.5 * k);
-        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.leapTime; e.hitPlayer = false; e.hideTele(); e.speed = d.leapSpeed; e.vy = d.leapLift; e.grounded = false; splash(e, 22); audio.whoosh(); }
+        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.leapTime; e.hitPlayer = false; e.hideTele(); e.speed = d.leapSpeed; e.vy = d.leapLift; e.grounded = false; splash(e, 22); if (e.heard) audio.whoosh(); }
         return 0;
       }
       case 'charge':

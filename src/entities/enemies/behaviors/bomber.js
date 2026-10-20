@@ -42,7 +42,7 @@ function burst(e, dist) {
   const d = e.def, P = ctx.player;
   ringFX(e.pos, d.blastRadius, 0xff8a6a, 0.5);
   sparkles.emit(e.center(), { count: 50, color: d.color, speed: 4.5, up: e.up, upBias: 0.5, life: 0.8, size: 0.42 });
-  audio.explode(); if (dist < 14) shakeCamera(0.3);
+  if (e.heard) audio.explode(); if (e.distP < 14) shakeCamera(0.3);
   if (!P.dead && e.distP < d.blastRadius + P.radius && P.r - groundHeight(P.up) < 1.5) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
   hitMobs(e, e.pos, d.blastRadius, d.damage, { knock: d.knockback });        // TODO 45b: the blast is no respecter of monsters
   e.die();
