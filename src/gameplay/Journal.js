@@ -85,7 +85,7 @@ export const Journal = {
 };
 
 // ---------------------------------------------------------------- listening
-encounterEvents.addEventListener('enemydefeated', e => Journal.defeat(e.detail.enemy));
+encounterEvents.addEventListener('enemydefeated', e => { if (!e.detail.killer) Journal.defeat(e.detail.enemy); });   // TODO 45b: only the hero's own defeats
 encounterEvents.addEventListener('bossdefeated', e => Journal.bossWon(e.detail.boss));
 encounterEvents.addEventListener('playerhurt', () => { if (Journal.fight) Journal.fight.hit = true; });
 encounterEvents.addEventListener('enemyhit', e => { const f = Journal.fight; if (f && e.detail.source === 'pet' && e.detail.enemy === f.boss) f.pet = true; });

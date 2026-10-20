@@ -23,7 +23,7 @@ function keepIndoors(items) {
 }
 
 export function dropLoot(e, rng = playRng) {
-  if (e.owner || e === ctx.boss || e.def.ai === 'boss' || e.def.object) return [];
+  if (e.owner || e.killedBy || e === ctx.boss || e.def.ai === 'boss' || e.def.object) return [];   // killedBy: another monster won this one (TODO 45b)
   const items = rng() < dropChance(e.def) ? rollLoot(MONSTER_DROPS.table, ctx.planet, rng, ctx.player.charId).items : [];
   const extra = MONSTER_DROPS.extra?.[e.type];                                  // only monsters with an extra draw again
   if (extra && rng() < extra.chance) for (const [item, qty] of extra.items)

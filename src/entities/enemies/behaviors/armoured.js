@@ -5,7 +5,7 @@
    Its pinch: a short wind-up with a warning disc in front, then a snap; it can't turn while recovering. */
 import * as THREE from 'three';
 import { ctx } from '../../../core/context.js';
-import { hurtPlayer } from '../../../combat/damage.js';
+import { hitMobs, hurtPlayer } from '../../../combat/damage.js';
 import { emote } from '../../../fx/emotes.js';
 import { sparkles } from '../../../fx/sparkles.js';
 import { audio } from '../../../systems/AudioSystem.js';
@@ -82,4 +82,5 @@ function pinch(e) {
   const c = _c.copy(e.pos).addScaledVector(e.fwd, d.reach);
   sparkles.emit(c, { count: 12, color: 0xffb38a, speed: 2.4, up: e.up, upBias: 0.6, life: 0.4, size: 0.3 });
   if (!P.dead && P.pos.distanceTo(c) < d.pinchRadius + P.radius && P.r - groundHeight(P.up) < 1.2) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
+  hitMobs(e, c, d.pinchRadius, d.damage, { knock: d.knockback });            // TODO 45b
 }
