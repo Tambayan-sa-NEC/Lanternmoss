@@ -15,6 +15,7 @@
 | Planet size, scenery density, flattened areas, steepest walkable slope, swimming | `src/config/game.js` → `PLANET_RADIUS`, `WORLD` |
 | Hero stats and abilities | `src/config/characters.js` |
 | XP curve, level cap, stat / damage growth | `src/config/leveling.js` |
+| Combat timing targets, per-world summon levels, XP routes and coin reserves (including Tidewhisper) | `src/config/balance.js` → `BALANCE` |
 | Challenges and their dialogue | `src/config/challenges.js` |
 | Quests (steps, rewards, dialogue) | `src/config/quests.js` |
 | Day length, phases and light | `src/config/day.js` |
@@ -42,6 +43,7 @@
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |
 | Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |
+| Coastal recipes and Tide gear forge fees (70/80/70/60 coins) | `src/config/coastalResources.js` → `COASTAL_RECIPES` |
 | Bounty board: kinds of job, counts, coins, material, rare-piece chance, board placement | `src/config/bounties.js` → `BOUNTIES` |
 | Gear sets: pieces, two- and three-piece bonuses (burn, chill, healing, swimming, push), burn tick | `src/config/sets.js` → `SETS`, `BURN_TICK` |
 | Talents: points per level, the reset wizard, each hero's tree and its release flag | `src/config/talents.js` → `TALENTS` |
@@ -57,6 +59,8 @@
 | How many chests each planet has, its loot material | `src/config/planets/<id>.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
+| Frame-time target and per-world count ceilings (including Tidewhisper's 550 calls / 230,000 triangles) | `src/config/render.js` → `PERFORMANCE_BUDGET`; calibrated frame limit: `src/config/contentGate.js` → `frameLimitMs` |
+| Default desktop validation machine, GPU, viewport, quality and hero/seed/scene matrix | `src/config/render.js` → `PERFORMANCE_REFERENCE`; actual GPU/profile helpers are shared by the collector and content gate |
 | Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](lighting.md)) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
 | Cave rewards: how near E offers a chest or vein, how far fixtures and monster spawns sit off the walls, how many monsters clear a room | `src/config/dungeons.js` → `CAVE.reward` |

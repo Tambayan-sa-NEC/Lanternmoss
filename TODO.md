@@ -763,7 +763,7 @@ support (40) need numbers to stay under.
 
 - [x] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
 - [x] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
-      record it as the ceiling. The target is a steady 60 fps at 1080p on integrated graphics (Iris Xe class) at the
+      record it as the ceiling. The target is a steady 60 fps at 1080p on the owner's Acer Nitro RTX 4050 at the
       default quality. Write the numbers down in `docs/wiki/technical/performance.md`.
 - [x] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
       quality preset from 2a, so lower presets draw less, not only at a lower resolution.
@@ -773,7 +773,10 @@ support (40) need numbers to stay under.
 Implemented: F3 / Graphics overlay, five live density sliders, spatial scenery/grass batches, resource and static
 prop batching, distant actor culling, and a real-WebGL per-planet regression script. See [measurements, ceilings and
 reproduction steps](docs/wiki/technical/performance.md). **Target status:** the available Intel UHD test machine remains below
-60 FPS; Iris Xe default-quality validation and further frame-time optimization remain performance work.
+60 FPS. On 2026-10-17 the owner replaced the uncertain Iris Xe device requirement with the Acer Nitro ANV15-51's
+RTX 4050 as the default desktop reference, preserving 1080p High, timing and count limits. Other machines supply
+additional functional/compatibility checks; mobile performance remains TODO 40. Default-reference validation and
+further frame-time optimization remain performance work.
 
 ---
 
@@ -981,7 +984,7 @@ counts across planets, which conflicts with a deliberately small Moon. These are
 | TODO | Whole-item estimate | Fits one five-hour session? | Replacement stages |
 | --- | --- | --- | --- |
 | 26 Groundwork | 9-16 h | No: registry, mechanic lifecycle, physics and progression are separate integration changes | 26a-26d |
-| 27 Tidewhisper | 18-33 h | No: moving water plus a complete ecosystem and two original fights | 27a-27h |
+| 27 Tidewhisper | 18-33 h core; 3-5 h otter follow-up | No: moving water plus a complete ecosystem and two original fights | 27a-27h; 27i next |
 | 28 Gear sets / hero depth | 12-21 h | No: set procs and three saved ability trees exceed the original M label | 28a-28e |
 | 29 Caves | 18-30 h | No: lighting, flat-space combat, saves, puzzles and five planet configurations | 29a-29g |
 | 30 Duskhollow | 20-37 h | No: lantern rules, four behaviors, accessibility and two light-dependent fights | 30a-30i |
@@ -1002,7 +1005,8 @@ seeded object ids and the original three-world campaign must continue to work at
 rematches (31a-d) can land between worlds after their own dependencies; 31g is independent of the Moon. Expansion cave
 configs (29g) follow the released worlds they use, so Duskhollow only depends on the lighting stage, not its own cave.
 Tide/Dusk/Star set items land with their worlds and use the set system once 28a exists; this avoids 27 depending on 28.
-The 27h go/no-go result may revise later estimates before work starts.
+The 27h functional go/no-go result may revise later estimates before work starts. Tidewhisper's separate hardware
+performance certification gates public release to `master`, not the start of 28, 29g or 30.
 
 **Verification:** each stage adds focused rules/save/simulation checks for its behavior and runs both complete suites.
 Visible changes also need browser checks at 720p/1080p and the lowest quality preset; major world releases refresh the
@@ -1102,14 +1106,15 @@ the next main-world stage is 27a.
 
 **Goal:** a planet of islands, tide pools and lighthouses, and the test run for the groundwork (26).
 Code: `src/config/planets/tidewhisper.js`, `src/world/mechanics/tides.js`, new behaviours and models, a boss in
-`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL, in eight stages. **Needs:** 26a-26d.
+`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL, eight completed core stages plus an otter follow-up stage. **Needs:** 26a-26d.
 Reuses on purpose: swimming (11), fishing (16), fuel (17), facing-based aiming (14).
 **Risk:** the moving sea touches physics, spawning, monster AI (monsters that end up in water), nodes and the farm.
 **Recommendation:** keep the tide range small (about 1.5 m), mark the tidal band in the height field, and only place
 things meant for it there (tide pools, clams, driftwood). The farm sits above the high-tide line.
 
-**Five-hour assessment:** eight stages. The shared moving-water queries must work before the archipelago is built;
-bosses and release balancing each get their own session. The otter remains optional after the release budget is measured.
+**Five-hour assessment:** eight core stages. The shared moving-water queries must work before the archipelago is built;
+bosses and release balancing each get their own session. The owner placed the otter in the first pending stage (27i)
+after the 27h functional merge; it has a separate estimate and public-release performance gate.
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
@@ -1120,7 +1125,92 @@ bosses and release balancing each get their own session. The otter remains optio
 | [x] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
 | [x] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
 | [x] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
-| [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
+| [x] **27h. Functional integration and go/no-go** | 27a-27g | 1-3.5 h | Complete the non-performance content gate, three-hero pacing/balance, full travel/Continue/save/completion browser path through the test-only candidate, and affected screenshots/tour. Record the reference performance matrix and its verdict, actual session costs and groundwork fixes. Merge tested functional work to `develop` with Tidewhisper unreleased if the public-release performance gate is still failing. The otter needs a separate estimate. |
+| [ ] **27i. Pearl-diving otter pet** | 27b, 27c, 27h | 3-5 h | First pending Tidewhisper stage: add an otter companion, its pearl-dive ability and Tidewhisper unlock using the existing pet system. Check bounded pearl yields, save/Continue, travel, menu and selection, all three heroes, a reviewed feature shot and rendering cost. Build behind the unreleased world fixture; include the otter in a fresh full Acer acceptance matrix before public enablement. The current 0/18 timing result gives no release headroom. |
+
+**27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
+27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
+Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.
+
+**27h gate split (approved 2026-10-19):** the owner's approved fallback separates functional completion from
+hardware certification after a clean 18-case Acer RTX 4050 rerun. Functional completion of 27h unblocks 28, 29g
+(still also needing 30i) and 30 on `develop`. It does **not** make Tidewhisper a released destination or authorize a
+`master` merge. The public-release gate remains the unchanged 60 FPS p95 frame-interval target at 1080p High, the
+550-call/230,000-triangle ceilings, all 18 hero/seed/scene cases on the Acer RTX 4050, the content gate, and the
+owner's separate release confirmation. Keep `released: false` and use only test fixtures for world-4 travel until
+that gate passes. A passing report and a separately tested destination enablement are required before public release.
+
+**27h synchronized hardware verdict (2026-10-19):** the primary display was confirmed at 165 Hz; visible Edge
+on the active RTX 4050 clocked 6.1/6.3 ms (median/p95). At the panel's supported 60 Hz mode its empty-page clock
+was 16.7/16.8 ms, setting the unchanged limit to 16.80 ms. On clean candidate `92d02e2` after the 29a-29f cave
+merge, all 18 cases completed with zero browser/shader errors. **0/18 timing rows passed** (p95 17.4–18.2 ms);
+**18/18 count rows passed** (peak 474/550 calls and 209,113/230,000 triangles). Average FPS was 59.04–60.03.
+No release artifact was written and the panel was restored to 165 Hz. This is a no-go for public enablement;
+functional checks and integration follow under the approved split. See the [full matrix and handoff](docs/wiki/technical/tidewhisper-release.md#synchronized-60-hz-acceptance-matrix-2026-10-19).
+
+**27h functionally implemented (2026-10-19):** on the cave-synchronized candidate, the readiness test finds only
+missing performance certification; six hero/seed profiles pass all 18 checked duel/roster bands with the same
+numbers as the pre-cave baseline, and the pacing audit passes level-8 XP, 281–360 coins for a 280-coin set,
+and one/two-day lighthouse plus gear material yields. The test-only candidate exercises real portal travel,
+partial quest/node save and Continue, return travel, the low-tide/quest gate, completion and one Tide Crown through
+reload at 720p/1080p. All 275 unit tests, 58 simulations and 25 relevant Edge browser scripts pass, including
+cave matrix/pixel equivalence and the four cave checks. The full screenshot tour completed with `errors: none`;
+Tidewhisper captures were reviewed and the boss shots were restaged to remove fixture HUD clutter and show
+Mirelure clearly. Unrelated check retakes were restored. Tidewhisper stays `released: false`; the 18-case frame
+gate is a public-release no-go. The measured session cost and go/no-go assessment are in the handoff and work log.
+
+**27h in progress (2026-10-15):** release validation continues on `feat/todo-27h-campaign-release`, from parent `feat/todo-27`.
+The earlier `feat/todo-27h-release-validation` checkpoint is preserved in its history.
+Mirelure's breathing clue now shares its clock with the bubbles, and diving cancels unfinished surface attacks.
+Candidate checks use the real fourth-world id and save schema; they exposed missing forage/chest configuration,
+which is now explicit. The normal release flag remains off. Initial Intel UHD diagnostics do not meet the required
+Iris Xe evidence under the original reference (superseded by the owner's Acer decision below). Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
+Mirelure HP 3250), and the pacing audit covers Tidewhisper's XP, coins (new Tide forge fees) and materials.
+Default-reference acceptance and the release itself remain. This is a **no-go** for
+release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/wiki/technical/tidewhisper-release.md).
+
+**27h sync/audit checkpoint (2026-10-17):** current child `feat/todo-27h-campaign-release` is synchronized from
+parent `feat/todo-27`; published old-stage history is preserved. 239 unit tests, all 52 simulations, affected
+content-gate rerun, campaign/encounter browser checks and 18 strict balance checks pass. Actual Acer UHD diagnostic:
+18 cases / 2,160 frames at 720p Low, 37.5-44.6 FPS and p95 26.4-32.8 ms; zero cases meet the fixed frame budget,
+and 8 exceed the 550-call ceiling (peak 636). Keep release/next-world approval pending; profile draw-call peaks
+and obtain target-device evidence. See the [current handoff](docs/wiki/technical/tidewhisper-release.md).
+
+**27h validation-machine decision (2026-10-17):** the owner selected the current Acer Nitro ANV15-51 / RTX 4050
+Laptop GPU as the default validation reference. Other available machines provide additional validation and
+compatibility coverage; Iris Xe access no longer blocks 27h. The collector now measures the existing desktop goal
+at 1920x1080 High rather than its earlier 720p Low diagnostic profile. The 60 FPS/frame-clock rule and 550-call /
+230,000-triangle ceilings are retained. First RTX 4050 matrix still fails timing/count acceptance; optimization
+and final clean-candidate validation are in progress. No destination release flag has changed.
+
+**27h step 1 diagnostic (2026-10-17):** completed a 24-row ABBA comparison of the hidden-actor matrix skip,
+all heroes/seeds 1/7, with identical fixed poses and per-frame draw counts. Four profiles improve p95, two worsen;
+this is render-only evidence, not a whole-game acceptance pass. Removed unchanged prompt/chip HTML rewrites and
+computed-style reads in the edge-marker loop. The new UI simulation and 720p/1080p browser check cover these
+changes; full regression suites, clean normal 18-case performance acceptance and release work remain pending.
+See [the comparison and trace findings](docs/wiki/technical/tidewhisper-release.md#step-1-controlled-render-comparison).
+
+**27h step 2 regression (2026-10-17):** 243 unit tests, all 53 simulations (including terrain timing), and all
+17 affected Edge browser checks pass. The tutorial check exposed a 3-pixel overflow in the 720p main pause page;
+its viewport height allowance is now scoped to that page, with the strict assertion retained and tutorial/save
+reruns passing. Older save/portal/tutorial checks now collect shader errors and close browsers with a bounded
+timeout; save checks cover both resolutions. Ordinary clean 18-case hardware acceptance is next; release stays off.
+See [the regression record](docs/wiki/technical/tidewhisper-release.md#step-2-full-regression-checks).
+
+**27h step 3 acceptance attempt (2026-10-17):** ordinary clean `da96f77` run, all 18 cases / 2160 samples on the
+RTX 4050 at 1080p High. All draw/triangle budgets pass, but only 5/18 cases meet the unchanged 16.67 ms p95 limit
+(76.02-102.24 average FPS; p95 13.8-20.7 ms). Zero page/shader errors. The collector correctly failed and wrote no
+release evidence. Step 3 remains open: diagnose the failing live scenes, improve frame pacing, recheck affected
+code and repeat clean acceptance before destination enablement. See [the result matrix](docs/wiki/technical/tidewhisper-release.md#step-3-ordinary-hardware-acceptance-attempt).
+
+**27h step 3 optimization checkpoint (2026-10-18):** profiled live rendering, skipped clean immutable subtree
+walks and added conservative actor-frustum bounds derived from geometry/current transforms. Pixel controls preserve
+all four worlds; paired six-profile render diagnostics improve with exact pose/draw matches. Final affected checks
+pass 248 units, six sims and three Edge browser scripts. A collector cleanup race was fixed and audited. Ordinary
+clean `c3375f0` acceptance still passes only 5/18 timing rows (p95 14.4-23.6 ms), although every count budget passes
+and page/shader errors are zero. Step 3 remains open; isolate live CPU/host-memory stalls and repeat full acceptance.
+Steps 4 (enable/production checks) and 5 (tour/docs/full integration) remain pending; Tidewhisper stays unreleased.
+See [the current handoff](docs/wiki/technical/tidewhisper-release.md#step-3-live-recheck-after-frustum-gating).
 
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
@@ -1180,10 +1270,10 @@ mechanic: optional gradual reflood and `activeTides()`. Level-8 duels for each h
 Tidewhisper remains unreleased. Next: 27h, campaign release and go/no-go.
 See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 
-- [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
+- [x] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
       on stilts on the largest island, with a pier for fishing.
-- [ ] **Tides:** the sea rises and falls once a day (low in the afternoon, high at night). Low tide opens sandbars,
+- [x] **Tides:** the sea rises and falls once a day (low in the afternoon, high at night). Low tide opens sandbars,
       tide pools (crabs, clams, pearls) and the causeway to the boss lagoon; high tide floods them (swim across;
       swimming drains energy faster, 16). Driftwood and shells wash up on the flats at each high tide, a reason to come
       back. A tide chip sits next to the clock.
@@ -1217,7 +1307,7 @@ See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 - [x] **People:** Marlo the lighthouse keeper (lines, tips for Mirelure, and the quest "The Dark Lighthouse": seaglass for a
       new lens and fuel to light it); stilt houses with two interiors; beach outfits for the travelling villagers.
 - [x] **Music:** a slow waltz over a sea-swell pad, made in code.
-- [ ] Optional, only if the world comes in under budget: an otter pet that dives for pearls.
+- [ ] An otter pet that dives for pearls (27i, first pending stage; public unlock requires a passing release budget).
 - [ ] **Go / no-go check** once it plays end to end: how long it took, what the groundwork (26) got wrong, and whether
       the checklist was too much. Fix 26 before starting 30, or cut Duskhollow down to fit.
 
@@ -1338,6 +1428,11 @@ Note that 29f put caves into worlds that are already released, so the next `deve
 them; that release is unchanged by the merge and still needs confirmation. Cave frame timing is measured but **not
 certified**, because the Iris Xe target device is still unavailable, exactly as for 27h. The merge and its reasons
 are recorded in `docs/logs/2610191629 todo-29-merge-to-develop.md`.
+
+**29g dependency update (2026-10-19):** the approved 27h gate split makes its tested functional completion the
+dependency for 29g; the failing Tidewhisper hardware timing matrix remains a public-release gate. After 27h joins
+`develop`, 29g still waits on 30i, which is not built. The cave-specific Tidewhisper/Duskhollow rollout does not
+change either world's release flag by itself.
 
 **29a implemented (2026-10-16):** `src/render/lighting.js` (`RENDER.localLight`): light radii in every toon shader
 (patched on the material prototype, grass and kelp chained), up to 8 spots for the nearest sources, toon-banded and

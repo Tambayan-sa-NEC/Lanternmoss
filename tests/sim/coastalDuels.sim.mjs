@@ -50,7 +50,7 @@ async function child(hero) {
     pin(); step(0.2);
     const abilities = Object.entries(kit()), basic = abilities[0][0];
     const skills = abilities.slice(1).filter(([, s]) => s.damage > 0 && !s.ult).map(([id]) => id);
-    const reach = { witch: 7, knight: 1.8, ranger: 8 }[hero];
+    const reach = { witch: 7, knight: kit()[basic].range, ranger: 8 }[hero];
     const clearKeys = () => { for (const k in keys) keys[k] = false; };
     const head = (to, sprint = true) => { const t = tangentToward(P.up, to); H.cam.fwd.copy(t); P.fwd.copy(t); keys.KeyW = true; keys.ShiftLeft = sprint; };
     const attack = (e, d) => {
@@ -74,7 +74,9 @@ async function child(hero) {
         if (d > reach + 0.3) { head(e.up, false); return; }
         attack(e, d);
       },
-      jellybell(e, d) { if (d > reach) { const edge = e.edge ??= beachBy(e); head(arcDist(P.up, edge) > 1 ? edge : e.up, false); return; } attack(e, d); },
+      // Each fight already starts at the nearest beach. Advance into real weapon reach instead of alternating
+      // between the shore and the target every frame, which made melee access look much slower than it is.
+      jellybell(e, d) { if (d > reach) { head(e.up, false); return; } attack(e, d); },
       surfSkipper(e, d) {
         const spot = e.spot ??= beachBy(e);
         if (!e.hidden && d < Math.max(reach, 2.5) + 2) { attack(e, d); return; }

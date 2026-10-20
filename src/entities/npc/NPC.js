@@ -13,6 +13,7 @@ import { buildOutfit, outfitColor } from '../../models/villagers.js';
 import { addDyn, removeDyn, resolveCollisions } from '../../physics/colliders.js';
 import { Walker } from '../../physics/Walker.js';
 import { disposeTree } from '../../render/meshes.js';
+import { batchRigidParts } from '../../render/staticParts.js';
 import { scene } from '../../render/scene.js';
 import { damp } from '../../utils/math.js';
 import { mpick, mr, rng } from '../../utils/random.js';
@@ -30,7 +31,7 @@ export class NPC extends Walker {
   /** def: see npcDefs.js. */
   constructor(def) {
     super(def.dir, def.radius); this.def = def; this.name = def.name; this.height = def.height; this.hover = def.hover || 0;
-    Object.assign(this, def.build()); scene.add(this.root); this.shadow = makeShadow(0.6);
+    Object.assign(this, batchRigidParts(def.build())); scene.add(this.root); this.shadow = makeShadow(0.6);
     this.selfCollider = addDyn(this.up, this.radius);
     this.home = this.up.clone(); this.state = 'idle'; this.timer = mr(2, 5); this.speed = 0; this.phase = 0; this.gesture = 0; this.loop = 0; this.spin = 0;
     this.talking = false; this.bag = []; this.last = -1; this.seen = new Set(); this.goal = null;

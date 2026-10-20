@@ -56,7 +56,7 @@ proof that a feature remains unfinished. Some completed parents retain historica
 | Existing work | Observed status | Implication for the visual update |
 | --- | --- | --- |
 | TODOs 1–18: core game, HUD, characters, environments and gameplay checks | Implemented; optional hero color/outfit variants remain open in TODO 4 | Reuse the playable foundation. Character variants are optional follow-up scope, not a prerequisite. |
-| TODOs 19–23: saves, performance tooling, tutorial, crafting and balance | Implemented in their documented scope | Preserve old saves, tutorial cues and balance. TODO 20's performance target remains unvalidated on Iris Xe; its tooling is complete, its target is not certified. |
+| TODOs 19–23: saves, performance tooling, tutorial, crafting and balance | Implemented in their documented scope | Preserve old saves, tutorial cues and balance. Use the current owner-approved reference in the performance wiki; completed tooling does not certify unmeasured hardware. |
 | TODOs 24–25c: portals, home, placeables and structures | Implemented | New house/furniture assets must fit existing interaction footprints, snapped construction and camera cutaways. |
 | TODOs 26a–26d: catalog, mechanics, physics, progression and content gate | Implemented | Reuse planet IDs, mechanic ownership and unreleased-world guards. Do not replace this infrastructure with visual code. |
 | TODO 27a: Tidewhisper terrain and tides | Completed during this review; feature `2864ffc` merged as `ce7c8aa`, with publication record `e7afab9` | Stable checkpoint is available. Its log records 199 unit tests, 33 simulations and 720p/1080p Low browser acceptance; these are 27a results, not visual-plan verification. Water appearance must consume the same live sea/lagoon queries as physics. |
@@ -228,7 +228,7 @@ all remain proposals until this stage is activated and reviewed.
 | [ ] **V03.1 Reproducible current baseline** | Record device/GPU/browser, viewport, preset, build, seed, camera and scene; measure mean/p95 frame time, composer calls/triangles, loading and resource counts. Separate old checked-in measurements from new evidence. |
 | [ ] **V03.2 Bottleneck experiments** | Measure actors, outlines, bloom/MSAA, lights/shadows, terrain and transparency independently. Choose the highest-impact fix rather than increasing scene complexity first. |
 | [ ] **V03.3 Proposed asset budgets** | Allocate per-asset and per-scene triangles, materials, textures, rigs, lights, shadow casters and download budgets. Set initial experimental limits using the budget table below, then confirm against the renderer prototype. |
-| [ ] **V03.4 Hardware and release requirements** | Identify how actual Iris Xe measurements will be obtained and distinguish the 1080p High project target from the 720p Low expansion gate. Preserve unknown/unvalidated statuses until measured. |
+| [ ] **V03.4 Hardware and release requirements** | Follow the owner-approved reference/profile in the performance wiki and render config; verify project and expansion fixtures stay aligned. Preserve unknown/unvalidated statuses until measured. |
 
 **Acceptance:** reproducible baseline, accepted provisional budgets and a measurable performance plan;
 count ceilings remain enforced; there is a stated resolution for missing required hardware evidence.
@@ -437,7 +437,7 @@ essential information does not depend only on hover or color; no layout overlap 
 | [ ] **V14.1 Island kit** | After accepted 27a, style sandbars, tidal pools, ocean/lagoon shores, causeways and lighthouse forms; verify low/high tide and drained lagoon presentation from shared queries. |
 | [ ] **V14.2 Ecosystem and economy kit** | Follow 27b–27c for palms, kelp/coral, wildlife/rare creature, resources/crops, gear and mist/squall art. Keep material families and new effects within budgets. |
 | [ ] **V14.3 Village and encounters** | Follow 27d–27g for Marlo, homes/quest props, the original roster, Old Ironclaw and Mirelure. Preserve bell armor, lure, sluice and arena readability. |
-| [ ] **V14.4 Release alignment** | With 27h, complete inventory/visual checks and real release measurements; refresh affected images. The optional otter requires a separate scope decision and demonstrated budget headroom. |
+| [ ] **V14.4 Release alignment** | With 27h, complete inventory/visual checks and real release measurements; refresh affected images. TODO 27i now scopes the otter follow-up; its public unlock still requires demonstrated budget headroom. |
 
 **Acceptance:** every required Tidewhisper visual state covered; tide and encounter cues are clear;
 27h and its actual hardware/content requirements pass before release.
@@ -495,7 +495,7 @@ post-resolution state are correct; 32g gates release; no Moon farm/cave is added
 | [ ] **V17.1 Population and renderer optimization** | Measure worst representative actors/weather/furniture/encounters; batch/instance shared meshes, limit material slots and alpha overdraw, tune LOD/culling and shadow/post-process cost. Never cull gameplay state with a mesh. |
 | [ ] **V17.2 Loading and resource stability** | Measure first load, cached load and per-world transitions; tune preload/compression after compatibility proof. Repeat travel, hero switches, menu previews and reset cycles; verify bounded geometry/texture/material counts. |
 | [ ] **V17.3 Save and layout acceptance** | Run old-v1 fixture and current save round trips for indoor/outdoor, equipment, home/building, resources, pets and unlocked travel. Confirm IDs/placement and selected quality do not alter saved gameplay results. |
-| [ ] **V17.4 Hardware/preset evidence** | Run the browser matrix and exact project/content performance fixtures on stated hardware. Refresh measurements with build IDs; fix regressions. Missing required Iris Xe evidence remains a blocking release limitation. |
+| [ ] **V17.4 Hardware/preset evidence** | Run the browser matrix and exact project/content performance fixtures on stated hardware. Refresh measurements with build IDs; fix regressions. Missing required reference-device evidence remains a blocking release limitation. |
 
 **Acceptance:** all applicable suites and browser/performance gates pass; no unexplained resource growth,
 layout drift or old-save loss; measured limits and remaining nonblocking issues are documented truthfully.
@@ -525,8 +525,8 @@ are proposals for V03/V07 to calibrate, not current measurements or approved new
 
 | Metric | Existing requirement or proposed starting point | How to verify |
 | --- | --- | --- |
-| Project performance target | Existing: steady 60 FPS at 1920 × 1080, default High, Iris Xe-class graphics; target remains unvalidated | Full project fixture plus populated/combat cases on identified hardware; record mean/p95 and GPU/browser |
-| Expansion release target | Existing: actual Iris Xe, 1280 × 720, Low; village/night/weather each at least 90 samples, p95 ≤ 1000/60 ms | Owning release reports under `docs/releases/`; preserve contentGate checks |
+| Project performance target | Steady 60 FPS at 1920 × 1080, default High, using the current owner-approved desktop reference in the performance wiki | Full project fixture plus populated/combat cases on identified hardware; record mean/p95 and GPU/browser |
+| Expansion release target | Current `PERFORMANCE_REFERENCE` profile: full hero/seed/scene matrix, at least 90 samples per row and the existing frame/count limits | Owning release reports under `docs/releases/`; preserve contentGate checks and verify the actual adapter/profile |
 | Act I scene counts | Existing calls/triangles: Lanternmoss 1050/310000, Emberfall 900/280000, Frostveil 850/280000 | Whole-composer counts through existing performance script; do not silently raise limits for new art |
 | Hero/villager reference mesh | Proposed prototype starting range: 3k–8k triangles, 1–2 material slots per actor, excluding separately budgeted equipment | Export inspection and populated runtime scene; split/reduce if crowd cost is excessive |
 | Common static prop | Proposed starting range: 100–1500 triangles, normally one shared material family | Asset inspection plus repeated-prop scene; use instancing or appropriate spatial batches |

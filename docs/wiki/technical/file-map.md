@@ -15,6 +15,8 @@ tests/                     unit tests: XP / level math, inventory, planets + ene
                            heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,
                            the seeded random stream
 tests/sim/                 gameplay sims (npm run sim): the real game played headless; balance.sim.mjs is the balance report
+vendor/three/              the Three.js r160 browser build and the eleven addon modules the game imports, so the
+                           published game needs no CDN; vendor/three/README.md says how to refresh it
 favicon.ico                the Girl Witch character mark in the browser tab (16–48 px)
 favicon.png                the 32 px PNG browser icon, from docs/logo/witch-A1.png
 src/
@@ -205,3 +207,64 @@ src/
 
 There are no asset files: every model, texture and sound is generated in code. Real assets would replace the
 builders in `src/models`, the props in `src/world/props.js`, or the methods in `src/systems/AudioSystem.js`.
+
+## Tidewhisper functional validation (27h complete; public release gated)
+
+`tests/sim/lib/tidewhisperCandidate.mjs` substitutes a test catalog entry while preserving the authored release flag.
+`tests/sim/tidewhisperCampaign.sim.mjs` and `tests/tidewhisper-readiness.test.mjs` check fourth-world integration and
+content completeness. `scripts/lib/tidewhisper-browser.mjs` boots the isolated candidate browser.
+`scripts/tidewhisper-campaign-smoke.mjs`, `scripts/tidewhisper-balance.mjs` and
+`scripts/tidewhisper-performance.mjs` cover travel/Continue, two-seed balance and actual hardware diagnostics.
+The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` reports remain separate from new runs.
+The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.
+
+`docs/tidewhisper-balance-20261017.json` is the clean-commit synchronization audit; the earlier balance JSON remains historical.
+`docs/tidewhisper-performance-acer-20261017.json` records the separate 18-case Acer Intel UHD diagnostic, not certification.
+`docs/tidewhisper-performance-acer-rtx4050-before-20261017.json` records the first 1080p High RTX 4050 reference
+matrix before actor batching; its dirty collector source is explicitly recorded, so it is baseline evidence only.
+It uses original model sources from `b3074d5` and the corrected fresh-adventure collector.
+`docs/tidewhisper-performance-acer-rtx4050-loaded-after-20261017.json` and
+`docs/tidewhisper-performance-acer-rtx4050-freed-memory-20261017.json` preserve failed clean visible-browser
+acceptance attempts before and after closing unused apps. Final certification remains separate and pending.
+`docs/tidewhisper-performance-acer-rtx4050-headed-before-20261017.json` is the original-rendering baseline for the
+default visible-browser profile, with runtime source provenance recorded in the JSON.
+`docs/tidewhisper-performance-acer-rtx4050-headless-after-20261017.json` preserves an intermediate hidden/instrumented
+iteration after the first rigid batches and before companion/culling refinements; it is not the final reference result.
+`tests/rigidBatching.test.mjs` verifies rigid-model geometry/colour conservation, independent pivots/effects and
+culled-branch matrix skipping/current-pose restoration;
+it also checks immutable subtree traversal, moving parents and explicit world queries.
+`tests/sim/performance.sim.mjs` also covers the optimized hero, coastal roster and chest rigs.
+
+`scripts/static-transforms-smoke.mjs` compares world matrices and raw canvas pixels after forcing visible immutable
+branches on all four worlds at 720p/1080p after keyboard movement. Diagnostic captures go to the system temp folder.
+It also restores the old distance-only actor gates and requires identical raw canvas pixels.
+`src/render/radialBounds.js` derives conservative rotation-independent rig envelopes and caches immutable branches;
+`tests/radialBounds.test.mjs` checks pose containment, cached extents, instances and unbounded fallbacks.
+`docs/tidewhisper-live-profile-20261017.json` summarizes the live Ranger/7 squall CPU profile;
+`docs/tidewhisper-static-comparison-20261017.json` preserves the separate 24-row immutable traversal ABBA comparison
+with source hashes, exact pose/draw assertions and changing host-load limitations.
+`docs/tidewhisper-step-3-regressions-20261017.json` records the affected checks after that change.
+`scripts/lib/discard-webgl.mjs` waits for context loss before disposing a discarded renderer; the static-transform
+smoke exercises cleanup while animation frames remain live. The performance collector saves complete reports
+before error assertions. `docs/tidewhisper-step-3-invalid-cleanup-attempt-20261017.json` is the labeled console
+summary of the earlier cleanup-race failure, not raw release evidence.
+
+`docs/tidewhisper-matrix-comparison-20261017.json` retains the 24-row ABBA render-only comparison, exact pose/draw
+checks and all 8640 sampled frames. `docs/tidewhisper-frame-trace-{before,after}-20261017.json` retain separate
+instrumented live-scene timeline summaries; these are diagnostics, not release evidence.
+`tests/sim/hudUpdates.sim.mjs` and `scripts/hud-performance-smoke.mjs` cover DOM preservation and live UI scaling.
+
+`docs/tidewhisper-step-2-regressions-20261017.json` records the full unit/simulation summaries, all 17 browser
+regressions, failed attempts and successful reruns, script/style provenance and incidental capture restoration.
+
+`docs/tidewhisper-performance-acer-rtx4050-step-3-20261017.json` preserves the ordinary clean 18-case hardware
+acceptance attempt after step 2. Thirteen timing rows fail; count budgets pass. It is not release evidence.
+
+`docs/tidewhisper-frustum-comparison-20261017.json` preserves the six-profile paired culling diagnostic.
+`docs/tidewhisper-step-3-frustum-regressions-20261018.json` records the subsequent affected checks.
+`docs/tidewhisper-performance-acer-rtx4050-step-3-final-20261017.json` is the clean `65f6a00` ordinary recheck
+before frustum gating (five timing passes, thirteen failures, zero page/shader errors), retained as historical evidence.
+
+`docs/tidewhisper-performance-acer-rtx4050-step-3-frustum-20261018.json` retains the latest clean live 18-case
+acceptance attempt after frustum gating: all count budgets pass, only five timing cases pass, zero page/shader
+errors. It is a no-go result and no release evidence file was written.

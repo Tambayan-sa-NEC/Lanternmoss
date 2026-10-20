@@ -3,6 +3,7 @@
    inner (the glow inside, shown once open), lock (padlock on locked chests), beam (light pillar on the boss chest). */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { batchRigidParts } from '../render/staticParts.js';
 
 const W = 1.0, H = 0.55, D = 0.66;
 
@@ -35,5 +36,5 @@ export function buildChestModel({ look, locked = false, beam = false, scale = 1 
       new THREE.MeshBasicMaterial({ color: look.glow, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
     beamMesh.position.y = 8; root.add(beamMesh);
   }
-  return { root, body, lid, inner, lock, beam: beamMesh };
+  return batchRigidParts({ root, body, lid, inner, lock, beam: beamMesh });
 }

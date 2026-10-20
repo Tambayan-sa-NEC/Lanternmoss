@@ -125,8 +125,9 @@ Farming and gathering requirements still need play time; this is an XP route aud
 | Lanternmoss | 3 | 2 | 195–206 | 160 | 12 |
 | Emberfall | 5 | 4 | 226–237 | 220 | 46 |
 | Frostveil | 7 | 6 | 305–330 | 300, including two trinkets | 30 |
+| Tidewhisper (27h, unreleased) | 8 | 8 | 281–360 | 280, its own Tide set and pendant | 39 |
 
-The bounds cover every possible chest coin roll, including each planet?s boss chest. The pacing audit also samples 100 loot seeds for each hero/world.
+The bounds cover every possible chest coin roll, including each planet's boss chest. The pacing audit also samples 100 loot seeds for each hero/world.
 Selling **all** chest contents adds 101–207, 141–261 and 180–407 coins respectively in that sample, but sacrifices
 the food, materials and gear they contained. It is deliberately optional, not counted twice as equipment and income.
 The reported reserve is a per-planet increment, not a cap on accumulated wealth. Rare chests require keys, available
@@ -137,6 +138,14 @@ Chest coins now have narrower ranges (common 8–9, rare 22–24) and increase b
 Warm Hearts 90 and Songs 40 coins; the earlier villager rewards remain 95 total. Boss kill XP is now 80/150/330 after
 planet scaling, avoiding the old early level jump while preserving the existing XP curve. Optional fights retain
 their rewards. Pim's seed prices are 3/3/5; every stocked item's buy price remains above its sell price.
+
+Tidewhisper is audited with its real id and planet index while it stays unreleased. Act I already ends at level 8,
+its summon level, so its route (The Dark Lighthouse and three Shellbacks crossing the beach) keeps the hero at 8
+without grinding. With no Act II gear beyond it yet, its coins reserve its own Tide set: the forge fees are 70/80/70
+and 60 for the pendant. Its materials are audited at minimum yields: washups return once per 300 s day and low-tide
+nodes are reachable once per day. The lens (6 seaglass, 6 wood) fits the first day, and the lens plus the whole set
+(28 seaglass, 14 wood including forge fuel, 4 pearls, 6 coral, 9 shells, 1 black pearl) fits two days. Revisit the
+budget when Duskhollow's gear exists.
 
 ## Survival, gathering and crafting
 
@@ -234,7 +243,7 @@ Ordinary damage is handled by the reported HP top-ups; only Doom Blade is active
 
 Individual monster types retain tactical differences: the Frostveil warrior takes 11.8 s to chase a Hexlantern,
 and some opening wisps fall before 2 s. These are reported outliers, not silently averaged away within a type.
-The pacing contract uses the planet?s roster median; each type?s median of three trials remains in the raw data.
+The pacing contract uses the planet's roster median; each type's median of three trials remains in the raw data.
 
 [Final raw measurements](../../balance-after.json) include each monster trial summary, big-fight move timestamps,
 transition fractions and flying damage. The first six rows came from the full nine-profile report; the three
@@ -282,8 +291,50 @@ out of combat for more than 5 s (`COMBAT.leashReturn`, `tests/sim/miniBossLeash.
 heal on their way home. With the reset gone the Witch's mini bosses settled (Frost Hydra 103-105 s, Emberfall
 111-127 s on seeds 1-7), but the Ranger's fell below the 90 s floor (77-83 s; her earlier ~95-111 s had been
 inflated by the same resets). Mini-boss health was raised 20% (Hydra 2,800 → 3,360, Basilisk 2,200 → 2,640, Frost
-Hydra 3,700 → 4,440); the table above is the result. Old Ironclaw (unreleased) is unchanged and is rebalanced with 27h.
+Hydra 3,700 → 4,440); the table above is the result. That historical audit left Old Ironclaw unchanged; the later 27h checkpoint lowers its base HP to 800 and limits
+wedges to once per shell (see [Tidewhisper](../world/tidewhisper.md#old-ironclaw-27f)).
 
 Verification: 142 unit tests, all 24 gameplay/audit sims, strict profile target checks, the affected Malgrath
 mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and shop screenshots are under
 `docs/screenshots/bosses/balance-flight.jpg` and `docs/screenshots/huds/balance-shop.jpg`.
+
+## Tidewhisper 27h synchronization (2026-10-17)
+
+The [fresh report](../../tidewhisper-balance-20261017.json) measures clean synchronized commit `2c42fce`
+against the [accepted October 15 checkpoint](../../tidewhisper-balance.json). Both use level 8, starting equipment,
+default pets, counter bots and counted HP top-ups. No gameplay numbers were tuned in this synchronization.
+All 18 required checks pass: six regular-roster medians at 2-6 seconds, six Ironclaw fights at 90-180 seconds,
+and six Mirelure fights at 180-300 seconds. Individual armored/evasive monsters remain informational.
+
+| Hero | Seed | Roster median: before / after (s) | Ironclaw: before / after (s) | Mirelure: before / after (s) |
+| --- | --- | ---: | ---: | ---: |
+| Witch | 1 | 3.58 / 3.58 | 171.6 / 171.6 | 273.4 / 273.4 |
+| Witch | 7 | 4.77 / 4.77 | 173.7 / 174.1 | 276.9 / 276 |
+| Warrior | 1 | 5.55 / 5.55 | 172.4 / 172.4 | 288.9 / 286.6 |
+| Warrior | 7 | 5.03 / 5.03 | 169.5 / 169.5 | 281.4 / 284.3 |
+| Ranger | 1 | 3.7 / 3.7 | 155.4 / 155.4 | 187.8 / 187.8 |
+| Ranger | 7 | 4.47 / 4.47 | 156 / 156 | 190.8 / 190.8 |
+
+The full synchronized pacing simulation also passes all three heroes: level 8 before Tide summon, 281-360 coins
+against a 280-coin Tide gear reserve, lighthouse materials within one day and lighthouse plus gear within two days.
+This route audit does not replace combat or target-device performance validation.
+
+### Tidewhisper after the 29a-29f cave merge (2026-10-19)
+
+The [new six-profile report](../../tidewhisper-balance-20261019.json) reruns the same level-8, starting-equipment
+bot on the cave-synchronized 27h candidate. Every required timing is unchanged from the
+[October 17 report](../../tidewhisper-balance-20261017.json); **0/18 checked rows** miss a target. The individual
+Shellback bouts above six seconds are informational under the existing regular-roster median rule.
+
+| Hero / seed | Roster median before → after (s) | Ironclaw before → after (s) | Mirelure before → after (s) |
+| --- | ---: | ---: | ---: |
+| Witch / 1 | 3.58 → 3.58 | 171.6 → 171.6 | 273.4 → 273.4 |
+| Witch / 7 | 4.77 → 4.77 | 174.1 → 174.1 | 276 → 276 |
+| Warrior / 1 | 5.55 → 5.55 | 172.4 → 172.4 | 286.6 → 286.6 |
+| Warrior / 7 | 5.03 → 5.03 | 169.5 → 169.5 | 284.3 → 284.3 |
+| Ranger / 1 | 3.7 → 3.7 | 155.4 → 155.4 | 187.8 → 187.8 |
+| Ranger / 7 | 4.47 → 4.47 | 156 → 156 | 190.8 → 190.8 |
+
+The synchronized pacing simulation also keeps the Tidewhisper route at level 8 before summon, **281–360 coins**
+against the 280-coin Tide set reserve, and sufficient lighthouse materials in one day and lighthouse plus gear
+materials in two days. No gameplay numbers or target bands changed for this rerun.

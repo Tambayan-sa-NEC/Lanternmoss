@@ -28,7 +28,7 @@ import { arcDist, projectTangent, tangentToward } from '../utils/sphere.js';
 import { SPAWN_DIR } from '../world/World.js';
 import { groundHeight } from '../world/terrain.js';
 import { dom } from './dom.js';
-import { toScreen } from './hud.js';
+import { toScreen, uiScale } from './hud.js';
 import { icon } from './icons.js';
 
 const SPAN = 160;                       // degrees of heading the compass strip shows, centred on the view
@@ -114,8 +114,8 @@ export function updateWaypoints() {
     m.e.style.display = visible ? 'none' : 'flex';
     if (visible) continue;
     // on an ellipse inside the screen edge; its lower half stops above the bottom HUD (bars, ability bar, boss bar)
-    const rad = a / DEG, ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui')) || 1;
-    const cx = innerWidth / 2, cy = innerHeight * 0.45, rx = innerWidth / 2 - 64, up = cy - 84, down = innerHeight - 200 * ui - cy;
+    const rad = a / DEG;
+    const cx = innerWidth / 2, cy = innerHeight * 0.45, rx = innerWidth / 2 - 64, up = cy - 84, down = innerHeight - 200 * uiScale - cy;
     m.e.style.left = `${cx + Math.sin(rad) * rx}px`; m.e.style.top = `${cy - Math.cos(rad) * (Math.cos(rad) > 0 ? up : down)}px`;
     m.e.firstChild.style.transform = `rotate(${a}deg)`; m.e.lastChild.textContent = `${Math.round(dist)}m`;
   }

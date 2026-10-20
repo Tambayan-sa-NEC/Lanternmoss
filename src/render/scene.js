@@ -7,6 +7,8 @@ export const PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, RENDER.maxPixe
 export const FOG_COLOR = new THREE.Color();
 
 export const scene = new THREE.Scene();
+// The scene remains at the origin. Rebuilding its identity every frame would force all static world matrices dirty.
+scene.updateMatrix(); scene.matrixAutoUpdate = false;
 scene.fog = new THREE.Fog(FOG_COLOR, RENDER.fog.near, RENDER.fog.far);
 
 export const camera = new THREE.PerspectiveCamera(RENDER.fov, innerWidth / innerHeight, RENDER.near, RENDER.far);

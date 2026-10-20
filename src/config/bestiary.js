@@ -102,7 +102,7 @@ export const BESTIARY_ENTRIES = {
     attacks: [['Pinch', 'Rears its great claw over a wedge in front of it, then snaps.'], ['Charge', 'Marks a lane and barrels along it.'],
       ['Bell ring', 'Strike the bell and it rings out a stunning shockwave after a short glow.'], ['Toll', 'From its second shell: it rears and slams the bell down, sending a shockwave rolling out.']],
     counters: ['Jump over the shockwaves.', 'Hit its face, not the bell: tucked in its shell it only takes a little damage.',
-      'At 66% and 33% it crawls out to swap shells: that\'s your window, from any side.', 'At low tide, bait a charge across the wet sand: it gets stuck, soft and open.'],
+      'At 66% and 33% it crawls out to swap shells: that\'s your window, from any side.', 'At low tide, bait a charge across the wet sand: it gets stuck, soft and open. It only falls for it once per shell.'],
     drops: 'Two black pearls, and the pearl beds it guards are yours to gather.',
   },
   mirelure: {

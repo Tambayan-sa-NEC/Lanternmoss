@@ -1,0 +1,178 @@
+{
+  "diagnostic": true,
+  "scene": "ranger/7/squall",
+  "profileSeconds": 6.17156,
+  "topSelfMs": [
+    {
+      "name": "(program) :0",
+      "ms": 1659.234
+    },
+    {
+      "name": "projectObject build/three.module.js:29679",
+      "ms": 367.869
+    },
+    {
+      "name": "updateMatrixWorld build/three.module.js:7720",
+      "ms": 276.052
+    },
+    {
+      "name": "multiplyMatrices build/three.module.js:6224",
+      "ms": 260.384
+    },
+    {
+      "name": "(idle) :0",
+      "ms": 213.887
+    },
+    {
+      "name": "pushOut physics/colliders.js:45",
+      "ms": 186.506
+    },
+    {
+      "name": "compose build/three.module.js:6571",
+      "ms": 115.067
+    },
+    {
+      "name": "copyArray build/three.module.js:18319",
+      "ms": 102.878
+    },
+    {
+      "name": "bindVertexArray :0",
+      "ms": 99.357
+    },
+    {
+      "name": "WebGLRenderer.renderBufferDirect build/three.module.js:29173",
+      "ms": 99.171
+    },
+    {
+      "name": "uniformMatrix4fv :0",
+      "ms": 95.592
+    },
+    {
+      "name": "setProgram build/three.module.js:30131",
+      "ms": 81.002
+    },
+    {
+      "name": "drawArrays :0",
+      "ms": 75.619
+    },
+    {
+      "name": "update enemies/Enemy.js:129",
+      "ms": 70.537
+    },
+    {
+      "name": "needsUpdate build/three.module.js:15223",
+      "ms": 56.913
+    },
+    {
+      "name": "applyMatrix4 build/three.module.js:5290",
+      "ms": 56.38
+    },
+    {
+      "name": "copy build/three.module.js:3989",
+      "ms": 55.86
+    },
+    {
+      "name": "updateMatrix build/three.module.js:7712",
+      "ms": 49.759
+    },
+    {
+      "name": "updateWaypoints ui/waypoints.js:91",
+      "ms": 49.464
+    },
+    {
+      "name": "update core/Game.js:165",
+      "ms": 47.128
+    },
+    {
+      "name": "renderObjects build/three.module.js:29931",
+      "ms": 46.289
+    },
+    {
+      "name": "setValueM4 build/three.module.js:18525",
+      "ms": 40.6
+    },
+    {
+      "name": "WebGLRenderer.render build/three.module.js:29530",
+      "ms": 39.569
+    },
+    {
+      "name": "groundHeight world/terrain.js:104",
+      "ms": 39.34
+    },
+    {
+      "name": "updateCombat combat/CombatSystem.js:12",
+      "ms": 38.093
+    },
+    {
+      "name": "updateCombatHud ui/hud.js:253",
+      "ms": 37.738
+    },
+    {
+      "name": "getBindingState build/three.module.js:15156",
+      "ms": 36.507
+    },
+    {
+      "name": "setMaterial build/three.module.js:23426",
+      "ms": 36.027
+    },
+    {
+      "name": "renderObject build/three.module.js:29954",
+      "ms": 35.176
+    },
+    {
+      "name": "painterSortStable build/three.module.js:21250",
+      "ms": 34.949
+    },
+    {
+      "name": "animate behaviors/armoured.js:64",
+      "ms": 34.89
+    },
+    {
+      "name": "uniformMatrix3fv :0",
+      "ms": 33.972
+    },
+    {
+      "name": "bindFramebuffer :0",
+      "ms": 33.867
+    },
+    {
+      "name": "getParameters build/three.module.js:20598",
+      "ms": 33.437
+    },
+    {
+      "name": "sort build/three.module.js:21396",
+      "ms": 31.766
+    }
+  ],
+  "draws": {
+    "objects": 2108,
+    "shadows": 81,
+    "groups": {
+      "SphereGeometry/ShaderMaterial/opaque": 2,
+      "BufferGeometry/MeshToonMaterial/opaque": 360,
+      "IcosahedronGeometry/MeshToonMaterial/opaque": 2,
+      "BufferGeometry/MeshBasicMaterial/opaque": 30,
+      "BufferGeometry/ShaderMaterial/opaque": 280,
+      "IcosahedronGeometry/ShaderMaterial/opaque": 2,
+      "BoxGeometry/ShaderMaterial/opaque": 16,
+      "TorusGeometry/ShaderMaterial/opaque": 2,
+      "IcosahedronGeometry/MeshBasicMaterial/opaque": 8,
+      "BufferGeometry/ShaderMaterial/transparent": 6,
+      "blob-shadow": 60,
+      "SphereGeometry/ShaderMaterial/transparent": 4,
+      "CylinderGeometry/MeshBasicMaterial/transparent": 2,
+      "RingGeometry/MeshBasicMaterial/transparent": 2
+    },
+    "calls": 407
+  },
+  "errors": [],
+  "candidateCommit": "4f105f2",
+  "profiledSource": "before immutable subtree shortcut",
+  "note": "Instrumented live diagnostic; draw group totals cover two render callbacks. Not frame-time acceptance.",
+  "sampledMsByAncestor": {
+    "render": 3019.709,
+    "gameUpdate": 1215.191,
+    "otherOrUnattributed": 1936.265
+  },
+  "ancestorAnalysis": "Each sample is assigned by its RenderSystem.render or Game.update ancestor. Remaining samples are not attributed; these are sampled wall durations of the original 4f105f2 diagnostic, not current acceptance CPU or GPU time."
+}
