@@ -40,6 +40,7 @@
 | Animals: looks and behaviour kinds, rare creatures and their gifts, how shy they are | `src/config/critters.js` |
 | Mini bosses (the Hydra, the Basilisk): stats, attacks, phases; their loot | `src/config/combat.js` → `hydra`, `basilisk`; `src/config/chests.js` → `MINI_BOSS_LOOT` |
 | Giving up a chase: healing on the way home, the mini boss's delay before it heals | `src/config/combat.js` → `leashReturn` |
+| Monsters fighting each other: how hard they hit, how long a grudge lasts, how wide a swipe catches | `src/config/combat.js` → `mobFeud` |
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |
 | Soft lock-on cone and range | `src/config/combat.js` → `autoAimAngle`, `autoAimRange` |
 | Crafting recipes | `src/config/crafting.js` |

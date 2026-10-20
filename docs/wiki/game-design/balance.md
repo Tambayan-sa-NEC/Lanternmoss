@@ -197,6 +197,32 @@ time; now it follows. **No target was loosened and no monster was retuned to hid
 which owns verifying surface AI and balance against these targets, and the choice between retuning that fight and
 narrowing the final-form rule is a design decision, not a measurement one.
 
+## Monsters fighting each other (45b)
+
+Who may damage whom among monsters is `canHarmMob` (`src/combat/damage.js`), the one place that rule lives. Only the
+**lesser** monsters feud (`Enemy.lesser`: anything that is not a mini boss, a main boss or a lair seal):
+
+| Attacker | Target | Lands? |
+| --- | --- | --- |
+| A lesser monster | another lesser monster | **Yes**, with any attack it has: swipe, slam, blast, charge, leap, pulse, pinch, or a ghost's orb. |
+| A lesser monster | itself | No. Nor a burrowed one, nor one in another space (a cave room, another world). |
+| A mini boss or a main boss | a lesser monster | **No**, in any form - melee, area or projectile. A boss's shot flies straight through its neighbours. |
+| A lesser monster | a mini boss or a main boss | No. A boss fight is never settled by the monsters standing in it. |
+
+Every attack keeps its **own hit test on the hero exactly as it was**; the monsters caught in the same blow are an
+addition to it, so a hero's fight plays as it did before. A monster that is hit turns on its attacker (`Enemy.foe`,
+set by `provoke`) and fights back with its ordinary AI. The grudge ends when one of them is down, after
+`COMBAT.mobFeud.forget` seconds, when the hero hits it (the hero always wins a monster's attention back), or when the
+encounter is torn down.
+
+**Nobody is credited for a monster's kill.** A monster that falls to another monster gives the hero no XP, no coins,
+no loot drop and no bestiary tally, and raises exactly one `enemydefeated` event, which now carries the `killer` that
+struck the last blow. The damage numbers stay off for a brawl too: it shows its sparks, not the hero's feedback.
+
+**Expect pack friendly fire.** A monster swinging at the hero also catches the neighbours standing in the blow, so
+packs now wear each other down during an ordinary fight. That is the intended mechanic, and it is a change in the
+hero's favour: 45c owns measuring it against the targets above on seeds 1 and 7 for all three heroes.
+
 ## Combat decisions and measurement limits
 
 Regular enemy health removes most opening-skill one-shots, while the ogre's health and the thornmole's exposure cycle
