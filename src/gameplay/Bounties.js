@@ -116,6 +116,6 @@ export const Bounties = {
   },
 };
 
-encounterEvents.addEventListener('enemydefeated', e => { const m = e.detail.enemy; if (!m.owner && !m.def?.object) Bounties.record({ kind: 'defeat', type: m.type }); });
+encounterEvents.addEventListener('enemydefeated', e => { const m = e.detail.enemy; if (!m.owner && !m.def?.object && !e.detail.killer) Bounties.record({ kind: 'defeat', type: m.type }); });   // a monster's own kill is not the hero's (TODO 45b)
 gameEvents.addEventListener('fishcaught', e => Bounties.record({ kind: 'fish', itemId: e.detail.itemId }));
 gameEvents.addEventListener('harvested', () => Bounties.record({ kind: 'harvest' }));

@@ -17,6 +17,13 @@ export const COMBAT = {
   // monster never does - it keeps coming until the hero is safe, faints, travels or starts again - so its `aggro` is
   // only how far away it first notices the hero, and its `leash` applies to wandering and to the forms above.
   leashReturn: { heal: 0.3, miniBossHealDelay: 5 },
+  // Monsters fighting each other (TODO 45b, src/combat/damage.js). Only lesser monsters feud: a lesser monster's
+  // attack also lands on any other lesser monster caught in the same blow, and the one that is hit turns on its
+  // attacker. A mini boss's or main boss's attack never damages a lesser monster, and no monster hurts itself.
+  // damage: how much of the blow a monster takes compared with the hero (1 = the same).
+  // forget: seconds a provoked monster keeps after its attacker before it goes back to hunting the hero.
+  // arc: a swipe only catches monsters roughly in front (cosine of the half-angle; 0 = a full half-circle).
+  mobFeud: { damage: 1, forget: 8, arc: 0.3 },
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },

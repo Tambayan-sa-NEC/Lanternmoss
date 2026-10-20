@@ -23,6 +23,7 @@ const quiet = keep => {
   for (const e of ctx.enemies) {
     if (e === keep || e === ctx.boss || !e.alive) continue;
     e.state = 'idle'; e.timer = 99; e.home.copy(e.up); e.hideTele?.();
+    e.foe = null; e.foeT = 0;                       // and no grudge against a neighbour it clipped (TODO 45b), which would start the fight again
   }
 };
 const P = H.player;
