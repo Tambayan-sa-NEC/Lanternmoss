@@ -1140,6 +1140,10 @@ feature shot is `docs/screenshots/pets/otter.jpg`; the model adds 14 meshes and 
 Tidewhisper release flag stays off. A fresh full Acer 18-case acceptance run including the otter is still required
 before public enablement; the prior 0/18 timing result is not a pass.
 
+**27i integration decision (owner, 2026-10-20):** integrate the tested, hidden otter functionality into `develop`
+under the approved 27h functional/public gate split. This does not enable Tidewhisper or replace the required fresh
+18-case Acer acceptance matrix before public release.
+
 **27h gate split (approved 2026-10-19):** the owner's approved fallback separates functional completion from
 hardware certification after a clean 18-case Acer RTX 4050 rerun. Functional completion of 27h unblocks 28, 29g
 (still also needing 30i) and 30 on `develop`. It does **not** make Tidewhisper a released destination or authorize a

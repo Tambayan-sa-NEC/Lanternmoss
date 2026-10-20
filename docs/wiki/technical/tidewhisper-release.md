@@ -579,6 +579,9 @@ implemented and checked on the test-only Tidewhisper candidate; see [the world p
 The authored destination and otter stay hidden. A fresh ordinary 18-case Acer acceptance matrix including the otter
 remains the public gate; the earlier 0/18 timing result is still a no-go.
 
+The owner directed functional integration of 27i into `develop` under the approved gate split on 2026-10-20.
+The public hardware verdict and release conditions remain unchanged.
+
 TODO 26 supplied the catalog, mechanic lifecycle and save infrastructure needed to build a fourth world, but it
 did not prove a complete real fourth-world campaign path: 27h found missing explicit forage/chest fields, save ids
 and borrowed Act I fixture metadata that could mask fourth-world gaps. It also left release validation coupled to
