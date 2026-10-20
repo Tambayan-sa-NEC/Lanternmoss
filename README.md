@@ -268,8 +268,9 @@ npm stop             # stop this project's server on port 8080
 npm stop -- 3000     # stop it on a custom port (PORT also works, as with npm start)
 ```
 
-Any static server works too (`npx serve`, `python -m http.server`). An internet connection is needed: Three.js and the
-UI font come from CDNs, declared in the import map in `index.html`.
+Any static server works too (`npx serve`, `python -m http.server`). Three.js ships with the game in `vendor/three/`
+and is declared in the import map in `index.html`, so play works offline; only the UI font still comes from a CDN,
+and the game falls back to a system font without it.
 
 ```sh
 npm test             # unit tests (Node's built-in test runner, no dependencies)
@@ -359,6 +360,7 @@ tests/                     unit tests: XP / level math, inventory, planets + ene
                            heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,
                            the seeded random stream
 tests/sim/                 gameplay sims (npm run sim): the real game played headless; balance.sim.mjs is the balance report
+vendor/three/              the Three.js r160 browser build and the addons the game imports, so no CDN is needed
 favicon.ico                the Girl Witch character mark in the browser tab (16–48 px)
 favicon.png                the 32 px PNG browser icon, from docs/logo/witch-A1.png
 src/
