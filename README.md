@@ -1,5 +1,7 @@
 # Lanternmoss
 
+**[▶ Play in your browser](https://tambayan-sa-nec.github.io/Lanternmoss/)** — no download, no sign-up.
+
 <img src="docs/logo/witch-A1.png" width="140" align="right" alt="Lanternmoss character mark: the Girl Witch in her violet hat">
 
 A tiny cozy planet of lanterns, moss and friendly critters: a third-person browser game built with
