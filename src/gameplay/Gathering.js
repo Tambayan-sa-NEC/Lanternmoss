@@ -47,7 +47,7 @@ export const Gathering = {
   spawnFor(world, planet, avoid = []) {
     this.clear(); this.world = world;
     const P = PLANETS[planet], res = P.resources; if (!res) return;
-    if(res.coastal){this.nodes=coastalResources(world,P,avoid);return;}
+    if(res.coastal){this.nodes=coastalResources(world,P,avoid);ctx.resourceNodes=this.nodes;return;}
     const rng = mulberry32((P.seed ^ 0x5eed51) >>> 0), boss = ctx.enemies.find(e => e.def.miniBoss);
     const place = (kind, near) => {
       const def = NODE_KINDS[kind];
@@ -64,8 +64,9 @@ export const Gathering = {
     };
     for (const [kind, count, near] of res.nodes) for (let i = 0; i < count; i++) place(kind, near);
     for (const [kind, count] of res.rare ?? []) for (let i = 0; i < count; i++) place(kind, 'boss');
+    ctx.resourceNodes=this.nodes;
   },
-  clear() { this.stop(); for (const n of this.nodes) n.dispose(); this.nodes = []; this.rest.clear(); },
+  clear() { this.stop(); for (const n of this.nodes) n.dispose(); this.nodes = []; ctx.resourceNodes=this.nodes; this.rest.clear(); },
   /** A fresh adventure: the first-time tips may show again. */
   resetRun() { this.tipsShown.clear(); this.tip = null; },
 
@@ -96,6 +97,7 @@ export const Gathering = {
       n.syncCoastal();
       return n;
     });
+    ctx.resourceNodes=this.nodes;
     this.rest = new Map(Object.entries(data.rest)); this.tipsShown = new Set(data.tipsShown); this.tip = null;
   },
 

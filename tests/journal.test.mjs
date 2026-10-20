@@ -7,7 +7,7 @@ import { ACHIEVEMENTS, BOSS_CHALLENGES, JOURNAL_KEY, JOURNAL_STATS } from '../sr
 import { BESTIARY_ENTRIES } from '../src/config/bestiary.js';
 import { COMBAT } from '../src/config/combat.js';
 import { ITEM_DEFINITIONS } from '../src/config/items.js';
-import { PETS } from '../src/config/pets.js';
+import { availablePetIds } from '../src/config/pets.js';
 import { PLANET_CATALOG, PLANETS } from '../src/config/planets.js';
 import { releasedEnemyTypes } from '../src/config/releasedEnemies.js';
 import { BESTIARY_ORDER, emptyJournal, goalTarget, isBoss, newlyDone, pageName, progress, sanitizeJournal, statValue } from '../src/gameplay/journalRules.js';
@@ -26,7 +26,7 @@ test('achievements are complete and reachable', () => {
     if (a.goal.stat === 'items') assert.ok(goalTarget(a.goal) <= ITEM_DEFINITIONS.length, `${a.id}: there are enough items to find`);
     assert.ok(!a.reward || a.reward.coins > 0, `${a.id}: reward`);
   }
-  assert.equal(goalTarget({ stat: 'petsFound', at: 'allPets' }), Object.keys(PETS).length);
+  assert.equal(goalTarget({ stat: 'petsFound', at: 'allPets' }), availablePetIds().length);
   assert.equal(BOSS_CHALLENGES.lowLevel.length, PLANETS.length, 'a low level for each planet\'s boss');
   assert.ok(JOURNAL_KEY.startsWith('lanternmoss.'));
 });

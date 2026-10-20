@@ -115,7 +115,7 @@ src/
 │   ├── enemies/           Enemy (melee / ranged / hopper AI), shared AI states, and behaviors/ for the newer AIs:
 │   │                      bomber, charger, burrower, support, and boss/: the boss framework (core.js) with one kit
 │   │                      per boss (gloomcap.js, dragon.js, demonLord.js)
-│   ├── companions/        pet bodies: FlyingPet (owl, wisp, dragon whelp), WalkingPet (wolf, fox), petBrain (targets, hits)
+│   ├── companions/        pet bodies: FlyingPet (owl, wisp, dragon whelp), WalkingPet (wolf, fox, otter), petBrain (targets, hits)
 │   ├── npc/               NPC behaviour (schedules, sleep, lines, outfits) and the villager definitions
 │   │                      (places, schedules, story-aware dialogue, a local villager per later planet)
 │   ├── wildlife/          critters (village pets, wild animals, rare creatures to befriend), birds and flocks, pond
@@ -153,7 +153,7 @@ src/
 │   ├── Journal.js         the journal: fills in achievements, the bestiary and the collection from game events, boss
 │   │                      challenges, rewards; saved in the browser across adventures
 │   ├── journalRules.js    the journal's saved shape, cleaning it on load, counters and achievement progress (pure)
-│   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst) and their lasting effects
+│   ├── petAbilities.js    pet abilities (Scout, Howl, Fetch, Mend, Flame Burst, Pearl Dive) and their lasting effects
 │   ├── buffs.js           buff timers: Moon-Hop, Feather-Step, Howl, and from food Mighty, Stoneskin, Quickstep, Mending
 │   ├── Needs.js           the energy meter: drains while you play, food fills it, low = slower healing and sprint
 │   ├── needsRules.js      energy levels, effects, drain and warnings (pure)
@@ -215,6 +215,9 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
 content completeness. `scripts/lib/tidewhisper-browser.mjs` boots the isolated candidate browser.
 `scripts/tidewhisper-campaign-smoke.mjs`, `scripts/tidewhisper-balance.mjs` and
 `scripts/tidewhisper-performance.mjs` cover travel/Continue, two-seed balance and actual hardware diagnostics.
+`tests/sim/otter.sim.mjs` checks the quest-gated companion and bounded pearl yields across heroes, days, travel and
+Continue. `scripts/otter-smoke.mjs` checks the real pet menu and ability keys at 720p/1080p and captures
+`docs/screenshots/pets/otter.jpg`. The otter body is built in `src/models/coastalCreatures.js`.
 The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` reports remain separate from new runs.
 The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.
 

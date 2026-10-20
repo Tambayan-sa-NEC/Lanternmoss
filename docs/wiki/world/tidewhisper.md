@@ -340,3 +340,19 @@ while she is up or beached; it never dodges, and HP is topped up below 50%. In 2
 170-266 s, but the ranger's 171-176 s was under the 180-300 s target. 27h raised her base HP from 3000 to 3250: every
 hero now takes 188-289 s (ranger 188/191, witch 273/277, knight 281/289) with 6-26 top-ups, close to the Act I bosses
 (8-28). The release gate and the desktop reference frame-time measurement are still pending.
+
+## Pearl-diving otter (27i)
+
+Completing Marlo's **The Dark Lighthouse** quest unlocks an otter companion. It follows the existing pet commands,
+levels with the hero and appears in the pet menu and character selection. Beside a submerged, ready clam bed on
+Tidewhisper, **Pearl Dive** (`V`) sends the otter below the water and yields one pearl while depleting that bed.
+Its tunable ability has a 14 m reach, a 90-second cooldown and a limit of two successful dives per in-game day.
+Failed attempts do not spend the cooldown. Continue and world travel preserve the daily count and cooldown; a new
+adventure clears them. The otter stays unavailable in normal play until Tidewhisper is released.
+
+![The otter companion in the Tidewhisper pet menu](../../screenshots/pets/otter.jpg)
+
+The candidate fixture checks the quest unlock, all three heroes, high-tide pearl yield, bed depletion, daily
+limit, Continue, travel and next-day renewal with `node tests/sim/otter.sim.mjs`. `node scripts/otter-smoke.mjs`
+checks real `B` and `V` input, the menu at 720p and 1080p, Continue, page and shader errors, and the otter's
+rendering cost (14 meshes and 1,068 triangles). This does not certify the public 18-case hardware budget.

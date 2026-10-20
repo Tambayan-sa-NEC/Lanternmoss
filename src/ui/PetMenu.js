@@ -4,7 +4,7 @@
    detail panel (src/ui/petViews.js): rename it, see its stats and ability, give it a command, take another along
    (it swaps in right there). The one place for all of that; the HUD pet card keeps quick command / ability buttons. */
 import * as THREE from 'three';
-import { PETS } from '../config/pets.js';
+import { petAvailable, availablePetIds } from '../config/pets.js';
 import { cancelAim } from '../combat/aiming.js';
 import { ctx } from '../core/context.js';
 import { bindKbd, is } from '../core/keybinds.js';
@@ -58,7 +58,7 @@ export const PetMenu = {
   },
   /** Click a pet: an unlocked one comes along (and is remembered for this hero); a locked one shows how to find it. */
   pick(id) {
-    if (!PETS[id]) return;
+    if (!petAvailable(id)) return;
     const changed = id !== this.view; this.view = id;
     if (Pets.unlocked.has(id) && id !== Pets.id) { Pets.choose(id, true); ctx.companion?.celebrate?.(); this.frame(); audio.blip(); }
     else if (!Pets.unlocked.has(id)) audio.fizzle();
@@ -79,7 +79,7 @@ export const PetMenu = {
   /** Keys while the menu is open (play input is ignored). */
   key(code) {
     if (code === 'Escape' || is('petMenu', code)) { this.close(); return; }
-    const ids = Object.keys(PETS), i = Math.max(0, ids.indexOf(this.view));
+    const ids = availablePetIds(), i = Math.max(0, ids.indexOf(this.view));
     if (['ArrowUp', 'ArrowLeft', 'KeyW', 'KeyA'].includes(code)) this.pick(ids[(i + ids.length - 1) % ids.length]);
     else if (['ArrowDown', 'ArrowRight', 'KeyS', 'KeyD'].includes(code)) this.pick(ids[(i + 1) % ids.length]);
     else if (is('petCommand', code)) { Pets.cycleCommand(); this.render(false); }

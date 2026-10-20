@@ -574,6 +574,14 @@ Tidewhisper stage, with a separate 3-5 h estimate. It can be developed with the 
 unlock requires a fresh, passing Acer release matrix including the otter; the present 0/18 timing result provides no
 headroom. Stage 27i does not block the already integrated 27h functional gate, 29g or Duskhollow work.
 
+**27i functional update (2026-10-20):** the otter companion, Dark Lighthouse unlock and bounded Pearl Dive are
+implemented and checked on the test-only Tidewhisper candidate; see [the world page](../world/tidewhisper.md#pearl-diving-otter-27i).
+The authored destination and otter stay hidden. A fresh ordinary 18-case Acer acceptance matrix including the otter
+remains the public gate; the earlier 0/18 timing result is still a no-go.
+
+The owner directed functional integration of 27i into `develop` under the approved gate split on 2026-10-20.
+The public hardware verdict and release conditions remain unchanged.
+
 TODO 26 supplied the catalog, mechanic lifecycle and save infrastructure needed to build a fourth world, but it
 did not prove a complete real fourth-world campaign path: 27h found missing explicit forage/chest fields, save ids
 and borrowed Act I fixture metadata that could mask fourth-world gaps. It also left release validation coupled to

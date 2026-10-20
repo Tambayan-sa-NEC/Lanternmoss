@@ -8,9 +8,9 @@ import { COMBAT } from '../src/config/combat.js';
 import { CHEST_KINDS } from '../src/config/chests.js';
 import { CRITTER_DEFS } from '../src/config/critters.js';
 import { KEYBINDS } from '../src/config/controls.js';
-import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_MOTION, PET_PICKS_KEY, PET_SHOWCASE, PETS } from '../src/config/pets.js';
+import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_MOTION, PET_PICKS_KEY, PET_SHOWCASE, PETS, availablePetIds, petAvailable } from '../src/config/pets.js';
 import { sanitizePicks } from '../src/gameplay/petPicks.js';
-import { PLANETS } from '../src/config/planets.js';
+import { PLANETS, PLANET_CATALOG } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 
 const src = p => readFileSync(new URL(`../src/${p}`, import.meta.url), 'utf8');
@@ -37,10 +37,17 @@ test('unlocks point at real quests, chest kinds and planets; every hero starts w
     if (p.unlock.chest) assert.ok(CHEST_KINDS[p.unlock.chest], `${id}: chest ${p.unlock.chest}`);
     if (p.unlock.bossChest !== undefined) assert.ok(PLANETS[p.unlock.bossChest], `${id}: planet ${p.unlock.bossChest}`);
     if (p.unlock.miniBoss) assert.ok(COMBAT.enemies[p.unlock.miniBoss]?.miniBoss && PLANETS.some(pl => (pl.miniBosses ?? []).some(m => m.type === p.unlock.miniBoss)), `${id}: mini boss ${p.unlock.miniBoss} lives somewhere`);
+    if (p.unlock.planet) assert.ok(PLANET_CATALOG.some(pl => pl.id === p.unlock.planet), `${id}: unlock world exists in catalog`);
     assert.ok(p.unlock.quest || p.unlock.chest || p.unlock.bossChest !== undefined || p.unlock.miniBoss, `${id}: unlocked somehow`);
   }
   for (const [h, c] of Object.entries(CHARACTERS)) assert.ok(PETS[c.companion] && !PETS[c.companion].unlock, `${h}: their own pet ${c.companion} is a starter`);
   assert.ok(Object.values(PETS).filter(p => p.unlock).length >= 3, 'at least three pets to find');
+});
+
+test('unreleased Tidewhisper hides its otter without making the all-pets goal impossible', () => {
+  assert.equal(PETS.otter.unlock.quest, 'darkLighthouse');
+  assert.equal(petAvailable('otter'), false);
+  assert.ok(!availablePetIds().includes('otter'));
 });
 
 test('commands, keys, growth and care numbers make sense', () => {

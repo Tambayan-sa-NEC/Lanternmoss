@@ -6,7 +6,7 @@ import { storyKeyAllowed } from '../config/npcs.js';
 import { cleanMechanicSnapshot } from '../world/mechanics/index.js';
 import { LEVELING } from '../config/leveling.js';
 import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
-import { PETS, PET_COMMANDS, PET_CARE } from '../config/pets.js';
+import { PETS, PET_COMMANDS, PET_CARE, petAvailable } from '../config/pets.js';
 import { QUESTS } from '../config/quests.js';
 import { CHALLENGES } from '../config/challenges.js';
 import { CROPS, FARM, NODE_KINDS, SCENERY } from '../config/resources.js';
@@ -150,7 +150,7 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
     }));
     case 'hotbar': return { selected: integer(s.selected, 0, 0, HOTBAR.size - 1), cd: number(s.cd, 0, 0, 3) };
     case 'pets': {
-      const unlocked = stringIds(value?.unlocked, id => Object.hasOwn(PETS, id));
+      const unlocked = stringIds(value?.unlocked, petAvailable);
       for (const [id, pet] of Object.entries(PETS)) if (!pet.unlock && !unlocked.includes(id)) unlocked.push(id);
       const active = unlocked.includes(s.active) ? s.active : CHARACTERS[hero].companion;
       return { unlocked, active, names: Object.fromEntries(Object.entries(record(s.names)).filter(([id, name]) => Object.hasOwn(PETS, id) && typeof name === 'string')
@@ -158,6 +158,7 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
         mode: known(s.mode, PET_COMMANDS, 'follow'), stayDir: direction(s.stayDir), hp: number(s.hp, PETS[active].hp),
         faintT: number(s.faintT, 0, 0, PET_CARE.faintTime), hurtAt: number(s.hurtAt, -99, -99),
         abilityCd: number(s.abilityCd, 0, 0, PETS[active].ability.cooldown), petCool: number(s.petCool, 0, 0, 2), swapCool: number(s.swapCool, 0, 0, 60),
+        diveDay: integer(s.diveDay, 0, 0), divesToday: integer(s.divesToday, 0, 0, PETS.otter.ability.perDay),
         mend: s.mend ? { left: number(s.mend.left, 0, 0, 120), perSec: number(s.mend.perSec, 0, 0, 100) } : null };
     }
     case 'dayClock': return { t: number(s.t, DAY.startAt * DAY.length, 0, DAY.length - 1e-6), day: integer(s.day, 1, 1) };

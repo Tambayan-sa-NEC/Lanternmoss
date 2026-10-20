@@ -17,7 +17,7 @@ const rare=()=>H.critters.find(c=>c.defKey==='pearlTurtle');
 const greet=()=>{const c=rare();P.placeAt(offsetDir(c.up,0,1.5));P.vel.set(0,0,0);c.update(.1);const target=rareTarget();assert.ok(target);target.run();};
 try {
   H.Tutorial.skip();P.invuln=10000;phase(.4);step(.1);
-  assert.equal(new Set(Object.values(COASTAL_BUILDERS)).size,3);
+  assert.equal(new Set(Object.values(COASTAL_BUILDERS)).size,4);
   for(const kind of ['lanternPalm','kelp','coralFan'])assert.ok(W.spots.trees.some(t=>t.kind===kind),`${kind} must be generated`);
   for(const key of ['hermitCrab','seaTurtle','harborSeal','pearlTurtle'])assert.ok(H.critters.some(c=>c.defKey===key),`${key} must be populated`);
   assert.equal(H.critters.length,14);assert.deepEqual(new Set(H.birds.filter(b=>b.species).map(b=>b.species)),new Set(['gull','tern']));
