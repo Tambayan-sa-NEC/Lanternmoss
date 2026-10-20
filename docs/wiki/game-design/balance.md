@@ -187,7 +187,7 @@ Where the ground gives out - a wall, an island, a cave room with no open route -
 hero as far as it can walk, rather than giving up and healing itself whole. It is never sent home by distance, so it
 never resets its health mid-pursuit.
 
-**Open balance finding (45a).** Removing the final-form leash makes one measured fight fall outside its target.
+**Open balance finding (45a) - resolved by 45b, measured in 45c; see below.** Removing the final-form leash makes one measured fight fall outside its target.
 Ranger / Emberfall / **The Basilisk** on **seed 1** goes from **97.3 s to 198.2 s**, past the 180 s ceiling of the
 `miniBoss` band, with damage taken rising 575 to 895 and the bot's health top-ups 9 to 14. The same fight on seed 7
 is 100.5 s, well inside, and the witch and knight stay inside on both; every roster median across all nine
@@ -219,9 +219,34 @@ encounter is torn down.
 no loot drop and no bestiary tally, and raises exactly one `enemydefeated` event, which now carries the `killer` that
 struck the last blow. The damage numbers stay off for a brawl too: it shows its sparks, not the hero's feedback.
 
-**Expect pack friendly fire.** A monster swinging at the hero also catches the neighbours standing in the blow, so
-packs now wear each other down during an ordinary fight. That is the intended mechanic, and it is a change in the
-hero's favour: 45c owns measuring it against the targets above on seeds 1 and 7 for all three heroes.
+**Pack friendly fire.** A monster swinging at the hero also catches the neighbours standing in the blow, so packs
+wear each other down during an ordinary fight. That is the intended mechanic, and it is a change in the hero's
+favour; it is measured below.
+
+A brawl further than `COMBAT.mobFeud.earshot` from the hero is neither heard nor felt: monsters now attack away from
+the hero, which they never used to do, so attack sounds and camera shake read the hero's own distance (`Enemy.distP`)
+rather than the distance to whatever the monster is swinging at.
+
+## What 45b did to the measured fights (45c)
+
+Measured with `npm run sim -- balance` on the stage before 45b and on 45b itself, seeds 1 and 7, all three heroes,
+nine hero/world profiles each. Seed 1 was run twice on the same build: all nine profiles reproduced exactly.
+
+| | Before 45b | After 45b |
+| --- | --- | --- |
+| Profiles outside a documented band (`src/config/balance.js`) | 20 | **19** |
+| Ordinary monster duels | within 0.2 s of each other, both seeds | unchanged in kind |
+
+**The one that changed is the 45a open finding, and it closes.** Ranger / Emberfall / **The Basilisk**, seed 1:
+**198.2 s -> 106.55 s**, back inside the 90-180 s `miniBoss` band, with damage taken 895 -> 477 and no deaths. Seed 7
+is 100.5 -> 100.63 s, unchanged. The cause is the mechanism this page describes above: the monsters that join that
+fight now wear one another down instead of adding every blow to the hero. **No target was loosened and no monster was
+retuned** - the fight came back inside its band on its own.
+
+The remaining 19 out-of-band entries are **identical before and after**, every one of them a single-monster duel that
+was already outside the 2-6 s band before this TODO began (Frostveil's slow kills at 6.8-12.4 s, and three sub-2 s
+fast kills on Lanternmoss). They are not 45a's or 45b's doing and are left as they were found, recorded here rather
+than hidden.
 
 ## Combat decisions and measurement limits
 

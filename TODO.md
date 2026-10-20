@@ -1967,7 +1967,7 @@ than running alongside it.
 
 # Phase H: Enemy pursuit and faction combat
 
-## 45. Unbounded mob pursuit and provoked faction fights **(suggested)**
+## 45. Unbounded mob pursuit and provoked faction fights **(suggested)** ✓
 
 **Goal:** ordinary mobs keep pursuing the player without a leash, evolved mini bosses stop returning home once they reach their final form/state, and mobs can damage and provoke one another into fights.
 Code: `src/entities/enemies/Enemy.js`, `src/config/combat.js`, `src/combat/` (targeting, damage and projectiles), `src/entities/enemies/behaviors/`, and `tests/sim/`.
@@ -1978,7 +1978,7 @@ Code: `src/entities/enemies/Enemy.js`, `src/config/combat.js`, `src/combat/` (ta
 | --- | --- | --- | --- |
 | [x] **45a. Pursuit and final-form leash rules** | 18, 23 | 2-4 h | Remove home-distance and aggro-distance give-up/return behavior for ordinary mobs: they continue to pursue the player indefinitely within their current world, including after the player outruns their current aggro radius. Do not add another leash or quiet distance cutoff. Keep mini-boss leash/return behavior during earlier forms/phases; remove it when the encounter enters its final form/state, and keep pursuit active until the existing encounter ends or the world resets. Define unreachable-route and world-transition cleanup explicitly. Test ordinary archetypes, long chases, obstacles, phase transitions, encounter resets and travel/Continue. |
 | [x] **45b. Mob damage and provoked retaliation** | 45a | 3-4.5 h | Allow mob-owned attacks, including ghost projectiles, to hit other mobs. A lesser mob damaged by another lesser mob can target and retaliate against its attacker; their attacks can continue the fight. Main-boss and mini-boss attacks must not damage lesser mobs, including through projectiles, melee or area effects. Cover same-world targeting, damage and aggro outcomes for each attacker/target class, death during retaliation, and interaction with existing boss summons/pack behavior. Preserve correct damage attribution and prevent duplicate XP, drops or defeat events. |
-| [ ] **45c. Integrated acceptance and documentation** | 45a-45b | 2-4.5 h | Add deterministic simulations for pursuit beyond every old cutoff, final-form mini-boss leash removal (with earlier phases still leashed), ghost-to-goblin projectile damage, lesser-mob provocation/retaliation, and main/mini-boss attacks that overlap lesser mobs without damaging or provoking them. Cover cleanup on death/travel/reset/Continue. Run the full required checks and relevant browser smokes, inspect affected combat visuals, update the combat wiki and this TODO's implementation note, and verify ordinary surface AI/balance remains within documented targets without weakening them. |
+| [x] **45c. Integrated acceptance and documentation** | 45a-45b | 2-4.5 h | Add deterministic simulations for pursuit beyond every old cutoff, final-form mini-boss leash removal (with earlier phases still leashed), ghost-to-goblin projectile damage, lesser-mob provocation/retaliation, and main/mini-boss attacks that overlap lesser mobs without damaging or provoking them. Cover cleanup on death/travel/reset/Continue. Run the full required checks and relevant browser smokes, inspect affected combat visuals, update the combat wiki and this TODO's implementation note, and verify ordinary surface AI/balance remains within documented targets without weakening them. |
 
 - [x] **Ordinary mobs never give up the chase:** no home leash, return-home state, or aggro-distance timeout while the player remains in the same world; pursue around reachable obstacles.
 - [x] **Mini-boss final form:** retain the existing leash before the final form/state, then remove it for the remainder of that encounter. Regression-check each phased mini-boss and reset/retry behavior.
@@ -2020,12 +2020,33 @@ self / burrowed / cross-space hits, all 19 kinds by class, and a boss's summon b
 negative control proving it fails without the change. `pets.sim.mjs` now clears grudges in its `quiet()` helper,
 because monsters in a pack clip one another and the fight would otherwise restart.
 
-**45b open balance note - 45c owns the measurement.** Pack friendly fire is new: a monster swinging at the hero also
+**45b open balance note - resolved in 45c, see below.** Pack friendly fire is new: a monster swinging at the hero also
 catches the neighbours standing in the blow, so packs wear each other down during an ordinary fight. It is a change
 in the hero's favour and is not yet measured against the seeds 1 / 7 targets for all three heroes.
 
+**45c implemented (2026-10-20):** integrated acceptance for the whole of 45. `tests/sim/mobFactions.sim.mjs` drives
+the two rules together in real encounters: two planet bosses swinging real telegraphed attacks (13 and 6 of them)
+over a goblin standing in the blows, which keeps all its health and is never provoked, and never damages the boss
+either; a mini boss driven into its final form, unleashed by 45a and still harmless to the goblin beside it; and
+feud cleanup with nothing left behind on a foe's death, on travel, on Continue and on a new adventure. A negative
+control (letting `canHarmMob` ignore the classes) fails it. `scripts/mob-combat-smoke.mjs` (port 8128) is the browser
+check at 720p and 1080p: a brawl that lands real damage, a ghost's orb across kinds, no damage numbers for a brawl,
+the hero reclaiming a monster mid-fight, a boss harmless to the monster underfoot, no overflow, zero page and shader
+errors, and the feature screenshot `docs/screenshots/mobs/mob-brawl.jpg`. A brawl beyond `COMBAT.mobFeud.earshot`
+is now neither heard nor felt, since monsters attack away from the hero for the first time.
+
+**45 balance verified (45c).** `npm run sim -- balance` before 45b and after, seeds 1 and 7, all three heroes, nine
+profiles each; seed 1 rerun on the same build reproduced all nine exactly. Profiles outside a documented band:
+**20 before, 19 after**. The one that changed is 45a's open finding, and it closes on its own: ranger / Emberfall /
+the Basilisk on seed 1 goes **198.2 s -> 106.55 s**, back inside the 90-180 s band (damage taken 895 -> 477), because
+the monsters joining that fight now wear each other down instead of adding every blow to the hero. Seed 7 is
+unchanged at 100.6 s. No target was loosened and no monster was retuned. The other 19 are identical before and
+after and all predate TODO 45: Frostveil's slow single-monster kills and three sub-2 s fast kills, recorded in
+[the balance wiki](docs/wiki/game-design/balance.md#what-45b-did-to-the-measured-fights-45c) rather than hidden.
+
+
 - [x] **Mob-on-mob combat:** lesser mobs can damage and provoke other lesser mobs; a goblin can retaliate after a ghost projectile. Main bosses and mini bosses cannot damage lesser mobs with any attack. Test both damage and aggro, and credit damage/rewards once to the correct source.
-- [ ] **No stranded fights:** unreachable paths, death, travel, save/Continue and encounter teardown cannot leave stale targets or active enemies; preserve existing house/cave safety rules and documented balance targets.
+- [x] **No stranded fights:** unreachable paths, death, travel, save/Continue and encounter teardown cannot leave stale targets or active enemies; preserve existing house/cave safety rules and documented balance targets.
 
 ---
 

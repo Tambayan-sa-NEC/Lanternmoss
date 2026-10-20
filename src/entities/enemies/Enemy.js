@@ -91,6 +91,9 @@ export class Enemy extends Walker {
       damage a lesser monster with any attack nor are drawn into a brawl, and a lair seal is not a fighter at all. */
   get lesser() { return this.def.ai !== 'boss' && !this.def.miniBoss && !this.def.static; }
 
+  /** Close enough to the hero to be heard or felt (TODO 45b): a brawl across the valley makes no noise. */
+  get heard() { return this.distP < COMBAT.mobFeud.earshot; }
+
   /** Turned on by another monster's blow (TODO 45b, damageEnemy with source 'mob'). It chases and attacks its
       attacker instead of the hero until one of them is down, the feud is forgotten (COMBAT.mobFeud.forget) or the
       world tears the encounter down. The hero is never the one who provokes this: their hits call aggro(). */
@@ -259,7 +262,7 @@ export class Enemy extends Walker {
     if (this.state === 'chase') {
       turnToward(this.fwd, toP, this.up, damp(d.turnRate, dt));
       if (d.fleeBelow && !this.fled && this.hp < d.hp * d.fleeBelow) { this.fled = true; this.state = 'flee'; this.timer = d.fleeTime; emote(this, '!', '#ffd24a'); return 0; }
-      if (dist < d.range && this.cool <= 0 && visible(this.pos, this.target.pos)) { this.state = 'windup'; this.timer = d.windup; if (d.slamRadius) audio.growl(); return 0; }
+      if (dist < d.range && this.cool <= 0 && visible(this.pos, this.target.pos)) { this.state = 'windup'; this.timer = d.windup; if (d.slamRadius && this.heard) audio.growl(); return 0; }
       this.move.copy(toP); if (d.weave) this.move.applyAxisAngle(this.up, Math.sin(ctx.time * 5 + this.seed) * d.weave);
       return dist > d.range * 0.8 ? d.speed : 0;
     }
@@ -284,11 +287,11 @@ export class Enemy extends Walker {
     if (d.slamRadius) {
       const c = this.slamCenter().clone();
       ringFX(c, d.slamRadius, 0xffb08a, 0.5); sparkles.emit(groundPoint(c, 0.3), { count: 30, color: 0xe8d6c0, speed: 3.5, up: this.up, upBias: 0.5, life: 0.7, size: 0.45 });
-      if (dist < 12) shakeCamera(0.35); audio.slam();
+      if (this.distP < 12) shakeCamera(0.35); if (this.heard) audio.slam();
       if (!playerSafe() && visible(c, ctx.player.pos) && ctx.player.pos.distanceTo(c) < d.slamRadius + ctx.player.radius && altitude(ctx.player) < 0.9) hurtPlayer(d.damage, c, d.knockback, { source: this });
       hitMobs(this, c, d.slamRadius, d.damage, { knock: d.knockback });                   // TODO 45b: the slam catches monsters too
     } else {
-      this.knock.addScaledVector(this.fwd, d.lunge || 0); audio.swipe();
+      this.knock.addScaledVector(this.fwd, d.lunge || 0); if (this.heard) audio.swipe();
       if (!playerSafe() && visible(this.pos, ctx.player.pos) && this.distP < d.range + 0.6 && this.fwd.dot(this.toP) > 0.3) hurtPlayer(d.damage, this.pos, d.knockback, { source: this });
       hitMobs(this, this.pos, d.range + 0.6, d.damage, { knock: d.knockback, arc: COMBAT.mobFeud.arc });   // TODO 45b: a swipe catches what is in front of it
     }
@@ -299,7 +302,7 @@ export class Enemy extends Walker {
     turnToward(this.fwd, toP, this.up, damp(6, dt));
     if (this.state === 'charge') { if (this.timer <= 0) { this.fire(); this.state = 'chase'; this.cool = d.cooldown; } return 0; }
     if (this.state !== 'chase') this.state = 'chase';
-    if (this.cool <= 0 && dist < d.aggro * 1.3 && visible(this.pos, this.target.pos)) { this.state = 'charge'; this.timer = d.windup; audio.charge(); return 0; }
+    if (this.cool <= 0 && dist < d.aggro * 1.3 && visible(this.pos, this.target.pos)) { this.state = 'charge'; this.timer = d.windup; if (this.heard) audio.charge(); return 0; }
     if (dist < d.keepDistance - 1.5) { this.move.copy(toP).negate(); return d.speed; }
     if (dist > d.keepDistance + 1.5) { this.move.copy(toP); return d.speed; }
     this.move.crossVectors(this.up, toP).multiplyScalar(Math.sin(ctx.time * 0.8 + this.seed) > 0 ? 1 : -1); return d.speed * 0.5;
@@ -312,7 +315,7 @@ export class Enemy extends Walker {
         if (h === ctx.player) hurtPlayer(d.damage, p.pos, 2.5, { source: this });
         else if (h) hitMob(this, h, d.damage, { from: p.pos, knock: 2.5 });             // TODO 45b: a ghost's orb burns a monster too
         sparkles.emit(p.pos, { count: 14, color: d.color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
-    audio.wispShot();
+    if (this.heard) audio.wispShot();
   }
   /** Slimes bounce straight at you and hurt on contact; big ones split when popped. */
   thinkHopper(dt) { this.state = 'chase'; turnToward(this.fwd, this.toP, this.up, damp(6, dt)); this.move.copy(this.toP); return this.def.speed; }

@@ -23,7 +23,9 @@ export const COMBAT = {
   // damage: how much of the blow a monster takes compared with the hero (1 = the same).
   // forget: seconds a provoked monster keeps after its attacker before it goes back to hunting the hero.
   // arc: a swipe only catches monsters roughly in front (cosine of the half-angle; 0 = a full half-circle).
-  mobFeud: { damage: 1, forget: 8, arc: 0.3 },
+  // earshot: a brawl further than this from the hero is neither heard nor felt - monsters now attack away from the
+  // hero, which they never used to do, and a fight across the valley should not thump in your ears.
+  mobFeud: { damage: 1, forget: 8, arc: 0.3, earshot: 30 },
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
