@@ -70,6 +70,21 @@ export class Enemy extends Walker {
     this.behavior?.reset?.(this);
   }
   center() { return this._c.copy(this.pos).addScaledVector(this.up, this.hover + this.height * 0.5); }
+  /** Does distance still end this monster's chase? (TODO 45a)
+      An ordinary monster: never. Once it has seen the hero it keeps coming for as long as they are in this world and
+      not safe - there is no home leash and no outrunning it. What ends the chase instead is the hero reaching the
+      village's safe radius, fainting, a peaceful place, travelling to another world, or a new adventure; each of those
+      already tears the encounter down. Where the ground gives out (a wall, an island, a cave room with no open route)
+      it keeps pressing toward the hero as far as it can walk, rather than giving up and healing.
+      A mini boss: yes, through its earlier forms, so a fight that drifts out of its lair still resets as before; no,
+      once its final form has begun, which lasts until the encounter ends or the world resets.
+      A main boss: yes, unchanged - its arena ring, not this rule, is what bounds it. */
+  get leashed() {
+    const d = this.def;
+    if (d.miniBoss) return this.bossPhase < (d.phases?.length ?? 1) - 1;
+    return d.ai === 'boss';
+  }
+
   aggro() { if (!this.alive || this.dormant || this.def.static || ENGAGED.has(this.state) || playerSafe() || !visible(this.pos, ctx.player.pos)) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
   hideTele() { if (this.tele) this.tele.visible = false; for (const m of this.fxMeshes) m.visible = false; }
   interrupt(t) {
@@ -158,7 +173,7 @@ export class Enemy extends Walker {
       this.hp = Math.min(this.def.hp, this.hp + this.def.hp * COMBAT.leashReturn.heal * dt);
     const dist = tangentTo(this.pos, this.up, ctx.player.pos, this.toP), safe = playerSafe();
     if (!ENGAGED.has(this.state) && this.state !== 'return' && dist < d.aggro) this.aggro();
-    if (ENGAGED.has(this.state) && (safe || distance(pointOf(this), this.home) > d.leash || dist > d.aggro * 2.2)) { this.state = 'return'; this.hideTele(); }
+    if (ENGAGED.has(this.state) && (safe || (this.leashed && (distance(pointOf(this), this.home) > d.leash || dist > d.aggro * 2.2)))) { this.state = 'return'; this.hideTele(); }
     this.move.copy(this.fwd);
     const slowMul = this.slowT > 0 ? 1 - this.slowAmt : 1;
     const speed = (this.stunT > 0 ? 0 : this.think(dt, dist)) * slowMul;

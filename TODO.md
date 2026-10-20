@@ -1976,12 +1976,34 @@ Code: `src/entities/enemies/Enemy.js`, `src/config/combat.js`, `src/combat/` (ta
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **45a. Pursuit and final-form leash rules** | 18, 23 | 2-4 h | Remove home-distance and aggro-distance give-up/return behavior for ordinary mobs: they continue to pursue the player indefinitely within their current world, including after the player outruns their current aggro radius. Do not add another leash or quiet distance cutoff. Keep mini-boss leash/return behavior during earlier forms/phases; remove it when the encounter enters its final form/state, and keep pursuit active until the existing encounter ends or the world resets. Define unreachable-route and world-transition cleanup explicitly. Test ordinary archetypes, long chases, obstacles, phase transitions, encounter resets and travel/Continue. |
+| [x] **45a. Pursuit and final-form leash rules** | 18, 23 | 2-4 h | Remove home-distance and aggro-distance give-up/return behavior for ordinary mobs: they continue to pursue the player indefinitely within their current world, including after the player outruns their current aggro radius. Do not add another leash or quiet distance cutoff. Keep mini-boss leash/return behavior during earlier forms/phases; remove it when the encounter enters its final form/state, and keep pursuit active until the existing encounter ends or the world resets. Define unreachable-route and world-transition cleanup explicitly. Test ordinary archetypes, long chases, obstacles, phase transitions, encounter resets and travel/Continue. |
 | [ ] **45b. Mob damage and provoked retaliation** | 45a | 3-4.5 h | Allow mob-owned attacks, including ghost projectiles, to hit other mobs. A lesser mob damaged by another lesser mob can target and retaliate against its attacker; their attacks can continue the fight. Main-boss and mini-boss attacks must not damage lesser mobs, including through projectiles, melee or area effects. Cover same-world targeting, damage and aggro outcomes for each attacker/target class, death during retaliation, and interaction with existing boss summons/pack behavior. Preserve correct damage attribution and prevent duplicate XP, drops or defeat events. |
 | [ ] **45c. Integrated acceptance and documentation** | 45a-45b | 2-4.5 h | Add deterministic simulations for pursuit beyond every old cutoff, final-form mini-boss leash removal (with earlier phases still leashed), ghost-to-goblin projectile damage, lesser-mob provocation/retaliation, and main/mini-boss attacks that overlap lesser mobs without damaging or provoking them. Cover cleanup on death/travel/reset/Continue. Run the full required checks and relevant browser smokes, inspect affected combat visuals, update the combat wiki and this TODO's implementation note, and verify ordinary surface AI/balance remains within documented targets without weakening them. |
 
-- [ ] **Ordinary mobs never give up the chase:** no home leash, return-home state, or aggro-distance timeout while the player remains in the same world; pursue around reachable obstacles.
-- [ ] **Mini-boss final form:** retain the existing leash before the final form/state, then remove it for the remainder of that encounter. Regression-check each phased mini-boss and reset/retry behavior.
+- [x] **Ordinary mobs never give up the chase:** no home leash, return-home state, or aggro-distance timeout while the player remains in the same world; pursue around reachable obstacles.
+- [x] **Mini-boss final form:** retain the existing leash before the final form/state, then remove it for the remainder of that encounter. Regression-check each phased mini-boss and reset/retry behavior.
+**45a implemented (2026-10-19):** one rule in one place, `Enemy.leashed` (`src/entities/enemies/Enemy.js`): an
+ordinary monster never gives up a chase on distance, a mini boss keeps its leash through its earlier forms and loses
+it once `bossPhase` reaches its last (the idiom the gloomcap kit already used), and a main boss is unchanged because
+its arena bounds it. An ordinary monster's `aggro` is now only how far off it first notices the hero. A chase ends
+instead at the village safe radius, on fainting, on travel, on a new adventure or on Continue, each of which already
+tears the encounter down; where the ground gives out a chaser keeps pressing as far as it can walk and never resets
+its health. Checked by `tests/sim/pursuit.sim.mjs` (four ordinary archetypes chasing 43-58 m past their old leashes
+and closing to 2-9 m; the safe radius, fainting, travel and Continue each ending it cleanly; a real mini-boss
+encounter leashed in its first form and unleashed in its last; all 19 monster kinds against the rule their class
+implies), with a negative control proving it fails without the change. `miniBossLeash.sim.mjs` and `pets.sim.mjs`
+were updated: the first asserted the old "ordinary monsters walk home and heal" rule, and the second needed its
+quiet made deliberately, because chasers now accumulate around a hero dragged across the world.
+
+**45a open balance finding - resolve in 45c before 45 is done.** Removing the final-form leash puts one measured
+fight outside its target: ranger / Emberfall / the Basilisk on **seed 1** goes **97.3 s to 198.2 s**, past the 180 s
+`miniBoss` ceiling (damage taken 575 to 895, bot top-ups 9 to 14), confirmed by a clean A/B with the change reverted.
+Seed 7 is 100.5 s and inside; witch and knight are inside on both; all nine roster medians are unchanged. No target
+was loosened and nothing was retuned to hide it. This lands in the same area as the earlier recorded leash decision
+(mini bosses keeping damage on give-up, +20% mini-boss health), so choosing between retuning that fight and
+narrowing the final-form rule is a design decision for the owner, not a measurement fix. See
+[pursuit](docs/wiki/game-design/balance.md#pursuit-and-who-gives-up-a-chase-45a).
+
 - [ ] **Mob-on-mob combat:** lesser mobs can damage and provoke other lesser mobs; a goblin can retaliate after a ghost projectile. Main bosses and mini bosses cannot damage lesser mobs with any attack. Test both damage and aggro, and credit damage/rewards once to the correct source.
 - [ ] **No stranded fights:** unreachable paths, death, travel, save/Continue and encounter teardown cannot leave stale targets or active enemies; preserve existing house/cave safety rules and documented balance targets.
 

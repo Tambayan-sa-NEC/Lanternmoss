@@ -164,6 +164,39 @@ iron ingots and 18 fuel, or nine wood made into charcoal instead of 18 wood burn
 waste the remainder of a fuel piece; bulk smelting pools it. First tools and essential food recipes retain their
 material costs, so the faster later crafting loop does not delay the opening tutorial.
 
+## Pursuit and who gives up a chase (45a)
+
+Who stops chasing when the hero gets far away is `Enemy.leashed` - the one place the rule lives:
+
+| | Gives up on distance? |
+| --- | --- |
+| An ordinary monster | **No.** Once it has seen the hero it keeps coming, past its old home leash and past the old "outran it" distance. |
+| A mini boss, earlier forms | Yes, exactly as before: past its leash it walks home keeping its damage (`COMBAT.leashReturn`). |
+| A mini boss, final form | **No**, for the rest of that encounter. |
+| A main boss | Yes, unchanged. Its arena ring, not this rule, is what bounds it. |
+
+An ordinary monster's `aggro` is therefore only how far off it first notices the hero; its `leash` now governs
+wandering and the forms above. What ends a chase instead:
+
+- the hero reaching the **village safe radius** (`COMBAT.player.safeRadius`), or a peaceful place such as a house;
+- the hero **fainting**;
+- **travelling** to another world, which disposes that world's monsters, or starting a **new adventure**;
+- **Continue**, which rebuilds the world without the old chaser.
+
+Where the ground gives out - a wall, an island, a cave room with no open route - a chaser keeps pressing toward the
+hero as far as it can walk, rather than giving up and healing itself whole. It is never sent home by distance, so it
+never resets its health mid-pursuit.
+
+**Open balance finding (45a).** Removing the final-form leash makes one measured fight fall outside its target.
+Ranger / Emberfall / **The Basilisk** on **seed 1** goes from **97.3 s to 198.2 s**, past the 180 s ceiling of the
+`miniBoss` band, with damage taken rising 575 to 895 and the bot's health top-ups 9 to 14. The same fight on seed 7
+is 100.5 s, well inside, and the witch and knight stay inside on both; every roster median across all nine
+hero/planet profiles is **unchanged**. The cause is the same mechanism this page's leash note describes from the
+other direction: previously the Basilisk broke off and walked home while the hero kited, which handed back attacking
+time; now it follows. **No target was loosened and no monster was retuned to hide it** - resolving it belongs to 45c,
+which owns verifying surface AI and balance against these targets, and the choice between retuning that fight and
+narrowing the final-form rule is a design decision, not a measurement one.
+
 ## Combat decisions and measurement limits
 
 Regular enemy health removes most opening-skill one-shots, while the ogre's health and the thornmole's exposure cycle
