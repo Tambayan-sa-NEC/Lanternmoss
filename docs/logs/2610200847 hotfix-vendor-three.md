@@ -1,0 +1,18 @@
+# Hotfix: vendor Three.js so the published game needs no CDN
+
+The build published at <https://tambayan-sa-nec.github.io/Lanternmoss/> loaded Three.js r160 from jsDelivr through the
+import map, so a player on a network that blocks that CDN got a game that never booted. Three.js now ships with the game.
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-20 08:49 | RESEARCH | TODO N/A | Work out what actually has to be vendored | master | The game imports six `three/addons/` modules; their transitive closure is 11 files (60 KB) plus the 1.24 MB core build. Node tests and sims resolve `three` from `node_modules`, so they are unaffected. Only `index.html` referenced the CDN | 0h 04m |
+| 2026-10-20 08:52 | DECISION | TODO N/A | Hotfix onto `master`, unminified build | master | Owner's call on both: fix the live game now rather than waiting for a release merge, and keep the unminified `three.module.js` for byte-parity with what the CDN served and readable stack traces. Rejected: landing on `develop` (live build keeps the CDN dependency until a release) and `three.module.min.js` (half the size, unreadable traces) | 0h 01m |
+| 2026-10-20 08:58 | FIX | TODO 45a N/A | Copy the build and addon closure into `vendor/three/` and repoint the import map | hotfix/vendor-three | MIT licence copied beside the code; `vendor/three/README.md` records the provenance and how to refresh it after a `three` devDependency bump | 0h 06m |
+| 2026-10-20 09:00 | TEST | TODO N/A | Browser check of the vendored build on a local server | hotfix/vendor-three | Throwaway probe `scripts/_vendor-check.mjs`, deleted in the same command. All 12 files (core + 11 addons) served locally, `THREE.REVISION` 160, witch survives 180 frames, zero jsDelivr requests, zero page or console errors | 0h 03m |
+| 2026-10-20 09:04 | TEST | TODO N/A | Full suites on the hotfix branch | hotfix/vendor-three | 208 unit tests pass, 0 fail; all 38 sims pass (master's older suite counts) | 0h 04m |
+| 2026-10-20 09:05 | HOTFIX | TODO N/A | Merge into `master` and push | master | `a8adffa`. Untagged, consistent with the publication decision | 0h 01m |
+| 2026-10-20 09:10 | MERGE | TODO N/A | Merge `master` into `develop` so the fix is not lost | develop | `5e1ebe5`. README conflicted in two places: kept develop's wording and its shorter file tree, adding the vendoring note and a `vendor/three/` line to each. Also updated `docs/wiki/technical/{running-and-checks,file-map,performance}.md`, which still claimed an internet connection was needed for Three.js | 0h 05m |
+| 2026-10-20 09:13 | TEST | TODO N/A | Recheck after conflict resolution | develop | Browser probe passes again on the merged tree; 275 unit tests pass, 0 fail; all 58 sims pass | 0h 03m |
+| 2026-10-20 09:14 | CHORE | TODO N/A | Push `develop`, delete `hotfix/vendor-three` | develop | Branch deleted locally; never pushed to the remote | 0h 01m |
+| 2026-10-20 09:15 | TEST | TODO N/A | Verify the published site serves the vendored build | master | Throwaway probe `scripts/_live-check.mjs`, deleted in the same command. Live game boots, `THREE.REVISION` 160, 12 vendor files served from tambayan-sa-nec.github.io, witch survives 180 frames, zero errors. Hosts contacted: the Pages origin and the two Google Fonts hosts only | 0h 02m |
+| 2026-10-20 09:15 | TOTAL | TODO N/A | Vendor Three.js into the published game | master | Live build no longer depends on jsDelivr. Remaining external dependency: the Grandstander/Nunito webfont, which degrades to the CSS fallback stack rather than breaking play | 0h 29m |
