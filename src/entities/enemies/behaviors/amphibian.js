@@ -5,7 +5,7 @@
    foot. A stagger as it surfaces leaves it floundering in the shallows just as long. When the tide leaves it high and dry it's stranded: visible and hittable while it hurries back to the sea. */
 import * as THREE from 'three';
 import { ctx } from '../../../core/context.js';
-import { hurtPlayer } from '../../../combat/damage.js';
+import { hitMobs, hurtPlayer } from '../../../combat/damage.js';
 import { emote } from '../../../fx/emotes.js';
 import { sparkles } from '../../../fx/sparkles.js';
 import { audio } from '../../../systems/AudioSystem.js';
@@ -41,12 +41,15 @@ export const amphibian = {
         const k = 1 - e.timer / d.windup;
         if (k < 0.6) { turnToward(e.fwd, e.toP, e.up, damp(10, dt)); e.leapDir.copy(e.fwd); e.leapFrom.copy(e.up); }
         layLane(e.lane, e.leapFrom, e.leapDir, d.leapSpeed * d.leapTime, d.width, 0.2 + 0.5 * k);
-        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.leapTime; e.hitPlayer = false; e.hideTele(); e.speed = d.leapSpeed; e.vy = d.leapLift; e.grounded = false; splash(e, 22); audio.whoosh(); }
+        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.leapTime; e.hitPlayer = false; e.hideTele(); e.speed = d.leapSpeed; e.vy = d.leapLift; e.grounded = false; splash(e, 22); if (e.heard) audio.whoosh(); }
         return 0;
       }
       case 'charge':
         projectTangent(e.leapDir, e.up).normalize(); e.fwd.copy(e.leapDir); e.move.copy(e.leapDir);
-        if (!e.hitPlayer && !ctx.player.dead && dist < e.radius + ctx.player.radius + d.width * 0.5) { e.hitPlayer = true; hurtPlayer(d.damage, e.pos, d.knockback, { source: e }); }
+        if (!e.hitPlayer) {
+          if (!ctx.player.dead && e.distP < e.radius + ctx.player.radius + d.width * 0.5) { e.hitPlayer = true; hurtPlayer(d.damage, e.pos, d.knockback, { source: e }); }
+          else if (hitMobs(e, e.pos, e.radius + d.width * 0.5, d.damage, { knock: d.knockback }).length) e.hitPlayer = true;   // TODO 45b
+        }
         if (e.timer <= 0) { e.state = 'recover'; e.timer = d.exposed; }
         return waterSpeed(e, d.leapSpeed);
       case 'recover':                                                       // stranded by choice: the window

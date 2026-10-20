@@ -164,6 +164,90 @@ iron ingots and 18 fuel, or nine wood made into charcoal instead of 18 wood burn
 waste the remainder of a fuel piece; bulk smelting pools it. First tools and essential food recipes retain their
 material costs, so the faster later crafting loop does not delay the opening tutorial.
 
+## Pursuit and who gives up a chase (45a)
+
+Who stops chasing when the hero gets far away is `Enemy.leashed` - the one place the rule lives:
+
+| | Gives up on distance? |
+| --- | --- |
+| An ordinary monster | **No.** Once it has seen the hero it keeps coming, past its old home leash and past the old "outran it" distance. |
+| A mini boss, earlier forms | Yes, exactly as before: past its leash it walks home keeping its damage (`COMBAT.leashReturn`). |
+| A mini boss, final form | **No**, for the rest of that encounter. |
+| A main boss | Yes, unchanged. Its arena ring, not this rule, is what bounds it. |
+
+An ordinary monster's `aggro` is therefore only how far off it first notices the hero; its `leash` now governs
+wandering and the forms above. What ends a chase instead:
+
+- the hero reaching the **village safe radius** (`COMBAT.player.safeRadius`), or a peaceful place such as a house;
+- the hero **fainting**;
+- **travelling** to another world, which disposes that world's monsters, or starting a **new adventure**;
+- **Continue**, which rebuilds the world without the old chaser.
+
+Where the ground gives out - a wall, an island, a cave room with no open route - a chaser keeps pressing toward the
+hero as far as it can walk, rather than giving up and healing itself whole. It is never sent home by distance, so it
+never resets its health mid-pursuit.
+
+**Open balance finding (45a) - resolved by 45b, measured in 45c; see below.** Removing the final-form leash makes one measured fight fall outside its target.
+Ranger / Emberfall / **The Basilisk** on **seed 1** goes from **97.3 s to 198.2 s**, past the 180 s ceiling of the
+`miniBoss` band, with damage taken rising 575 to 895 and the bot's health top-ups 9 to 14. The same fight on seed 7
+is 100.5 s, well inside, and the witch and knight stay inside on both; every roster median across all nine
+hero/planet profiles is **unchanged**. The cause is the same mechanism this page's leash note describes from the
+other direction: previously the Basilisk broke off and walked home while the hero kited, which handed back attacking
+time; now it follows. **No target was loosened and no monster was retuned to hide it** - resolving it belongs to 45c,
+which owns verifying surface AI and balance against these targets, and the choice between retuning that fight and
+narrowing the final-form rule is a design decision, not a measurement one.
+
+## Monsters fighting each other (45b)
+
+Who may damage whom among monsters is `canHarmMob` (`src/combat/damage.js`), the one place that rule lives. Only the
+**lesser** monsters feud (`Enemy.lesser`: anything that is not a mini boss, a main boss or a lair seal):
+
+| Attacker | Target | Lands? |
+| --- | --- | --- |
+| A lesser monster | another lesser monster | **Yes**, with any attack it has: swipe, slam, blast, charge, leap, pulse, pinch, or a ghost's orb. |
+| A lesser monster | itself | No. Nor a burrowed one, nor one in another space (a cave room, another world). |
+| A mini boss or a main boss | a lesser monster | **No**, in any form - melee, area or projectile. A boss's shot flies straight through its neighbours. |
+| A lesser monster | a mini boss or a main boss | No. A boss fight is never settled by the monsters standing in it. |
+
+Every attack keeps its **own hit test on the hero exactly as it was**; the monsters caught in the same blow are an
+addition to it, so a hero's fight plays as it did before. A monster that is hit turns on its attacker (`Enemy.foe`,
+set by `provoke`) and fights back with its ordinary AI. The grudge ends when one of them is down, after
+`COMBAT.mobFeud.forget` seconds, when the hero hits it (the hero always wins a monster's attention back), or when the
+encounter is torn down.
+
+**Nobody is credited for a monster's kill.** A monster that falls to another monster gives the hero no XP, no coins,
+no loot drop and no bestiary tally, and raises exactly one `enemydefeated` event, which now carries the `killer` that
+struck the last blow. The damage numbers stay off for a brawl too: it shows its sparks, not the hero's feedback.
+
+**Pack friendly fire.** A monster swinging at the hero also catches the neighbours standing in the blow, so packs
+wear each other down during an ordinary fight. That is the intended mechanic, and it is a change in the hero's
+favour; it is measured below.
+
+A brawl further than `COMBAT.mobFeud.earshot` from the hero is neither heard nor felt: monsters now attack away from
+the hero, which they never used to do, so attack sounds and camera shake read the hero's own distance (`Enemy.distP`)
+rather than the distance to whatever the monster is swinging at.
+
+## What 45b did to the measured fights (45c)
+
+Measured with `npm run sim -- balance` on the stage before 45b and on 45b itself, seeds 1 and 7, all three heroes,
+nine hero/world profiles each. Seed 1 was run twice on the same build: all nine profiles reproduced exactly.
+
+| | Before 45b | After 45b |
+| --- | --- | --- |
+| Profiles outside a documented band (`src/config/balance.js`) | 20 | **19** |
+| Ordinary monster duels | within 0.2 s of each other, both seeds | unchanged in kind |
+
+**The one that changed is the 45a open finding, and it closes.** Ranger / Emberfall / **The Basilisk**, seed 1:
+**198.2 s -> 106.55 s**, back inside the 90-180 s `miniBoss` band, with damage taken 895 -> 477 and no deaths. Seed 7
+is 100.5 -> 100.63 s, unchanged. The cause is the mechanism this page describes above: the monsters that join that
+fight now wear one another down instead of adding every blow to the hero. **No target was loosened and no monster was
+retuned** - the fight came back inside its band on its own.
+
+The remaining 19 out-of-band entries are **identical before and after**, every one of them a single-monster duel that
+was already outside the 2-6 s band before this TODO began (Frostveil's slow kills at 6.8-12.4 s, and three sub-2 s
+fast kills on Lanternmoss). They are not 45a's or 45b's doing and are left as they were found, recorded here rather
+than hidden.
+
 ## Combat decisions and measurement limits
 
 Regular enemy health removes most opening-skill one-shots, while the ogre's health and the thornmole's exposure cycle

@@ -2,7 +2,7 @@
    erupts beneath them after a short tremor, then stays exposed for a few seconds before diving again.
    Keep moving to dodge the eruption, then punish it while it's up. */
 import { ctx } from '../../../core/context.js';
-import { hurtPlayer } from '../../../combat/damage.js';
+import { hitMobs, hurtPlayer } from '../../../combat/damage.js';
 import { ringFX, groundPoint } from '../../../fx/combatFx.js';
 import { sparkles } from '../../../fx/sparkles.js';
 import { audio } from '../../../systems/AudioSystem.js';
@@ -59,6 +59,7 @@ function erupt(e, dist) {
   setHidden(e, false); e.hideTele(); e.state = 'recover'; e.timer = d.exposed; e.cool = d.cooldown;
   ringFX(e.pos, d.eruptRadius, DUST, 0.4);
   sparkles.emit(groundPoint(e.pos, 0.3), { count: 36, color: DUST, speed: 3.5, up: e.up, upBias: 1.2, life: 0.8, size: 0.4 });
-  audio.slam(); if (dist < 10) shakeCamera(0.15);
-  if (!P.dead && dist < d.eruptRadius + P.radius && P.r - groundHeight(P.up) < 1) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
+  if (e.heard) audio.slam(); if (e.distP < 10) shakeCamera(0.15);
+  if (!P.dead && e.distP < d.eruptRadius + P.radius && P.r - groundHeight(P.up) < 1) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
+  hitMobs(e, e.pos, d.eruptRadius, d.damage, { knock: d.knockback });        // TODO 45b
 }

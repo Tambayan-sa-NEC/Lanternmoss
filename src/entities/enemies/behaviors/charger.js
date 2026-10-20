@@ -2,7 +2,7 @@
    Sidestep it. A charge that slams into a tree, rock or house leaves it dazed and taking bonus damage. */
 import * as THREE from 'three';
 import { ctx } from '../../../core/context.js';
-import { hurtPlayer } from '../../../combat/damage.js';
+import { hitMobs, hurtPlayer } from '../../../combat/damage.js';
 import { emote } from '../../../fx/emotes.js';
 import { sparkles } from '../../../fx/sparkles.js';
 import { hitsStatic } from '../../../physics/colliders.js';
@@ -31,12 +31,15 @@ export const charger = {
         const k = 1 - e.timer / d.windup;
         if (k < 0.6) { turnToward(e.fwd, toP, e.up, damp(10, dt)); e.chargeDir.copy(e.fwd); e.laneFrom.copy(e.up); }   // aims, then commits
         layLane(e.lane, e.laneFrom, e.chargeDir, d.chargeSpeed * d.chargeTime, d.width, 0.2 + 0.5 * k);
-        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.chargeTime; e.hitPlayer = false; e.hideTele(); audio.whoosh(); }
+        if (e.timer <= 0) { e.state = 'charge'; e.timer = d.chargeTime; e.hitPlayer = false; e.hideTele(); if (e.heard) audio.whoosh(); }
         return 0;
       }
       case 'charge':
         projectTangent(e.chargeDir, e.up).normalize(); e.fwd.copy(e.chargeDir); e.move.copy(e.chargeDir);
-        if (!e.hitPlayer && !ctx.player.dead && dist < e.radius + ctx.player.radius + d.width * 0.5) { e.hitPlayer = true; hurtPlayer(d.damage, e.pos, d.knockback, { source: e }); }
+        if (!e.hitPlayer) {
+          if (!ctx.player.dead && e.distP < e.radius + ctx.player.radius + d.width * 0.5) { e.hitPlayer = true; hurtPlayer(d.damage, e.pos, d.knockback, { source: e }); }
+          else if (hitMobs(e, e.pos, e.radius + d.width * 0.5, d.damage, { knock: d.knockback }).length) e.hitPlayer = true;   // TODO 45b
+        }
         if (rng() < dt * 25) sparkles.emit(e.pos, { count: 1, color: 0xe8d6c0, speed: 1.2, up: e.up, upBias: 0.6, life: 0.4, size: 0.3 });
         if (e.timer <= 0) { e.state = 'recover'; e.timer = e.cool = d.cooldown; }
         return d.chargeSpeed;

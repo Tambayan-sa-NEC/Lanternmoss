@@ -26,7 +26,7 @@ import { mr, rng } from '../../utils/random.js';
 import { arcDist, frameQuat, projectTangent, tangentFrame, tangentTo, turnToward } from '../../utils/sphere.js';
 import { SPAWN_DIR } from '../../world/World.js';
 import { groundHeight } from '../../world/terrain.js';
-import { damageEnemy, hurtPlayer } from '../../combat/damage.js';
+import { canHarmMob, damageEnemy, hitMob, hitMobs, hurtPlayer } from '../../combat/damage.js';
 import { BURN_TICK } from '../../config/sets.js';
 import { forgetTarget } from '../../combat/targeting.js';
 import { encounterEvents } from '../../combat/events.js';
@@ -65,12 +65,50 @@ export class Enemy extends Walker {
     this.fwd.copy(tangentFrame(this.up)[0]).applyAxisAngle(this.up, rng() * 6.28);
     Object.assign(this, { hp: this.def.hp, alive: true, state: 'idle', timer: mr(0.5, 2.5), cool: 0, speed: 0, phase: 0, deadT: 0, turn: 0,
       slowT: 0, slowAmt: 0, markT: 0, stunT: 0, hitPop: 0, hopT: mr(0.2, 1), hopDir: null, fled: false, remove: false,
-      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0, burn: null, burnTick: 0, calmT: 0 });   // calmT = seconds out of combat; burn = { dps, t }: the Ember set (config/sets.js); hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
+      hidden: false, shieldT: 0, shieldAmt: 0, stunnedT: 0, burn: null, burnTick: 0, calmT: 0, foe: null, foeT: 0, distP: Infinity, killedBy: null });   // calmT = seconds out of combat; burn = { dps, t }: the Ember set (config/sets.js); hidden = untargetable (burrowed); shield = damage reduction; stunned = takes bonus damage
     this.knock.set(0, 0, 0); this.selfCollider.active = !this.space; this.root.visible = this.shadow.visible = true; this.root.scale.setScalar(this.baseScale);
     this.behavior?.reset?.(this);
   }
   center() { return this._c.copy(this.pos).addScaledVector(this.up, this.hover + this.height * 0.5); }
-  aggro() { if (!this.alive || this.dormant || this.def.static || ENGAGED.has(this.state) || playerSafe() || !visible(this.pos, ctx.player.pos)) return; this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
+  /** What this monster is fighting right now: its foe if another monster provoked it, else the hero (TODO 45b). */
+  get target() { return this.foe ?? ctx.player; }
+  /** Does distance still end this monster's chase? (TODO 45a)
+      An ordinary monster: never. Once it has seen the hero it keeps coming for as long as they are in this world and
+      not safe - there is no home leash and no outrunning it. What ends the chase instead is the hero reaching the
+      village's safe radius, fainting, a peaceful place, travelling to another world, or a new adventure; each of those
+      already tears the encounter down. Where the ground gives out (a wall, an island, a cave room with no open route)
+      it keeps pressing toward the hero as far as it can walk, rather than giving up and healing.
+      A mini boss: yes, through its earlier forms, so a fight that drifts out of its lair still resets as before; no,
+      once its final form has begun, which lasts until the encounter ends or the world resets.
+      A main boss: yes, unchanged - its arena ring, not this rule, is what bounds it. */
+  get leashed() {
+    const d = this.def;
+    if (d.miniBoss) return this.bossPhase < (d.phases?.length ?? 1) - 1;
+    return d.ai === 'boss';
+  }
+
+  /** Is this one of the lesser monsters? (TODO 45b) Only they fight each other: a mini boss and a main boss neither
+      damage a lesser monster with any attack nor are drawn into a brawl, and a lair seal is not a fighter at all. */
+  get lesser() { return this.def.ai !== 'boss' && !this.def.miniBoss && !this.def.static; }
+
+  /** Close enough to the hero to be heard or felt (TODO 45b): a brawl across the valley makes no noise. */
+  get heard() { return this.distP < COMBAT.mobFeud.earshot; }
+
+  /** Turned on by another monster's blow (TODO 45b, damageEnemy with source 'mob'). It chases and attacks its
+      attacker instead of the hero until one of them is down, the feud is forgotten (COMBAT.mobFeud.forget) or the
+      world tears the encounter down. The hero is never the one who provokes this: their hits call aggro(). */
+  provoke(attacker) {
+    if (!this.alive || this.dormant || !canHarmMob(attacker, this)) return;
+    this.foe = attacker; this.foeT = COMBAT.mobFeud.forget;
+    if (!ENGAGED.has(this.state)) { this.state = 'chase'; emote(this, '!', '#ff4d6d'); }
+  }
+
+  /** The hero has its attention: a monster in the middle of a brawl drops the grudge and comes for them (TODO 45b). */
+  aggro() {
+    this.foe = null; this.foeT = 0;
+    if (!this.alive || this.dormant || this.def.static || ENGAGED.has(this.state) || playerSafe() || !visible(this.pos, ctx.player.pos)) return;
+    this.state = 'chase'; emote(this, '!', '#ff4d6d');
+  }
   hideTele() { if (this.tele) this.tele.visible = false; for (const m of this.fxMeshes) m.visible = false; }
   interrupt(t) {
     if (this.def.staggerImmune) return;
@@ -92,12 +130,14 @@ export class Enemy extends Walker {
     if (this.burnTick >= BURN_TICK || b.t <= 0) { damageEnemy(this, b.dps * this.burnTick, { source: 'burn', color: 0xff8a3a }); this.burnTick = 0; }
     if (b.t <= 0) this.burn = null;
   }
-  die() {
+  /** killer: the monster that struck the last blow (TODO 45b), null when the hero, their pet or a burn did. */
+  die(killer = null) {
+    this.killedBy = killer;
     this.alive = false; this.state = 'dead'; this.deadT = 0; this.selfCollider.active = false; this.hideTele(); this.bar.style.display = 'none';
     sparkles.emit(this.center(), { count: 36, color: this.def.color, speed: 3, up: this.up, upBias: 0.6, life: 0.9, size: 0.4 });
     audio.enemyDie(); forgetTarget(this);
     this.behavior?.onDie?.(this);
-    encounterEvents.dispatchEvent(new CustomEvent('enemydefeated', { detail: { enemy: this } }));
+    encounterEvents.dispatchEvent(new CustomEvent('enemydefeated', { detail: { enemy: this, killer } }));
     for (let i = 0; i < (this.def.splitCount || 0); i++) {
       const e = new Enemy(this.def.splitInto, advance(pointOf(this), _tv.copy(this.fwd).applyAxisAngle(this.up, i * Math.PI * 2 / this.def.splitCount + 0.8), 0.9));
       e.home.copy(this.home); e.state = 'chase'; e.vy = 4; e.grounded = false; ctx.enemies.push(e); }
@@ -156,15 +196,20 @@ export class Enemy extends Walker {
     this.calmT = ENGAGED.has(this.state) ? 0 : this.calmT + dt;
     if (this.def.miniBoss && this.calmT > COMBAT.leashReturn.miniBossHealDelay && this.hp < this.def.hp)   // a mini boss heals only once properly out of the fight
       this.hp = Math.min(this.def.hp, this.hp + this.def.hp * COMBAT.leashReturn.heal * dt);
-    const dist = tangentTo(this.pos, this.up, ctx.player.pos, this.toP), safe = playerSafe();
+    if (this.foe && (!canHarmMob(this, this.foe) || (this.foeT -= dt) <= 0)) this.foe = null;   // TODO 45b: the feud ends with its foe
+    const target = this.foe ?? ctx.player;                          // a provoked monster hunts its attacker, everyone else the hero
+    const dist = tangentTo(this.pos, this.up, target.pos, this.toP);
+    const heroSafe = playerSafe();                                  // the hero's own rules: the village, fainting, indoors
+    this.distP = this.foe ? tangentTo(this.pos, this.up, ctx.player.pos, _a2) : dist;
+    const safe = this.foe ? false : heroSafe;                       // a brawl carries on while the hero is safe
     if (!ENGAGED.has(this.state) && this.state !== 'return' && dist < d.aggro) this.aggro();
-    if (ENGAGED.has(this.state) && (safe || distance(pointOf(this), this.home) > d.leash || dist > d.aggro * 2.2)) { this.state = 'return'; this.hideTele(); }
+    if (ENGAGED.has(this.state) && (safe || (this.leashed && (distance(pointOf(this), this.home) > d.leash || dist > d.aggro * 2.2)))) { this.state = 'return'; this.hideTele(); }
     this.move.copy(this.fwd);
     const slowMul = this.slowT > 0 ? 1 - this.slowAmt : 1;
     const speed = (this.stunT > 0 ? 0 : this.think(dt, dist)) * slowMul;
     if (this.space && ctx.room !== this.space) return;   // a hit can faint the hero and tear down the cave
-    if (this.space && this.state === 'chase' && !this.space.clear(this.pos, ctx.player.pos, this.radius)) {
-      this.move.copy(this.space.toward(this.pos, this.space.waypoint(this.pos, ctx.player.pos, this.radius)));
+    if (this.space && this.state === 'chase' && !this.space.clear(this.pos, target.pos, this.radius)) {
+      this.move.copy(this.space.toward(this.pos, this.space.waypoint(this.pos, target.pos, this.radius)));
     }
     this.speed += (speed - this.speed) * damp(8, dt);
     if (d.ai === 'hopper') {            // slimes only travel while airborne
@@ -178,8 +223,10 @@ export class Enemy extends Walker {
     if (this.hopDir) projectTangent(this.hopDir, this.up).normalize();
     if (n && this.state === 'wander') { this.fwd.addScaledVector(n, 0.9); projectTangent(this.fwd, this.up).normalize(); this.turn = -this.turn; }
     this.behavior?.update?.(this, dt, n);
-    if (d.contact && ENGAGED.has(this.state) && !safe && this.cool <= 0 && dist < this.radius + ctx.player.radius + 0.3 && altitude(ctx.player) < 1) {
-      hurtPlayer(d.damage, this.pos, d.knockback, { source: this }); this.cool = d.contactCooldown; }
+    if (d.contact && ENGAGED.has(this.state) && this.cool <= 0) {
+      if (!heroSafe && this.distP < this.radius + ctx.player.radius + 0.3 && altitude(ctx.player) < 1) {
+        hurtPlayer(d.damage, this.pos, d.knockback, { source: this }); this.cool = d.contactCooldown; }
+      else if (hitMobs(this, this.pos, this.radius + 0.3, d.damage, { knock: d.knockback }).length) this.cool = d.contactCooldown; }
     if (this.stunT > 0.1 && rng() < dt * 12) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, this.height * 0.55), { count: 1, color: 0xffe066, speed: 1.4, up: this.up, upBias: 0.3, life: 0.5, size: 0.32 });   // dazed stars
     if (this.slowT > 0 && rng() < dt * 8) sparkles.emit(this.center(), { count: 1, color: 0x9fe8ff, speed: 0.8, life: 0.6, size: 0.26 });
     if (this.shieldT > 0 && rng() < dt * 10) sparkles.emit(_tv.copy(this.center()).addScaledVector(this.up, mr(-0.5, 0.5) * this.height), { count: 1, color: 0xbff4ff, speed: 1.2, life: 0.5, size: 0.3 });
@@ -215,7 +262,7 @@ export class Enemy extends Walker {
     if (this.state === 'chase') {
       turnToward(this.fwd, toP, this.up, damp(d.turnRate, dt));
       if (d.fleeBelow && !this.fled && this.hp < d.hp * d.fleeBelow) { this.fled = true; this.state = 'flee'; this.timer = d.fleeTime; emote(this, '!', '#ffd24a'); return 0; }
-      if (dist < d.range && this.cool <= 0 && visible(this.pos, ctx.player.pos)) { this.state = 'windup'; this.timer = d.windup; if (d.slamRadius) audio.growl(); return 0; }
+      if (dist < d.range && this.cool <= 0 && visible(this.pos, this.target.pos)) { this.state = 'windup'; this.timer = d.windup; if (d.slamRadius && this.heard) audio.growl(); return 0; }
       this.move.copy(toP); if (d.weave) this.move.applyAxisAngle(this.up, Math.sin(ctx.time * 5 + this.seed) * d.weave);
       return dist > d.range * 0.8 ? d.speed : 0;
     }
@@ -240,11 +287,13 @@ export class Enemy extends Walker {
     if (d.slamRadius) {
       const c = this.slamCenter().clone();
       ringFX(c, d.slamRadius, 0xffb08a, 0.5); sparkles.emit(groundPoint(c, 0.3), { count: 30, color: 0xe8d6c0, speed: 3.5, up: this.up, upBias: 0.5, life: 0.7, size: 0.45 });
-      if (dist < 12) shakeCamera(0.35); audio.slam();
+      if (this.distP < 12) shakeCamera(0.35); if (this.heard) audio.slam();
       if (!playerSafe() && visible(c, ctx.player.pos) && ctx.player.pos.distanceTo(c) < d.slamRadius + ctx.player.radius && altitude(ctx.player) < 0.9) hurtPlayer(d.damage, c, d.knockback, { source: this });
+      hitMobs(this, c, d.slamRadius, d.damage, { knock: d.knockback });                   // TODO 45b: the slam catches monsters too
     } else {
-      this.knock.addScaledVector(this.fwd, d.lunge || 0); audio.swipe();
-      if (!playerSafe() && visible(this.pos, ctx.player.pos) && dist < d.range + 0.6 && this.fwd.dot(this.toP) > 0.3) hurtPlayer(d.damage, this.pos, d.knockback, { source: this });
+      this.knock.addScaledVector(this.fwd, d.lunge || 0); if (this.heard) audio.swipe();
+      if (!playerSafe() && visible(this.pos, ctx.player.pos) && this.distP < d.range + 0.6 && this.fwd.dot(this.toP) > 0.3) hurtPlayer(d.damage, this.pos, d.knockback, { source: this });
+      hitMobs(this, this.pos, d.range + 0.6, d.damage, { knock: d.knockback, arc: COMBAT.mobFeud.arc });   // TODO 45b: a swipe catches what is in front of it
     }
   }
   /** Wisps keep their distance, strafe, and fire slow homing orbs after a visible charge. */
@@ -253,17 +302,20 @@ export class Enemy extends Walker {
     turnToward(this.fwd, toP, this.up, damp(6, dt));
     if (this.state === 'charge') { if (this.timer <= 0) { this.fire(); this.state = 'chase'; this.cool = d.cooldown; } return 0; }
     if (this.state !== 'chase') this.state = 'chase';
-    if (this.cool <= 0 && dist < d.aggro * 1.3 && visible(this.pos, ctx.player.pos)) { this.state = 'charge'; this.timer = d.windup; audio.charge(); return 0; }
+    if (this.cool <= 0 && dist < d.aggro * 1.3 && visible(this.pos, this.target.pos)) { this.state = 'charge'; this.timer = d.windup; if (this.heard) audio.charge(); return 0; }
     if (dist < d.keepDistance - 1.5) { this.move.copy(toP).negate(); return d.speed; }
     if (dist > d.keepDistance + 1.5) { this.move.copy(toP); return d.speed; }
     this.move.crossVectors(this.up, toP).multiplyScalar(Math.sin(ctx.time * 0.8 + this.seed) > 0 ? 1 : -1); return d.speed * 0.5;
   }
   fire() {
     const d = this.def;
-    ctx.projectiles.push(new Projectile({ team: 'enemy', up: pointOf(this), dir: this.toP, alt: 1.1, speed: d.projectileSpeed, range: d.aggro * 1.8, radius: 0.35,
-      size: 0.22, color: d.color, homing: d.projectileHoming, homeTo: () => (ctx.player.dead ? null : _a2.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1)),
-      onHit: (p, h) => { if (h === ctx.player) hurtPlayer(d.damage, p.pos, 2.5, { source: this }); sparkles.emit(p.pos, { count: 14, color: d.color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
-    audio.wispShot();
+    ctx.projectiles.push(new Projectile({ team: 'enemy', owner: this, up: pointOf(this), dir: this.toP, alt: 1.1, speed: d.projectileSpeed, range: d.aggro * 1.8, radius: 0.35,
+      size: 0.22, color: d.color, homing: d.projectileHoming, homeTo: () => { const t = this.target; return t.dead || t.alive === false ? null : _a2.copy(t.pos).addScaledVector(t.up, 1); },
+      onHit: (p, h) => {
+        if (h === ctx.player) hurtPlayer(d.damage, p.pos, 2.5, { source: this });
+        else if (h) hitMob(this, h, d.damage, { from: p.pos, knock: 2.5 });             // TODO 45b: a ghost's orb burns a monster too
+        sparkles.emit(p.pos, { count: 14, color: d.color, speed: 2.4, life: 0.5, size: 0.32 }); } }));
+    if (this.heard) audio.wispShot();
   }
   /** Slimes bounce straight at you and hurt on contact; big ones split when popped. */
   thinkHopper(dt) { this.state = 'chase'; turnToward(this.fwd, this.toP, this.up, damp(6, dt)); this.move.copy(this.toP); return this.def.speed; }

@@ -36,7 +36,8 @@ function knockDir(from, ent, out) {
 const BIG_HIT = 40;
 
 /** o: from (knockback origin), knock, slow + slowTime, mark (seconds), stagger (seconds), stun (seconds, see Enemy.stun),
-    color (spark tint), source ('pet' for the companion, 'burn' for an Ember set burn tick; omitted for the hero's own
+    color (spark tint), source ('pet' for the companion, 'burn' for an Ember set burn tick, 'mob' for another
+    monster's blow (TODO 45b), which carries the attacker in o.attacker and credits nobody; omitted for the hero's own
     abilities, which also carry the worn sets' burn / chill / knock: config/sets.js). */
 export function damageEnemy(e, amount, o = {}) {
   if (!e.alive || e.hidden) return;                                   // burrowed monsters can't be hit
@@ -50,7 +51,7 @@ export function damageEnemy(e, amount, o = {}) {
     e.aggro(); return;
   }
   if (!o.source) amount *= damageMultiplier(ctx.player.level) * (1 + (ctx.player.stats.damageBonus || 0));   // no source = the hero's own abilities (level + gear)
-  if (o.source !== 'pet' && e.markT > 0) amount *= 1 + COMBAT.mark.bonus;
+  if (o.source !== 'pet' && o.source !== 'mob' && e.markT > 0) amount *= 1 + COMBAT.mark.bonus;
   if (!o.source && buffs.howl > 0) amount *= 1 + PETS.wolf.ability.damage;   // a pet's Howl (gameplay/petAbilities.js)
   if (!o.source && buffs.might > 0) amount *= 1 + BUFFS.mightDamage;          // Mighty: a pie, a skewer, a fire pepper
   if (e.stunnedT > 0) amount *= 1 + (e.def.stunnedDamageBonus || 0); // dazed after crashing a charge
@@ -59,7 +60,8 @@ export function damageEnemy(e, amount, o = {}) {
   amount = Math.max(1, Math.round(amount)); e.hp -= amount; e.hitPop = 1;
   encounterEvents.dispatchEvent(new CustomEvent('enemyhit', { detail: { enemy: e, amount, source: o.source ?? 'player' } }));
   const marked = e.markT > 0 && o.source !== 'pet', big = amount >= BIG_HIT;
-  if (settings.damageNumbers) floatText(_tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
+  if (settings.damageNumbers && o.source !== 'mob') floatText(    // TODO 45b: a brawl shows its sparks, not the hero's numbers
+    _tv.copy(e.center()).addScaledVector(e.up, e.height * 0.5), `${amount}`,
     o.source === 'pet' ? '#c7a8ff' : o.source === 'burn' ? '#ff9a4a' : big ? '#ffd36b' : marked ? '#ffb03d' : '#ffffff', big ? 1.6 : 1);
   sparkles.emit(e.center(), { count: big ? 18 : 8, color: o.color ?? 0xffffff, speed: big ? 3.6 : 2.5, life: 0.4, size: big ? 0.4 : 0.3 });
   if (o.knock && o.from) e.knock.addScaledVector(knockDir(o.from, e, _tv), o.knock * (1 - (e.def.knockResist || 0)));
@@ -68,12 +70,44 @@ export function damageEnemy(e, amount, o = {}) {
   if (!o.source) setOnHit(e, amount);
   if (o.stagger) e.interrupt(o.stagger);
   if (o.stun && e.hp > 0) e.stun(o.stun);
-  if (o.source !== 'pet') noteHit(e);
-  e.aggro(); audio.hitEnemy();
+  if (o.source !== 'pet' && o.source !== 'mob') noteHit(e);
+  if (o.source === 'mob') e.provoke(o.attacker); else e.aggro();
+  audio.hitEnemy();
   if (e.hp <= 0) {
-    e.die();
+    e.die(o.source === 'mob' ? o.attacker : null);                      // TODO 45b: who struck the last blow
     if (LEVELING.creditSources.includes(o.source || 'player')) { gainXp(e.def.xp, e); gainCoins(coinsForKill(e), _tv.copy(e.center()).addScaledVector(e.up, e.height * 0.9)); }
   }
+}
+
+/** Who may damage whom among monsters (TODO 45b). Only lesser monsters feud: a mini boss's or a main boss's attack
+    never damages a lesser monster, in any form, so a boss fight is never settled by the monsters standing in it.
+    Nothing hits itself, a monster already down, a burrowed one, or one in another space (a cave room, another world). */
+export function canHarmMob(attacker, target) {
+  return !!attacker?.lesser && !!target?.lesser && attacker !== target
+    && target.alive && !target.hidden && !target.dormant
+    && (attacker.space ?? null) === (target.space ?? null);
+}
+
+/** One monster's blow landing on one other (TODO 45b): the single place a monster's damage reaches a monster, so
+    attribution stays with o.attacker and the kill credits nobody (LEVELING.creditSources has no 'mob'). */
+export function hitMob(attacker, target, amount, o = {}) {
+  if (!canHarmMob(attacker, target)) return false;
+  damageEnemy(target, amount * COMBAT.mobFeud.damage, { source: 'mob', attacker, from: o.from ?? attacker.pos, knock: o.knock ?? 0 });
+  return true;
+}
+
+/** A monster's blow landing on every monster caught in it (TODO 45b). Every attack keeps its own hit test on the hero
+    exactly as it was; this only adds the monsters standing in the same blow, so the hero's own fight is unchanged.
+    o.knock: push, o.arc: a swipe's facing test (COMBAT.mobFeud.arc). Returns the monsters it hit. */
+export function hitMobs(attacker, center, radius, amount, o = {}) {
+  const hit = [];
+  if (!attacker?.lesser) return hit;                                  // a boss's blow passes straight through them
+  for (const t of ctx.enemies) {
+    if (!canHarmMob(attacker, t) || t.center().distanceTo(center) > radius + t.hitR) continue;
+    if (o.arc !== undefined && attacker.fwd.dot(_tv.copy(t.pos).sub(attacker.pos).normalize()) < o.arc) continue;
+    if (hitMob(attacker, t, amount, { from: center, knock: o.knock })) hit.push(t);
+  }
+  return hit;
 }
 
 /** The worn sets' effects on a hit of the hero's own (config/sets.js): burn, chill and a Breaker push. */
