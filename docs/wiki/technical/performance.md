@@ -99,7 +99,7 @@ node scripts/performance.mjs
 
 `CHROME` can point to Chrome instead. The script uses a fresh headless profile and its own server on port 8095.
 It does not force software rendering; inspect the reported GPU before comparing frame rates. Internet access is
-needed for the game's existing Three.js/font CDN imports. Run without other heavy tasks for useful timing.
+needed for the game's font CDN import (Three.js is now served from `vendor/three/`). Run without other heavy tasks for useful timing.
 
 Each planet uses its village spawn, the witch, a passive pet, night at 88% of the day and the heaviest particle weather
 in its configured mix (storm, embers, blizzard). The camera uses pitch 0.38 and distance 8.5. Viewport is 1920 × 1080,

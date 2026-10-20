@@ -15,6 +15,8 @@ tests/                     unit tests: XP / level math, inventory, planets + ene
                            heroes, villagers + quests + shop, houses, chests + loot, items + gear + crafting, pets, keybinds,
                            the seeded random stream
 tests/sim/                 gameplay sims (npm run sim): the real game played headless; balance.sim.mjs is the balance report
+vendor/three/              the Three.js r160 browser build and the eleven addon modules the game imports, so the
+                           published game needs no CDN; vendor/three/README.md says how to refresh it
 favicon.ico                the Girl Witch character mark in the browser tab (16–48 px)
 favicon.png                the 32 px PNG browser icon, from docs/logo/witch-A1.png
 src/

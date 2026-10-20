@@ -19,8 +19,9 @@ npm stop             # stop this project's server on port 8080
 npm stop -- 3000     # stop it on a custom port (PORT also works, as with npm start)
 ```
 
-Any static server works too (`npx serve`, `python -m http.server`). An internet connection is needed: Three.js and the
-UI font come from CDNs, declared in the import map in `index.html`.
+Any static server works too (`npx serve`, `python -m http.server`). Three.js ships with the game in `vendor/three/`
+and is declared in the import map in `index.html`, so play works offline; only the UI font still comes from a CDN,
+and the game falls back to a system font without it.
 
 ```sh
 npm test             # unit tests (Node's built-in test runner, no dependencies)

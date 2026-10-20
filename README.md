@@ -125,7 +125,9 @@ npm start -- 3000    # Or choose a different port
 npm stop             # Stop this project's server on port 8080
 ```
 
-Any static HTTP server works, including `npx serve` or `python -m http.server`.
+Any static HTTP server works, including `npx serve` or `python -m http.server`. Three.js ships with the game in
+`vendor/three/` and is declared in the import map in `index.html`, so play works offline; only the UI font still
+comes from a CDN, and the game falls back to a system font without it.
 
 **2. Run tests and simulations**
 
@@ -162,6 +164,7 @@ Lanternmoss/
 │   └── progression/         # Player progression
 ├── tests/                   # Unit tests and tests/sim/
 ├── scripts/                 # Dev server, smoke checks, screenshots
+├── vendor/three/            # Bundled Three.js r160 build and addons (no CDN needed)
 ├── docs/
 │   ├── wiki/                # Game design, world, technical references
 │   ├── screenshots/         # In-game screenshots
