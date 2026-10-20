@@ -10,7 +10,7 @@
    The screen opens with the current hero (and the pet they took last time) already picked, so Play is two Enters away. */
 import * as THREE from 'three';
 import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
-import { PETS } from '../config/pets.js';
+import { petAvailable, availablePetIds } from '../config/pets.js';
 import { ctx } from '../core/context.js';
 import { Pets } from '../gameplay/Pets.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -82,7 +82,7 @@ export const CharacterSelect = {
   },
   /** On the pet step: take an unlocked pet along (it comes round in front of the hero), or look at how to find a locked one. */
   pickPet(id, quiet = false) {
-    if (!PETS[id]) return;
+    if (!petAvailable(id)) return;
     const changed = id !== this.petView; this.petView = id;
     if (Pets.unlocked.has(id) && id !== Pets.id) { Pets.choose(id, true); if (!quiet) audio.blip(); }
     else if (Pets.unlocked.has(id)) Pets.remember(id);
@@ -121,7 +121,7 @@ export const CharacterSelect = {
     if (code === 'Enter' || code === 'Space') { this.confirm(); return; }
     if (code === 'Backspace') { this.back(); return; }
     if (this.step === 'pet') {                                // arrows step through the pets (locked ones too: they say how to find them)
-      const ids = Object.keys(PETS), i = Math.max(0, ids.indexOf(this.petView));
+      const ids = availablePetIds(), i = Math.max(0, ids.indexOf(this.petView));
       if (prev || next) this.pickPet(ids[(i + (next ? 1 : ids.length - 1)) % ids.length]);
       else if (/^Digit[1-9]$/.test(code) && ids[+code.slice(5) - 1]) this.pickPet(ids[+code.slice(5) - 1]);
       return;

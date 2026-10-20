@@ -24,4 +24,5 @@ export const ctx = {
   projectiles: [],
   hitStop: 0,         // seconds of slow motion left after a heavy impact (fx/combatFx.js hitStop)
   worldItems: [],     // WorldItem pickups lying on the planet
+  resourceNodes: [],  // current Gathering nodes, shared with pet abilities; replaced on travel/load
 };

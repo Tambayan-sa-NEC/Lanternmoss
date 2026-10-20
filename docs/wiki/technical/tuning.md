@@ -48,7 +48,7 @@
 | Bounty board: kinds of job, counts, coins, material, rare-piece chance, board placement | `src/config/bounties.js` → `BOUNTIES` |
 | Gear sets: pieces, two- and three-piece bonuses (burn, chill, healing, swimming, push), burn tick | `src/config/sets.js` → `SETS`, `BURN_TICK` |
 | Talents: points per level, the reset wizard, each hero's tree and its release flag | `src/config/talents.js` → `TALENTS` |
-| Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys | `src/config/pets.js` |
+| Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys; otter Pearl Dive radius, cooldown, daily cap and yield | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
 | Photo mode: camera range, filters, frames, poses, emotes | `src/config/photo.js` → `PHOTO` (filter / frame looks: `RenderSystem` paper pass) |

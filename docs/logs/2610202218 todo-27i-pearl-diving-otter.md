@@ -1,0 +1,7 @@
+﻿| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-20 22:18 | PLAN | TODO 27i | Started the independent otter stage | feat/todo-27i-otter | Updated clean develop and created TODO parent and stage branches; kept Tidewhisper unreleased | 0h 01m |
+| 2026-10-20 22:38 | FEATURE | TODO 27i | Built quest-gated otter and bounded Pearl Dive | feat/todo-27i-otter | Added companion model, saved daily count, submerged clam-bed yield, UI visibility gate, candidate sim and browser smoke; 0h 20m elapsed since task start | 0h 20m |
+| 2026-10-20 22:38 | TEST | TODO 27i | Ran unit and initial simulation suites | feat/todo-27i-otter | npm test 277/277 passed. Initial npm run sim had 1/62 failure: coastalWildlife expected three model builders; updated assertion to four and its focused sim passed. Full rerun underway. | 0h 04m |
+| 2026-10-20 22:44 | TEST | TODO 27i | Rechecked implementation | feat/todo-27i-otter | Corrected coastal builder assertion; npm run sim 62/62 passed. Otter Edge smoke passed real B/V, Continue, both viewports, 14 meshes/1,068 triangles and zero page/shader errors. | 0h 05m |
+| 2026-10-20 22:47 | DOCS | TODO 27i | Updated TODO, wiki and screenshots | feat/todo-27i-otter | Reviewed and retook pets/otter.jpg after clearing the view; screenshot tour ended errors: none, Controls/gameplay spots looked sound, unrelated retakes restored. Tidewhisper campaign browser smoke passed zero page/shader errors. | 0h 04m |

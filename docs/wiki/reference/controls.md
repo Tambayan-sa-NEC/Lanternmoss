@@ -20,7 +20,7 @@ over). The defaults:
 | `T` | pet command: follow → stay → attack my target → passive |
 | `J` | the journal: achievements, bestiary and collection (pauses; also on the pause menu and title screen) |
 | `K` | photo mode: pauses, hides the HUD; orbit / zoom / `Q` `E` tilt, `1`–`6` filter, frame, pose, emote, `Enter` saves a PNG, `H` hides the toolbar |
-| `V` | your pet's ability (Scout, Howl, Fetch, Mend or Flame Burst) |
+| `V` | your pet's ability (Scout, Howl, Fetch, Mend, Flame Burst or the Tidewhisper otter's Pearl Dive) |
 | drag / wheel | rotate / zoom camera (the view only: aiming follows the hero's facing) |
 | `Esc` / `P` | pause menu: resume, settings, controls, quit (Esc first closes the bag, aiming or dialogue) |
 | `F3` | show / hide performance statistics (also works while paused; rebind in Settings) |

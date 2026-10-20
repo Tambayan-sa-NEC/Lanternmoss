@@ -8,7 +8,7 @@ import { PLANETS } from '../src/config/planets.js';
 const fixture = () => JSON.parse(readFileSync(new URL('fixtures/save-v1.json', import.meta.url), 'utf8'));
 test('v1 fixture remains readable, with independent planet snapshots and one explicit slot', () => {
   const raw = fixture(), clean = sanitizeSave(raw);
-  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, player: cleanState('player', raw.systems.player), portals: cleanState('portals', null), progression: cleanState('progression', raw.systems.progression), tutorial: cleanState('tutorial', null), crafting: cleanState('crafting', null), buffs: cleanState('buffs', raw.systems.buffs), talents: { ranks: {} } } });
+  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, player: cleanState('player', raw.systems.player), pets: cleanState('pets', raw.systems.pets), portals: cleanState('portals', null), progression: cleanState('progression', raw.systems.progression), tutorial: cleanState('tutorial', null), crafting: cleanState('crafting', null), buffs: cleanState('buffs', raw.systems.buffs), talents: { ranks: {} } } });
   // A save written before caves existed (29d) keeps its surface pose and simply starts outside, with no cave progress.
   assert.deepEqual([clean.systems.player.cave, clean.systems.player.caveX, clean.systems.player.caveZ], [null, 0, 0]);
   assert.equal(clean.planets.lanternmoss.caves, undefined, 'an old planet snapshot gains no cave rows');
@@ -19,6 +19,15 @@ test('v1 fixture remains readable, with independent planet snapshots and one exp
   assert.equal(clean.planets.lanternmoss.chests.opened[0], 'lanternmoss:0');
   assert.equal(clean.planets.emberfall.farm.plots[0].crop, 'carrot');
   assert.deepEqual(sanitizeSave(clean), clean);
+});
+test('otter dive state is bounded and an unreleased pet cannot be imported into normal play', () => {
+  const raw = fixture();
+  raw.systems.pets.unlocked.push('otter'); raw.systems.pets.active = 'otter';
+  raw.systems.pets.diveDay = 4; raw.systems.pets.divesToday = 999;
+  const pets = sanitizeSave(raw).systems.pets;
+  assert.ok(!pets.unlocked.includes('otter'));
+  assert.equal(pets.active, 'owl');
+  assert.equal(pets.diveDay, 4); assert.equal(pets.divesToday, 2);
 });
 test('damaged, foreign, missing-player and future saves are rejected without overwriting', () => {
   const disk = new Map([[SAVE_KEY, JSON.stringify(fixture())]]);
