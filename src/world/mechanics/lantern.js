@@ -29,6 +29,13 @@ export function canopyCover(d, layout) {
   for (const gap of layout.gaps) open(gap.dir, gap.radius, gap.gapCover ?? layout.gapCover);
   return clamp(cover, 0, 1);
 }
+/** True where the canopy closes over: outside every gap of starlight and outside the village's own gap. The giant
+    lumen caps grow only here (world/duskFlora.js), so what you see overhead matches how dark it is underneath. */
+export function underCanopy(d, layout) {
+  if (!layout) return true;
+  const clear = (dir, radius) => arcDist(d, dir) >= radius + layout.fade;   // past the whole fade: the dusk is at full strength here
+  return (layout.village <= 0 || clear(layout.villageDir, layout.village)) && layout.gaps.every(g => clear(g.dir, g.radius));
+}
 /** The dusk above the canopy at a moment of the adventure calendar: brightest at midday, deepest at midnight. */
 export function duskAt(seconds, config = LANTERN.dusk) {
   const frac = ((seconds / DAY.length) % 1 + 1) % 1;
@@ -46,14 +53,18 @@ export const lantern = {
 
   create(env) {
     let state = lantern.clean(null), time = 0;
-    const layout = canopyLayout(env.planet.canopy, env.world.spawnDir);
+    const layout = env.world.canopy ?? canopyLayout(env.planet.canopy, env.world.spawnDir);   // the World resolves it once
     const O = LANTERN.oil, L = LANTERN.light;
 
     const place = () => env.player?.up ?? env.world.spawnDir;        // where the hero stands, for darkness and the HUD
+    /** The Moonmoth Wing charm (30b), worn in either trinket slot, widens the lit lantern. */
+    const charmed = () => Object.values(env.player?.equipment ?? {}).some(piece => piece?.itemId === LANTERN.charm.item);
     /** The light the lantern gives right now: full while there is oil, a small safe ember when it is empty. */
     const beam = () => {
       const lit = state.oil > 0, gutter = lit ? 1 - L.flicker * (0.5 - 0.5 * Math.cos(time * 7.3)) : 1;
-      return { lit, radius: (lit ? L.radius : L.emberRadius) * gutter, intensity: (lit ? L.intensity : L.emberIntensity) * gutter };
+      const wide = lit && charmed() ? LANTERN.charm.radius : 1;
+      return { lit, charm: wide > 1, radius: (lit ? L.radius : L.emberRadius) * gutter * wide,
+        intensity: (lit ? L.intensity : L.emberIntensity) * gutter };
     };
 
     const instance = {
@@ -61,7 +72,7 @@ export const lantern = {
       /** Everything the view, the HUD and the chip need; darkness is 0 indoors, where the light is already safe. */
       get status() {
         const b = beam(), dusk = duskAt(env.clock()), cover = canopyCover(place(), layout);
-        return { oil: state.oil, max: O.max, lit: b.lit, radius: b.radius, intensity: b.intensity, cover,
+        return { oil: state.oil, max: O.max, lit: b.lit, radius: b.radius, intensity: b.intensity, charm: b.charm, cover,
           darkness: env.indoors ? 0 : clamp(cover * dusk.level, 0, 1),
           label: cover <= layout.villageCover + 1e-6 ? 'Village light' : cover < layout.cover ? 'Starlight gap' : dusk.label,
           low: state.oil / O.max < L.lowOil, indoors: !!env.indoors };

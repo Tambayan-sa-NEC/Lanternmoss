@@ -91,6 +91,24 @@ export const TREE_BUILDERS = {
     for (let i = 0; i < 6; i++) { const a = i / 6 * 6.28 + rr(0, 0.5), rad = rr(0.6, 1.3);
       A(G.ico(0.16, 0), 0xcffcff, LM(0.1 + Math.cos(a) * rad, 3.1 + Math.sqrt(Math.max(0, 1.9 * 1.9 - rad * rad)) * 0.55, Math.sin(a) * rad, 0, 0, 0, 1, 0.5, 1), { glow: true, intensity: 2.2 }); }
   },
+  lumenCap(A) {               // Duskhollow's canopy: a pale stalk carrying a huge glowing cap about 25 m up
+    const cap = rpick([0x6f5aa8, 0x5f6fb0, 0x7a5a9c]), gills = 0xbfa8ff;
+    A(G.cyl(0.7, 1.15, 23, 7), 0xe6dcc8, LM(0, 11.5, 0, 0, 0, 0.02));
+    A(G.cyl(1.5, 1.05, 0.5, 9), 0xd8ccb6, LM(0, 3.4, 0));                                   // the swollen base ring
+    A(G.hemi(8.2, 11, 4), cap, LM(0.2, 23.2, 0, 0, 0, 0, 1, 0.52, 1), { jitter: 0.12 });
+    A(G.cyl(8.1, 5.4, 0.3, 11), gills, LM(0.2, 23.1, 0), { glow: true, intensity: 1.5 });   // lit gills: the canopy glows from below
+    for (let i = 0; i < 7; i++) { const a = i / 7 * 6.28 + rr(0, 0.4), rad = rr(2.4, 6.4);   // lantern vines hang from the cap
+      A(G.cyl(0.05, 0.05, rr(2.2, 4.6), 4), 0x8f7fd0, LM(0.2 + Math.cos(a) * rad, 21.1, Math.sin(a) * rad), { outline: false });
+      A(G.ico(0.3, 0), 0xcffcff, LM(0.2 + Math.cos(a) * rad, 19.4, Math.sin(a) * rad), { glow: true, intensity: 2.4 }); }
+  },
+  glowcap(A) {                // a small cap you walk under, glowing along its rim
+    const cap = rpick([0x8f7fd0, 0x6fb8b0, 0xc78fd0]);
+    A(G.cyl(0.22, 0.3, 1.9, 6), 0xf0e6d2, LM(0, 0.95, 0, 0, 0, 0.05));
+    A(G.hemi(1.15, 9, 3), cap, LM(0.05, 1.85, 0, 0, 0, 0, 1, 0.6, 1), { jitter: 0.1 });
+    A(G.cyl(1.12, 0.8, 0.14, 9), 0xe8dcff, LM(0.05, 1.83, 0));
+    for (let i = 0; i < 4; i++) { const a = i / 4 * 6.28 + rr(0, 0.6);
+      A(G.ico(0.13, 0), 0xaaf6e0, LM(0.05 + Math.cos(a) * 0.95, 1.84, Math.sin(a) * 0.95), { glow: true, intensity: 2.3 }); }
+  },
   oak(A) {                    // broad round oak: a thick trunk, low branches, a wide two-tone crown
     const [c1, c2] = rpick([[0x8fd07a, 0x74b862], [0xa8d870, 0x8cc05a], [0x7cc49a, 0x5fae84]]);
     A(G.cyl(0.32, 0.5, 2.4, 7), 0x8a5f4c, LM(0, 1.2, 0));

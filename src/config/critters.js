@@ -29,6 +29,12 @@ export const CRITTER_DEFS = {
   reindeer: { kind: 'deer', fur: 0x9a8a80, belly: 0xf4f0ec, ear: 'big', tail: 'puff', len: 1.45, leg: 0.55, snout: 1.4, w: 1.1, antlers: 1.35, speed: 1.0, radius: 0.48 },
   frog: { kind: 'frog', fur: 0x6fc46a, belly: 0xe8f6c0, ear: 'none', tail: 'none', frogEyes: true, len: 0.75, leg: 0.08, snout: 0.6, w: 1.45, speed: 0.9, hop: 3.0, radius: 0.22 },
   lizard: { kind: 'lizard', fur: 0xe0703a, belly: 0xffd08a, ear: 'none', tail: 'cat', tailCol: 0xc85a2a, len: 1.3, leg: 0.08, snout: 1.6, w: 0.8, spines: 0xffb03d, speed: 2.4, radius: 0.24 },
+  // ---- Duskhollow (30b): glow snails, lantern bats and crickets. hang = metres it stays in the air;
+  //      wingbeat = how fast its wings beat instead of a walk cycle (src/entities/wildlife/Critter.js).
+  glowSnail: { kind: 'snail', build: 'snail', fur: 0xcfc3e8, shell: 0x6f5aa8, accent: 0x9ff3d8, speed: 0.3, radius: 0.26 },
+  lanternBat: { kind: 'bat', build: 'bat', fur: 0x4a3f66, wing: 0x3a3152, accent: 0xffd36b, eye: 0xffe066, speed: 1.6,
+    radius: 0.24, hang: 2.1, wingbeat: 9 },
+  duskCricket: { kind: 'cricket', build: 'cricket', fur: 0x6f8f6a, accent: 0xbfe8a0, speed: 1.1, hop: 2.8, radius: 0.18 },
   // ---- rare creatures: one wanders each planet
   goldBunny: { kind: 'bunny', fur: 0xffd36b, belly: 0xfff6d0, ear: 'long', earCol: 0xffc040, tail: 'puff', tailCol: 0xffffff, len: 0.8, leg: 0.13, snout: 0.7, w: 0.9,
     speed: 1.8, hop: 3.8, eye: 0x3a2a6a, rare: { name: 'Golden Moonbunny', gift: 'goldenClover', color: 0xffe08a } },
@@ -36,6 +42,8 @@ export const CRITTER_DEFS = {
     eye: 0xffe066, eyeGlow: true, speed: 2.4, radius: 0.26, rare: { name: 'Ember Salamander', gift: 'emberScale', color: 0xffb03d } },
   auroraHare: { kind: 'bunny', fur: 0xeaf6ff, belly: 0xffffff, ear: 'long', earCol: 0xbff4ff, tail: 'puff', tailCol: 0x9ff3ff, len: 0.85, leg: 0.15, snout: 0.75, w: 0.95,
     speed: 2.0, hop: 4.0, eye: 0x7fd6ff, eyeGlow: true, rare: { name: 'Aurora Hare', gift: 'auroraFeather', color: 0x9ff3ff } },
+  moonmoth: { kind: 'moth', build: 'moth', fur: 0xe8e0ff, belly: 0xfff6e0, wing: 0xdfe8ff, accent: 0xfff0a0, eye: 0xcffcff,
+    speed: 1.5, radius: 0.3, hang: 1.5, wingbeat: 7, rare: { name: 'Moonmoth', gift: 'moonmothWing', color: 0xdfe8ff } },
   // ---- the dragontoad pet (config/pets.js)
   dragontoad: { kind: 'toad', build: 'toad', fur: 0x5aa86a, belly: 0xf0e0a0, accent: 0xff8a3a, wing: 0xd8603a, speed: 1.4, hop: 3.2, radius: 0.36 },
 };

@@ -24,6 +24,7 @@ import { createWater } from './water.js';
 import { Weather } from './weather.js';
 import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
 import { LanternView } from './mechanics/lanternView.js';
+import { canopyLayout } from './mechanics/lantern.js';
 import { configurePhysics, physicsQueries } from './physics.js';
 import { archipelagoLayout } from './archipelago.js';
 import { coastalWind } from '../render/coastalWind.js';
@@ -49,6 +50,7 @@ export class World {
     if (!this.mechanics.accepts(planet)) throw new Error(`Unknown planet mechanic: ${planet.mechanic}`);
     this.mechanics.exit();
     this.coast = planet.terrain?.archipelago ? archipelagoLayout(planet.terrain.archipelago, this.spawnDir) : null;
+    this.canopy = planet.canopy ? canopyLayout(planet.canopy, this.spawnDir) : null;   // Duskhollow's gaps of starlight (30a/30b)
     configurePhysics(this.coast ? { ...planet.physics, waterRegions: [{ id: 'lagoon', dir: this.coast.lagoon.dir.toArray(), radius: this.coast.lagoon.radius,
       level: planet.physics.seaLevel, maxLevel: planet.physics.seaMaxLevel }] } : planet.physics);
     this.planet = planet; this.objects = []; this.ownMaterials = [];
@@ -111,7 +113,7 @@ export class World {
     if (this.farmDir) placed.push({ dir: this.farmDir, r: 7 }); // keep scattered solids out of the protected plot site
     B.decorative = true; decoratePonds(B); B.decorative = false;
     this.spots = { trees: [], rocks: [] };                            // every tree and rock, to chop and mine (gameplay/Gathering.js)
-    this.trees = scatterFlora(B, planet.flora, this.spots);           // { kind: count }
+    this.trees = scatterFlora(B, planet.flora, this.spots, { canopy: this.canopy });   // { kind: count }
     this.scenery = freezeStaticTransforms(B.build()); this.add(this.scenery);
     const fl = planet.flora ?? {}, grass = createGrass(palette.grass, fl.grass ?? 1), tall = createTallGrass(fl.tallGrass ?? palette.grass, spawnDir, fl.tallCount ?? 1);
     const [stems, heads] = createMeadowFlowers(fl.flowers ?? [0xff8fb1, 0x8ff0ff, 0xffd36b, 0xc5a6ff], fl.meadow ?? 1);

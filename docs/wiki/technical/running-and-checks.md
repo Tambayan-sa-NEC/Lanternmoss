@@ -79,6 +79,8 @@ node scripts/mob-combat-smoke.mjs  # monsters fighting each other (45b/45c): bra
                                    # the hero reclaiming a monster, a boss harmless to them; retakes docs/screenshots/mobs/mob-brawl.jpg
 node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk on Low, the village gap, real WASD lighting
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
+node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
+                                   # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
@@ -110,6 +112,13 @@ trail and burn oil, checks that an empty lantern keeps a safe ember and costs no
 overflow nothing with zero page and shader errors. It captures `world/duskhollow.jpg` through `shots.mjs`.
 `node tests/sim/duskhollow.sim.mjs` covers generation, the clock and canopy, the HUD, pause and sleep, saves,
 Continue and real portal travel; `node --test tests/lantern.test.mjs` covers the pure dusk, canopy and oil rules.
+
+`node scripts/dusk-wildlife-smoke.mjs` owns port 8130 and checks the 30b flora and wildlife in the browser: the
+canopy grows only where the dusk is closed, the animals and swarms render, a real `E` catches a swarm, really using
+the jar pours oil, and the Moonmoth Wing widens the lantern. It captures `world/duskhollow-canopy.jpg` and
+`critters/duskhollow-wildlife.jpg`. `node tests/sim/duskWildlife.sim.mjs` covers placement, the animals' reactions,
+catching and its save, the charm and the scenery, particle and light budgets;
+`node --test tests/duskWildlife.test.mjs` covers the pure canopy, content and charm rules.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
