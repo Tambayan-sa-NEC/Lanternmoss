@@ -118,6 +118,9 @@ charm, which adds armor and mana regeneration. The existing adventure-wide rare-
 equipment owners persist it in v1 saves; no new save owner/version is added. Continue/revisits may allow a later
 friendship reward, as with the original rare creatures, but cannot grant a second first-gift charm. Respawning
 rebuilds the turtle's swimming destination at its new shore rather than retaining its old home.
+The Pearl of the Deep is marked `props.giftOnly` (2026-10-21), so it is kept out of the random gear pool: until
+Tidewhisper is released, befriending the turtle is the only way to hold it. It used to be a possible tier-3 chest
+drop on released Frostveil, which exposed an unreleased world's charm to players.
 
 Verify with both full suites and `node scripts/coastal-wildlife-smoke.mjs` (Puppeteer Core/Chromium; `CHROME`
 overrides the executable). The helper owns port 8108 and exercises the actual config through

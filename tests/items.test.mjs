@@ -76,6 +76,22 @@ test('wearing gear: totals, caps, the right hero only, and applied on top of the
   assert.match(equipProblem(get('honeyBun'), 'witch'), /can't be worn/);
 });
 
+test("an unreleased world's rare-creature gift never joins the random loot pool", async () => {
+  const { PLANET_CATALOG } = await import('../src/config/planets.js');
+  const { rollGear } = await import('../src/gameplay/loot.js');
+  const gifts = PLANET_CATALOG.filter(p => !p.released).map(p => p.wildlife?.rare)
+    .filter(Boolean).map(key => CRITTER_DEFS[key].rare.gift);
+  assert.ok(gifts.length >= 1, 'at least one unreleased world has a rare creature');
+  for (const id of gifts) {
+    assert.equal(get(id).props?.giftOnly, true, `${id} must be marked gift-only`);
+    // The real pool, rolled many times on the last released world (where every tier can turn up).
+    const rolled = new Set();
+    let seed = 1; const rng = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    for (let i = 0; i < 3000; i++) rolled.add(rollGear(2, 'witch', 'chest', rng)?.item);
+    assert.ok(!rolled.has(id), `${id} must never drop from a released world's chest`);
+  }
+});
+
 test('recipes only use real items, and every material crafts something', () => {
   const ids = new Set(ITEM_DEFINITIONS.map(d => d.id));
   assert.equal(new Set(RECIPES.map(r => r.id)).size, RECIPES.length, 'recipe ids are unique');
