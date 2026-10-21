@@ -1,6 +1,7 @@
 /* ---------------------------------------------------------------------
    DUSKHOLLOW'S LANTERN AND ENDLESS DUSK (TODO 30a).
-   Runtime: src/world/mechanics/lantern.js (the planet mechanic), src/fx/glowmoss.js (the footprints).
+   Runtime: src/world/mechanics/lantern.js (the planet mechanic), src/fx/glowmoss.js (the footprints),
+   src/gameplay/Fireflies.js (the swarms you catch for oil).
    The world never goes fully black: darkness feeds src/render/lighting.js, which keeps a minimum ambient and the
    ink outlines, so the lowest quality preset stays readable. An empty lantern only shrinks your light; it never hurts.
      dusk      the endless dusk. The day clock still turns, as brighter and dimmer dusk:
@@ -22,6 +23,7 @@
                emberRadius / emberIntensity   the small, safe glow an empty lantern shrinks to
                lowOil       share of the tank below which the Oil bar warns and the flame starts to gutter
                flicker      how much the lit radius breathes, as a share of it
+     charm     the Moonmoth Wing (30b): while that charm is worn, the lit lantern reaches `radius` times further
      foot      the glowmoss carpet lighting up in your footprints, the world's signature effect:
                max          hard cap on live prints (one instanced draw call; scenery density scales it down)
                spacing      metres walked between prints      life  seconds a print stays, fading out
@@ -29,10 +31,22 @@
                color / glow colour of the lit moss and how strongly it burns over the ground
    --------------------------------------------------------------------- */
 
+export const FIREFLIES = {
+  count: 7,            // swarms placed around the world
+  radius: 1.4,         // how wide a swarm drifts around its own centre, in metres
+  drift: 0.35,         // how fast it wanders
+  reach: 2.6,          // how close the hero stands before E can catch it
+  away: 150,           // seconds a caught swarm stays gone before another settles somewhere else
+  jar: 'fireflyJar',   // what catching one gives
+  light: { radius: 3.4, color: 0xbff4a0, intensity: 0.5 },   // the glow it casts through render/lighting.js
+  sparkle: 0.12,       // seconds between its drawn particles (fx/sparkles.js applies the particle density)
+};
+
 export const LANTERN = {
   dusk: { day: 0.42, night: 0.78, deepDark: 0.35 },
   canopy: { cover: 1, gapCover: 0.35, villageCover: 0.12, fade: 14 },
   oil: { max: 100, start: 100, burn: 0.34, refillStep: 25 },
   light: { radius: 7.5, intensity: 0.95, emberRadius: 2.8, emberIntensity: 0.4, lowOil: 0.2, flicker: 0.05 },
+  charm: { item: 'moonmothWing', radius: 1.4 },
   foot: { max: 24, spacing: 1.15, life: 4.5, radius: 0.7, lift: 0.07, color: 0x7cf0c0, glow: 1.5 },
 };

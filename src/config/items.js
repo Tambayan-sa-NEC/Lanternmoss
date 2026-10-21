@@ -98,6 +98,7 @@ export const ITEM_EFFECTS = {
   mana: 'Restores {amount} mana / stamina',
   energy: 'Fills {amount} energy',
   buff: '{buffName} for {seconds}s',
+  oil: 'Pours {amount} oil into your lantern',
 };
 
 /** Procedural icon / world-model shapes (CSS in styles/main.css, meshes in src/models/items.js). */
@@ -333,6 +334,13 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xff6a3a, art: 'pendant' }, value: 90, equip: { slot: 'charm', tier: 2, stats: { damage: 0.07, armor: 0.04 } } },
   { id: 'auroraFeather', name: 'Aurora Feather', description: 'A shimmering feather left by an Aurora Hare. Your magic runs deep and returns fast.', category: 'equipment',
     icon: { shape: 'charm', color: 0x9ff3ff, art: 'moonCharm' }, value: 110, equip: { slot: 'charm', tier: 3, stats: { maxMana: 20, manaRegen: 1.5 } } },
+  // ---- Duskhollow (30b) ----
+  { id: 'fireflyJar', name: 'Firefly Jar', description: 'A jar of Duskhollow fireflies, still blinking. Tip them into your lantern and they burn gently for a while.',
+    category: 'consumable', icon: { shape: 'orb', color: 0xbff4a0, art: 'bottle' }, maxStack: 10, value: 14, tags: ['lantern'],
+    use: [{ effect: 'oil', amount: 25 }] },
+  { id: 'moonmothWing', name: 'Moonmoth Wing', description: 'A pale wing scale left by a befriended Moonmoth. Worn at your belt, your lantern reaches further into the dusk.',
+    category: 'equipment', icon: { shape: 'charm', color: 0xdfe8ff, art: 'moonCharm' }, value: 120, props: { giftOnly: true },
+    equip: { slot: 'charm', tier: 3, stats: { maxMana: 10, moveSpeed: 0.03 } } },
   // ---- keys ----
   { id: 'wayfarerKey', name: "Wayfarer's Key", description: 'Opens the next locked world for a one-way portal trip. Defeat its boss or spend another key to return home. Rarely found in Lantern chests; earned for a no-hit boss win.', category: 'misc',
     icon: { shape: 'key', color: 0x9fe9ff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },

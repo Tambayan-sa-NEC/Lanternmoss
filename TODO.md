@@ -1559,7 +1559,7 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
 | [x] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
-| [ ] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
+| [x] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
 | [ ] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
 | [ ] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
 | [ ] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
@@ -1567,6 +1567,30 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
 | [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30b implemented (2026-10-21):** Duskhollow is planted and populated. `src/world/duskFlora.js` grows the canopy by
+one rule that ties it to the light: a giant **lumen cap** (a 19 m stalk under an 8 m cap with lit gills and hanging
+lantern vines) only grows where the dusk is at full strength, so the roof is solid over the hollows and genuinely
+open over every authored gap and the village. **Glowcaps**, **ghost ferns** and **pale moonflowers** fill in
+everywhere, gaps included; all four counts are authored in `flora.canopy` and capped in code.
+Its animals are **glow snails** (they pull into their lit shells), **lantern bats** (they hang in the air under the
+caps and flutter off), **dusk crickets** (heard before seen), pale blind fish in the pools, and the rare
+**Moonmoth**, built in `src/models/duskCreatures.js` with the hover and wingbeat fields added to `Critter`.
+**Firefly swarms** (`src/gameplay/Fireflies.js`) drift as a soft light and a trickle of particles rather than
+bodies; real `E` catches one for a **Firefly Jar** that pours 25 oil into the lantern, and the caught swarm's
+waiting time is saved per planet (new `fireflies` planet row) so Continue cannot relight it and reloading cannot
+farm jars. The Moonmoth's **Moonmoth Wing** charm widens a lit lantern 1.4x (7.5 m to 10.5 m) and never changes the
+safe ember; it is marked `props.giftOnly`, a new rule in `src/gameplay/loot.js` that keeps an unreleased world's
+gift out of every random chest.
+Checked by `tests/duskWildlife.test.mjs`, `tests/sim/duskWildlife.sim.mjs` and
+`node scripts/dusk-wildlife-smoke.mjs` (port 8130; the canopy and animals render, real `E` catches a swarm, the jar
+pours oil, the charm widens the carried light, 720p/1080p, zero page and shader errors), plus two reviewed shots.
+Full suites passed: 287 unit tests and 64 simulations. One real defect was found and fixed on the way: a comment
+appended to the wrong line had swallowed `this.fwd.applyAxisAngle(this.up, rng() * 6.28)` in `Critter`, which
+dropped one draw from the seeded world stream and moved every seeded layout (caves, pets and coastal sims failed
+until it was restored). Duskhollow stays `released: false` with no roster. See
+[Duskhollow](docs/wiki/world/duskhollow.md). Not done here: the lumen economy, weather, music, Wick's Old Road,
+every monster and the release (30c-30i).
 
 **30a implemented (2026-10-21):** Duskhollow now generates. `src/config/planets/duskhollow.js` seeds deep valleys
 (hills plus ridged noise, more than 12 m of relief) under an authored canopy: its height, the village gap and five
@@ -1611,9 +1635,9 @@ music, Wick's waylamps, every monster and the release (30b-30i).
   - At 50% she drinks light: the arena dims each time she feeds, and the scales she sheds blind you (a fog that
     follows you).
   - Arena ring: pale moonfire. Trophy: the Dusk Crown.
-- [ ] **Flora:** lumen caps (the canopy, and smaller ones you walk under), lantern vines hanging from them, ghost ferns,
+- [x] **Flora:** lumen caps (the canopy, and smaller ones you walk under), lantern vines hanging from them, ghost ferns,
       glowmoss and pale moonflowers.
-- [ ] **Wildlife:** firefly swarms (catch them in a jar with `E`, for light and oil), glow snails, lantern bats hanging
+- [x] **Wildlife:** firefly swarms (catch them in a jar with `E`, for light and oil), glow snails, lantern bats hanging
       under the caps, and crickets you hear before you see. Pale blind fish in glowing pools. Rare: the **Moonmoth**
       (gift: the Moonmoth Wing charm, a wider light).
 - [ ] **Weather:** no rain under the canopy (the dripping caps water the farm instead), plus two new kinds: **spore

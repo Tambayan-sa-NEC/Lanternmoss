@@ -85,6 +85,7 @@ src/
 │   │                      where each room's chest, veins and monster spawns stand, and the puzzle, warded door,
 │   │                      guardian and way home at the end of it (pure)
 │   ├── caves.js           a cave's rooms, corridors and lanterns, built far below the planet
+│   ├── duskFlora.js       Duskhollow's canopy, glowcaps, ghost ferns and moonflowers (the giant caps avoid the gaps)
 │   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
 │   │                      (tides.js, lantern.js: Duskhollow's dusk and oil; lanternView.js draws them for the World)
 │   ├── physics.js         planet gravity, live pond/sea levels and declared maximum-water queries
@@ -101,6 +102,7 @@ src/
 │   └── sky.js             sky dome, clouds, fireflies
 ├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
+│   ├── duskCreatures.js   Duskhollow's glow snail, lantern bat, cricket and Moonmoth
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── resources.js       resource nodes (bushes, herbs, branches, veins), the farm (fence, plots, scarecrow), crops, the float
 │   ├── stations.js        the four crafting stations (glowing coals, a bubbling pot, flasks on a stand)
@@ -160,6 +162,7 @@ src/
 │   ├── needsRules.js      energy levels, effects, drain and warnings (pure)
 │   ├── Gathering.js       resource nodes, chopping trees and mining rocks, tool jobs (swing, drops, regrow), tips
 │   ├── Fishing.js         casting, the bite, the reeling meter, catches
+│   ├── Fireflies.js       Duskhollow's firefly swarms: their drifting lights, catching one with E, saved timers
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 export const SHOT_FOLDERS = {
   characters: ['select', 'swim'],
   pets: ['pets', 'pet-field', 'select-pet', 'dragontoad', 'otter'],
-  critters: ['meadow', 'rare', 'tidewhisper-pearl-turtle'],
+  critters: ['meadow', 'rare', 'tidewhisper-pearl-turtle', 'duskhollow-wildlife'],
   mobs: ['combat', 'basilisk', 'hydra', 'tidewhisper-enemies', 'mob-brawl'],
   bosses: ['boss-demon', 'boss-dragon', 'lair', 'summon', 'arena', 'balance-flight', 'tidewhisper-ironclaw',
     'tidewhisper-mirelure-beached', 'tidewhisper-mirelure-lures'],
@@ -24,7 +24,7 @@ export const SHOT_FOLDERS = {
     'structures-exterior', 'structures-interior'],
   world: ['mesas', 'storm', 'blizzard', 'tidewhisper-high', 'tidewhisper-low', 'tidewhisper-flora', 'lighting-harness',
     'tidewhisper-campaign-720', 'tidewhisper-campaign-1080', 'cave', 'cave-combat', 'cave-rewards', 'cave-guardian',
-    'duskhollow'],
+    'duskhollow', 'duskhollow-canopy'],
   activities: ['fishing', 'gathering', 'chest', 'photo-mode', 'photo-storybook'],
   huds: ['title', 'continue', 'save-menu', 'controls', 'keys', 'help', 'tutorial', 'fainted', 'bag', 'journal', 'bestiary',
     'achievement', 'crafting', 'enchanting', 'bounty-window', 'portal-destinations', 'portal-one-way', 'balance-shop',

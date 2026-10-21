@@ -65,6 +65,10 @@
 | Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](lighting.md)) |
 | Duskhollow's endless dusk, canopy cover, lantern oil and light, and the glowmoss trail | `src/config/lantern.js` → `LANTERN` ([docs](../world/duskhollow.md)) |
 | Duskhollow's canopy height and its authored gaps of starlight | `src/config/planets/duskhollow.js` → `canopy` |
+| How many lumen caps, glowcaps, ghost ferns and moonflowers grow there | `src/config/planets/duskhollow.js` → `flora.canopy` |
+| Duskhollow's animals, their counts and where they live | `src/config/planets/duskhollow.js` → `wildlife`; looks in `src/config/critters.js` |
+| Firefly swarms: how many, how far they drift, catching reach, how long a caught one stays away, their glow | `src/config/lantern.js` → `FIREFLIES` |
+| The Moonmoth Wing charm and how much it widens the lantern | `src/config/lantern.js` → `LANTERN.charm` |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
 | Cave rewards: how near E offers a chest or vein, how far fixtures and monster spawns sit off the walls, how many monsters clear a room | `src/config/dungeons.js` → `CAVE.reward` |
 | Cave ore: the veins that grow only underground (tool, tier, swings, drops) and each cave's ore, vein count and chest kinds | `src/config/dungeons.js` → `CAVE_VEINS`, `CAVES` (`ore`, `veins`, `chest`, `endChest`) |

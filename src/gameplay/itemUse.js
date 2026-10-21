@@ -10,6 +10,7 @@ import { RecipeBook } from './RecipeBook.js';
 import { equipFromSlot } from './equipment.js';
 import { Needs } from './Needs.js';
 import { healAmount } from '../combat/damage.js';
+import { activeLantern } from '../world/mechanics/lantern.js';
 
 /** Actions run by other systems (tools: ./Gathering.js, seeds: ./Farm.js), registered there to keep this file free of
     them: action id -> (inventory, slot, def) => { ok, message }. */
@@ -22,6 +23,7 @@ const EFFECTS = {
   energy: e => Needs.eat(e.amount),
   buff: (e, def) => { itemBuff(e.kind, e.seconds, def.tags.includes('meal')); return true; },
   recipe: (e, def) => !!RecipeBook.readScroll(def.id),
+  oil: e => (activeLantern()?.refill(e.amount) ?? 0) > 0,            // only where a world has a lantern (Duskhollow, 30b)
 };
 for (const id of Object.keys(ITEM_EFFECTS)) if (!EFFECTS[id]) console.warn(`Item effect "${id}" has no handler in gameplay/itemUse.js`);
 
