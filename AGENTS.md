@@ -6,6 +6,11 @@ standing rules. Following them needs no extra confirmation, except where a secti
 
 # Starting a task
 
+These task, branch, and completion steps apply to repository work. A question-only exchange about the project,
+including a status request, explanation, advice, or read-only investigation to answer the question, does not start a
+logged task. Answer it without creating a branch or work log unless the user explicitly asks for a record. If the
+user also requests an implementation or other repository change, follow the normal workflow and log that work.
+
 1. Note the start time from the machine clock (`date +"%Y-%m-%d %H:%M"`). It is the log's file name prefix and the
    start of its `TOTAL` duration (see Project work logs).
 2. Update `develop` (`git pull --ff-only`) and check the working tree is clean. For a multistep TODO, create or
@@ -197,10 +202,13 @@ into `develop` so the fix isn't lost. Push both, delete the hotfix branch, and l
 
 # Project work logs
 
-Record every meaningful task, decision, change, and verification in a Markdown file under `docs/logs/`.
+Record every meaningful repository task, decision, change, and verification in a Markdown file under `docs/logs/`.
+Do not log questions about the project or the research and advice used solely to answer them unless the user
+explicitly asks for a log. This includes status reports and progress questions. Keep logging implementation work
+and its decisions, tests, documentation, merges, and releases under the rules below.
 Name each log file `YYMMDDHHMM <descriptive-title>.md`: the machine-clock time the work started (the log's first
 row), a space, then a short kebab-case title starting with the TODO stage when there is one, for example
-`2610141529 todo-27f-old-ironclaw.md` or `2610141529 project-status.md`. Get the prefix with `date +"%y%m%d%H%M"`
+`2610141529 todo-27f-old-ironclaw.md` or `2610141529 workflow-update.md`. Get the prefix with `date +"%y%m%d%H%M"`
 in Bash or `Get-Date -Format "yyMMddHHmm"` in PowerShell. Quote the path in commands, since it contains a space.
 Use a Markdown table with one entry per row, keeping these seven columns in this order:
 
@@ -220,7 +228,8 @@ Use a Markdown table with one entry per row, keeping these seven columns in this
 - Use a task type from the list below, the applicable TODO number (or `TODO N/A` for work outside the roadmap),
   and the current branch name. Record outcomes and limitations truthfully, including failed checks and how they
   were fixed.
-- Reviews of someone else's branch and short advice sessions get their own small log too.
+- Reviews of someone else's branch that are requested as repository work get their own small log. A review or short
+  advice session used solely to answer a project question follows the question exception above.
 - Append new rows to the table. Escape literal pipes as `\|` and use `<br>` for line breaks inside cells.
 - Preserve existing entries when changing the log format: older rows and tables keep their original columns
   (`TASK`, ISO datetimes, no DURATION). Start a new table in the new format below an old one rather than mixing them.
