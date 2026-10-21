@@ -35,6 +35,38 @@ state of its otter. The flag was returned to `false`. Update those checks agains
 then run the complete suites, real production portal/save/Continue browser path, screenshot tour and visual review
 before calling the destination releasable. A public `master` merge separately requires owner confirmation.
 
+### Release-flag failure audit (2026-10-21)
+
+This is a review of the 26 failures in the temporary `released: true` unit run above. The flag is still `false`; no
+production fixes or test expectations were changed in this audit. The coastal behavior cited below is specified in
+[Tidewhisper](../world/tidewhisper.md), and release gating in [content release](content-release.md).
+
+| Failing test (26 total) | Finding and next resolution |
+| --- | --- |
+| `bossSummon`: conditions | `lowTide` is implemented by `BossGate.requirements()` and is part of Mirelure's specified gate. Extend the test's condition set. **Runtime defect:** `BossGate.lineFor()` indexes `SUMMON_HINTS[kind]`, but there is no `lowTide` hint, so a villager can throw when low tide is the first unmet condition. Add the hint and a focused regression. |
+| `coastal-enemies`, `coastal-village`, `coastal-wildlife` | Each explicitly asserts Tidewhisper stays unreleased. Replace these historical stage assertions with checks of the released roster, village and wildlife after enablement. |
+| `combat`: boss kit | Its three-entry expected behavior list omits the registered `mirelure` kit. Extend it without dropping the distinct-boss check. |
+| `combat`: peak hit | The fourth boss's highest scaled nonlethal single hit is 36, below Malgrath's 36.75. This is a real conflict with the test's strictly increasing single-hit rule, not a catalog mismatch. Review the intended difficulty progression and measured duels before deciding whether to tune Mirelure or revise that rule; do not change the target just to pass. |
+| `contentGate`: title, expansion awards | The title now correctly lists a released Tidewhisper, and `tideBoss` activates. Check that Duskhollow and Moon remain masked and that Act I's three-boss achievement and later five-world award retain their rules. |
+| `environment`: flora | The old test requires wildflower and tall-grass colors. Tidewhisper deliberately has dune grass, sea thrift and sea lavender in `flora.coastal`. Validate those coastal entries and their builders instead. |
+| `environment`: animals | The old allowed locations omit coastal `beach` and `rocks`; the world declares hermit crabs, turtles and seals there. Extend the location contract and retain real-gift checks. |
+| `environment`: mini bosses | The old placement allowlist omits Ironclaw's `pearlBeach`, which the world page specifies. Include that placement and verify its actual spawning/guard behavior. |
+| `houses`: layout, owners | Both tests dereference `resolveHouse()` without checking for `null`. Tidewhisper intentionally closes four legacy public doors and has two public interiors. Skip disabled houses and check the two coastal interiors and owners. |
+| `items`: unreleased rare gift | Once Tidewhisper is released, no remaining unreleased world has a rare creature, so the test's required fixture no longer exists. Assert that every rare gift, including `pearlOfDeep`, is excluded from random loot independently of release state. The loot pool already filters `giftOnly`. |
+| `pets`: otter availability | The test asserts the otter is hidden. The specified Dark Lighthouse unlock makes it available when Tidewhisper releases. Verify quest gating and all-pets progression. |
+| `planetCatalog`: catalog, portal, completion, story, v1 save (five) | These encode a three-world catalog, a blocked Tidewhisper portal, three-world campaign completion, no Marlo house, and rejection of Tidewhisper save state. Update each for four released worlds while retaining no-gap travel, Act I achievement, unreleased Duskhollow/Moon rejection, story ownership and malformed-save cleaning. The observed portal becoming enabled after the required wins is expected. |
+| `planets`: terrain | The generic terrain assertion only accepts hills/ridges/plateaus. Tidewhisper uses the specified archipelago schema. Validate its islands, bars and lagoon; keep palette and distinct-world checks. |
+| `save`: otter import, planet IDs | An otter ID becomes a valid unlocked pet on release; the old test expects it stripped. Test bounded dive state and the actual unlock rules, including an unavailable-world fixture. Extend the fixed released-ID list to Tidewhisper without weakening the numeric planet-equality scan. |
+| `survival`: village materials | The old test demands a village `branches` node. Tidewhisper supplies wood from driftwood, lantern palms and a house gift, while `pebbles` and `sweetleaf` are tagged for the village. Confirm adequate nearby wood for the six-wood lighthouse hand-in; then express the material requirement by accessible drops rather than an Act I node name. |
+| `survival`: catches | The old test indexes `FISHING.catches[3]`, which is absent. Production `rollCatch()` and bounty rules read Tidewhisper's `resources.catches` first. Check that table and real fish items, then retain Act I fallback coverage. |
+| `tides`: release state | Tide behavior assertions pass; its final explicit `released: false` assertion is historical and should be replaced with release-state coverage. |
+
+Fifteen failures are explicit release-state or three-world expectations (three coastal, two content-gate, items, pets,
+five planet-catalog, two save, tides). Ten are generic tests that do not admit Tidewhisper's existing coastal data
+(boss condition, boss kit, three environment, two houses, terrain, two survival). The remaining failure is the boss
+peak-hit progression assertion. The boss-condition failure also exposes the missing villager hint. These are
+first-failure findings: later assertions in those tests have not been proven to pass with the fourth world.
+
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
 Tidewhisper object and its `released: false` flag remain untouched. Restoration reinstates the original catalog identity.
