@@ -1135,6 +1135,12 @@ tag, and Mirelure roll damage are corrected. The two-seed, three-hero balance ga
 Production travel/save/Continue checks and final integration remain open; see the
 [release handoff](docs/wiki/technical/tidewhisper-release.md#step-2-resolution-checkpoint-2026-10-21).
 
+**27 release step 3 checkpoint (2026-10-21):** The validation branch now enables the authored Tidewhisper
+destination. `npm test` passes 278/278. A production-entry Edge smoke, with no candidate fixture, passes title,
+portal, travel, partial save/Continue, return, Mirelure completion, one Tide Crown after reload and an older v1 save,
+with zero page/shader errors. Its portal shot was reviewed. Full suites, a fresh final-commit Acer matrix, the
+screenshot tour and integration remain step 4; the public `master` merge still needs separate confirmation.
+
 **27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
 27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
 Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.

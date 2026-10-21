@@ -5,7 +5,7 @@ level 9 and continuing through level 15. Old level-10 saves can earn XP again; C
 and their computed stats. Cap-16 saves keep zero surplus XP. The original v1 fixture remains unchanged.
 
 Each planet declares `expectedLevel`, `lowLevel` and `scale` in its own config. Act I retains its existing
-difficulty; planned Act II starting values are:
+difficulty. Tidewhisper's measured release-candidate values and the planned later values are:
 
 | World | Expected levels | Low-level challenge | HP scale | Damage scale |
 | --- | --- | --- | --- | --- |
@@ -13,8 +13,9 @@ difficulty; planned Act II starting values are:
 | Duskhollow | 10–13 | 12 | 3.4 | 2.25 |
 | Lantern Moon | 13–16 | 15 | 4 | 2.5 |
 
-These are starting values for each world's later balance/release stage, not completed balance measurements.
-The title shows Act I and planned Act II entries, with the secret masked as `?`. Planned entries are descriptive
+Tidewhisper's two-seed, three-hero balance audit meets its acceptance bands; Duskhollow and Lantern Moon retain
+starting values for their later balance stages. The title shows Tidewhisper as released on the validation branch,
+Duskhollow as planned and the secret Moon masked as `?`. Planned entries are descriptive
 and cannot be selected. Generation, travel, Continue validation and keys still use only released worlds.
 Frostveil is the Act I finale; beating all currently released main worlds completes that playable campaign.
 

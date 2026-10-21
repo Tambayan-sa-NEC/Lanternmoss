@@ -1,28 +1,25 @@
 # Tidewhisper terrain and tides
 
-## In brief (functionally complete, hardware validated, unreleased)
+## In brief (release candidate; final acceptance pending)
 
-TODO 27h's functional content, balance, pacing and test-only campaign travel/Continue path passed again after the
-TODO 29 cave merge on 2026-10-19. The clean Acer RTX 4050 acceptance matrix still failed the unchanged p95 frame
-gate in all 18 cases at 1080p High on a 60 Hz display (17.4–18.2 ms versus 16.80 ms). The owner-approved gate split
-allows the functional work to join `develop` while `released: false` remains in force. That earlier timing result
-has been superseded for the native reference mode: a fresh Acer
-matrix on 2026-10-21 passed all 18 timing and render-count cases with the otter selected in every row. The world
-remains hidden because release-enabled production checks have not passed. A public `master` release also needs
-owner confirmation; see the
-[current release handoff](../technical/tidewhisper-release.md#fresh-reference-result-and-production-no-go-2026-10-21).
+TODO 27h's functional content, balance, pacing and candidate travel/Continue path passed after the TODO 29 cave
+merge. An earlier clean Acer RTX 4050 native-mode matrix passed all 18 timing and render-count cases with the otter in
+every row; step 4 must repeat it on the final changed candidate. On the release-validation branch, `released: true` exposes the authored fourth world. Its production
+portal, save/Continue, return travel, boss completion and old-v1-save browser path pass. The complete release suites,
+screenshot tour and branch integration remain; a public `master` release also needs owner confirmation. See the
+[current release handoff](../technical/tidewhisper-release.md#step-3-production-path-checkpoint-2026-10-21).
 
 These summaries moved here from the root README; each is detailed in its section below.
 
-Tidewhisper's unreleased economy stage adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
+Tidewhisper's economy adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
 claims, shore fishing, three coastal meals and craftable Tide gear. Dawn sea mist, rain/wind/whitecaps and a
 procedural sea waltz accompany the coast. See [resources, weather and music](#coastal-resources-weather-and-music-27c).
 
-The unreleased Tidewhisper village now has stilt buildings, a supported fishing pier, Marlo and two coastal
+The Tidewhisper village has stilt buildings, a supported fishing pier, Marlo and two coastal
 interiors. Restore the lighthouse with seaglass and wood; the saved quest joins level 8 and low tide as the
 future boss gate. See [village and lighthouse](#stilt-village-and-lighthouse-27d).
 
-Tidewhisper's unreleased monsters read the live tide. Shellbacks turn a barnacled plate that blocks hits from the
+Tidewhisper's monsters read the live tide. Shellbacks turn a barnacled plate that blocks hits from the
 front, so circle round them. Jellybells drift onto the flats with the rising tide and sting in a ring, and are
 stranded when it falls. Surf skippers lurk untargetable in the surf, then leap at anyone near the water.
 Sea-green wisps return from Act I. See [regular enemy roster](#regular-enemy-roster-27e).
@@ -36,9 +33,8 @@ time with her breathing and she surfaces. At half health she smashes the sluice 
 back. Her trophy is the Tide Crown. See [Mirelure](#mirelure-the-lantern-angler-27g).
 
 TODOs 27a-27g implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest, regular
-monsters, Old Ironclaw and Mirelure. Tidewhisper remains `released: false`: campaign release requires 27h.
-The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
-gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
+monsters, Old Ironclaw and Mirelure. The authored catalog entry is now `released: true` on the validation branch.
+The earlier development fixture remains test-only; the production browser check uses the authored entry directly.
 
 The config in `src/config/planets/tidewhisper.js` describes six islands, two connecting sandbars, a lagoon,
 sea-green land, sandy shores, turquoise shallows, deep blue water and a peach/aqua sky. Terrain is baked once;
@@ -197,7 +193,7 @@ Mirelure's registered summon conditions require level 8, the completed quest and
 hint when it is the remaining condition. The shared boss gate
 reports these predicates and seals again if the tide rises before awakening. The development fixture borrows a
 sealed original boss to exercise the live gate; it does not implement Mirelure. That encounter is 27g, and the
-world stays unreleased. Actual low-tide causeway geometry/physics continues to come from 27a.
+world stayed unreleased at that stage. Actual low-tide causeway geometry/physics continues to come from 27a.
 
 ![Relit lighthouse development preview](../../screenshots/village/tidewhisper-village.jpg)
 

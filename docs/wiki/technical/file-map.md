@@ -215,6 +215,9 @@ builders in `src/models`, the props in `src/world/props.js`, or the methods in `
 content completeness. `scripts/lib/tidewhisper-browser.mjs` boots the isolated candidate browser.
 `scripts/tidewhisper-campaign-smoke.mjs`, `scripts/tidewhisper-balance.mjs` and
 `scripts/tidewhisper-performance.mjs` cover travel/Continue, two-seed balance and actual hardware diagnostics.
+`scripts/tidewhisper-production-smoke.mjs` boots the ordinary page entry with the authored world released,
+without the candidate intercept. It checks title, portal travel, coastal save/Continue, return, Mirelure completion
+and an older v1 save; `scripts/shots.mjs` sends its reviewed portal capture to `docs/screenshots/huds/`.
 `tests/sim/otter.sim.mjs` checks the quest-gated companion and bounded pearl yields across heroes, days, travel and
 Continue. `scripts/otter-smoke.mjs` checks the real pet menu and ability keys at 720p/1080p and captures
 `docs/screenshots/pets/otter.jpg`. The otter body is built in `src/models/coastalCreatures.js`.

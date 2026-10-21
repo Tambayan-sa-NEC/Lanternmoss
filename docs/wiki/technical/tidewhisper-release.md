@@ -1,8 +1,10 @@
 # Tidewhisper 27h: validation and hardware handoff
 
-Status: **functional checks and the otter-inclusive Acer hardware matrix pass; production enablement is not yet ready**.
-Tidewhisper remains `released: false`. A test branch that switched the flag on exposed 26 failing unit tests, mostly
-three-world assumptions, so it was switched back off. No release tag or `master` merge is authorized by this checkpoint.
+Status: **production enabled on the validation branch; final acceptance and integration remain**.
+The authored Tidewhisper entry is `released: true` on `feat/todo-27-release-validation`. The initial flag probe
+exposed 26 unit failures; steps 1–2 audited and resolved them, and step 3 passed the production browser path.
+No release tag or `master` merge has been made. The earlier Acer hardware evidence predates these code changes,
+so the final candidate needs a fresh matrix in step 4.
 On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
 the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
@@ -100,9 +102,28 @@ the images were restored after inspection.
 This checkpoint does not certify production portal/Continue behavior, the full simulation and browser suites,
 or the final release integration; those remain the next steps.
 
+### Step 3 production-path checkpoint (2026-10-21)
+
+The validation branch now sets the authored `tidewhisper` entry to `released: true`. The new
+`scripts/tidewhisper-production-smoke.mjs` loads the ordinary `/src/main.js` entry on port 8143 with no candidate
+interception or test module in the browser. At 720p and 1080p, the title and real E-key portal offer Tidewhisper
+after the three Act I wins while Duskhollow and Moon remain hidden. The browser travels to the actual fourth world,
+saves a partial lighthouse quest and depleted node, reloads Continue, returns home and revisits. After setting the
+documented level/quest/low-tide gate, it defeats Mirelure, opens one Tide Crown chest and confirms completion and
+the single crown through another reload. A legacy v1 adventure still Continues on Emberfall. Page and shader errors
+are zero. The reviewed [portal capture](../../screenshots/huds/tidewhisper-portal.jpg) shows all four destinations
+without the initial controls panel or toast obstructing them. `npm test` passes 278/278 with the authored flag on.
+
+The first production smoke attempt stopped at the sealed boss because the scripted clock was at high tide. Setting
+the clock to the specified low-tide phase fixed that harness setup. The first old-save attempt was overwritten by
+the game's page-exit autosave; suspending that one save in the isolated browser session let the v1 fixture load.
+Neither observation required a gameplay change. Full simulations, the wider browser suite, a fresh clean Acer
+matrix for this changed candidate, tour captures and integration remain step 4. The earlier reference matrix
+cannot by itself certify code changed after its candidate commit.
+
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
-Tidewhisper object and its `released: false` flag remain untouched. Restoration reinstates the original catalog identity.
+Tidewhisper object and its release flag remain untouched. Restoration reinstates the original catalog identity.
 It preserves the three original worlds and exercises real `tidewhisper` ids, scaling, portal travel and Continue.
 It lives under tests/scripts and is never imported by the production entry point. Borrowing an Act I save slot is
 insufficient release evidence: those earlier fixtures inherited missing configuration and could hide schema issues.

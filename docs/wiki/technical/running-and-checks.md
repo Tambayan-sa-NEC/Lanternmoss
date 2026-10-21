@@ -92,6 +92,12 @@ After the approved 2026-10-19 gate split, these functional checks may pass and m
 performance remains a public-release blocker. They never enable the authored Tidewhisper release flag.
 It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
 
+`node scripts/tidewhisper-production-smoke.mjs` owns port 8143 and loads the ordinary browser entry with the
+authored fourth-world release flag. It rejects candidate-module loading, checks the title and real E-key portal at
+720p/1080p, saves a partial coastal quest/node state, reloads Continue, returns and revisits, completes Mirelure,
+reloads the single Tide Crown, then opens an old v1 save. It asserts zero page/shader errors and captures the
+reviewed `huds/tidewhisper-portal.jpg`. Run it only on a branch where Tidewhisper is intentionally released.
+
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
 zero page/shader errors. It captures `pets/otter.jpg` through `shots.mjs`.

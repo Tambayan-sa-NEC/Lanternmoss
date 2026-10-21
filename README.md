@@ -92,7 +92,7 @@ Your adventure carries forward between planets: **level, equipment, inventory, c
 | :--- | :--- | :--- |
 | **Public game — `master`** | Lanternmoss, Emberfall, and Frostveil, with campaigns, bosses, and mini bosses | **Playable** |
 | **Integration — `develop`** | Gear set bonuses, individual hero talent trees, shared local lighting for dark areas, bounty board, and photo mode | **On `develop`** |
-| **Fourth world** | Tidewhisper: implementation tasks 27a–27g completed; 27h awaits hardware certification | **Not released** |
+| **Fourth-world release candidate** | Tidewhisper: coastal campaign, lighthouse, Mirelure and otter; production path passes | **Enabled on validation branch; final acceptance pending** |
 | **Future destinations** | Duskhollow and the secret Lantern Moon | **Planned** |
 
 > [!NOTE]
