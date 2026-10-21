@@ -26,7 +26,7 @@ const ANCHORS = {
     homeSign: [HOME.sign.x, HOME.sign.z, 0],
     oven: [-3.0, -2.5, 0], counter: [-0.7, -1.3, 0], bed: [3.0, -2.2, 0], table: [2.1, 0.7, 0], rug: [0, 0.9, 0], chest: [-3.4, 1.1, 1.57],
     shelf: [1.1, -3.05, 0], bookshelf: [[-1.4, -3.05, 0], [1.3, -3.05, 0]], lamp: [3.5, 1.7, 0], plant: [-3.5, -0.3, 0],
-    window: [-2.2, -3.35, 0], fireplace: [0.1, -3.05, 0], anvil: [-2.0, -0.9, 0], kettle: [-3.0, -2.5, 0],
+    window: [-2.2, -3.35, 0], fireplace: [0.1, -3.05, 0], anvil: [-2.0, -0.9, 0], kettle: [-3.0, -2.5, 0], telescope: [2.8, 2.8, -0.6],
   },
 };
 /** Collision radius of solid furniture (rugs, windows and yarn are walk-through). */

@@ -143,13 +143,15 @@ shipwreck iron needs a Copper Pickaxe. Shell beds, coral branches, salt crystals
 models; there are no extra lights. Farm plots remain above declared high water. Squall rain waters crops using
 the existing farming rule; sea mist does not.
 
-Driftwood gives wood. Shell washups give shells and seaglass; seaweed and glass have their own washups. Each
+Driftwood gives wood; Marlo's lighthouse chest gives three starter wood, and lantern palms can also be chopped.
+Shell washups give shells and seaglass; seaweed and glass have their own washups. Each
 washup can be claimed once per high-water crest (90% of the adventure day). Its optional `claimedCycle` field
 lives in the existing gathering v1 snapshot, even after the cooldown expires. A calendar skip exposes only the
 latest batch; it never creates accumulated rewards. Continue and revisits preserve claims and requested node
 ids. Earlier saves without the field default to an unclaimed node. World/quality changes do not add save owners.
 
-With a rod on the hotbar, **E** near seawater fishes using the existing bite/reeling meter. Silver sprats are the
+With a rod on the hotbar, **E** near seawater fishes using the existing bite/reeling meter. Silver sprats carry the
+same fish tag as Act I catches and are the
 common coastal catch and golden koi remain rare. The float follows the live tide and cancels if its water dries.
 At a cooking pot, make salted fish (sprat + salt), seaweed rolls (seaweed + sprat) and coastal chowder (clams +
 sprat + salt). At a forge, craft the Tide Circlet, Mantle and Boots from glass, pearls, coral and shells; a Tide
@@ -191,7 +193,8 @@ Coastal Chowders once. The lighthouse's emissive beacon follows the saved quest'
 extra persistent owner or point light. Partial hand-ins, completion, house gifts/lore and indoor position use the
 existing v1 save systems and survive Continue and revisits. Away from Marlo, the tracker points back to Tidewhisper.
 
-Mirelure's registered summon conditions require level 8, the completed quest and low tide. The shared boss gate
+Mirelure's registered summon conditions require level 8, the completed quest and low tide. Villagers give a low-tide
+hint when it is the remaining condition. The shared boss gate
 reports these predicates and seals again if the tide rises before awakening. The development fixture borrows a
 sealed original boss to exercise the live gate; it does not implement Mirelure. That encounter is 27g, and the
 world stays unreleased. Actual low-tide causeway geometry/physics continues to come from 27a.
@@ -322,6 +325,8 @@ arena ring is crashing surf (`ARENA_WALLS.surf`). Her kit is `src/entities/enemi
   and open to everything: she thrashes (a marked circle), rolls along a marked lane and bites. After 23 s the water
   creeps back over 22 s (`drainLagoon(seconds, reflood)`); once there is 1 m of water over her she dives, and four
   lures return.
+- Her roll's base hit is 19 damage (38 after the fourth-world scale), keeping its peak single hit above Malgrath's
+  36.75 while retaining the same warning, travel and recovery timing.
 - **Retries**: a faint, walking away or a reload resets the fight. The lures go out, the lagoon refills and the sluice
   is mended, so a saved drain never outlives its fight. The win drops her treasure chest with the **Tide Crown**, once;
   Continue keeps her beaten without a second chest or crown.

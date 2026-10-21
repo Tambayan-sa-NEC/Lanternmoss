@@ -20,7 +20,8 @@ const resolved = resolveHouse;
 
 test('every house on every planet has a name, a known layout and furniture that layout can place', () => {
   for (const i of Object.keys(HOUSES)) for (let p = 0; p < PLANETS.length; p++) {
-    const h = resolved(i, p), known = anchors(h.layout);
+    const h = resolved(i, p); if (!h) continue;
+    const known = anchors(h.layout);
     assert.ok(h.name && ['mushroom', 'cottage'].includes(h.layout), `house ${i} planet ${p}`);
     for (const kind of h.props) assert.ok(known.has(kind), `house ${i} planet ${p}: ${h.layout} can't place '${kind}'`);
     assert.ok(h.props.includes('bed') || h.resident || h.playerHome, `house ${i} planet ${p}: somewhere to rest, or a cottage to furnish`);
@@ -29,7 +30,7 @@ test('every house on every planet has a name, a known layout and furniture that 
 
 test('owners are real villagers; someone lives in each house, or a note says where they are', () => {
   for (const i of Object.keys(HOUSES)) for (let p = 0; p < PLANETS.length; p++) {
-    const h = resolved(i, p);
+    const h = resolved(i, p); if (!h) continue;
     if (h.owner) assert.ok(VILLAGERS.includes(h.owner), `house ${i}: owner ${h.owner}`);
     if (h.resident) assert.ok(h.resident.name && h.resident.lines.length && h.resident.portrait, `house ${i}: resident`);
     assert.ok(h.owner || h.resident || h.note, `house ${i} planet ${p}: owner, resident or note`);

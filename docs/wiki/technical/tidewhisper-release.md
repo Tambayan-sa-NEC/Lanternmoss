@@ -67,6 +67,39 @@ five planet-catalog, two save, tides). Ten are generic tests that do not admit T
 peak-hit progression assertion. The boss-condition failure also exposes the missing villager hint. These are
 first-failure findings: later assertions in those tests have not been proven to pass with the fourth world.
 
+### Step 2 resolution checkpoint (2026-10-21)
+
+The low-tide villager hint is present and the Mirelure simulation now asserts the actual dialogue path after the
+quest is complete but the tide is high. Mirelure's marked roll moved from 18 to 19 base damage, so its highest
+scaled single hit is 38 versus Malgrath's 36.75, with the existing timing and damage-progression rule intact.
+The two-seed, three-hero balance matrix remains 0/18 checked rows outside target; its six Mirelure duel times and
+top-up counts match the [October 19 reference](../../tidewhisper-balance-20261019.json).
+
+| Seed / hero | Before: time, HP top-ups | After: time, HP top-ups |
+| --- | --- | --- |
+| 1 / Knight | 286.6 s, 24 | 286.6 s, 24 |
+| 1 / Ranger | 187.8 s, 7 | 187.8 s, 7 |
+| 1 / Witch | 273.4 s, 11 | 273.4 s, 11 |
+| 7 / Knight | 284.3 s, 26 | 284.3 s, 26 |
+| 7 / Ranger | 190.8 s, 10 | 190.8 s, 10 |
+| 7 / Witch | 276.0 s, 15 | 276.0 s, 15 |
+
+These bots top up HP and do not dodge Mirelure's roll; unchanged top-up counts do not certify survival comfort.
+
+The village material check now uses coastal drops and Marlo's three-wood gift instead of demanding Act I's
+`branches` node at a shore village. Its six driftwood nodes supply at least 12 wood per washup cycle if collected;
+the lighthouse needs six. A release-flag unit run also found two actual content gaps: Marlo's cottage listed a
+telescope without a cottage anchor, and Silver Sprat had no `fish` tag. Both are corrected. Tests now cover the
+fourth world's catalog, title, portal, campaign completion, saves, otter availability, coastal resources and
+terrain while retaining their unreleased-world checks. The normal hidden-world and temporary release-enabled
+unit suites each pass 278/278. The production flag has been restored to `false` after the temporary run.
+The targeted Mirelure simulation passes the new low-tide dialogue assertion, and the coastal-village and Mirelure
+Edge smokes pass at 720p and 1080p with zero page/shader errors. Both smokes refreshed unrelated tracked captures;
+the images were restored after inspection.
+
+This checkpoint does not certify production portal/Continue behavior, the full simulation and browser suites,
+or the final release integration; those remain the next steps.
+
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored
 Tidewhisper object and its `released: false` flag remain untouched. Restoration reinstates the original catalog identity.

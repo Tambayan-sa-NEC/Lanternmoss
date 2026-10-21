@@ -1128,6 +1128,13 @@ after the 27h functional merge; it has a separate estimate and public-release pe
 | [x] **27h. Functional integration and go/no-go** | 27a-27g | 1-3.5 h | Complete the non-performance content gate, three-hero pacing/balance, full travel/Continue/save/completion browser path through the test-only candidate, and affected screenshots/tour. Record the reference performance matrix and its verdict, actual session costs and groundwork fixes. Merge tested functional work to `develop` with Tidewhisper unreleased if the public-release performance gate is still failing. The otter needs a separate estimate. |
 | [x] **27i. Pearl-diving otter pet** | 27b, 27c, 27h | 3-5 h | Add an otter companion, its pearl-dive ability and Tidewhisper unlock using the existing pet system. Check bounded pearl yields, save/Continue, travel, menu and selection, all three heroes, a reviewed feature shot and rendering cost. Built behind the unreleased world fixture; include the otter in a fresh full Acer acceptance matrix before public enablement. The current 0/18 timing result gives no release headroom. |
 
+**27 release step 2 checkpoint (2026-10-21):** The 26 release-flag unit failures have been resolved in the
+validation branch. Both the hidden-world and temporary four-world unit suites pass 278/278; the latter run
+restored `released: false` afterward. The low-tide villager hint, cottage telescope placement, Silver Sprat fish
+tag, and Mirelure roll damage are corrected. The two-seed, three-hero balance gate passes 18/18 checked rows.
+Production travel/save/Continue checks and final integration remain open; see the
+[release handoff](docs/wiki/technical/tidewhisper-release.md#step-2-resolution-checkpoint-2026-10-21).
+
 **27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
 27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
 Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.

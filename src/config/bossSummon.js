@@ -42,5 +42,6 @@ export const SUMMON_HINTS = {
   sigils: 'The elites out there, the big golden-crowned ones, carry sigils. Bring {need} to the lair and {boss} will answer.',
   quest: 'Help {giver} first. {boss} only shows itself to someone this village trusts.',
   night: '{boss} only rises at night. Wait for the stars, then go to the lair, if you dare.',
+  lowTide: 'The causeway to {boss} opens at low tide. Watch the water before you cross, {hero}.',
   ready: 'Can you feel it? {boss} is stirring in its lair. Whenever you\'re ready, {hero}.',
 };

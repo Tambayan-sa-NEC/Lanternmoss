@@ -7,7 +7,6 @@ import { ITEM_DEFINITIONS } from '../src/config/items.js';
 import { cleanState } from '../src/core/save.js';
 import { coastalActivity } from '../src/config/coastalWildlife.js';
 test('coastal configuration covers distinct plants, bounded counts and known rare-gift equipment',()=>{
-  assert.equal(tidewhisper.released,false);
   assert.deepEqual(Object.keys(tidewhisper.flora.coastal.trees),['lanternPalm','kelp','coralFan']);
   assert.deepEqual(Object.keys(tidewhisper.flora.coastal.plants),['duneGrass','seaThrift','seaLavender']);
   assert.ok(Object.values(tidewhisper.flora.coastal.trees).reduce((a,b)=>a+b,0)<=40);

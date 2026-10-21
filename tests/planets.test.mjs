@@ -86,7 +86,8 @@ test('scaleEnemyDef returns the base table untouched for a planet with no scalin
 test('every planet has a shape of its own: valid terrain parts and cliff / peak colours', () => {
   const shapes = new Set();
   for (const p of PLANETS) {
-    const t = p.terrain; assert.ok(t && (t.hills || t.ridges || t.plateaus), `${p.name}: terrain`);
+    const t = p.terrain; assert.ok(t && (t.hills || t.ridges || t.plateaus || t.archipelago), `${p.name}: terrain`);
+    if (t.archipelago) assert.ok(t.archipelago.islands.length >= 3 && t.archipelago.bars.length && t.archipelago.lagoon, `${p.name}: navigable archipelago`);
     for (const k of ['hills', 'ridges', 'plateaus']) if (t[k]) assert.ok(t[k].amp > 0 && t[k].freq > 0, `${p.name}: ${k} amp / freq`);
     if (t.plateaus) assert.ok(t.plateaus.step > 0 && t.plateaus.sharp >= 0 && t.plateaus.sharp <= 1, `${p.name}: plateau steps`);
     assert.ok(Number.isInteger(t.lakes ?? 0), `${p.name}: lakes`);

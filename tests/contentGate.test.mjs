@@ -98,10 +98,12 @@ test('only the secret Moon waives its mini boss and requires no farm/cave plus a
 });
 test('title previews mask the secret and distinguish planned worlds from released destinations',()=>{
   const rows=campaignRows(PLANET_CATALOG,COMBAT.enemies);assert.deepEqual(rows.map(r=>r.act),[1,2]);
-  assert.deepEqual(rows[1].planets.map(p=>p.name),['Tidewhisper','Duskhollow','?']);assert.ok(rows[1].planets.every(p=>!p.released));
+  assert.deepEqual(rows[1].planets.map(p=>p.name),['Tidewhisper','Duskhollow','?']);
+  assert.deepEqual(rows[1].planets.map(p=>p.released),PLANET_CATALOG.filter(p=>p.act===2).map(p=>p.released));
+  assert.equal(rows[1].planets[1].detail,'Planned');assert.equal(rows[1].planets[2].secret,true);
 });
 test('expansion awards activate incrementally without changing the Act I achievement or including secrets in five-world completion',()=>{
-  assert.deepEqual(expansionAchievements(PLANET_CATALOG),[]);assert.ok(!ACHIEVEMENTS.some(a=>a.id==='fiveWorlds'));
+  assert.deepEqual(expansionAchievements(PLANET_CATALOG).map(a=>a.id),PLANET_CATALOG[3].released?['tideBoss']:[]);assert.ok(!ACHIEVEMENTS.some(a=>a.id==='fiveWorlds'));
   const catalog=PLANET_CATALOG.map(p=>({...p}));catalog[3].released=true;assert.deepEqual(expansionAchievements(catalog).map(a=>a.id),['tideBoss']);
   catalog[4].released=true;const five=expansionAchievements(catalog).find(a=>a.id==='fiveWorlds');assert.equal(five.goal.bosses.length,5);assert.ok(!five.goal.bosses.includes('nyxra'));
   catalog[5].released=true;assert.ok(expansionAchievements(catalog).find(a=>a.id==='moonBoss').secret);

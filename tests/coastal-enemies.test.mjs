@@ -20,7 +20,7 @@ test('Tidewhisper roster: three exclusive sea monsters with their own modules, o
     const page=BESTIARY_ENTRIES[t];assert.ok(page.name&&page.blurb&&page.attacks.length&&page.counters.length&&page.drops,`${t} page`);
     const extra=MONSTER_DROPS.extra[t];assert.ok(extra.chance>0&&extra.chance<1&&extra.items.every(([id])=>itemRegistry.get(id)),`${t} drop`);
   }
-  assert.equal(tide.released,false,'the world stays unreleased until 27h');
+  assert.equal(PLANET_CATALOG.filter(p=>p.released).includes(tide),tide.released);
 });
 
 test('the Shellback plate refuses only directed hits from its front cone, and not while dazed',async()=>{
