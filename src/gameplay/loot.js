@@ -13,7 +13,9 @@ export function resolveLootItem(item, planet) {
   return item;
 }
 
-const GEAR = ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity && !d.props?.craftedOnly);   // explicit acquisition stays out of random rewards
+// Explicit acquisition stays out of random rewards: crafted-only pieces, and gifts that belong to one unreleased
+// world's creature (props.giftOnly), which must never turn up in a released world's chest.
+const GEAR = ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity && !d.props?.craftedOnly && !d.props?.giftOnly);
 const NAMES = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d.name]));
 
 /** "2x Moonberry", "Rare Ember Mail" (for toasts). */
