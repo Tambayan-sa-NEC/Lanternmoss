@@ -1,7 +1,9 @@
 # Tidewhisper 27h: validation and hardware handoff
 
-Status: **functional 27h checks pass; public release no-go**. Tidewhisper remains `released: false`. No release tag or
-`master` merge is authorized by this checkpoint. On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
+Status: **functional checks and the otter-inclusive Acer hardware matrix pass; production enablement is not yet ready**.
+Tidewhisper remains `released: false`. A test branch that switched the flag on exposed 26 failing unit tests, mostly
+three-world assumptions, so it was switched back off. No release tag or `master` merge is authorized by this checkpoint.
+On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
 the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
 The synchronized 2026-10-19 candidate passed **275 unit tests, all 58 simulations, 25 relevant Edge browser
@@ -9,10 +11,29 @@ scripts**, the three-hero duel and pacing audits, and the full screenshot tour (
 campaign script exercises real portal, travel, Continue, return, boss gate and one-time completion paths through
 the test-only fourth-world candidate at 720p and 1080p. The source release flag remains off.
 
-Latest synchronized hardware attempt: **0/18 timing cases pass; all 18 render-count cases pass**. See
-[the 60 Hz matrix](#synchronized-60-hz-acceptance-matrix-2026-10-19). The collector failed acceptance and
-produced no release artifact. The owner-approved gate split permits functional integration to `develop`; production
-enablement and public release still depend on a passing Acer matrix.
+The earlier synchronized hardware attempt passed **0/18 timing cases**; see
+[the 60 Hz matrix](#synchronized-60-hz-acceptance-matrix-2026-10-19). A fresh native-mode matrix including the otter
+passed **18/18 timing and render-count cases** on 2026-10-21; the collector wrote
+[reference evidence](../../releases/tidewhisper.json). Production enablement and its release checks remain open.
+
+## Fresh reference result and production no-go (2026-10-21)
+
+Clean commit `0d6b656` ran visible Edge at 1920×1080 DPR1 High on the Acer RTX 4050, with the otter selected in every
+hero, seed 1/7, and village/night/squall row. The native panel mode was 165 Hz; the empty-page clock measured
+6.1 ms median / 6.3 ms p95, so the fixed 16.67 ms limit applied. All 18 rows passed: frame p95 13.5–16.2 ms,
+peak 476/550 draw calls and 210,141/230,000 triangles, with zero page or shader errors. The collector's `--release`
+gate wrote `docs/releases/tidewhisper.json`, and the content gate reports no missing content with that evidence.
+
+A 60 Hz attempt before the otter collector correction exceeded its calibrated 16.8 ms limit in each of 16 completed
+rows; Edge detached before the last two and wrote no report. The primary panel was checked back at 165 Hz. The
+successful native-mode run uses the unchanged fixed frame target; the failed 60 Hz attempt remains a recorded
+mode-specific limitation. An earlier native-mode pass used default pets and was retained only as a diagnostic.
+
+Turning the production `released` flag on in the task branch yielded 252/278 passing unit tests. Twenty-six failures
+include assumptions about a three-world catalog, Tidewhisper's shore materials and fishing data, and the release
+state of its otter. The flag was returned to `false`. Update those checks against the intended four-world behavior,
+then run the complete suites, real production portal/save/Continue browser path, screenshot tour and visual review
+before calling the destination releasable. A public `master` merge separately requires owner confirmation.
 
 The test-only candidate harness substitutes the fourth catalog entry **before** importing Game, saves and achievements.
 It borrows a released Act I fixture template and copies Tidewhisper content into that test object; the authored

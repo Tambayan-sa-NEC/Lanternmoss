@@ -1144,6 +1144,13 @@ before public enablement; the prior 0/18 timing result is not a pass.
 under the approved 27h functional/public gate split. This does not enable Tidewhisper or replace the required fresh
 18-case Acer acceptance matrix before public release.
 
+**27 release validation (2026-10-21):** the fresh Acer RTX 4050 matrix now includes the otter in every hero/seed/scene
+row and passes all 18 timing and render-count cases at 1080p High in the native display mode (p95 13.5–16.2 ms
+against 16.67 ms; peak 476 calls and 210,141 triangles). The content gate accepts the resulting real evidence.
+Tidewhisper remains `released: false`: enabling its production flag exposed 26 failing unit tests tied to the
+four-world transition, so the flag was restored. Bring those checks and the real production travel/Continue path
+through acceptance before declaring the destination releasable. See the [release handoff](docs/wiki/technical/tidewhisper-release.md#fresh-reference-result-and-production-no-go-2026-10-21).
+
 **27h gate split (approved 2026-10-19):** the owner's approved fallback separates functional completion from
 hardware certification after a clean 18-case Acer RTX 4050 rerun. Functional completion of 27h unblocks 28, 29g
 (still also needing 30i) and 30 on `develop`. It does **not** make Tidewhisper a released destination or authorize a
