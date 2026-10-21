@@ -1,8 +1,12 @@
 # Planet mechanic lifecycle
 
 `World` owns one `PlanetMechanics` controller. A planet may declare `mechanic: '<id>'`; no declaration means no
-mechanic. The registry includes `tides` for unreleased Tidewhisper; the original three worlds keep their existing rules.
-See [terrain and tide controls](../world/tidewhisper.md). Lantern darkness and lunar gravity belong to their later roadmap stages. Weather remains a separate
+mechanic. The registry includes `tides` for unreleased Tidewhisper and `lantern` for unreleased Duskhollow; the original three
+worlds keep their existing rules. See [terrain and tide controls](../world/tidewhisper.md) and
+[the endless dusk and the lantern](../world/duskhollow.md). Lunar gravity belongs to its later roadmap stage.
+A mechanic stays pure: the registry must import without creating a scene, so what a mechanic looks like belongs to
+the World, as the tide's water does (`src/world/mechanics/lanternView.js` for Duskhollow's dusk, belt lantern and
+glowmoss trail). Weather remains a separate
 visual system; a mechanic may read it through its environment.
 
 Mechanics can apply derived gravity/water rules through `environment.world.physics.set(...)`. Declare maximum

@@ -86,6 +86,7 @@ src/
 │   │                      guardian and way home at the end of it (pure)
 │   ├── caves.js           a cave's rooms, corridors and lanterns, built far below the planet
 │   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
+│   │                      (tides.js, lantern.js: Duskhollow's dusk and oil; lanternView.js draws them for the World)
 │   ├── physics.js         planet gravity, live pond/sea levels and declared maximum-water queries
 │   ├── terrain.js         each planet's shape (seeded hills / ridges / plateaus), flats, the baked height field, ponds,
 │   │                      slopes, water depth, ground-placement matrices
@@ -185,7 +186,8 @@ src/
 │   ├── itemUse.js         using items: effect handlers (heal, mana, energy, buff), tool / seed actions
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
-│                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming)
+│                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming),
+│                          glowmoss (Duskhollow's bounded, instanced footprint trail)
 ├── ui/                    DOM side: element lookups, HUD (bars, status row, ability bar + tooltips, boss bar), icons (SVG),
 │                          waypoints (compass strip + off-screen arrows), PauseMenu (pause, settings, controls, quit),
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),

@@ -12,7 +12,9 @@ exports three views:
 Each entry has a stable `id`, `name`, positive `act`, and explicit boolean `released` and `secret` fields. The starting
 world must be released and non-secret. Released entries also need generation data and pass the mandatory
 [content release gate](../technical/content-release.md). Keep a new world unreleased until its own release stage passes that checklist. Tidewhisper,
-Duskhollow and the Lantern Moon currently contain only unfinished metadata and cannot be selected or generated.
+Duskhollow has terrain, a palette and its lantern mechanic from stage 30a but no roster, people or economy yet; the
+Lantern Moon still contains only unfinished metadata. Neither can be selected, generated or travelled to in normal
+play. See [Duskhollow](duskhollow.md).
 
 The original runtime order remains Lanternmoss, Emberfall, Frostveil. Their seeds, placement lists and generated
 resource/chest/scenery/farm/house/portal/boss positions are unchanged. A simulation checks them against layout digests
