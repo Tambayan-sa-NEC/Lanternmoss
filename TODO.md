@@ -1558,7 +1558,7 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
+| [x] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
 | [ ] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
 | [ ] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
 | [ ] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
@@ -1567,6 +1567,26 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
 | [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30a implemented (2026-10-21):** Duskhollow now generates. `src/config/planets/duskhollow.js` seeds deep valleys
+(hills plus ridged noise, more than 12 m of relief) under an authored canopy: its height, the village gap and five
+gaps of starlight. The new `lantern` mechanic (`src/world/mechanics/lantern.js`, tuned in `src/config/lantern.js`)
+keeps the day clock turning as brighter and dimmer dusk and multiplies it by the canopy cover where the hero stands;
+that darkness goes to the 29a local light, which keeps its minimum ambient, so the world is dark but never a black
+screen. The belt lantern is the hero's carried light: its Oil bar sits beside Energy, it burns only while you play
+this world outdoors (never indoors, in a cave, in a menu, paused, or over skipped and away time), and an empty
+lantern shrinks from 7.5 m to a safe 2.8 m ember that costs no health. Oil is saved per planet. Walking lights the
+glowmoss (`src/fx/glowmoss.js`): one bounded, instanced additive trail of at most 24 prints that the scenery-density
+setting scales down. The mechanic stays pure, so its presentation lives in `src/world/mechanics/lanternView.js`,
+which the World owns exactly as it owns the tide's water.
+Checked by `tests/lantern.test.mjs` (6 unit tests, no browser stubs), `tests/sim/duskhollow.sim.mjs` and
+`node scripts/duskhollow-smoke.mjs` (port 8129, lowest preset: deep hollow 91/255 versus village gap 205/255 mean
+ground luminance, real WASD walking, the safe ember, 720p/1080p, zero page and shader errors). Full suites passed:
+283 unit tests and 63 simulations, plus the mechanics, tides and lighting browser checks for the shared registry,
+browser helper and light. Duskhollow stays `released: false` and has no roster, so it still fails the content gate
+by design; the checks use the test-only `tests/sim/lib/duskhollowFixture.mjs`. See
+[Duskhollow](docs/wiki/world/duskhollow.md). Not done here: the canopy models, flora, wildlife, economy, weather,
+music, Wick's waylamps, every monster and the release (30b-30i).
 
 - [ ] **Shape and look:** deep valleys under a canopy of giant lumen caps about 25 m up, with gaps of starlight. An
       endless dusk (the day clock still turns, as brighter and dimmer dusk). Glowmoss carpets light up in your

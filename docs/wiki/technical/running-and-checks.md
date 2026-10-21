@@ -77,6 +77,8 @@ node scripts/cave-puzzles-smoke.mjs # cave puzzles: the ward stops real keys, bo
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 node scripts/mob-combat-smoke.mjs  # monsters fighting each other (45b/45c): brawl damage, a ghost's orb, no damage numbers,
                                    # the hero reclaiming a monster, a boss harmless to them; retakes docs/screenshots/mobs/mob-brawl.jpg
+node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk on Low, the village gap, real WASD lighting
+                                   # the glowmoss trail and burning oil, the safe ember; retakes its shot
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
@@ -96,6 +98,18 @@ It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
 zero page/shader errors. It captures `pets/otter.jpg` through `shots.mjs`.
 `node tests/sim/otter.sim.mjs` covers all three heroes, the daily cap, bed state, travel and saved dive state.
+
+## Duskhollow checks (30a)
+
+Duskhollow is unreleased, so its checks run through the development fixture `tests/sim/lib/duskhollowFixture.mjs`,
+which borrows the first released world's save and travel slot. Nothing here enables the authored world.
+
+`node scripts/duskhollow-smoke.mjs` owns port 8129 and runs on the lowest quality preset: it measures that the
+deepest dusk is still readable and the village gap brighter, walks with real `W`/`D` to light the bounded glowmoss
+trail and burn oil, checks that an empty lantern keeps a safe ember and costs no health, and that 720p and 1080p
+overflow nothing with zero page and shader errors. It captures `world/duskhollow.jpg` through `shots.mjs`.
+`node tests/sim/duskhollow.sim.mjs` covers generation, the clock and canopy, the HUD, pause and sleep, saves,
+Continue and real portal travel; `node --test tests/lantern.test.mjs` covers the pure dusk, canopy and oil rules.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High

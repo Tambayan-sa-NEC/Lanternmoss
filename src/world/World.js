@@ -23,6 +23,7 @@ import { buildVillage } from './village.js';
 import { createWater } from './water.js';
 import { Weather } from './weather.js';
 import { PlanetMechanics } from '../gameplay/PlanetMechanics.js';
+import { LanternView } from './mechanics/lanternView.js';
 import { configurePhysics, physicsQueries } from './physics.js';
 import { archipelagoLayout } from './archipelago.js';
 import { coastalWind } from '../render/coastalWind.js';
@@ -135,6 +136,7 @@ export class World {
     this.viewerPos = this.spawnDir.clone().multiplyScalar(groundHeight(this.spawnDir));
     this.applyDensity(); this.resetSun();
     this.mechanics.enter(planet);
+    this.lantern = planet.mechanic === 'lantern' ? new LanternView(densityFor('scenery', settings)) : null;   // Duskhollow's dusk, belt lantern and glowmoss (30a)
     this.syncPhysics();
   }
 
@@ -146,6 +148,7 @@ export class World {
   /** Changes only render counts; never regenerates a planet or consumes its seeded placement stream. */
   applyDensity() {
     setSceneryDensity(this.scenery, densityFor('scenery', settings));
+    this.lantern?.applyDensity(densityFor('scenery', settings));       // a mechanic's own scenery (Duskhollow's glowmoss trail)
     for (const group of this.grass) group.traverse(mesh => {
       if (!mesh.isInstancedMesh) return;
       mesh.count = Math.floor(mesh.userData.fullCount * densityFor('grass', settings)); mesh.visible = mesh.count > 0;
@@ -164,6 +167,7 @@ export class World {
   /** Removes everything generate() created and forgets the terrain, placement and scenery colliders. */
   dispose() {
     this.mechanics.exit();
+    this.lantern?.dispose(); this.lantern = null;
     for(const shoal of this.seaLife??[])shoal.dispose();this.seaLife=[];
     this.weather?.dispose();
     for (const o of this.objects) { scene.remove(o); disposeTree(o); }
@@ -201,5 +205,6 @@ export class World {
     this.waterMat.uniforms.uSquall.value=this.weather.now.whitecaps??0;
     this.viewerPos.copy(player.pos); this.updateGrassVisibility();
     this.crystal.position.copy(this.crystalBase).addScaledVector(this.stoneCenter, Math.sin(time * 1.4) * 0.25); this.crystal.rotateY(dt * 0.9);
+    this.lantern?.update(dt, player);                                  // after the daylight, before LocalLights reads the darkness
   }
 }

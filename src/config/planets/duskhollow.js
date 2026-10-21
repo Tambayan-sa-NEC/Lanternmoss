@@ -1,4 +1,28 @@
-// Planned world: content and release acceptance belong to its own TODO.
+/* Planned world: content and release acceptance belong to its own TODO.
+   Terrain, endless dusk and the belt lantern: 30a. Flora and wildlife: 30b; economy, weather and music: 30c;
+   Wick and the Old Road: 30d; regular enemies: 30e-30f; Grandmother Gloomweaver: 30g; Umbra: 30h. Release: 30i.
+   `canopy` is the giant lumen caps overhead, read by src/world/mechanics/lantern.js:
+     height       metres the caps hang above the ground (the canopy models arrive in 30b)
+     village      radius in metres of the gap the village sits in, the world's safe light
+     gaps         the authored gaps of starlight, as { angle (radians around the village), distance (metres),
+                  radius (metres of open sky) }; LANTERN.canopy supplies cover, gapCover, villageCover and fade. */
 export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, secret: false,
   expectedLevel: [10, 13], lowLevel: 12, scale: { hp: 3.4, damage: 2.25, speed: 1.3, cooldown: 0.75, xp: 3.1 },
+  seed: 161803, mechanic: 'lantern',
+  terrain: { hills: { amp: 3.4, freq: 1.9 }, ridges: { amp: 13, freq: 1.25 }, lakes: 1 },
+  canopy: { height: 25, village: 24, gaps: [
+    { angle: 0.9, distance: 52, radius: 11 },
+    { angle: 2.6, distance: 74, radius: 9 },
+    { angle: 4.2, distance: 58, radius: 13 },
+    { angle: 5.6, distance: 96, radius: 10 },
+    { angle: 3.3, distance: 128, radius: 12 },
+  ] },
+  palette: { ground: [0x47406a, 0x514a78, 0x3d3760, 0x5b5486], meadow: 0x6f66a8, sand: 0x5a5280, bed: 0x2e2a4a, cliff: 0x3a3558, peak: 0x8e86c0,
+    grass: [0x46806e, 0x3d7a6a, 0x529a7e, 0x3a6d60], water: { deep: 0x1b2448, light: 0x5fd0c0 },
+    sky: { horizon: 0x6a4e86, mid: 0x3a3366, zenith: 0x161634 }, fog: 0x3b3566 },
+  flora: { trees: { shroom: 5, birch: 1, crystal: 1 }, treeCount: 46, flowers: [0xbff4ff, 0xd8b8ff, 0x9ff3c8, 0xfff0a0],
+    tallGrass: [0x46806e, 0x529a7e, 0x3a6d60], meadow: 0.6 },
+  weather: { clear: 4, fog: 3, breezy: 2 },
+  tagline: 'an endless dusk under glowing caps',
+  arrival: 'Duskhollow. The caps hold back the sky here, so the day never quite arrives. Keep the lantern on your belt fed, and the moss will light your way home.',
   boss: { type: 'umbra' } };

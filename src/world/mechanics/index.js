@@ -1,7 +1,8 @@
 /* Pure mechanic definitions: import/register real modules here when their world stages land.
    Factories receive their environment at runtime; importing this registry must not create scenes or state. */
 import { tides } from './tides.js';
-const definitions = new Map([['tides', tides]]);
+import { lantern } from './lantern.js';
+const definitions = new Map([['tides', tides], ['lantern', lantern]]);
 
 export function registerMechanic(id, definition) {
   if (!/^[a-z][a-zA-Z0-9]*$/.test(id) || definitions.has(id) || typeof definition?.create !== 'function' || typeof definition?.clean !== 'function')

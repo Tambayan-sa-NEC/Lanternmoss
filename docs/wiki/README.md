@@ -39,6 +39,7 @@ not confirmed design.
 | [Monsters and bosses](world/monsters-and-bosses.md) | Every monster, mini boss and boss, and how they fight |
 | [Caves](world/caves.md) | Seeded cave layouts, entering, walking and leaving (**unreleased**; TODO 29) |
 | [Tidewhisper](world/tidewhisper.md) | The fourth world (**unreleased**): terrain and tides, wildlife, resources, village, monsters and its encounters |
+| [Duskhollow](world/duskhollow.md) | The fifth world (**unreleased**; stage 30a only): twilight terrain, the endless dusk, the belt lantern and glowmoss |
 
 ## Technical
 
