@@ -144,8 +144,9 @@ its summon level, so its route (The Dark Lighthouse and three Shellbacks crossin
 without grinding. With no Act II gear beyond it yet, its coins reserve its own Tide set: the forge fees are 70/80/70
 and 60 for the pendant. Its materials are audited at minimum yields: washups return once per 300 s day and low-tide
 nodes are reachable once per day. The lens (6 seaglass, 6 wood) fits the first day, and the lens plus the whole set
-(28 seaglass, 14 wood including forge fuel, 4 pearls, 6 coral, 9 shells, 1 black pearl) fits two days. Revisit the
-budget when Duskhollow's gear exists.
+(28 seaglass, 14 wood including forge fuel, 4 pearls, 6 coral, 9 shells, 1 black pearl) fits two days. Duskhollow (30c) now reserves its own row as well: the Dusk set costs 75/85/75
+coins for the armour and 65 for the trinket, paid for by its lumen veins, glowcap patches, shade crop and chests,
+and its materials (lumen ingots, spider silk, lumen dust and one moonstone) come from that world alone.
 
 ## Survival, gathering and crafting
 

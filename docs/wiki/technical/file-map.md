@@ -30,6 +30,8 @@ src/
 │   ├── photo.js           photo mode: camera limits, filters, frames, poses, emotes, the picture's file name
 │   ├── planets.js         ordered catalog, released campaign views and transition timings
 │   ├── planets/           one config per world: seeds, content, NPCs, house overrides and release metadata
+│   ├── lantern.js         Duskhollow's dusk, canopy cover, lantern oil and light, glowmoss trail and firefly swarms
+│   ├── duskResources.js   its materials, lantern oil, shade crop, Dusk set and their recipes (like coastalResources.js)
 │   ├── planetRules.js     release, secret-unlock, completion and population rules
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
 │   │                      stats, the hotbar, effects, bag size and pickup settings

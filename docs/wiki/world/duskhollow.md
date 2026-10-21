@@ -1,12 +1,14 @@
 # Duskhollow: twilight terrain and the lantern
 
-## In brief (stages 30a-30b, unreleased)
+## In brief (stages 30a-30c, unreleased)
 
 Duskhollow is the fifth world: deep valleys under a canopy of giant lumen caps, where your lantern decides what you
 can see. Stage 30a builds its terrain, its endless dusk, the belt lantern with its Oil bar, and the glowmoss that
 lights up in your footprints. Stage 30b fills it in: the canopy itself and the plants under it, glow snails, lantern
 bats, crickets and pale blind fish, firefly swarms you catch for lantern oil, and the Moonmoth, whose charm widens
-your light. The rest of the planned checklist - the economy, weather and music (30c), Wick and the Old Road (30d),
+your light. Stage 30c gives it an economy and a sky of its own: lumen ore, ingots and dust, spider silk, the
+guarded moonstone vein, lantern oil, shade mushrooms, the craftable Dusk set, spore drift and deep dark, the
+dripping caps that water the farm where no rain falls, and a music box theme. The rest of the planned checklist - the economy, Wick and the Old Road (30d),
 the four monsters (30e-30f), Grandmother Gloomweaver (30g), Umbra (30h) and campaign release (30i) - is
 **not built yet**.
 
@@ -113,6 +115,49 @@ before another settles somewhere else. Using a jar pours 25 oil into the lantern
 How long each caught swarm still has to wait is saved per planet, so Continue cannot relight them and reloading
 cannot farm jars. See [adventure saves](../technical/save-format.md). Glowcap and lumen-oil refills arrive with 30c.
 
+## Resources and the lumen chain (30c)
+
+| Found | Where | Becomes |
+| --- | --- | --- |
+| **Lumen ore** | Lumen veins, with an iron pickaxe | **Lumen ingots** at the forge |
+| **Lumen dust** | Shaken loose from the same veins; the world's own material, so it fills its chests | Lumen oil, and every Dusk piece |
+| **Glowcap** | Glowcap patches, by hand | Lumen oil at the brewing stand - or tipped straight into the lantern for 10 oil |
+| **Moonstone** | One guarded vein, placed behind the mini boss like every rare vein | The Dusk Lantern trinket |
+| **Spider silk** | Cut from gloomweaver webs in 30f; until then from chests | The lining of every Dusk piece |
+
+**Lumen oil** is the full flask: it fills a belt lantern to the brim. With firefly jars (30b) and glowcaps, the
+world now has three ways to keep the light on, which is what the lantern was always waiting for.
+
+**The Dusk set** (`duskHood`, `duskMantle`, `duskBoots`, `duskLantern`) is forged from lumen ingots, silk and dust,
+and reserved by this world's coin budget the way Tidewhisper reserves the Tide set. Its bonuses are about the light
+rather than about fighting:
+
+| Pieces | Bonus |
+| --- | --- |
+| 2 | Your lantern burns 40% slower |
+| 3 | Your lantern burns 60% slower and reaches 15% further |
+
+Both reach the lantern through the hero's ordinary set effects (`lanternOil`, `lanternRadius`), so they follow
+equipping, unequipping and loading like every other stat.
+
+![Mining a lumen vein under the caps](../../screenshots/activities/duskhollow-lumen.jpg)
+
+## Weather, the dripping caps and the shade crop (30c)
+
+No rain ever falls under the canopy. Duskhollow's sky draws from clear, fog, breezy, **spore drift** (glowing spores
+drifting through the hollows) and **deep dark**. The weather itself changes no rules: deep dark only states a number
+(`deepDark`, blended 0..1 like any other weather value), and this world's mechanic decides what it means - it
+thickens the dusk by `LANTERN.dusk.deepDark` of the light that is left and presses a lit lantern in by
+`LANTERN.light.deepDarkShrink`. It still never reaches full dark, and it still costs no health.
+
+The same split holds for the farm. Since no rain falls, the **dripping caps** water every planted plot early in the
+day (`LANTERN.drip`): the farm asks the live mechanic for `watersFarm`, rather than any weather kind quietly
+standing in for rain. **Shade mushrooms** grow from shade spores and only take where the mechanic says the world
+lies in shade, which today is Duskhollow alone; anywhere else the plot refuses them.
+
+Its music is a **music box over low strings** (`musicBox` in `src/config/music.js`), made in code like every other
+theme.
+
 ## What is checked
 
 | Check | What it proves |
@@ -123,11 +168,13 @@ cannot farm jars. See [adventure saves](../technical/save-format.md). Glowcap an
 | `npm test` (`tests/duskWildlife.test.mjs`) | The canopy rule, that every authored plant and animal exists and is bounded, the jar's oil effect, and that the charm widens a lit lantern but never the ember |
 | `npm run sim -- duskWildlife` | Placement and the no-cap-over-a-gap rule, each animal's reaction, catching a swarm through the real interaction, its saved timer surviving Continue, the Moonmoth's one charm per adventure, and the scenery, particle and light budgets |
 | `node scripts/dusk-wildlife-smoke.mjs` | In a real browser: the canopy and animals render, real `E` catches a swarm, really using the jar pours oil, the charm widens the carried light, 720p/1080p, zero errors |
+| `npm test` (`tests/duskEconomy.test.mjs`) | Every node, forage and material is real; the lumen chain and Dusk recipes; the set reaching the lantern; deep dark as a number turned into a rule; the drip window and the shade crop |
+| `npm run sim -- duskEconomy` | The veins and patches are placed with the music box playing, the chain smelts and brews, the worn set slows the burn, deep dark thickens the dusk and shrinks the light, the caps water the farm with no rain, and shade spores refuse a sunlit world |
+| `node scripts/dusk-economy-smoke.mjs` | In a real browser: real `E` mines a lumen vein with the iron pickaxe, the Craft tab lists the chain and the set, a glowcap pours oil, deep dark visibly darkens the hollow while the lit ground stays readable, and real `E` plants shade spores |
 
 ## Not built yet
 
-The lumen economy (ore, ingots, dust, silk, moonstone, shade mushrooms and the Dusk set), spore drift and deep dark,
-the music box, Wick's Old Road and its waylamps, Shadelings, Gloomweavers, Mosslurks, Snuffers, Grandmother
-Gloomweaver, Umbra and the campaign release. No enemy roster is configured, so Duskhollow still fails the content
-gate by design. The `deepDark` share in `src/config/lantern.js` is reserved for the 30c weather and does nothing
-today, and the firefly jar is the only thing that refills the lantern so far.
+Wick's Old Road and its waylamps, the stalk-house interiors, Shadelings, Gloomweavers, Mosslurks, Snuffers,
+Grandmother Gloomweaver, Umbra and the campaign release. No enemy roster is configured, so Duskhollow still fails
+the content gate by design. Spider silk has no source in the world until the gloomweavers' webs arrive in 30f, and
+the moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is simply mineable.

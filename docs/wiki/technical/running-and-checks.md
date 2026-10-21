@@ -81,6 +81,8 @@ node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
 node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
                                    # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/dusk-economy-smoke.mjs # Duskhollow (unreleased, 30c): real E mining a lumen vein, the Craft tab, a glowcap
+                                   # poured into the lantern, deep dark, real E planting shade spores; retakes its shot
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
@@ -119,6 +121,12 @@ the jar pours oil, and the Moonmoth Wing widens the lantern. It captures `world/
 `critters/duskhollow-wildlife.jpg`. `node tests/sim/duskWildlife.sim.mjs` covers placement, the animals' reactions,
 catching and its save, the charm and the scenery, particle and light budgets;
 `node --test tests/duskWildlife.test.mjs` covers the pure canopy, content and charm rules.
+
+`node scripts/dusk-economy-smoke.mjs` owns port 8131 and checks 30c in the browser: a real `E` mines a lumen vein
+with the iron pickaxe, the Craft tab lists the lumen chain and the Dusk set, really using a glowcap pours oil into
+the lantern, the deep-dark weather visibly darkens the hollow while the lit ground stays readable, and a real `E`
+plants shade spores in the farm. It captures `activities/duskhollow-lumen.jpg`.
+`node tests/sim/duskEconomy.sim.mjs` and `node --test tests/duskEconomy.test.mjs` cover the same ground headlessly.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High

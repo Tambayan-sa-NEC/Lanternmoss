@@ -16,7 +16,10 @@
      chill       { slow, time }: every hit of the hero's own slows the monster by `slow` for `time` seconds
                  (monsters' slowResist applies; it never weakens a stronger slow already on them)
      swimEnergy  share cut from the energy swimming costs (0.5 = half)
-     knock       extra knockback on every hit of the hero's own (bosses and heavy monsters resist it as usual) */
+     knock       extra knockback on every hit of the hero's own (bosses and heavy monsters resist it as usual)
+     lanternOil  share cut from how fast a belt lantern burns oil (0.4 = it lasts two thirds longer); Duskhollow only
+     lanternRadius  share added to a lit lantern's reach (0.15 = +15%); both are applied in
+                 src/world/mechanics/lantern.js, so they follow the worn set like every other stat */
 export const SETS = {
   moss: {
     name: 'Moss set', color: '#8fd07a', pieces: ['mossHood', 'mossCloak', 'wanderBoots'],
@@ -37,6 +40,13 @@ export const SETS = {
     bonuses: [
       { at: 2, text: 'Hits chill: 20% slower for 1.5 s', effects: { chill: { slow: 0.2, time: 1.5 } } },
       { at: 3, text: 'Hits chill: 35% slower for 2 s', effects: { chill: { slow: 0.35, time: 2 } } },
+    ],
+  },
+  dusk: {
+    name: 'Dusk set', color: '#bfa8ff', pieces: ['duskHood', 'duskMantle', 'duskBoots', 'duskLantern'],
+    bonuses: [
+      { at: 2, text: 'Your lantern burns 40% slower', effects: { lanternOil: 0.4 } },
+      { at: 3, text: 'Your lantern burns 60% slower and reaches 15% further', effects: { lanternOil: 0.6, lanternRadius: 0.15 } },
     ],
   },
   tide: {

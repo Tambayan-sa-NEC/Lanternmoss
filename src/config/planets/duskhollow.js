@@ -26,7 +26,13 @@ export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, 
   wildlife: { critters: [['glowSnail', 5], ['lanternBat', 6, 'caps'], ['duskCricket', 7]], rare: 'moonmoth',
     villagePets: false, fireflies: 7, birds: 0, flocks: 0,
     fish: [{ body: 0xe8eef0, spot: 0xcfe4ff, fin: 0xf4fbff }, { body: 0xdfe8ff, spot: 0xffffff, fin: 0xe8f4ff }] },   // pale blind fish in the glowing pools
-  weather: { clear: 4, fog: 3, breezy: 2 },
+  weather: { clear: 4, fog: 2, breezy: 2, sporeDrift: 3, deepDark: 2 },   // no rain under the canopy (30c)
+  music: 'musicBox', material: 'lumenDust',
+  chests: [{ kind: 'common', count: 8 }, { kind: 'rare', count: 3 }],
+  forage: [{ item: 'glowcap', count: 10 }, { item: 'spiderSilk', count: 6 }, { item: 'shadeSpores', count: 4 }],
+  resources: { nodes: [['branches', 7, 'village'], ['pebbles', 6, 'village'], ['sweetleaf', 5, 'village'],
+    ['glowcaps', 12], ['branches', 6], ['pebbles', 6], ['lumenVein', 10], ['ironVein', 6], ['sweetleaf', 6]],
+    rare: [['moonstoneVein', 2]] },
   tagline: 'an endless dusk under glowing caps',
   arrival: 'Duskhollow. The caps hold back the sky here, so the day never quite arrives. Keep the lantern on your belt fed, and the moss will light your way home.',
   boss: { type: 'umbra' } };
