@@ -326,7 +326,7 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0x4a4aa8, art: 'cape' }, value: 40, equip: { slot: 'back', tier: 1, stats: {} } },
   // ---- gifts from rare creatures (config/critters.js): befriend one to get its charm ----
   { id:'pearlOfDeep',name:'Pearl of the Deep',description:'A luminous pearl from a befriended Pearl Turtle. Steadies your guard and restores your magic.',category:'equipment',
-    icon:{shape:'charm',color:0xbafff1,art:'pendant'},value:130,equip:{slot:'charm',tier:3,stats:{armor:.03,manaRegen:.8}} },
+    icon:{shape:'charm',color:0xbafff1,art:'pendant'},value:130,props:{giftOnly:true},equip:{slot:'charm',tier:3,stats:{armor:.03,manaRegen:.8}} },
   { id: 'goldenClover', name: 'Golden Clover', description: 'A four-leaf clover from a Golden Moonbunny. Luck makes you quicker and quick to mend.', category: 'equipment',
     icon: { shape: 'charm', color: 0xffd36b, art: 'leafCharm' }, value: 70, equip: { slot: 'charm', tier: 1, stats: { hpRegen: 1.2, moveSpeed: 0.05 } } },
   { id: 'emberScale', name: 'Ember Scale', description: 'A warm scale an Ember Salamander shed for you. Harder hits, a tougher hide.', category: 'equipment',
