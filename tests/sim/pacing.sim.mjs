@@ -103,7 +103,8 @@ for (const [id, crop] of Object.entries(CROPS)) {
   check(seconds >= 150 && seconds <= 300, `${id}: ${seconds} s of watered growth, one village loop`);
   const energy = crop.harvest.reduce((n, [item, qty]) => n + mean(qty) * (items.get(item).use?.find(e => e.effect === 'energy')?.amount ?? 0), 0);
   const output = crop.harvest.reduce((n, [item, qty]) => n + mean(qty) * sell(item), 0);
-  const stock = SHOP.stock.find(s => s.item === crop.seed), cost = stock.price ?? Math.round(items.get(crop.seed).value * SHOP.buyMarkup);
+  // A crop's seeds are either sold in the village shop or foraged on their own world (Duskhollow's shade spores, 30c).
+  const stock = SHOP.stock.find(s => s.item === crop.seed), cost = stock?.price ?? Math.round(items.get(crop.seed).value * SHOP.buyMarkup);
   check(output > cost, `${id}: expected harvest/returned-seed sale ${output} > seed ${cost}`);
   console.log(`INFO  ${id}: raw harvest ${energy} energy offsets ${(energy / rate).toFixed(0)} s mixed travel`);
 }

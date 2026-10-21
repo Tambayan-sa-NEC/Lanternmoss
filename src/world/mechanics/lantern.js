@@ -57,13 +57,24 @@ export const lantern = {
     const O = LANTERN.oil, L = LANTERN.light;
 
     const place = () => env.player?.up ?? env.world.spawnDir;        // where the hero stands, for darkness and the HUD
+    /** 0..1 of the deep-dark weather. The weather only states a number; what it means is this world's own rule. */
+    const deepDark = () => clamp(env.world.weather?.now?.deepDark ?? 0, 0, 1);
+    /** The worn Dusk set (30c) reaches the lantern through the hero's ordinary set effects. */
+    const setFx = () => env.player?.stats?.setFx ?? {};
+    /** The dusk where the hero stands, thickened by the deep dark; 0 indoors, where the light is already safe. */
+    const darkness = () => {
+      if (env.indoors) return 0;
+      const dusk = clamp(canopyCover(place(), layout) * duskAt(env.clock()).level, 0, 1);
+      return clamp(dusk + (1 - dusk) * LANTERN.dusk.deepDark * deepDark(), 0, 1);
+    };
     /** The Moonmoth Wing charm (30b), worn in either trinket slot, widens the lit lantern. */
     const charmed = () => Object.values(env.player?.equipment ?? {}).some(piece => piece?.itemId === LANTERN.charm.item);
     /** The light the lantern gives right now: full while there is oil, a small safe ember when it is empty. */
     const beam = () => {
       const lit = state.oil > 0, gutter = lit ? 1 - L.flicker * (0.5 - 0.5 * Math.cos(time * 7.3)) : 1;
-      const wide = lit && charmed() ? LANTERN.charm.radius : 1;
-      return { lit, charm: wide > 1, radius: (lit ? L.radius : L.emberRadius) * gutter * wide,
+      const wide = lit ? (charmed() ? LANTERN.charm.radius : 1) * (1 + (setFx().lanternRadius ?? 0)) : 1;
+      const thick = 1 - L.deepDarkShrink * deepDark();                // the deep dark presses the light in
+      return { lit, charm: wide > 1, radius: (lit ? L.radius : L.emberRadius) * gutter * wide * thick,
         intensity: (lit ? L.intensity : L.emberIntensity) * gutter };
     };
 
@@ -73,11 +84,16 @@ export const lantern = {
       get status() {
         const b = beam(), dusk = duskAt(env.clock()), cover = canopyCover(place(), layout);
         return { oil: state.oil, max: O.max, lit: b.lit, radius: b.radius, intensity: b.intensity, charm: b.charm, cover,
-          darkness: env.indoors ? 0 : clamp(cover * dusk.level, 0, 1),
+          darkness: darkness(), deepDark: deepDark(), watersFarm: instance.watersFarm, shaded: true,
           label: cover <= layout.villageCover + 1e-6 ? 'Village light' : cover < layout.cover ? 'Starlight gap' : dusk.label,
           low: state.oil / O.max < L.lowOil, indoors: !!env.indoors };
       },
-      /** Pours oil in (glowcaps, firefly jars and lumen oil arrive in 30b/30c); returns what the tank took. */
+      /** The dripping caps water the farm early in the day instead of rain (30c): a rule of this world, which the
+          farm asks for, rather than a hidden side effect of its weather. */
+      get watersFarm() { const f = duskAt(env.clock()).frac; return f >= LANTERN.drip.from && f < LANTERN.drip.to; },
+      /** Everything here lies under the caps, so shade crops take (config/resources.js CROPS shade). */
+      get shaded() { return true; },
+      /** Pours oil in (glowcaps, firefly jars and lumen oil); returns what the tank took. */
       refill(amount = O.refillStep) {
         if (!Number.isFinite(amount) || amount <= 0) return 0;
         const before = state.oil; state.oil = clamp(before + amount, 0, O.max);
@@ -97,7 +113,8 @@ export const lantern = {
       enter() { live = instance; },
       update(dt) {
         time += dt;
-        if (!env.indoors && state.oil > 0) state.oil = clamp(state.oil - O.burn * dt, 0, O.max);
+        if (!env.indoors && state.oil > 0)                            // the worn Dusk set makes a tank last longer
+          state.oil = clamp(state.oil - O.burn * (1 - clamp(setFx().lanternOil ?? 0, 0, 0.9)) * dt, 0, O.max);
       },
       exit() { if (live === instance) live = null; },
     };

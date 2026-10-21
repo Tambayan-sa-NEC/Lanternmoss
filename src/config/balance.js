@@ -17,6 +17,7 @@ export const BALANCE = {
     ['emberAxe', 'emberHelm', 'emberMail', 'emberBoots', 'ironAxe', 'ironPick'],
     ['frostBow', 'frostCirclet', 'frostMantle', 'snowstepBoots'],
     ['starStaff', 'frostCirclet', 'frostMantle', 'snowstepBoots', 'frostLocket', 'diamondCharm'],
-    ['tideCirclet', 'tideMantle', 'tideBoots', 'tidePendant'],   // Tidewhisper funds its own set until Duskhollow's gear exists
+    ['tideCirclet', 'tideMantle', 'tideBoots', 'tidePendant'],   // Tidewhisper funds its own set
+    ['duskHood', 'duskMantle', 'duskBoots', 'duskLantern'],      // Duskhollow (30c): its veins, crops and chests pay for the Dusk set
   ],
 };

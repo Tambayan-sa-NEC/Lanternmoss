@@ -69,6 +69,10 @@
 | Duskhollow's animals, their counts and where they live | `src/config/planets/duskhollow.js` → `wildlife`; looks in `src/config/critters.js` |
 | Firefly swarms: how many, how far they drift, catching reach, how long a caught one stays away, their glow | `src/config/lantern.js` → `FIREFLIES` |
 | The Moonmoth Wing charm and how much it widens the lantern | `src/config/lantern.js` → `LANTERN.charm` |
+| When the dripping caps water Duskhollow's farm, and how much the deep dark thickens its dusk | `src/config/lantern.js` → `LANTERN.drip`, `LANTERN.dusk.deepDark`, `LANTERN.light.deepDarkShrink` |
+| Duskhollow's materials, lantern oil, shade crop and Dusk set, and every recipe that makes them | `src/config/duskResources.js` → `DUSK_ITEMS`, `DUSK_RECIPES` |
+| Its veins and patches, the shade crop's growth, and which worlds water their own plots | `src/config/resources.js` → `NODE_KINDS`, `CROPS`, `FARM` |
+| Spore drift and deep dark | `src/config/weather.js` → `WEATHER_KINDS` (`spores`, `deepDark`) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
 | Cave rewards: how near E offers a chest or vein, how far fixtures and monster spawns sit off the walls, how many monsters clear a room | `src/config/dungeons.js` → `CAVE.reward` |
 | Cave ore: the veins that grow only underground (tool, tier, swings, drops) and each cave's ore, vein count and chest kinds | `src/config/dungeons.js` → `CAVE_VEINS`, `CAVES` (`ore`, `veins`, `chest`, `endChest`) |

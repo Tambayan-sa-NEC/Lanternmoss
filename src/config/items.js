@@ -32,6 +32,7 @@ import { RUNES } from './magic.js';
 import { FURNISHINGS } from './home.js';
 import { BUILDING_ITEMS } from './placeables.js';
 import { COASTAL_ITEMS } from './coastalResources.js';
+import { DUSK_ITEMS } from './duskResources.js';
 
 export const ITEM_CATEGORIES = {
   consumable: 'Consumable',
@@ -120,6 +121,7 @@ export const INVENTORY = {
 
 export const ITEM_DEFINITIONS = [
   ...COASTAL_ITEMS,
+  ...DUSK_ITEMS,
   ...Object.entries(BUILDING_ITEMS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'placeable', maxStack: 20, value: 0, icon: { shape: 'charm', color: f.color, art: f.art } })),
   ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'furniture', maxStack: 5, value: 0,
     icon: { shape: 'charm', color: f.color, art: f.art } })),
@@ -205,7 +207,8 @@ export const ITEM_DEFINITIONS = [
   { id: 'featherCharm', name: 'Feather-Step Charm', description: "Fern's sprite magic, folded into a leaf. Run like the wind for a while.", category: 'consumable',
     icon: { shape: 'charm', color: 0xb8ffe0, art: 'leafCharm' }, maxStack: 5, rarity: 'rare', value: 30, use: [{ effect: 'buff', kind: 'feather', seconds: 30 }] },
   // ---- materials (crafting: config/crafting.js) ----
-  { id: 'glowcap', name: 'Glowcap', description: 'A softly glowing mushroom cap from Lanternmoss. Crafts tonics and Lanternmoss gear.', category: 'material',
+  { id: 'glowcap', name: 'Glowcap', description: 'A softly glowing mushroom cap. Crafts tonics and Lanternmoss gear, and tips straight into a belt lantern.', category: 'material',
+    action: 'use', use: [{ effect: 'oil', amount: 10 }],
     icon: { shape: 'cap', color: 0x9ff0ff, art: 'mushroom' }, maxStack: 30, value: 3 },
   { id: 'emberShard', name: 'Ember Shard', description: 'Still warm. Found on the slopes of Emberfall. Crafts stews and Emberfall gear.', category: 'material',
     icon: { shape: 'gem', color: 0xff8a4a, art: 'shard' }, maxStack: 30, rarity: 'uncommon', value: 6 },

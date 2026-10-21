@@ -25,7 +25,7 @@ export const SHOT_FOLDERS = {
   world: ['mesas', 'storm', 'blizzard', 'tidewhisper-high', 'tidewhisper-low', 'tidewhisper-flora', 'lighting-harness',
     'tidewhisper-campaign-720', 'tidewhisper-campaign-1080', 'cave', 'cave-combat', 'cave-rewards', 'cave-guardian',
     'duskhollow', 'duskhollow-canopy'],
-  activities: ['fishing', 'gathering', 'chest', 'photo-mode', 'photo-storybook'],
+  activities: ['fishing', 'gathering', 'chest', 'photo-mode', 'photo-storybook', 'duskhollow-lumen'],
   huds: ['title', 'continue', 'save-menu', 'controls', 'keys', 'help', 'tutorial', 'fainted', 'bag', 'journal', 'bestiary',
     'achievement', 'crafting', 'enchanting', 'bounty-window', 'portal-destinations', 'portal-one-way', 'balance-shop',
     'performance', 'performance-settings', 'gear-sets', 'talents', 'witch-talents-1080', 'warrior-talents', 'warrior-talents-1080', 'ranger-talents', 'ranger-talents-1080'],

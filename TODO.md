@@ -1560,13 +1560,36 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | --- | --- | --- | --- |
 | [x] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
 | [x] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
-| [ ] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
+| [x] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
 | [ ] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
 | [ ] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
 | [ ] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
 | [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
 | [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30c implemented (2026-10-21):** Duskhollow has an economy and a sky of its own. `src/config/duskResources.js`
+(shaped like the coast's) adds lumen ore, dust, ingots, spider silk, moonstone, **lumen oil** and the **shade
+mushroom** crop, with the recipes that join them: ore smelts at the forge, glowcaps and dust brew into oil, and the
+four-piece **Dusk set** is forged from ingots, silk and dust. Lumen veins need an iron pickaxe, the moonstone vein is
+a guarded rare vein, and a glowcap can be tipped straight into the lantern for 10 oil, so the world now has three
+refills. The set's bonuses are about the light: two pieces burn oil 40% slower, three burn 60% slower and reach 15%
+further, carried to the mechanic through the hero's ordinary set effects (`lanternOil`, `lanternRadius`).
+**Spore drift** and **deep dark** join the weather, and the acceptance line's rule holds: the weather only states a
+number, and the world's mechanic decides what it means. Deep dark thickens the dusk by `LANTERN.dusk.deepDark` of
+the light that is left and presses the lantern in by `LANTERN.light.deepDarkShrink`; no rain falls at all, so the
+**dripping caps** water the farm early in the day through the mechanic's `watersFarm`, and **shade spores** only
+take where its `shaded` rule says so. Its music is the procedural `musicBox` theme. BALANCE.budgets reserves the
+Dusk set the way Tidewhisper reserves the Tide set.
+Checked by `tests/duskEconomy.test.mjs`, `tests/sim/duskEconomy.sim.mjs` and `node scripts/dusk-economy-smoke.mjs`
+(port 8131; real `E` mining with an iron pickaxe, the Craft tab, a glowcap poured into the lantern, deep dark taking
+the hollow from 91/255 to 58/255 while the lit ground holds 64/255, and real `E` planting shade spores), plus a
+reviewed shot. Full suites passed: 293 unit tests and 65 simulations. Three sims had to be made deliberate rather
+than lucky, because new content moves the seeded bot stream: the pets sim now quiets the neighbours before checking
+that a passive pet does not bite, the coastal sim takes a surf skipper that is actually submerged, and the pacing
+audit accepts a crop whose seeds are foraged instead of sold. Duskhollow stays `released: false` with no roster. See
+[Duskhollow](docs/wiki/world/duskhollow.md). Not done here: Wick's Old Road, the interiors, every monster and the
+release (30d-30i); spider silk has no in-world source until the webs of 30f.
 
 **30b implemented (2026-10-21):** Duskhollow is planted and populated. `src/world/duskFlora.js` grows the canopy by
 one rule that ties it to the light: a giant **lumen cap** (a 19 m stalk under an 8 m cap with lit gills and hanging
@@ -1640,14 +1663,14 @@ music, Wick's waylamps, every monster and the release (30b-30i).
 - [x] **Wildlife:** firefly swarms (catch them in a jar with `E`, for light and oil), glow snails, lantern bats hanging
       under the caps, and crickets you hear before you see. Pale blind fish in glowing pools. Rare: the **Moonmoth**
       (gift: the Moonmoth Wing charm, a wider light).
-- [ ] **Weather:** no rain under the canopy (the dripping caps water the farm instead), plus two new kinds: **spore
+- [x] **Weather:** no rain under the canopy (the dripping caps water the farm instead), plus two new kinds: **spore
       drift** (glowing spores) and **deep dark** (the dusk thickens; the lantern mechanic shrinks your light a little).
-- [ ] **Resources and items:** lumen ore (needs an iron pickaxe) for lumen ingots, spider silk from cut webs (cloth for
+- [x] **Resources and items:** lumen ore (needs an iron pickaxe) for lumen ingots, spider silk from cut webs (cloth for
       light armour), firefly jars, and shade mushrooms (a crop that grows only in shade). Material: **lumen dust**. Rare
       vein: moonstone. Gear: the Dusk set (28).
 - [ ] **People:** Wick the lamplighter (lines, tips for Umbra, and the quest "Light the Old Road"); houses inside
       mushroom stalks; the travellers' lines ("I can't see my own beard!").
-- [ ] **Music:** a music box over low strings, made in code.
+- [x] **Music:** a music box over low strings, made in code.
 
 ## 31. After the last boss **(suggested)**
 

@@ -7,7 +7,8 @@
      dusk      the endless dusk. The day clock still turns, as brighter and dimmer dusk:
                day / night  darkness (0 = the open surface as it always was, 1 = a cave) at the brightest point of the
                             day and at the darkest point of the night, eased between them by the day fraction
-               deepDark     extra darkness the deep-dark weather may ask for later (30c), as a share of what is left
+               deepDark     extra darkness the deep-dark weather asks for (30c), as a share of what light is left;
+                            that weather shrinks a lit lantern by LANTERN.light.deepDarkShrink as well
      canopy    the giant lumen caps overhead. Authored gaps let starlight through (see planets/duskhollow.js):
                cover        darkness multiplier under the closed canopy (1 = the full dusk above)
                gapCover     multiplier in the middle of a gap of starlight
@@ -24,6 +25,8 @@
                lowOil       share of the tank below which the Oil bar warns and the flame starts to gutter
                flicker      how much the lit radius breathes, as a share of it
      charm     the Moonmoth Wing (30b): while that charm is worn, the lit lantern reaches `radius` times further
+     drip      the dripping caps (30c): the fraction of each day when they water the farm plots, instead of rain.
+               It is a rule of this world, applied by its mechanic, not a side effect of its weather
      foot      the glowmoss carpet lighting up in your footprints, the world's signature effect:
                max          hard cap on live prints (one instanced draw call; scenery density scales it down)
                spacing      metres walked between prints      life  seconds a print stays, fading out
@@ -43,10 +46,11 @@ export const FIREFLIES = {
 };
 
 export const LANTERN = {
-  dusk: { day: 0.42, night: 0.78, deepDark: 0.35 },
+  dusk: { day: 0.42, night: 0.78, deepDark: 0.45 },
   canopy: { cover: 1, gapCover: 0.35, villageCover: 0.12, fade: 14 },
   oil: { max: 100, start: 100, burn: 0.34, refillStep: 25 },
-  light: { radius: 7.5, intensity: 0.95, emberRadius: 2.8, emberIntensity: 0.4, lowOil: 0.2, flicker: 0.05 },
+  light: { radius: 7.5, intensity: 0.95, emberRadius: 2.8, emberIntensity: 0.4, lowOil: 0.2, flicker: 0.05, deepDarkShrink: 0.2 },
   charm: { item: 'moonmothWing', radius: 1.4 },
+  drip: { from: 0.02, to: 0.2 },
   foot: { max: 24, spacing: 1.15, life: 4.5, radius: 0.7, lift: 0.07, color: 0x7cf0c0, glow: 1.5 },
 };
