@@ -97,7 +97,7 @@ export const GEAR_RARITY = {
 
 /** What a mini boss (hydra, basilisk) leaves where it falls: one roll of this table, every time, plus its own
     `extra` items (by monster type). */
-export const MINI_BOSS_LOOT = { table: 'rare', extra: { hydra: [['frogHat', 1]], ironclaw: [['blackPearl', 2]] } };
+export const MINI_BOSS_LOOT = { table: 'rare', extra: { hydra: [['frogHat', 1]], ironclaw: [['blackPearl', 2]], grandweaver: [['spiderSilk', 4], ['moonstone', 1]] } };
 
 export const MONSTER_DROPS = {
   chance: 0.1,             // base chance a defeated monster drops something...

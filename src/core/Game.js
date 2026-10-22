@@ -184,7 +184,7 @@ export class Game {
       for (const n of ctx.npcs) n.update(dt);
       updateWorldItems(dt);
     }
-    clearMire();                                                   // the webs press the hero's speed back down as they animate (30f)
+    clearMire(dt);                                                 // the webs press the hero's speed back down as they animate (30f)
     updateCombat(dt, this.world, keys);
     if (!ctx.room) {
       this.planets.update(dt);                                       // before challenges: a boss win calls off any active one

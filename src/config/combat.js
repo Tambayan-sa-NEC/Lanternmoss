@@ -145,6 +145,34 @@ export const COMBAT = {
                    { below: 1.0, attacks: ['gaze', 'whip', 'lunge'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Enraged', attacks: ['gaze', 'whip', 'lunge', 'spit'], speedMul: 1.2, cooldownMul: 0.8 },
                  ] },
+    // ---- Duskhollow (TODO 30g). Grandmother Gloomweaver hangs in a canopy of her own web on three anchor strands,
+    // where nothing can touch her: `anchors` is how many go up each time (`type` the object below, `at` metres out
+    // around her, `hang` metres she hangs above the ground, `drop` seconds she takes to fall once the last one burns,
+    // `dazed` seconds she lies open after landing). She re-anchors at every phase change but the last, so the fight
+    // is three rounds of burn-the-anchors and fight-her-down. She wears the same spider/beetle pair as her
+    // grandchildren (config/settings.js roundBeetles), and she guards the moonstone vein (config/resources.js).
+    grandweaver:{ ai: 'boss', behavior: 'grandweaver', miniBoss: true, name: 'Grandmother Gloomweaver, Keeper of the Moonstone',
+                 color: 0x4a3c68, capColor: 0xe8d0ff, hp: 760, speed: 2.4, radius: 1.4, height: 2.2, aggro: 15, leash: 22, turnRate: 2.4,
+                 knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3,
+                 telegraph: true, respawn: 0, xp: 175, cooldown: 1.2,
+                 anchors: { count: 3, type: 'gloomAnchor', at: 6.5, hang: 6, drop: 1.1, dazed: 2.4 },
+                 attacks: {
+                   weave: { windup: 1.0, reach: 9, damage: 0, recover: 0.7, cooldown: 1.0, reuse: 4 },      // drops a web where you stand
+                   spit:  { windup: 0.8, count: 3, spread: 46, speed: 10, homing: 0.4, damage: 10, slow: 0.45, slowTime: 2.5, recover: 0.6, cooldown: 1.0, reuse: 3 },
+                   bite:  { windup: 0.6, range: 4.0, arc: 80, damage: 15, knockback: 7, recover: 0.7, cooldown: 0.8 },
+                   sweep: { windup: 0.95, radius: 5.5, arc: 220, damage: 13, knockback: 10, recover: 0.9, cooldown: 1.0, reuse: 5 },
+                 },
+                 phases: [   // each threshold sends her back up the stalks to spin a fresh set of anchors
+                   { below: 1.0, attacks: ['weave', 'spit', 'bite'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.6, title: 'Second web', attacks: ['weave', 'spit', 'bite', 'sweep'], speedMul: 1.1, cooldownMul: 0.9 },
+                   { below: 0.3, title: 'Last web', attacks: ['weave', 'spit', 'bite', 'sweep'], speedMul: 1.2, cooldownMul: 0.78 },
+                 ] },
+    // An anchor strand: an object holding her up. A blade will not cut a cable of this thickness - it has to burn.
+    // Any lit belt lantern held within `reach` burns one down over `burnTime` seconds (so every hero can), and a hit
+    // that carries fire takes it in one (so the witch can do it from across the clearing).
+    gloomAnchor:{ ai: 'anchor', object: true, static: true, name: 'Anchor strand', color: 0xe8d0ff, hp: 1, speed: 0,
+                 radius: 0.6, height: 6, aggro: 0, leash: 99, respawn: 0, xp: 0,
+                 knockResist: 1, slowResist: 1, staggerImmune: true, reach: 2.6, burnTime: 2.6 },
     // Tidewhisper (TODO 27f). faceArc = half-angle (degrees) of the front that can be hurt; everywhere else is the bell,
     // which only rings (bellRing: a shockwave after `delay`, at most once per `cooldown`; stun = seconds dazed).
     // guarded = damage share while tucked in its shell; openBonus = extra while out of it (swap) or wedged in the sand

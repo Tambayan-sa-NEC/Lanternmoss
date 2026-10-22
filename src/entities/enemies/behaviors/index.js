@@ -17,6 +17,8 @@ import { basilisk } from './boss/basilisk.js';
 import { hydra } from './boss/hydra.js';
 import { ironclaw } from './boss/ironclaw.js';
 import { mireLure, mirelure } from './boss/mirelure.js';
+import { grandweaver } from './boss/grandweaver.js';
+import { anchor } from './anchor.js';
 import { burrower } from './burrower.js';
 import { charger } from './charger.js';
 import { drifter } from './drifter.js';
@@ -36,4 +38,4 @@ const seal = {
   },
 };
 
-export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, lightbound, mimic, weaver, thief, web, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk, ironclaw, mirelure, mireLure };
+export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, lightbound, mimic, weaver, thief, web, grandweaver, anchor, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk, ironclaw, mirelure, mireLure };

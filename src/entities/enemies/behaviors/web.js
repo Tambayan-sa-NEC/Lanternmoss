@@ -19,8 +19,14 @@ import { spawnWorldItem } from '../../../gameplay/pickups.js';
 const _p = new THREE.Vector3();
 
 /** Every frame the hero starts free, and each web they stand in presses the slow back down (Game.update calls this
-    before the enemies animate). Nothing else writes `mireK`, so a cut web releases the hero immediately. */
-export function clearMire() { if (ctx.player) ctx.player.mireK = 1; }
+    before the enemies animate). Nothing else writes `mireK`, so a cut web releases the hero immediately.
+    A hit of thrown silk (Grandmother Gloomweaver's spit, 30g) is the one slow that is not a web underfoot: it runs
+    on its own timer here, so it fades by itself and nothing has to remember it across a save. */
+export function clearMire(dt = 0) {
+  const P = ctx.player; if (!P) return;
+  P.mireK = 1;
+  if (P.silkT > 0) { P.silkT = Math.max(0, P.silkT - dt); P.mireK = Math.min(P.mireK, P.silkK ?? 1); }
+}
 
 /** How slow the hero is right now, 0..1 of walking speed (1 = free). For the HUD and the checks. */
 export const mireOn = player => player?.mireK ?? 1;
