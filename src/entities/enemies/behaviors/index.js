@@ -22,6 +22,9 @@ import { charger } from './charger.js';
 import { drifter } from './drifter.js';
 import { lightbound } from './lightbound.js';
 import { mimic } from './mimic.js';
+import { thief } from './thief.js';
+import { weaver } from './weaver.js';
+import { web } from './web.js';
 import { support } from './support.js';
 import { ctx } from '../../../core/context.js';
 
@@ -33,4 +36,4 @@ const seal = {
   },
 };
 
-export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, lightbound, mimic, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk, ironclaw, mirelure, mireLure };
+export const BEHAVIORS = { bomber, charger, burrower, support, armoured, drifter, amphibian, lightbound, mimic, weaver, thief, web, boss: gloomcap, gloomcap, dragon, demonLord, seal, hydra, basilisk, ironclaw, mirelure, mireLure };

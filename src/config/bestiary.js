@@ -95,6 +95,23 @@ export const BESTIARY_ENTRIES = {
       'Count the caps. A real patch does not blink.', 'It is slow once sprung, so back away and fight it at range.'],
     drops: 'Often a few glowcaps as well - the ones it was wearing.',
   },
+  gloomweaver: {
+    name: 'Gloomweaver', blurb: 'A round, fuzzy spider that strings sticky webs between the stalks and bites whatever gets caught in them.',
+    attacks: [['Bite', 'A short wind-up, then a snap of its fangs.'], ['Spin', 'Lays a sticky web a few paces ahead of itself, over and over, until the ground around you is fenced in.']],
+    counters: ['Cut the webs before you fight it: a blade takes one down, and fire burns it away in one.',
+      'Fight it on ground you have already cleared, or it will spin a new web behind you.',
+      'It is no tougher than a goblin once you can move freely.',
+      'If spiders are not for you, turn on "Draw spiders as beetles" in Settings: it and its grandmother both change.'],
+    drops: 'Often a thread or two of spider silk as well.',
+  },
+  snuffer: {
+    name: 'Snuffer', blurb: 'A little hooded thief with a stolen flask on its belt. It does not want to fight you; it wants what is in your lantern.',
+    attacks: [['Snatch', 'Darts in, takes a draught of lantern oil and runs off with it, faster than it came.']],
+    counters: ['Catch it and you get the oil back with interest: a flask bursts out of it when it goes down.',
+      'It can only steal what the tank still holds, so an empty lantern has nothing for it.',
+      'It runs in a straight line while it flees: cut it off, or hit it at range.'],
+    drops: 'Sometimes a flask of lumen oil as well.',
+  },
   hydra: {
     lore: 'Old Bramble swears the lake hydra was a single, harmless eel until somebody tried to chop it in half. '
       + 'Now it guards the deep water, and a warm, speckled egg it will not explain.',

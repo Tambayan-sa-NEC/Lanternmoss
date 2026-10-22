@@ -95,6 +95,7 @@ import { Tutorial } from '../gameplay/Tutorial.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
 import { Fireflies } from '../gameplay/Fireflies.js';
 import { OldRoad } from '../gameplay/OldRoad.js';
+import { clearMire } from '../entities/enemies/behaviors/web.js';
 import { DAY } from '../config/day.js';
 import { TutorialUI } from '../ui/TutorialUI.js';
 
@@ -183,6 +184,7 @@ export class Game {
       for (const n of ctx.npcs) n.update(dt);
       updateWorldItems(dt);
     }
+    clearMire();                                                   // the webs press the hero's speed back down as they animate (30f)
     updateCombat(dt, this.world, keys);
     if (!ctx.room) {
       this.planets.update(dt);                                       // before challenges: a boss win calls off any active one

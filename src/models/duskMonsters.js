@@ -3,6 +3,7 @@
    (src/entities/enemies/behaviors/lightbound.js, mimic.js). */
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
+import { settings } from '../core/settings.js';
 
 const group = (parent, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; };
 
@@ -61,4 +62,98 @@ export function buildMosslurk(def = {}) {
     legs.push(l);
   }
   return { root, body, caps, mouth, eyes, legs };
+}
+
+/** Accessibility (TODO 30f): with `roundBeetles` on, every spider on this world draws its beetle silhouette
+    instead. Both shapes are built once and one is hidden, so the toggle takes effect the very next frame and costs
+    no rebuild; the hidden one is not drawn. The regular Gloomweaver and (in 30g) Grandmother Gloomweaver share this
+    one switch, so the setting can never leave a hero facing one of each. */
+export function showSpiderLook(e) {
+  const beetle = !!settings.roundBeetles;
+  if (e.spider) e.spider.visible = !beetle;
+  if (e.beetle) e.beetle.visible = beetle;
+}
+
+/** The spider / beetle pair every Duskhollow spider wears. `scale` sizes it for a regular weaver or a mini boss.
+    Parts: body (the whole creature, for hit pops), spider, beetle, legs[8], fangs[2], eyes[n]. */
+export function buildSpiderLook(def = {}, scale = 1) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  const fur = def.color ?? 0x5a4a78, mark = def.capColor ?? 0xd8c0ff;
+  body.scale.setScalar(scale);
+
+  const spider = group(body, 0, 0, 0);                                 // round and fuzzy, not leggy and spindly
+  addTo(spider, part(G.ico(0.42, 1), fur), [0, 0.42, -0.08], [0, 0, 0], [1, 0.92, 1.1]);
+  addTo(spider, part(G.ico(0.26, 1), fur), [0, 0.44, 0.34]);           // the head, tucked into the body
+  for (let i = 0; i < 5; i++) addTo(spider, part(G.ico(0.07, 0), mark, { glow: true, intensity: 1.4 }),
+    [Math.cos(i * 1.26) * 0.2, 0.62 + Math.sin(i * 1.26) * 0.12, -0.2]);   // the mark on its back
+  const eyes = [];
+  for (const sx of [-1, 1]) for (const [dx, dy] of [[0.1, 0.06], [0.2, -0.02]])
+    eyes.push(addTo(spider, part(G.ico(0.045, 0), 0xfff0a0, { glow: true, intensity: 2 }), [sx * dx, 0.5 + dy, 0.52]));
+  const fangs = [];
+  for (const sx of [-1, 1]) {
+    const f = group(spider, sx * 0.08, 0.36, 0.5);
+    addTo(f, part(G.cone(0.05, 0.18, 4), 0xfff6e6), [0, -0.08, 0], [0.4, 0, 0]);
+    fangs.push(f);
+  }
+
+  const beetle = group(body, 0, 0, 0);                                 // the accessible silhouette: a round beetle
+  beetle.visible = false;
+  addTo(beetle, part(G.ico(0.44, 1), fur), [0, 0.42, 0], [0, 0, 0], [1, 0.8, 1.15]);
+  addTo(beetle, part(G.box(0.05, 0.3, 0.74), 0x2a2140, { outline: false }), [0, 0.68, -0.02]);   // the shell's seam
+  addTo(beetle, part(G.ico(0.22, 1), fur), [0, 0.34, 0.46], [0, 0, 0], [1, 0.9, 0.8]);
+  for (const sx of [-1, 1]) addTo(beetle, part(G.cone(0.05, 0.26, 4), mark, { glow: true, intensity: 1.6 }), [sx * 0.1, 0.5, 0.6], [-0.7, 0, sx * 0.3]);
+  for (const sx of [-1, 1]) eyes.push(addTo(beetle, part(G.ico(0.05, 0), 0xfff0a0, { glow: true, intensity: 2 }), [sx * 0.11, 0.4, 0.62]));
+
+  const legs = [];                                                     // eight legs, shared by both silhouettes
+  for (let i = 0; i < 8; i++) {
+    const side = i < 4 ? -1 : 1, k = i % 4;
+    const l = group(body, side * 0.34, 0.34, 0.3 - k * 0.22);
+    addTo(l, part(G.cyl(0.035, 0.03, 0.46, 4), 0x2a2140), [side * 0.12, -0.14, 0], [0, 0, side * 0.9]);
+    legs.push(l);
+  }
+  return { root, body, spider, beetle, legs, fangs, eyes };
+}
+
+/** Gloomweaver: the regular spider of the hollows. */
+export function buildGloomweaver(def = {}) { return buildSpiderLook(def, 1); }
+
+/** Snuffer: a small hooded thief with a stolen flask on its belt (shown only while it is carrying oil).
+    Parts: body, hood, legs[2], flask. */
+export function buildSnuffer(def = {}) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  const cloth = def.color ?? 0x3b3356, lamp = def.capColor ?? 0xffc06a;
+  addTo(body, part(G.cone(0.34, 0.72, 6), cloth), [0, 0.36, 0]);
+  const hood = group(body, 0, 0.66, 0);
+  addTo(hood, part(G.cone(0.26, 0.38, 6), cloth), [0, 0.06, -0.04], [0.25, 0, 0]);
+  addTo(hood, part(G.ico(0.17, 1), 0x191230, { outline: false }), [0, 0, 0.1]);
+  for (const sx of [-1, 1]) addTo(hood, part(G.ico(0.04, 0), lamp, { glow: true, intensity: 2.4 }), [sx * 0.07, 0.01, 0.22]);
+  for (const sx of [-1, 1]) addTo(body, part(G.ico(0.09, 0), cloth), [sx * 0.3, 0.42, 0.04]);      // little hands
+  const legs = [];
+  for (const sx of [-1, 1]) {
+    const l = group(body, sx * 0.12, 0.14, 0);
+    addTo(l, part(G.cyl(0.05, 0.045, 0.28, 4), 0x241c38), [0, -0.12, 0]);
+    legs.push(l);
+  }
+  const flask = group(body, 0.26, 0.42, 0.12);
+  addTo(flask, part(G.cyl(0.09, 0.11, 0.2, 6), 0x6a5a3a), [0, 0, 0]);
+  addTo(flask, part(G.ico(0.07, 0), lamp, { glow: true, intensity: 2.6 }), [0, 0.04, 0]);
+  flask.visible = false;
+  return { root, body, hood, legs, flask };
+}
+
+/** A sticky web: a sagging sheet of silk between two anchors, with a few strands reaching out of it.
+    Parts: body, sheet (the sheet itself, whose opacity breathes). */
+export function buildGloomweb(def = {}) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  const silk = def.color ?? 0xd8c0ff;
+  const sheet = new THREE.Mesh(new THREE.CircleGeometry(def.radius ?? 1.5, 12).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: silk, transparent: true, opacity: 0.45, depthWrite: false, side: THREE.DoubleSide }));
+  sheet.position.y = 0.12; sheet.renderOrder = 2; body.add(sheet);
+  const r = def.radius ?? 1.5;
+  for (let i = 0; i < 9; i++) {                                        // the strands, reaching up out of the sheet
+    const a = i / 9 * Math.PI * 2;
+    addTo(body, part(G.cyl(0.012, 0.012, 0.55, 3), silk, { outline: false }), [Math.cos(a) * r * 0.66, 0.34, Math.sin(a) * r * 0.66], [0.2 * Math.cos(a), 0, 0.2 * Math.sin(a)]);
+  }
+  for (let ring = 1; ring <= 2; ring++) addTo(body, part(new THREE.TorusGeometry(r * ring / 2.4, 0.02, 3, 12).rotateX(Math.PI / 2), silk, { outline: false }), [0, 0.15, 0]);
+  return { root, body, sheet };
 }

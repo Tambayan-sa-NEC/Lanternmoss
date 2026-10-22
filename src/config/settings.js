@@ -32,6 +32,9 @@ export const SETTINGS_SCHEMA = [
     { key: 'outlineWidth', label: 'Outline width', type: 'range', min: 0, max: 5, step: 0.2, unit: 'px', default: 3.2 },
   ] },
   { group: 'Gameplay', items: [
+    // Duskhollow's spiders (TODO 30f): the regular Gloomweaver and its mini boss both draw a round beetle instead,
+    // so nobody has to look at a spider to play the world. Both silhouettes are built; this only swaps which shows.
+    { key: 'roundBeetles', label: 'Draw spiders as beetles', type: 'toggle', default: false },
     { key: 'screenShake', label: 'Screen shake', type: 'range', min: 0, max: 150, step: 10, unit: '%', default: 100 },
     { key: 'damageNumbers', label: 'Damage numbers', type: 'toggle', default: true },
     { key: 'hitStop', label: 'Impact slow-motion', type: 'toggle', default: true },
