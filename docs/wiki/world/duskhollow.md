@@ -1,6 +1,6 @@
 # Duskhollow: twilight terrain and the lantern
 
-## In brief (stages 30a-30c, unreleased)
+## In brief (stages 30a-30d, unreleased)
 
 Duskhollow is the fifth world: deep valleys under a canopy of giant lumen caps, where your lantern decides what you
 can see. Stage 30a builds its terrain, its endless dusk, the belt lantern with its Oil bar, and the glowmoss that
@@ -8,9 +8,11 @@ lights up in your footprints. Stage 30b fills it in: the canopy itself and the p
 bats, crickets and pale blind fish, firefly swarms you catch for lantern oil, and the Moonmoth, whose charm widens
 your light. Stage 30c gives it an economy and a sky of its own: lumen ore, ingots and dust, spider silk, the
 guarded moonstone vein, lantern oil, shade mushrooms, the craftable Dusk set, spore drift and deep dark, the
-dripping caps that water the farm where no rain falls, and a music box theme. The rest of the planned checklist - the economy, Wick and the Old Road (30d),
-the four monsters (30e-30f), Grandmother Gloomweaver (30g), Umbra (30h) and campaign release (30i) - is
-**not built yet**.
+dripping caps that water the farm where no rain falls, and a music box theme. Stage 30d gives it people and a
+purpose: Wick the lamplighter in a stalk you can walk into, the travellers' lines, the village brazier, the Old
+Road's waylamps and the three moonwells his quest asks you to relight, and the gate that keeps Umbra asleep. The
+rest of the planned checklist - the four monsters (30e-30f), Grandmother Gloomweaver (30g), Umbra herself (30h) and
+campaign release (30i) - is **not built yet**.
 
 Duskhollow stays `released: false`: it cannot be selected, generated or travelled to in normal play. The checks run
 it through a development fixture (`tests/sim/lib/duskhollowFixture.mjs`) that copies this world's content into the
@@ -158,6 +160,46 @@ lies in shade, which today is Duskhollow alone; anywhere else the plot refuses t
 Its music is a **music box over low strings** (`musicBox` in `src/config/music.js`), made in code like every other
 theme.
 
+## Wick and the Old Road (30d)
+
+**Wick the lamplighter** lives in a mushroom stalk on the village square. He keeps the keeper's look and swinging
+lantern that Tidewhisper's Marlo wears, walks the square in the morning and evening, and sleeps at home. He is the
+one who tells you what Umbra does with light, and he asks for the quest the world is built around.
+
+![Wick the lamplighter by the village brazier](../../screenshots/npcs/duskhollow-wick.jpg)
+
+**The Old Road** leaves the village in one branch for each of the first three authored gaps of starlight, so every
+**moonwell** stands under open sky. Waylamps line each branch at a fixed spacing (`OLD_ROAD.branches`), and the
+**village brazier** burns in the village gap, where the light is already safe.
+
+| What | Where | What it does |
+| --- | --- | --- |
+| **The village brazier** | The village gap | Never goes out. Press `E` to take the village flame |
+| **A waylamp** | Every `spacing` metres along a branch | Dark until you light it. Once lit it stays lit for the rest of the adventure - and gives you fire again |
+| **A moonwell** | In each gap of starlight | One of Wick's three. Lighting all three finishes his quest and is half of Umbra's gate |
+
+**Carrying the flame.** A fresh flame lasts `OLD_ROAD.flame.seconds` of play, and it burns by exactly the same rule
+as the lantern on your belt: never indoors, never in a cave or a menu, never while paused, and never over skipped or
+away time. Lighting a waylamp is a relay - it fills the carried flame right back up - so the road lights itself once
+you have started. **Running dry costs nothing but the walk back**: the flame simply goes out, the lamps you already
+lit stay lit, and the last of them is where you take fire again.
+
+![The Old Road: lit waylamps running out of the hollow](../../screenshots/world/duskhollow-old-road.jpg)
+
+What is alight, and how long the carried flame has left, are rules of this world's mechanic, saved per planet beside
+the Oil bar, so Continue and portal travel find the road exactly as you left it. A lit lamp head glows on its own;
+only the brazier, the moonwells and the nearest `OLD_ROAD.lamp.sources` waylamps hold a
+[shared local light](../technical/lighting.md), so a road relit end to end costs no more than a road with two lamps
+lit.
+
+**Inside the stalks.** Two houses can be entered: Wick's own and a traveller's. They are ordinary round rooms with a
+stalk's inside - lit gills overhead instead of a flat ceiling, a lantern vine, and the lamplighter's oil jars. Wick's
+bookshelf carries the lamplighter's round and the night Umbra came.
+
+**Umbra's gate.** `boss.summon` is `{ level: 11, quest: 'oldRoad' }`: she sleeps in her lair until the hero is
+level 11 **and** the three moonwells burn. The sealed lair, its status chip and the bestiary all say so through the
+ordinary [boss gate](monsters-and-bosses.md). Her fight, her trophy and her arena arrive with 30h.
+
 ## What is checked
 
 | Check | What it proves |
@@ -171,10 +213,13 @@ theme.
 | `npm test` (`tests/duskEconomy.test.mjs`) | Every node, forage and material is real; the lumen chain and Dusk recipes; the set reaching the lantern; deep dark as a number turned into a rule; the drip window and the shade crop |
 | `npm run sim -- duskEconomy` | The veins and patches are placed with the music box playing, the chain smelts and brews, the worn set slows the burn, deep dark thickens the dusk and shrinks the light, the caps water the farm with no rain, and shade spores refuse a sunlit world |
 | `node scripts/dusk-economy-smoke.mjs` | In a real browser: real `E` mines a lumen vein with the iron pickaxe, the Craft tab lists the chain and the set, a glowcap pours oil, deep dark visibly darkens the hollow while the lit ground stays readable, and real `E` plants shade spores |
+| `npm test` (`tests/oldRoad.test.mjs`) | The saved lit lamps and flame, cleaned and bounded; taking fire, the relay, a flame that runs dry, the three moonwells counted once; Wick, his stalk and the level-11 gate |
+| `npm run sim -- oldRoad` | The road is built where the fiction says, Wick offers and tracks his quest, the flame is carried and runs dry through the real interactions, Continue and portal travel keep the road lit, the three wells finish the quest, and level 11 unseals the lair |
+| `node scripts/old-road-smoke.mjs` | In a real browser: real `E` takes the village flame and lights a waylamp, a lit lamp hands out fire again, running dry costs no health, the village gap is still safe light, and a relit lamp's light reaches the shader |
 
 ## Not built yet
 
-Wick's Old Road and its waylamps, the stalk-house interiors, Shadelings, Gloomweavers, Mosslurks, Snuffers,
-Grandmother Gloomweaver, Umbra and the campaign release. No enemy roster is configured, so Duskhollow still fails
-the content gate by design. Spider silk has no source in the world until the gloomweavers' webs arrive in 30f, and
-the moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is simply mineable.
+Shadelings, Gloomweavers, Mosslurks, Snuffers, Grandmother Gloomweaver, Umbra herself and the campaign release. No
+enemy roster is configured, so Duskhollow still fails the content gate by design, and nothing yet answers the gate
+Wick's quest opens. Spider silk has no source in the world until the gloomweavers' webs arrive in 30f, and the
+moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is simply mineable.

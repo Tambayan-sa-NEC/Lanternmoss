@@ -81,6 +81,8 @@ node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
 node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
                                    # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/old-road-smoke.mjs   # Duskhollow (unreleased, 30d): Wick's quest, real E carrying the village flame and
+                                  # lighting waylamps, a flame that runs dry, and the lair's level-11 gate
 node scripts/dusk-economy-smoke.mjs # Duskhollow (unreleased, 30c): real E mining a lumen vein, the Craft tab, a glowcap
                                    # poured into the lantern, deep dark, real E planting shade spores; retakes its shot
 ```
@@ -127,6 +129,16 @@ with the iron pickaxe, the Craft tab lists the lumen chain and the Dusk set, rea
 the lantern, the deep-dark weather visibly darkens the hollow while the lit ground stays readable, and a real `E`
 plants shade spores in the farm. It captures `activities/duskhollow-lumen.jpg`.
 `node tests/sim/duskEconomy.sim.mjs` and `node --test tests/duskEconomy.test.mjs` cover the same ground headlessly.
+
+`node scripts/old-road-smoke.mjs` owns port 8132 and checks 30d in the browser, through the village fixture
+`tests/sim/lib/duskVillageFixture.mjs`: the brazier, the waylamps and the three moonwells render dark, Wick really
+offers "Light the Old Road", a real `E` takes the village flame and lights a waylamp, a flame left to run dry costs
+no health and a lit waylamp hands out fire again, the village gap still reads as the world's safe light, and a
+relit lamp's light reaches the shader that draws the dark hollow. It captures `world/duskhollow-old-road.jpg` and
+`npcs/duskhollow-wick.jpg`.
+`node tests/sim/oldRoad.sim.mjs` covers the same route headlessly and adds Continue, portal travel, the quest
+completing, the local-light budget of a road relit end to end, and the level-11 gate sealing and unsealing the
+lair; `node --test tests/oldRoad.test.mjs` covers the pure flame, lamp and moonwell rules and the saved shape.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
