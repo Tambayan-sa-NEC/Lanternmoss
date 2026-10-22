@@ -1,5 +1,6 @@
-/* CAMERA: third-person, surface-aligned, collision-aware rig around the player. Two other modes: the dollhouse view
-   indoors (setRoomView), and a still showcase framing for choosing a hero or a pet (setShowcase: no orbit). */
+/* CAMERA: third-person, surface-aligned, collision-aware rig around the player. Three other modes: the dollhouse view
+   indoors (setRoomView), a still showcase framing for choosing a hero or a pet (setShowcase: no orbit), and photo
+   mode's free orbit around the hero (setPhotoView). */
 import * as THREE from 'three';
 import { CAMERA, PLAYER } from '../config/game.js';
 import { ctx } from '../core/context.js';
@@ -16,7 +17,7 @@ const V3 = THREE.Vector3;
 
 /** fwd/up = view heading and up (transported around the sphere); pitch/dist = what the player asked for,
     effPitch/curDist = what obstacles allow; init = false snaps the follow target on the next frame. */
-export const cam = { room: null, show: null, fwd: new V3(), up: new V3(), target: new V3(), pitch: CAMERA.pitch, effPitch: CAMERA.pitch, dist: settings.cameraDistance, curDist: settings.cameraDistance,
+export const cam = { room: null, show: null, photo: null, fwd: new V3(), up: new V3(), target: new V3(), pitch: CAMERA.pitch, effPitch: CAMERA.pitch, dist: settings.cameraDistance, curDist: settings.cameraDistance,
   lastDrag: -99, init: false, shake: 0 };
 
 export function initCamera(player) { cam.fwd.copy(player.fwd); cam.up.copy(player.up); }
@@ -61,6 +62,22 @@ function updateShowcaseCamera(dt) {
   camera.up.copy(v.up); camera.lookAt(cam.target);
   cam.fwd.copy(v.face).negate();                                 // so play starts looking the same way round
 }
+/** Photo mode (src/ui/PhotoMode.js): a free orbit around the hero within PHOTO.camera's limits. view = { fwd (tangent the
+    camera looks along), pitch, dist, roll } is owned and clamped by the caller; null = back to following the hero. */
+export function setPhotoView(view) { cam.photo = view; cam.init = false; }
+function updatePhotoCamera(dt) {
+  const P = ctx.player, v = cam.photo;
+  cam.up.copy(P.up); projectTangent(v.fwd, P.up).normalize(); cam.fwd.copy(v.fwd);
+  _tv.copy(P.pos).addScaledVector(P.up, v.lift);
+  if (!cam.init) { cam.target.copy(_tv); cam.init = true; } else cam.target.lerp(_tv, damp(12, dt));
+  const keep = cam.dist; cam.dist = v.dist; const allowed = camMarch(v.pitch); cam.dist = keep;   // props pull it in, as in play
+  camera.position.copy(cam.target).addScaledVector(_off, allowed);
+  const len = camera.position.length(); _q.copy(camera.position).divideScalar(len);
+  const gh = groundHeight(_q) + 0.35; if (len < gh) camera.position.copy(_q).multiplyScalar(gh);
+  camera.up.copy(P.up); camera.lookAt(cam.target);
+  if (v.roll) camera.rotateZ(v.roll);                            // tilt the horizon about the view axis
+}
+
 /** Slow orbit behind the title screen: eases to `dist` and `pitch` while turning at `speed` rad/s. */
 export function orbitCamera(dt, dist = 5.5, speed = 0.3, pitch = CAMERA.pitch) {
   cam.fwd.applyAxisAngle(cam.up, dt * speed); cam.dist += (dist - cam.dist) * damp(1.5, dt); cam.pitch += (pitch - cam.pitch) * damp(1.5, dt);
@@ -80,6 +97,7 @@ function camMarch(pitch) {
 
 export function updateCamera(dt) {
   const P = ctx.player;
+  if (cam.photo) { updatePhotoCamera(dt); return; }
   if (cam.show) { updateShowcaseCamera(dt); return; }
   if (cam.room) { updateRoomCamera(dt); return applyShake(dt); }
   if (!cam.init) { cam.target.copy(P.pos).addScaledVector(P.up, 1.4); cam.init = true; }

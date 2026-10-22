@@ -3,7 +3,7 @@
 import { ACHIEVEMENTS } from '../config/achievements.js';
 import { BESTIARY_ENTRIES } from '../config/bestiary.js';
 import { COMBAT } from '../config/combat.js';
-import { PETS } from '../config/pets.js';
+import { availablePetIds, petAvailable } from '../config/pets.js';
 import { PLANETS } from '../config/planets.js';
 import { releasedEnemyTypes } from '../config/releasedEnemies.js';
 
@@ -17,7 +17,8 @@ export const isMiniBoss = type => !!COMBAT.enemies[type]?.miniBoss;
 /** A bestiary page's title: the monster's name, or the boss's (without its epithet). */
 export const pageName = type => BESTIARY_ENTRIES[type]?.name ?? COMBAT.enemies[type]?.name?.split(',')[0] ?? type;
 
-const COUNTERS = ['monsters', 'bosses', 'chests', 'quests', 'crafted', 'minibosses', 'rareFriends'];
+// every counter Journal.add() keeps; a counter missing here is lost on reload (fish, harvests and gathered were, before 34)
+const COUNTERS = ['monsters', 'bosses', 'chests', 'quests', 'crafted', 'minibosses', 'rareFriends', 'gathered', 'fish', 'harvests', 'bounties'];
 const FLAGS = new Set(ACHIEVEMENTS.filter(a => a.goal.flag).map(a => a.goal.flag));
 
 /**   stats     lifetime counters (COUNTERS)
@@ -49,7 +50,7 @@ export function sanitizeJournal(raw, knownItem = () => true) {
   j.found = pick(src.found, k => knownItem(k), v => (v === true ? true : null));
   j.legendary = pick(src.legendary, k => knownItem(k), v => (v === true ? true : null));
   for (const k of Object.keys(j.legendary)) j.found[k] = true;
-  j.pets = pick(src.pets, k => has(PETS, k), v => (v === true ? true : null));
+  j.pets = pick(src.pets, petAvailable, v => (v === true ? true : null));
   return j;
 }
 
@@ -58,7 +59,7 @@ export function statValue(j, stat) {
   switch (stat) {
     case 'kinds': return Object.keys(j.defeated).filter(type => releasedKinds.has(type)).length;
     case 'bossKinds': return Object.keys(j.defeated).filter(type => releasedKinds.has(type) && isBoss(type)).length;
-    case 'petsFound': return Object.keys(j.pets).length;
+    case 'petsFound': return Object.keys(j.pets).filter(petAvailable).length;
     case 'items': return Object.keys(j.found).length;
     case 'legendary': return Object.keys(j.legendary).length;
     default: return j.stats[stat] ?? 0;
@@ -68,7 +69,7 @@ export function statValue(j, stat) {
 export function goalTarget(goal) {
   if (goal.flag) return 1;
   if (goal.bosses) return goal.bosses.length;
-  return goal.at === 'allPets' ? Object.keys(PETS).length : goal.at === 'allKinds' ? BESTIARY_ORDER.length : goal.at;
+  return goal.at === 'allPets' ? availablePetIds().length : goal.at === 'allKinds' ? BESTIARY_ORDER.length : goal.at;
 }
 /** { have, need, done } for one achievement. */
 export function progress(a, j) {

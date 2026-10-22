@@ -92,3 +92,22 @@ function brew() {
 }
 
 export const STATION_BUILDERS = { workbench, forge, pot, brew };
+
+/** The village bounty board (config/bounties.js): two posts, a little roof and three pinned notes. notes = the paper
+    meshes, one per task (Bounties tints them: posted, ready to claim, claimed); glow = the lantern on top. */
+export function bountyBoard() {
+  const g = new THREE.Group(), glow = [], notes = [];
+  for (const x of [-0.78, 0.78]) addTo(g, part(G.box(0.14, 2.1, 0.14), WOOD_DK), [x, 1.05, 0]);
+  addTo(g, part(G.box(1.5, 1.0, 0.08), WOOD), [0, 1.35, 0]);
+  addTo(g, part(G.box(1.62, 0.08, 0.14), WOOD_DK), [0, 1.86, 0]);
+  addTo(g, part(G.box(1.62, 0.08, 0.14), WOOD_DK), [0, 0.84, 0]);
+  addTo(g, part(G.box(1.95, 0.08, 0.62), 0xc85a4a), [0, 2.24, -0.02], [0.32, 0, 0]);          // a little roof, front slope
+  addTo(g, part(G.box(1.95, 0.08, 0.62), 0xb04a3c), [0, 2.24, -0.02], [-0.32, 0, 0]);
+  [-0.45, 0.02, 0.47].forEach((x, i) => {
+    const n = addTo(g, part(G.box(0.36, 0.46, 0.02), 0xfff3d6), [x, 1.36 + (i === 1 ? 0.06 : -0.03), 0.06], [0, 0, (i - 1) * 0.08]);
+    addTo(g, part(G.ico(0.035, 0), 0xd04a5a, { outline: false }), [x, 1.56 + (i === 1 ? 0.06 : -0.03), 0.08]);   // the pin
+    notes.push(n);
+  });
+  glow.push(addTo(g, part(G.ico(0.11, 0), 0xffd36b, { glow: true, intensity: 2.4 }), [0, 2.05, 0.18]));
+  return { root: g, glow, notes, smoke: new THREE.Vector3(0, 2.05, 0.18) };
+}

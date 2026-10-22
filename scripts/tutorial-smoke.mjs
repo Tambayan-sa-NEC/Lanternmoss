@@ -1,12 +1,13 @@
 // Optional real-browser check. npm i --no-save --no-package-lock puppeteer-core; CHROME selects a Chromium browser.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8096;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let serverError = '';
 server.stderr.on('data', data => { serverError += data; });
@@ -23,6 +24,7 @@ try {
     headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage(); await page.setViewport({ width: 1280, height: 720 });
   const errors = []; page.on('pageerror', e => errors.push(String(e)));
+  page.on('console', m => { if (m.type() === 'error' && /shader|WebGLProgram|VALIDATE_STATUS/i.test(m.text())) errors.push(m.text()); });
   await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0', timeout: 90000 });
   await page.waitForFunction(() => window.LANTERNMOSS, { timeout: 60000 });
   await page.click('[data-act="play"]');
@@ -34,12 +36,12 @@ try {
   assert.match(await page.$eval('#tutorial', e => e.textContent), /A few steps/);
   await wait(3500); // Let the three-second arrival animation finish before taking the guide screenshot.
   await page.waitForFunction(() => Number(getComputedStyle(document.getElementById('cresult')).opacity) < 0.01, { timeout: 60000 });
-  await page.screenshot({ path: shots + 'tutorial.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('tutorial'), type: 'jpeg', quality: 84 });
   await page.click('[data-tutorial="help"]'); await page.waitForSelector('#journal.show');
   assert.equal(await page.evaluate(async () => (await import('/src/core/context.js')).ctx.paused), true);
   for (const label of ['Energy and recovery', 'Gathering and tools', 'Crafting stations', 'Ore into metal', 'Fishing', 'Seeds and farming', 'Your companion', 'First finds'])
     assert.ok((await page.$eval('.help-page', e => e.textContent)).includes(label), label);
-  await page.screenshot({ path: shots + 'help.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('help'), type: 'jpeg', quality: 84 });
   await page.keyboard.press('Escape'); await page.click('[data-tutorial="skip"]');
   await page.reload({ waitUntil: 'networkidle0', timeout: 90000 }); await page.waitForFunction(() => window.LANTERNMOSS);
   await page.click('[data-act="continue"]');
@@ -70,8 +72,15 @@ try {
         }), `${size}/${hero}/${id}: guide must not overlap controls`);
       }
     }
-    await page.keyboard.press('Escape'); await wait(300);
-    assert.ok(await page.$eval('#pause .panel', e => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && e.scrollHeight <= e.clientHeight + 2; }), 'pause menu fits');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('#pause .panel');
+      return window.LANTERNMOSS.PauseMenu.isOpen && panel.getAnimations().every(a => a.playState === 'finished');
+    });
+    const panel = await page.$eval('#pause .panel', e => { const r = e.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, scroll: e.scrollHeight, client: e.clientHeight, viewport: innerHeight }; });
+    const fits = panel.top >= 0 && panel.bottom <= panel.viewport && panel.scroll <= panel.client + 2;
+    if (!fits) await page.screenshot({ path: join(tmpdir(), `lanternmoss-tutorial-layout-${size[1]}.png`) });
+    assert.ok(fits, `pause menu fits ${size}: ${JSON.stringify(panel)}`);
     for (const selector of ['[data-go="help"]', '[data-go="tutorial"]', '[data-go="quit"]']) assert.ok(await page.$eval(selector, e => e.getBoundingClientRect().bottom <= innerHeight));
     await page.click('[data-go="help"]'); await page.waitForSelector('#journal.show');
     assert.ok(await page.$eval('.jpanel', e => e.getBoundingClientRect().bottom <= innerHeight));
@@ -86,7 +95,7 @@ try {
   });
   await page.waitForSelector('#faint-screen', { visible: true });
   assert.match(await page.$eval('#faint-screen', e => e.textContent), /You fainted.*Gloomcap.*1m 13s.*Back home in/s);
-  await page.screenshot({ path: shots + 'fainted.jpg', type: 'jpeg', quality: 84 });
+  await page.screenshot({ path: shotPath('fainted'), type: 'jpeg', quality: 84 });
   await page.evaluate(() => window.LANTERNMOSS.PauseMenu.open());
   const remaining = await page.evaluate(() => window.LANTERNMOSS.player.deadT); await wait(500);
   assert.equal(await page.evaluate(() => window.LANTERNMOSS.player.deadT), remaining);
@@ -94,7 +103,10 @@ try {
   await page.waitForFunction(() => !window.LANTERNMOSS.player.dead, { timeout: 60000 });
   assert.equal(await page.$eval('#faint-screen', e => getComputedStyle(e).display), 'none');
   assert.deepEqual(errors, []);
-  console.log('PASS  browser guide, Help, skip/reload/replay, rebound hero prompts, menu bounds at 720p/1080p, fainting and paused countdown');
+  console.log('PASS  browser guide, Help, skip/reload/replay, rebound hero prompts, menu bounds at 720p/1080p, fainting and paused countdown; zero page/shader errors');
 } finally {
-  await browser?.close(); server.kill();
+  server.kill(); server.stdout?.destroy(); server.stderr?.destroy(); server.unref();
+  if (browser) { let timer; try { await Promise.race([browser.close(), new Promise(resolve => { timer = setTimeout(() => {
+    const child = browser.process(); child?.kill(); browser.disconnect(); for (const stream of child?.stdio ?? []) stream?.destroy?.(); child?.unref(); resolve();
+  }, 10000); })]); } finally { clearTimeout(timer); } }
 }

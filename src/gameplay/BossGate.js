@@ -210,6 +210,9 @@ export const BossGate = {
       if (w.kind === 'thorn') {
         const vine = new THREE.Mesh(new THREE.ConeGeometry(0.28, h, 5), new THREE.MeshToonMaterial({ color: w.color })); vine.position.y = h / 2; vine.rotation.z = ((i % 3) - 1) * 0.18; post.add(vine);
         const tip = new THREE.Mesh(new THREE.IcosahedronGeometry(0.14, 0), fxMaterial(w.glow, 1.8)); tip.position.y = h; post.add(tip);
+      } else if (w.kind === 'surf') {                                       // a spout of spray that rises and crashes
+        const spray = new THREE.Mesh(new THREE.ConeGeometry(0.5, h, 7, 1, true), fxMaterial(w.color, 1.2)); spray.position.y = h / 2; spray.rotation.x = Math.PI; post.add(spray);
+        const foam = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), fxMaterial(w.glow, 1.6)); foam.position.y = h; post.add(foam);
       } else {
         const flame = new THREE.Mesh(new THREE.ConeGeometry(0.42, h, 6, 1, true), fxMaterial(w.color, 1.6)); flame.position.y = h / 2; post.add(flame);
         const core = new THREE.Mesh(new THREE.ConeGeometry(0.2, h * 0.6, 5, 1, true), fxMaterial(w.glow, 2.2)); core.position.y = h * 0.3; post.add(core);
@@ -225,7 +228,8 @@ export const BossGate = {
     this.ringK = clamp(this.ringK + (up ? dt : -dt * 1.5) / ARENA.rise, 0, 1);
     for (const p of this.posts) {
       p.post.visible = this.ringK > 0.01;
-      if (p.post.visible) p.post.scale.set(1, Math.max(0.001, this.ringK * (this.wall.kind === 'flame' ? 0.85 + 0.15 * Math.sin(ctx.time * 9 + p.seed) : 1)), 1);
+      if (p.post.visible) p.post.scale.set(1, Math.max(0.001, this.ringK * (this.wall.kind === 'flame' ? 0.85 + 0.15 * Math.sin(ctx.time * 9 + p.seed)
+        : this.wall.kind === 'surf' ? 0.6 + 0.4 * Math.abs(Math.sin(ctx.time * 2.2 + p.seed)) : 1)), 1);
     }
     if (up && this.ringK > 0.3) this.keepInside(P, dt);
     if (!up) this.warned = false;
@@ -241,7 +245,7 @@ export const BossGate = {
     if (this.buzzT <= 0) {
       this.buzzT = 0.5; audio.fizzle();
       sparkles.emit(P.pos.clone().addScaledVector(P.up, 1), { count: 14, color: this.wall.glow, speed: 2.2, up: P.up, upBias: 0.6, life: 0.5, size: 0.32 });
-      if (!this.warned) { this.warned = true; toast(`The ${this.wall.kind === 'thorn' ? 'thorns hold' : 'flames hold'} you in: no leaving until ${this.bossName} falls!`); }
+      if (!this.warned) { this.warned = true; toast(`The ${{ thorn: 'thorns hold', surf: 'crashing surf holds' }[this.wall.kind] ?? 'flames hold'} you in: no leaving until ${this.bossName} falls!`); }
     }
   },
 
@@ -286,7 +290,9 @@ export const BossGate = {
 // an elite's sigil, a seal's crumbling, the boss's fall
 encounterEvents.addEventListener('enemydefeated', ev => {
   const e = ev.detail.enemy, g = BossGate;
-  if (e.elite && g.summon.sigils) spawnWorldItem(g.summon.sigils.item, 1, e.up, { from: e.up, popTime: 0.5, stepAway: false });
+  // Only the planet's own elites carry a sigil. A cave warden (TODO 29f) is made elite by the same helper but
+  // belongs to its cave, so it neither drops a sigil into a room it cannot lie in nor shortcuts the boss gate.
+  if (e.elite && !e.space && !e.caveGuardian && g.summon.sigils) spawnWorldItem(g.summon.sigils.item, 1, e.up, { from: e.up, popTime: 0.5, stepAway: false });
   if (e.lairSeal) {
     const left = g.seals.filter(s => s.alive).length;
     audio.chestOpen?.(true); shakeCamera(0.3);

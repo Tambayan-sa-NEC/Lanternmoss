@@ -16,6 +16,16 @@ const { arcDist, offsetDir } = await imp('utils/sphere.js');
 const { H, step, game } = await boot('knight');
 let fails = 0; const check = (ok, m) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${m}`); if (!ok) fails++; };
 const press = code => { __fire('keydown', { code }); __fire('keyup', { code }); };
+/* Since TODO 45a a monster that has seen the hero keeps coming, so chasers pile up as this sim drags the hero around
+   the world. Checks about a pet on its own need that quiet made deliberately, rather than assumed. This sends the
+   hangers-on back to sleep where they stand instead of removing them, so later checks still have a roster. */
+const quiet = keep => {
+  for (const e of ctx.enemies) {
+    if (e === keep || e === ctx.boss || !e.alive) continue;
+    e.state = 'idle'; e.timer = 99; e.home.copy(e.up); e.hideTele?.();
+    e.foe = null; e.foeT = 0;                       // and no grudge against a neighbour it clipped (TODO 45b), which would start the fight again
+  }
+};
 const P = H.player;
 step(1);
 check(Pets.id === 'wolf' && ctx.companion?.petId === 'wolf' && Pets.nameOf() === 'Fang', `the knight starts with Fang the wolf (${Pets.nameOf()})`);
@@ -40,7 +50,7 @@ P.placeAt(offsetDir(P.up, 1.2, 14)); step(3);
 check(arcDist(ctx.companion.up, spot) < 2.5 && arcDist(ctx.companion.up, P.up) > 8, `stay: waits where it was told (${arcDist(ctx.companion.up, spot).toFixed(1)} from its spot)`);
 // attack: goes after your target even if it isn't fighting
 Pets.command('attack'); const far = ctx.enemies.find(e => e.alive && e !== ctx.boss && e !== foe);
-P.placeAt(offsetDir(far.up, 0.3, 6)); ctx.companion.snapToHero(); far.hp = 1e4; hp0 = far.hp; step(0.1);
+P.placeAt(offsetDir(far.up, 0.3, 6)); quiet(far);           // one engaged target, so the pet's choice is unambiguous ctx.companion.snapToHero(); far.hp = 1e4; hp0 = far.hp; step(0.1);
 targeting.aim = far; for (let i = 0; i < 80 && far.hp === hp0; i++) { targeting.aim = far; step(0.1); }
 check(far.hp < hp0, 'attack: goes for your target');
 Pets.command('follow');
@@ -50,7 +60,8 @@ check(Pets.fainted && !ctx.companion.root.visible, 'faints at 0 HP (hidden, not 
 press('KeyV'); check(Pets.abilityCd === 0, 'no ability while resting');
 step(PET_CARE.faintTime + 0.5);
 check(!Pets.fainted && ctx.companion.root.visible && Pets.hp === Pets.maxHp(), 'bounds back after a while, fully healed');
-Pets.hurt(30); Pets.hurtAt = -99; step(2); check(Pets.hp > Pets.maxHp() - 30, 'heals up out of the fight');
+quiet(null); Pets.hurt(30); Pets.hurtAt = -99; step(2);     // genuinely out of the fight: nothing is chasing
+check(Pets.hp > Pets.maxHp() - 30, 'heals up out of the fight');
 // ---- abilities
 press('KeyV'); step(0.1);
 check(buffs.howl > 0 && Pets.abilityCd > 0, `V: Howl (+damage buff ${buffs.howl.toFixed(1)}s, cooldown ${Pets.abilityCd.toFixed(0)}s)`);

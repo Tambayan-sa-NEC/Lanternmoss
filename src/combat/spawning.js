@@ -8,7 +8,7 @@ import { ctx } from '../core/context.js';
 import { Enemy } from '../entities/enemies/Enemy.js';
 import { freeOfColliders } from '../physics/colliders.js';
 import { mulberry32, rand } from '../utils/random.js';
-import { arcDist, offsetDir, randomDir } from '../utils/sphere.js';
+import { arcDist, dirAlong, offsetDir, randomDir, tangentToward } from '../utils/sphere.js';
 import { PLANETS } from '../config/planets.js';
 import { spawnDrySpot } from '../world/placement.js';
 import { seaLevel } from '../world/physics.js';
@@ -106,8 +106,9 @@ export function spawnBoss(world, { type, trophy: _trophy, summon: _summon, arena
   return e;
 }
 
-/** A planet's mini bosses (PLANETS[i].miniBosses = [{ type, near: 'lake' | 'far', overrides }]): the hydra on the bank
-    of the lake farthest from the village, others far out in the wilds, away from the lair. */
+/** A planet's mini bosses (PLANETS[i].miniBosses = [{ type, near: 'lake' | 'far' | 'pearlBeach', overrides }]): the hydra
+    on the bank of the lake farthest from the village, Old Ironclaw on the sand above Tidewhisper's pearl beds (dry even at
+    high water), others far out in the wilds, away from the lair. */
 export function spawnMiniBosses(world, list = []) {
   const out = [];
   for (const m of list) {
@@ -116,6 +117,11 @@ export function spawnMiniBosses(world, list = []) {
       const lakes = ponds.filter(p => p.r >= 6).sort((a, b) => arcDist(b.dir, world.spawnDir) - arcDist(a.dir, world.spawnDir));
       const lake = lakes[0];
       if (lake) for (let i = 0; i < 40 && !dir; i++) { const d = offsetDir(lake.dir, rand() * 6.28, lake.r + 3.5); if (freeOfColliders(d, 2) && dryGround(d, 2) && slopeAt(d) < 0.5) dir = d; }
+    }
+    const beach = m.near === 'pearlBeach' ? world.coast?.pearlBeach : null;
+    if (beach) {
+      const inland = tangentToward(beach, world.coast.islands[5].dir);
+      for (let r = 4; r < 14 && !dir; r += 0.5) { const d = dirAlong(beach, inland, r); if (dryGround(d, 2, { high: true }) && freeOfColliders(d, 2) && slopeAt(d) < 0.5) dir = d; }
     }
     for (let i = 0; i < 300 && !dir; i++) {
       const d = randomDir();

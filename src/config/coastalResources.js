@@ -14,6 +14,7 @@ export const COASTAL_ITEMS = [
     ['clam','Clam','A fresh clam for coastal chowder.','mushroom',0xf5ceaf,5],
     ['silverSprat','Silver Sprat','A little sea fish, delicious salted.','fish',0x9cdde3,6],
   ].map(([id,name,description,art,color,value])=>({id,name,description,category:'material',icon:{shape:'gem',art,color},value,maxStack:20,
+    ...(id==='silverSprat'?{tags:['fish']}:{}),
     rarity:id==='blackPearl'?'rare':id==='pearl'?'uncommon':'common'})),
   ...[
     ['saltedFish','Salted Fish','Sea fish preserved with salt.','fish',35,45],
@@ -33,7 +34,8 @@ export const COASTAL_RECIPES = [
   {id:'saltedFish',group:'Cooking',station:'pot',result:'saltedFish',needs:[['silverSprat',1],['seaSalt',1]]},
   {id:'seaweedRoll',group:'Cooking',station:'pot',result:'seaweedRoll',needs:[['seaweed',2],['silverSprat',1]]},
   {id:'coastalChowder',group:'Cooking',station:'pot',result:'coastalChowder',needs:[['clam',2],['silverSprat',1],['seaSalt',1]]},
+  // forge fees (27h): Tidewhisper's chests and lighthouse quest reserve this one set (BALANCE.budgets, docs/wiki/game-design/balance.md)
   ...['tideCirclet','tideMantle','tideBoots'].map((id,i)=>({id,group:'Armour',station:'forge',result:id,rarity:'rare',
-    needs:[['seaglass',4+i*2],['pearl',i===1?2:1],['coral',2],['shell',2]],fuel:2})),
-  {id:'tidePendant',group:'Trinkets',station:'forge',result:'tidePendant',rarity:'rare',needs:[['blackPearl',1],['seaglass',4],['shell',3]],fuel:2},
+    needs:[['seaglass',4+i*2],['pearl',i===1?2:1],['coral',2],['shell',2]],fuel:2,coins:[70,80,70][i]})),
+  {id:'tidePendant',group:'Trinkets',station:'forge',result:'tidePendant',rarity:'rare',needs:[['blackPearl',1],['seaglass',4],['shell',3]],fuel:2,coins:60},
 ];

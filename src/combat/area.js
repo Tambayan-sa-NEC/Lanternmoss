@@ -6,8 +6,9 @@ import { PLANET_RADIUS as R } from '../config/game.js';
 import { ctx } from '../core/context.js';
 import { colliders } from '../physics/colliders.js';
 import { camera } from '../render/scene.js';
-import { arcDist, dirAlong, tangentToward } from '../utils/sphere.js';
+import { arcDist } from '../utils/sphere.js';
 import { dryGround, groundHeight, maxRelief, ponds } from '../world/terrain.js';
+import { altitude, pointOf, distance, advance, toward, visible } from './space.js';
 
 const V3 = THREE.Vector3;
 const _ray = new THREE.Ray(), _ndc = new V3(), _sphere = new THREE.Sphere(new V3(), R), _hit = new V3(), _u = new V3();
@@ -20,7 +21,7 @@ export function enemiesInArea(center, radius, maxAlt = AREA_MAX_ALT) {
   const out = [];
   for (const e of ctx.enemies) {
     if (!e.alive || e.hidden || e.hover > maxAlt) continue;
-    if (arcDist(e.up, center) < radius + e.def.radius) out.push(e);
+    if (distance(pointOf(e), center) < radius + e.def.radius && visible(center, pointOf(e))) out.push(e);
   }
   return out;
 }
@@ -28,15 +29,16 @@ export function enemiesInArea(center, radius, maxAlt = AREA_MAX_ALT) {
 /** True when the hero is inside the ground circle; grounded = also require feet near the ground (jumpable attacks). */
 export function playerInArea(center, radius, grounded = false) {
   const P = ctx.player; if (P.dead) return false;
-  if (grounded && P.r - groundHeight(P.up) > 0.9) return false;
-  return arcDist(P.up, center) < radius + P.radius;
+  if (grounded && altitude(P) > 0.9) return false;
+  return distance(pointOf(P), center) < radius + P.radius && visible(center, pointOf(P));
 }
 
 /** Fraction 0 (centre) .. 1 (edge) of how far from the centre the hero / an enemy is, for damage falloff. */
-export function edgeFraction(up, center, radius) { return Math.min(1, arcDist(up, center) / Math.max(0.01, radius)); }
+export function edgeFraction(up, center, radius) { return Math.min(1, distance(up, center) / Math.max(0.01, radius)); }
 
 /** A spot the hero can stand on: not in a pond and not inside a tree, rock, house or pond edge. */
 export function landable(dir, radius) {
+  if (ctx.room) return ctx.room.contains(dir, radius);
   if (ponds.some(p => arcDist(dir, p.dir) < p.r + 0.4)) return false;
   if (!dryGround(dir, radius)) return false;
   for (const c of colliders) if (c.active && arcDist(dir, c.dir) < c.r + radius) return false;
@@ -46,14 +48,14 @@ export function landable(dir, radius) {
 /** Nearest landable spot to `dir` along the line back toward `from` (then in small circles around it), or null. */
 export function nearestLandable(from, dir, radius) {
   if (landable(dir, radius)) return dir.clone();
-  const back = tangentToward(dir, from), total = arcDist(from, dir);
-  for (let s = 0.6; s < total; s += 0.6) { const d = dirAlong(dir, back, s); if (landable(d, radius)) return d; }
+  const back = toward(dir, from), total = distance(from, dir);
+  for (let s = 0.6; s < total; s += 0.6) { const d = advance(dir, back, s); if (landable(d, radius) && visible(from, d, radius)) return d; }
   return null;
 }
 
 /** dir clamped to at most `range` along the surface from `from`. */
 export function clampRange(from, dir, range) {
-  const d = arcDist(from, dir); return d <= range ? dir.clone() : dirAlong(from, tangentToward(from, dir), range);
+  const d = distance(from, dir); return d <= range ? dir.clone() : advance(from, toward(from, dir), range);
 }
 
 const below = p => p.length() < groundHeight(_u.copy(p).normalize());
@@ -62,6 +64,11 @@ const below = p => p.length() < groundHeight(_u.copy(p).normalize());
 export function groundUnderScreen(nx, ny) {
   _ndc.set(nx, ny, 0.5).unproject(camera);
   _ray.origin.copy(camera.position); _ray.direction.copy(_ndc).sub(camera.position).normalize();
+  if (ctx.room) {
+    const plane = new THREE.Plane(ctx.room.up, -ctx.room.origin.y);
+    const hit = _ray.intersectPlane(plane, _hit);
+    return hit && ctx.room.contains(hit) ? hit.clone() : null;
+  }
   const top = R + maxRelief();
   _sphere.radius = top;                                           // above the highest hill: skip the empty sky
   if (!_ray.intersectSphere(_sphere, _hit)) return null;

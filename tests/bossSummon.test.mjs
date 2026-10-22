@@ -9,7 +9,7 @@ import { PLANETS } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 import { LEVELING } from '../src/config/leveling.js';
 
-const KINDS = new Set(['level', 'seals', 'sigils', 'quest', 'night']);
+const KINDS = new Set(['level', 'seals', 'sigils', 'quest', 'night', 'lowTide']);
 
 test('every boss has conditions that can be met on its planet', () => {
   PLANETS.forEach((p, i) => {
@@ -30,8 +30,10 @@ test('every boss has conditions that can be met on its planet', () => {
     }
     if (s.quest) {
       const q = QUESTS[s.quest];
-      assert.ok(q && (q.planet ?? 0) <= i, `${name}: quest ${s.quest} is offered by then`);
+      const questPlanet = typeof q?.planet === 'string' ? PLANETS.findIndex(world => world.id === q.planet) : q?.planet ?? 0;
+      assert.ok(q && questPlanet >= 0 && questPlanet <= i, `${name}: quest ${s.quest} is offered by then`);
     }
+    if (s.lowTide) assert.ok(p.tides && s.lowTide === true, `${name}: a real tide gate`);
     assert.ok(ARENA_WALLS[p.boss.arena?.wall], `${name}: an arena wall`);
     assert.ok(ARENA.radius < COMBAT.enemies[name].leash, `${name}: the arena ring sits inside its leash`);
   });
@@ -42,5 +44,5 @@ test('summoning, elites and hints make sense', () => {
   assert.ok(SUMMON.rise[0] < SUMMON.rise[1] && SUMMON.rise[1] <= SUMMON.sequence && SUMMON.card[1] <= SUMMON.sequence, 'sequence timings');
   assert.ok(ELITE.hp > 1 && ELITE.damage >= 1 && ELITE.scale > 1, 'elites are tougher');
   for (const k of [...KINDS, 'ready']) assert.ok(SUMMON_HINTS[k]?.includes('{boss}') || k === 'level', `a villager hint for ${k}`);
-  for (const [id, w] of Object.entries(ARENA_WALLS)) assert.ok(['thorn', 'flame'].includes(w.kind) && w.height > 0, `${id}: wall look`);
+  for (const [id, w] of Object.entries(ARENA_WALLS)) assert.ok(['thorn', 'flame', 'surf'].includes(w.kind) && w.height > 0, `${id}: wall look`);
 });

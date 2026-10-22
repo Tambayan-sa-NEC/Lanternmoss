@@ -51,8 +51,13 @@ test('nodes: real drops, sane timings, tools that exist; every planet has wood, 
   for (const p of PLANETS) {
     const r = p.resources; assert.ok(r, `${p.name}: resources`);
     for (const [kind, n] of [...r.nodes, ...(r.rare ?? [])]) assert.ok(NODE_KINDS[kind] && n > 0, `${p.name}: node ${kind}`);
-    for (const k of ['branches', 'pebbles', 'sweetleaf']) assert.ok(r.nodes.some(([kind, , near]) => kind === k && near === 'village'), `${p.name}: ${k} near the village`);
-    assert.ok(r.nodes.some(([k]) => NODE_KINDS[k].look === 'bush'), `${p.name}: berries`);
+    for (const k of r.coastal ? ['pebbles', 'sweetleaf'] : ['branches', 'pebbles', 'sweetleaf'])
+      assert.ok(r.nodes.some(([kind, , near]) => kind === k && near === 'village'), `${p.name}: ${k} near the village`);
+    if (r.coastal) {
+      const wood=r.nodes.reduce((sum,[kind,n])=>sum+n*(NODE_KINDS[kind].drops.find(([id])=>id==='wood')?.[1]?.[0]??0),0);
+      assert.ok(wood>=6,`${p.name}: enough driftwood for lighthouse fuel`);
+      assert.ok(p.houses[4].gift.items.some(([id,n])=>id==='wood'&&n>=3),`${p.name}: keeper's starter wood`);
+    } else assert.ok(r.nodes.some(([k]) => NODE_KINDS[k].look === 'bush'), `${p.name}: berries`);
     assert.ok((r.rare ?? []).every(([k]) => NODE_KINDS[k].rare) && r.rare?.length, `${p.name}: a rare vein`);
     assert.ok(p.miniBosses?.length, `${p.name}: a mini boss guards the rare vein`);
   }
@@ -86,7 +91,8 @@ test('drops and catches roll as configured', () => {
   let koiPond = 0, koiLake = 0;
   for (let i = 0; i < 4000; i++) { if (rollCatch(0, false, rng) === 'goldenKoi') koiPond++; if (rollCatch(0, true, rng) === 'goldenKoi') koiLake++; }
   assert.ok(koiPond > 0 && koiLake > koiPond * 2, `a lake makes the koi likelier (${koiPond} -> ${koiLake})`);
-  PLANETS.forEach((p, i) => { for (const [item] of FISHING.catches[i]) assert.ok(get(item)?.tags.includes('fish'), `${p.name}: fish ${item}`); });
+  PLANETS.forEach((p, i) => { for (const [item] of p.resources?.catches ?? FISHING.catches[i] ?? []) assert.ok(get(item)?.tags.includes('fish'), `${p.name}: fish ${item}`); });
+  if (PLANETS.some(p=>p.id==='tidewhisper')) assert.equal(rollCatch(3,false,()=>0),'silverSprat');
   const easy = catchFeel('pondPerch'), hard = catchFeel('goldenKoi');
   assert.ok(hard.zone < easy.zone && hard.sweeps > easy.sweeps, 'the koi is harder to reel in');
   assert.equal(needleAt(0, 1), 0); assert.ok(Math.abs(needleAt(0.5, 1) - 0.5) < 1e-9); assert.equal(needleAt(1, 1), 1); assert.ok(Math.abs(needleAt(1.25, 1) - 0.75) < 1e-9);

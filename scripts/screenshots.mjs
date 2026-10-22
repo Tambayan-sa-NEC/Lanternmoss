@@ -1,14 +1,13 @@
-// Retakes the README screenshots (docs/screenshots/*.jpg) by playing through staged scenes in headless Chrome.
+// Retakes the README screenshots (docs/screenshots/<folder>/*.jpg; folders in shots.mjs) by playing through staged scenes in headless Chrome.
 // Run after every major update:   node scripts/screenshots.mjs
 // Needs Google Chrome and puppeteer-core (not a project dependency: `npm i --no-save puppeteer-core`, or point
 // PUPPETEER at an installed copy's entry file). CHROME overrides the browser path. Software rendering is slow
 // (a few frames a second), so the waits below are generous; the whole run takes a few minutes.
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { shotPath } from './shots.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const out = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(out, { recursive: true });
 const CHROME = process.env.CHROME ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const PORT = 8093;
 const only = process.argv[2] ? new Set(process.argv[2].split(',')) : null;   // e.g. node scripts/screenshots.mjs boss,bag
@@ -18,13 +17,13 @@ const puppeteer = (await import(process.env.PUPPETEER ? pathToFileURL(process.en
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(PORT)], { cwd: root, stdio: 'ignore' });
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage(); await page.setViewport({ width: 1280, height: 720 });
-const errors = []; page.on('pageerror', e => errors.push(String(e)));
+const errors = []; page.on('pageerror', e => { errors.push(String(e)); console.error('PAGE ERROR', String(e)); });
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const shot = async (name, { keepToast = false, keepBanner = false } = {}) => {
   if (only && !only.has(name)) return;
   if (!keepToast) await page.evaluate(() => { document.getElementById('toast').style.opacity = 0; });
   await page.evaluate(keep => { const a = document.getElementById('achv'); if (a) a.style.visibility = keep ? '' : 'hidden'; }, keepBanner);
-  await page.screenshot({ path: `${out}${name}.jpg`, type: 'jpeg', quality: 84 }); console.log('saved', name);
+  await page.screenshot({ path: shotPath(name), type: 'jpeg', quality: 84 }); console.log('saved', name);
 };
 const run = (fn, ...args) => page.evaluate(fn, ...args);
 /** Steps the game `secs` ahead at 30 fps (software rendering is too slow for the menu camera's swoop to settle). */
@@ -37,7 +36,7 @@ try {
   await wait(5000); await shot('title');
   await page.click('[data-act="play"]'); await ff(3); await wait(2500); await shot('select');
   await page.keyboard.press('Enter'); await ff(3); await wait(2500); await shot('select-pet');       // the pet step
-  await run(() => { const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); L.setWeather('clear'); L.weather.timer = 1e9; });   // (weather pinned per scene)
+  await run(() => { const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); L.Tutorial.skip(); L.setWeather('clear'); L.weather.timer = 1e9; });   // (no guide card; weather pinned per scene)
   await wait(2500); await page.keyboard.press('KeyH'); await wait(500);       // fold the controls panel away
 
   // helpers in the page: frame the camera on a surface point, keep the hero safe while scenes are staged
@@ -262,7 +261,21 @@ try {
       await ff(1); await wait(3000); await shot('blizzard');
     }
   }
+  // The real Witch tree (no fixture): keep this README picture current with the rest of the tour.
+  await page.addStyleTag({ content: 'body.talent-proof > :not(canvas):not(#talent-menu) { display: none !important; }' });
+  await run(() => {
+    const L = window.LANTERNMOSS; L.goToPlanet(0); window.__sky('clear'); L.player.placeAt(L.planets.world.spawnDir);
+    L.player.level = 16; L.Talents.reset();
+    for (const id of ['brightBolt', 'brightBolt', 'quickFrost', 'quickFrost', 'seekingFlame', 'deepFreeze', 'deepFreeze']) L.Talents.learn(id);
+    L.PauseMenu.open(); L.TalentUI.open();
+    document.body.classList.add('talent-proof');
+  });
+  await wait(800); await shot('talents');
+  await run(() => { const L = window.LANTERNMOSS; document.body.classList.remove('talent-proof'); L.TalentUI.close(); L.PauseMenu.close(); });
   console.log('errors:', errors.length ? errors : 'none');
 } finally {
-  await browser.close(); server.kill();
+  server.kill();
+  let timer;
+  try { await Promise.race([browser.close(), new Promise(r => { timer = setTimeout(() => { browser.process()?.kill(); r(); }, 10000); })]); }
+  finally { clearTimeout(timer); }
 }

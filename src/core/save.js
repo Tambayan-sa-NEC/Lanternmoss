@@ -6,13 +6,14 @@ import { storyKeyAllowed } from '../config/npcs.js';
 import { cleanMechanicSnapshot } from '../world/mechanics/index.js';
 import { LEVELING } from '../config/leveling.js';
 import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
-import { PETS, PET_COMMANDS, PET_CARE } from '../config/pets.js';
+import { PETS, PET_COMMANDS, PET_CARE, petAvailable } from '../config/pets.js';
 import { QUESTS } from '../config/quests.js';
 import { CHALLENGES } from '../config/challenges.js';
 import { CROPS, FARM, NODE_KINDS, SCENERY } from '../config/resources.js';
 import { NEEDS } from '../config/survival.js';
 import { DAY } from '../config/day.js';
 import { HOUSES, resolveHouse } from '../config/houses.js';
+import { CAVES } from '../config/dungeons.js';
 import { COMBAT } from '../config/combat.js';
 import { TUTORIAL_STEPS, HELP_TOPICS, GATHERING_TIPS } from '../config/tutorial.js';
 import { CRITTER_DEFS } from '../config/critters.js';
@@ -23,6 +24,9 @@ import { RUNES } from '../config/magic.js';
 import { xpToNext } from '../progression/leveling.js';
 import { cleanBuildings } from '../gameplay/buildingRules.js';
 import { cleanHomeState } from '../gameplay/homeRules.js';
+import { cleanBountyState } from '../gameplay/bountyRules.js';
+import { TALENTS } from '../config/talents.js';
+import { cleanTalents } from '../progression/talentRules.js';
 
 export const SAVE_KEY = 'lanternmoss.adventure';
 export const SAVE_VERSION = 1;
@@ -36,11 +40,12 @@ export const SAVE_SYSTEMS = {
   player: 'adventure', inventory: 'adventure', equipment: 'adventure', hotbar: 'adventure',
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
-  progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure',
-  building: 'planet', home: 'planet', farm: 'planet', gathering: 'planet', chests: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
+  progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
+  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', cavePuzzles: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
+  'gameplay/Dungeons.js': 'The cave itself is rebuilt from the planet seed; which cave the hero is in and where they stand is saved with the player, and its chests, veins and rooms by CaveRewards.',
   'gameplay/Stations.js': 'Station models and proximity are rebuilt from the planet.',
   'gameplay/petAbilities.js': 'Visual scouting/fetch targets are transient; lasting buffs and cooldowns are saved.',
 };
@@ -56,12 +61,14 @@ export const SAVE_OWNERS = {
   'gameplay/buffs.js:buffs': 'buffs', 'gameplay/buffs.js:BuffState': 'buffs', 'gameplay/Needs.js:Needs': 'buffs',
   'gameplay/Houses.js:Houses': 'houses', 'gameplay/PlanetProgression.js:PlanetProgression': 'progression',
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
-  'gameplay/Chests.js:Chests': 'chests', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
+  'gameplay/Chests.js:Chests': 'chests', 'gameplay/CaveRewards.js:CaveRewards': 'caves', 'gameplay/CavePuzzles.js:CavePuzzles': 'cavePuzzles', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
   'gameplay/Portals.js:Portals': 'portals',
   'gameplay/Home.js:Home': 'home',
   'gameplay/Building.js:Building': 'building',
+  'gameplay/Bounties.js:Bounties': 'bounties',
+  'gameplay/Talents.js:Talents': 'talents',
   'gameplay/PlanetMechanics.js:PlanetMechanics': 'mechanics',
 };
 export const DEVICE_SYSTEMS = { 'gameplay/Journal.js:Journal': 'Lifetime journal, saved independently on this device.' };
@@ -105,7 +112,7 @@ const numericMap = (v, allow, max = 1e9, min = 0) => Object.fromEntries(Object.e
   .filter(([key]) => allow(key)).map(([key, n]) => [key, number(n, 0, min, max)]));
 
 /** Clean one system's plain snapshot before any runtime object sees it. */
-export function cleanState(key, value, hero = 'witch') {
+export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel) {
   const s = record(value);
   switch (key) {
     case 'mechanics': return cleanMechanicSnapshot(value);
@@ -132,6 +139,8 @@ export function cleanState(key, value, hero = 'witch') {
         time: number(s.time), up: direction(s.up), fwd: direction(s.fwd),
         lastHurt: number(s.lastHurt, -99, -99),
         indoors: Number.isInteger(s.indoors) && HOUSES[s.indoors] ? s.indoors : null,
+        cave: Object.values(CAVES).some(c => c.id === s.cave) ? s.cave : null,
+        caveX: number(s.caveX, 0, -400, 400), caveZ: number(s.caveZ, 0, -400, 400),
         roomX: number(s.roomX, 0, -50, 50), roomZ: number(s.roomZ, 0, -50, 50) };
     }
     case 'inventory': return Array.from({ length: HOTBAR.size + INVENTORY.slots }, (_, i) => cleanStack(list(value)[i]));
@@ -141,7 +150,7 @@ export function cleanState(key, value, hero = 'witch') {
     }));
     case 'hotbar': return { selected: integer(s.selected, 0, 0, HOTBAR.size - 1), cd: number(s.cd, 0, 0, 3) };
     case 'pets': {
-      const unlocked = stringIds(value?.unlocked, id => Object.hasOwn(PETS, id));
+      const unlocked = stringIds(value?.unlocked, petAvailable);
       for (const [id, pet] of Object.entries(PETS)) if (!pet.unlock && !unlocked.includes(id)) unlocked.push(id);
       const active = unlocked.includes(s.active) ? s.active : CHARACTERS[hero].companion;
       return { unlocked, active, names: Object.fromEntries(Object.entries(record(s.names)).filter(([id, name]) => Object.hasOwn(PETS, id) && typeof name === 'string')
@@ -149,6 +158,7 @@ export function cleanState(key, value, hero = 'witch') {
         mode: known(s.mode, PET_COMMANDS, 'follow'), stayDir: direction(s.stayDir), hp: number(s.hp, PETS[active].hp),
         faintT: number(s.faintT, 0, 0, PET_CARE.faintTime), hurtAt: number(s.hurtAt, -99, -99),
         abilityCd: number(s.abilityCd, 0, 0, PETS[active].ability.cooldown), petCool: number(s.petCool, 0, 0, 2), swapCool: number(s.swapCool, 0, 0, 60),
+        diveDay: integer(s.diveDay, 0, 0), divesToday: integer(s.divesToday, 0, 0, PETS.otter.ability.perDay),
         mend: s.mend ? { left: number(s.mend.left, 0, 0, 120), perSec: number(s.mend.perSec, 0, 0, 100) } : null };
     }
     case 'dayClock': return { t: number(s.t, DAY.startAt * DAY.length, 0, DAY.length - 1e-6), day: integer(s.day, 1, 1) };
@@ -191,6 +201,8 @@ export function cleanState(key, value, hero = 'witch') {
       miniDefeated: stringIds(s.miniDefeated, id => PLANETS.some(p => (p.miniBosses ?? []).some((m, i) => id === `${p.id}:mini:${i}`))),
       lairs: Object.fromEntries(Object.entries(record(s.lairs)).filter(([id, v]) => ids.has(id) && direction(v)).map(([id, v]) => [id, direction(v)])) };
     case 'combat': return Object.fromEntries(Object.keys(CHARACTERS[hero].abilities).map(id => [id, number(s[id], 0, 0, 3600)]));
+    case 'bounties': return cleanBountyState(value);
+    case 'talents': return cleanTalents(value, TALENTS.trees[hero], level);
     case 'farm': return { day: integer(s.day, 1, 1), plots: Array.from({ length: FARM.grid[0] * FARM.grid[1] }, (_, i) => {
       const p = record(list(s.plots)[i]), crop = known(p.crop, CROPS);
       return { tilled: bool(p.tilled) || !!crop, crop, growth: crop ? number(p.growth, 0, 0, 1) : 0, watered: bool(p.watered) };
@@ -208,6 +220,25 @@ export function cleanState(key, value, hero = 'witch') {
     case 'chests': return { ...(s.delta ? { delta: true } : {}), opened: stringIds(s.opened, chestId), sinceKey: integer(s.sinceKey, 0, 0, 100),
       list: list(s.list, 128).map(c => ({ id: c?.id, kind: choice(c?.kind, ['common', 'rare', 'boss'], null), dir: direction(c?.dir), fwd: direction(c?.fwd) }))
         .filter(c => chestId(c.id) && c.kind && c.dir && c.fwd) };
+    case 'caves': {
+      const cave = Object.values(CAVES).find(c => c.id === s.cave) ?? null;
+      const owned = id => typeof id === 'string' && !!cave && id.startsWith(`${cave.id}:r`);
+      return { cave: cave?.id ?? null, opened: stringIds(s.opened, id => owned(id) && id.endsWith(':chest')),
+        mined: stringIds(s.mined, id => owned(id) && /:v\d{1,3}$/.test(id)),
+        cleared: stringIds(s.cleared, id => owned(id) && /:r\d{1,4}$/.test(id)),
+        visited: stringIds(s.visited, id => owned(id) && /:r\d{1,4}$/.test(id)) };
+    }
+    case 'cavePuzzles': {
+      const cave = Object.values(CAVES).find(c => c.id === s.cave) ?? null;
+      const owned = id => typeof id === 'string' && !!cave && id.startsWith(`${cave.id}:r`);
+      return { cave: cave?.id ?? null,
+        lit: stringIds(s.lit, id => owned(id) && /:sw\d{1,3}$/.test(id)),
+        unlocked: stringIds(s.unlocked, id => owned(id) && id.endsWith(':door')),
+        beaten: stringIds(s.beaten, id => owned(id) && id.endsWith(':guardian')),
+        opened: stringIds(s.opened, id => owned(id) && (id.endsWith(':keychest') || id.endsWith(':shortcut'))),
+        stones: list(s.stones, 32).map(st => ({ id: record(st).id, x: number(record(st).x, 0, -400, 400), z: number(record(st).z, 0, -400, 400) }))
+          .filter(st => owned(st.id) && /:st\d{1,3}$/.test(st.id)) };
+    }
     case 'bossGate': return { awake: bool(s.awake), beaten: bool(s.beaten), broken: stringIds(s.broken, n => Number.isInteger(n) && n >= 0 && n < 10),
       hinted: stringIds(s.hinted, name => typeof name === 'string' && name.length < 80), praised: stringIds(s.praised, name => typeof name === 'string' && name.length < 80) };
     case 'pickups': return list(value, 4096).map(w => {
@@ -223,7 +254,7 @@ export function sanitizeSave(data) {
   const s = record(data);
   if (s.game !== 'lanternmoss' || s.version !== SAVE_VERSION || !Object.hasOwn(record(s.systems), 'player')) return null;
   const player = cleanState('player', s.systems.player), systems = {}, planets = {};
-  for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'adventure') systems[key] = cleanState(key, s.systems[key], player.charId);
+  for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'adventure') systems[key] = cleanState(key, s.systems[key], player.charId, player.level);
   for (const [id, raw] of Object.entries(record(s.planets))) {
     if (!ids.has(id)) continue;
     const state = {}; for (const [key, scope] of Object.entries(SAVE_SYSTEMS)) if (scope === 'planet' && Object.hasOwn(record(raw), key))

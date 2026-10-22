@@ -17,7 +17,7 @@ export const Needs = {
     const P = ctx.player;
     if (ctx.started && !P.dead && !ctx.transitioning && !ctx.cutscene) {
       const before = P.energy;
-      P.energy = Math.max(0, P.energy - drainRate({ sprinting: P.sprinting && P.grounded, swimming: P.swimming }) * dt);
+      P.energy = Math.max(0, P.energy - drainRate({ sprinting: P.sprinting && P.grounded, swimming: P.swimming, swimCut: P.stats.setFx?.swimEnergy ?? 0 }) * dt);
       for (const w of crossedWarnings(before, P.energy)) toast(WARN[w] ?? 'You feel hungry.');
     }
     const fx = needEffects(P.energy); P.regenK = fx.regen; P.sprintK = fx.sprint;

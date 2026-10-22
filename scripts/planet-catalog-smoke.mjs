@@ -20,7 +20,7 @@ try {
   await page.setViewport({ width: 1280, height: 720 });
   await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle0' });
   await page.waitForFunction(() => window.LANTERNMOSS);
-  assert.deepEqual(await page.$$eval('#title .campaign .planet[data-released="true"] strong', nodes => nodes.map(n => n.textContent)), ['Lanternmoss', 'Emberfall', 'Frostveil']);
+  assert.deepEqual(await page.$$eval('#title .campaign .planet[data-released="true"] strong', nodes => nodes.map(n => n.textContent)), ['Lanternmoss', 'Emberfall', 'Frostveil', 'Tidewhisper']);
   await page.click('[data-act="play"]');
   await page.evaluate(async () => {
     const { setSetting } = await import('/src/core/settings.js'); setSetting('pauseOnBlur', false); setSetting('quality', 'low');
@@ -30,7 +30,7 @@ try {
   const openGate = async () => {
     await page.evaluate(() => window.LANTERNMOSS.player.placeAt(window.LANTERNMOSS.Portals.gate.dir));
     await page.keyboard.press('KeyE'); await page.waitForFunction(() => window.LANTERNMOSS.PortalUI.isOpen);
-    assert.deepEqual(await page.$$eval('#portal-picker [data-destination]', nodes => nodes.map(n => n.dataset.destination)), ['lanternmoss', 'emberfall', 'frostveil']);
+    assert.deepEqual(await page.$$eval('#portal-picker [data-destination]', nodes => nodes.map(n => n.dataset.destination)), ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper']);
   };
   await openGate();
   assert.equal(await page.$eval('[data-destination="emberfall"]', node => node.disabled), false);
@@ -62,9 +62,9 @@ try {
   }), true);
   const blocked = await page.evaluate(() => {
     const L = window.LANTERNMOSS;
-    return ['tidewhisper', 'duskhollow', 'lanternMoon'].map(id => [L.Portals.travel(id), L.planets.travelTo(id)]);
+    return ['duskhollow', 'lanternMoon'].map(id => [L.Portals.travel(id), L.planets.travelTo(id)]);
   });
-  assert.deepEqual(blocked, [[false, false], [false, false], [false, false]]);
+  assert.deepEqual(blocked, [[false, false], [false, false]]);
   await openGate();
   const bounds = await page.$eval('.portal-panel', node => ({ bottom: node.getBoundingClientRect().bottom, right: node.getBoundingClientRect().right,
     top: node.getBoundingClientRect().top, left: node.getBoundingClientRect().left, overflow: node.scrollWidth > node.clientWidth }));
@@ -79,7 +79,7 @@ try {
     return { planet: L.planetId, level: L.player.level, local: L.npcs.find(n => n.def.local)?.name,
       worlds: L.PLANETS.map(p => p.id) };
   });
-  assert.deepEqual(restored.worlds, ['lanternmoss', 'emberfall', 'frostveil']);
+  assert.deepEqual(restored.worlds, ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper']);
   assert.equal(restored.planet, 'emberfall'); assert.equal(restored.local, 'Cinder');
   assert.deepEqual(errors, []);
   console.log('All planet-catalog browser checks passed, including legacy version-1 restoration; zero page errors.');

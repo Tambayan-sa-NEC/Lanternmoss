@@ -218,6 +218,12 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xd8844a, art: 'ore' }, maxStack: 30, value: 4 },
   { id: 'ironOre', name: 'Iron Ore', description: 'Heavy, dark iron from deep veins (a copper pickaxe gets it out). Helmets and boots.', category: 'material',
     icon: { shape: 'gem', color: 0x8a8fa8, art: 'ore' }, maxStack: 30, rarity: 'uncommon', value: 7 },
+  { id: 'gloomquartz', name: 'Gloomquartz', description: 'Violet quartz that keeps a little lantern-light of its own. It grows only in the dark of a cave.', category: 'material',
+    icon: { shape: 'gem', color: 0x9f8cff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'cinderquartz', name: 'Cinderquartz', description: "Amber quartz from the warren under Emberfall. It holds a coal's last heat long after the fire is out.", category: 'material',
+    icon: { shape: 'gem', color: 0xff9a5a, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'rimequartz', name: 'Rimequartz', description: 'Pale quartz from the grotto under Frostveil, so cold it frosts over in the hand.', category: 'material',
+    icon: { shape: 'gem', color: 0xbfe8ff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
   // ---- smelted at the forge (config/crafting.js: ore + fuel -> ingots); fuel burns in the forge (FUEL)
   { id: 'copperIngot', name: 'Copper Ingot', description: 'Copper ore, smelted bright at the forge. Watering cans, copper picks, rings and staves.', category: 'material',
     icon: { shape: 'gem', color: 0xe08a4a, art: 'ingot' }, maxStack: 20, value: 10 },
@@ -320,7 +326,7 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0x4a4aa8, art: 'cape' }, value: 40, equip: { slot: 'back', tier: 1, stats: {} } },
   // ---- gifts from rare creatures (config/critters.js): befriend one to get its charm ----
   { id:'pearlOfDeep',name:'Pearl of the Deep',description:'A luminous pearl from a befriended Pearl Turtle. Steadies your guard and restores your magic.',category:'equipment',
-    icon:{shape:'charm',color:0xbafff1,art:'pendant'},value:130,equip:{slot:'charm',tier:3,stats:{armor:.03,manaRegen:.8}} },
+    icon:{shape:'charm',color:0xbafff1,art:'pendant'},value:130,props:{giftOnly:true},equip:{slot:'charm',tier:3,stats:{armor:.03,manaRegen:.8}} },
   { id: 'goldenClover', name: 'Golden Clover', description: 'A four-leaf clover from a Golden Moonbunny. Luck makes you quicker and quick to mend.', category: 'equipment',
     icon: { shape: 'charm', color: 0xffd36b, art: 'leafCharm' }, value: 70, equip: { slot: 'charm', tier: 1, stats: { hpRegen: 1.2, moveSpeed: 0.05 } } },
   { id: 'emberScale', name: 'Ember Scale', description: 'A warm scale an Ember Salamander shed for you. Harder hits, a tougher hide.', category: 'equipment',
@@ -332,6 +338,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'key', color: 0x9fe9ff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },
   { id: 'lanternKey', name: 'Lantern Key', description: 'A little brass key with a glowing bow. It opens one locked Lantern chest.', category: 'misc',
     icon: { shape: 'key', color: 0xffd36b, art: 'key' }, maxStack: 5, rarity: 'rare', value: 12, tags: ['key'] },
+  { id: 'wardenKey', name: "Warden's Key", description: "A heavy key of dark stone, sealed away behind a cave's own puzzle. It opens the warded door at the end of that cave.", category: 'misc',
+    icon: { shape: 'key', color: 0x9f8cff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },
   // ---- sigils: carried by elites, offered at a boss's lair (config/bossSummon.js) ----
   { id: 'emberSigil', name: 'Ember Sigil', description: 'A warm, humming seal-stone carried by an Emberfall elite. Three of them wake Pyrrhax.', category: 'quest',
     icon: { shape: 'gem', color: 0xff7a3a, art: 'shard' }, maxStack: 9, rarity: 'rare', value: 0 },
@@ -340,6 +348,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'crown', color: 0xb48cff, art: 'crown' }, rarity: 'legendary', value: 0 },
   { id: 'emberCrown', name: "Pyrrhax's Horn Crown", description: 'Proof that you freed Emberfall from the red dragon.', category: 'quest',
     icon: { shape: 'crown', color: 0xff7a4a, art: 'crown' }, rarity: 'legendary', value: 0 },
+  { id: 'tideCrown', name: 'The Tide Crown', description: "Proof that you put out the Lantern Angler's false lights and freed Tidewhisper.", category: 'quest',
+    icon: { shape: 'crown', color: 0x6fe0d8, art: 'crown' }, rarity: 'legendary', value: 0 },
   { id: 'frostCrown', name: "Malgrath's Crown", description: 'Proof that you cast down the Winged Demon Lord and freed Frostveil, the last planet.', category: 'quest',
     icon: { shape: 'crown', color: 0x8fd8ff, art: 'crown' }, rarity: 'legendary', value: 0 },
 ];

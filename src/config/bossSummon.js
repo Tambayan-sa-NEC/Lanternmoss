@@ -32,6 +32,7 @@ export const ARENA_WALLS = {
   thorns:   { color: 0x6a8a3a, glow: 0xb48cff, height: 2.2, kind: 'thorn' },
   fire:     { color: 0xff6a2a, glow: 0xffb03d, height: 2.6, kind: 'flame' },
   hellfire: { color: 0xd0305a, glow: 0xff4d6d, height: 2.8, kind: 'flame' },
+  surf:     { color: 0xbff4ff, glow: 0xe8fbff, height: 2.4, kind: 'surf' },     // Mirelure's lagoon: crashing surf
 };
 
 /** What villagers say about a sealed lair: one hint per unmet condition ({boss} = its short name). */
@@ -41,5 +42,6 @@ export const SUMMON_HINTS = {
   sigils: 'The elites out there, the big golden-crowned ones, carry sigils. Bring {need} to the lair and {boss} will answer.',
   quest: 'Help {giver} first. {boss} only shows itself to someone this village trusts.',
   night: '{boss} only rises at night. Wait for the stars, then go to the lair, if you dare.',
+  lowTide: 'The causeway to {boss} opens at low tide. Watch the water before you cross, {hero}.',
   ready: 'Can you feel it? {boss} is stirring in its lair. Whenever you\'re ready, {hero}.',
 };

@@ -2,10 +2,9 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8100;
-const shots = fileURLToPath(new URL('../docs/screenshots/', import.meta.url)); mkdirSync(shots, { recursive: true });
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let browser, stderr = ''; server.stderr.on('data', d => { stderr += d; });
 try {
@@ -45,7 +44,7 @@ try {
     const L = window.LANTERNMOSS; L.CharacterSelect.pick('witch'); L.begin(); L.Tutorial.skip();
   });
   await page.waitForFunction(() => getComputedStyle(document.getElementById('start')).display === 'none');
-  await enter(); await menu(); await page.screenshot({ path: shots + 'home-claim.jpg', type: 'jpeg', quality: 85 });
+  await enter(); await menu(); await page.screenshot({ path: shotPath('home-claim'), type: 'jpeg', quality: 85 });
   await page.keyboard.press('Tab'); await page.keyboard.press('Space');
   assert.ok(await page.evaluate(() => window.LANTERNMOSS.Home.state.claimed));
   assert.equal(await page.$$eval('[data-home-action="place"]:disabled', buttons => buttons.length), 5);
@@ -68,11 +67,11 @@ try {
   assert.equal(await page.evaluate(() => window.LANTERNMOSS.Home.state.furniture.length), 5);
   const compact = await page.$eval('.home-panel', e => ({ top: e.getBoundingClientRect().top, bottom: e.getBoundingClientRect().bottom, sh: e.scrollHeight, ch: e.clientHeight }));
   assert.ok(compact.top >= 18 && compact.bottom <= 702); assert.equal(compact.sh, compact.ch, '720p furniture panel fits without clipping or scrolling');
-  await page.screenshot({ path: shots + 'home-furnishings.jpg', type: 'jpeg', quality: 85 });
+  await page.screenshot({ path: shotPath('home-furnishings'), type: 'jpeg', quality: 85 });
   await page.locator('[data-home-action="remove"][data-item="homeRug"]').click();
   assert.equal(await page.evaluate(() => window.LANTERNMOSS.inventory.count('homeRug')), 1);
   await page.locator('[data-home-action="place"][data-item="homeRug"]').click();
-  await page.keyboard.press('Escape'); await page.screenshot({ path: shots + 'home-interior.jpg', type: 'jpeg', quality: 85 });
+  await page.keyboard.press('Escape'); await page.screenshot({ path: shotPath('home-interior'), type: 'jpeg', quality: 85 });
   console.log('PASS real door/sign/claim, keyboard focus/Space, five Craft buttons and furniture placement/removal');
 
   for (const hero of ['witch', 'knight', 'ranger']) {

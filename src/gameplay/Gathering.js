@@ -33,6 +33,13 @@ import { coastalResources } from '../world/coastalResources.js';
 
 const CHIPS = { tree: 0x9a6a44, rock: 0xb6aec8 };
 
+/** The living monster guarding node n (def.guardedBy: its type, close to it), or null: Old Ironclaw and the pearl beds.
+    Its defeat is saved by the planet progression, so a beaten guard never returns. */
+export function guardOf(n) {
+  const type = n.def.guardedBy; if (!type) return null;
+  return ctx.enemies.find(e => e.alive && e.type === type && arcDist(e.home, n.up) < 30) ?? null;
+}
+
 export const Gathering = {
   nodes: [], rest: new Map(), job: null, world: null, tipsShown: new Set(), tip: null,
 
@@ -40,7 +47,7 @@ export const Gathering = {
   spawnFor(world, planet, avoid = []) {
     this.clear(); this.world = world;
     const P = PLANETS[planet], res = P.resources; if (!res) return;
-    if(res.coastal){this.nodes=coastalResources(world,P,avoid);return;}
+    if(res.coastal){this.nodes=coastalResources(world,P,avoid);ctx.resourceNodes=this.nodes;return;}
     const rng = mulberry32((P.seed ^ 0x5eed51) >>> 0), boss = ctx.enemies.find(e => e.def.miniBoss);
     const place = (kind, near) => {
       const def = NODE_KINDS[kind];
@@ -57,8 +64,9 @@ export const Gathering = {
     };
     for (const [kind, count, near] of res.nodes) for (let i = 0; i < count; i++) place(kind, near);
     for (const [kind, count] of res.rare ?? []) for (let i = 0; i < count; i++) place(kind, 'boss');
+    ctx.resourceNodes=this.nodes;
   },
-  clear() { this.stop(); for (const n of this.nodes) n.dispose(); this.nodes = []; this.rest.clear(); },
+  clear() { this.stop(); for (const n of this.nodes) n.dispose(); this.nodes = []; ctx.resourceNodes=this.nodes; this.rest.clear(); },
   /** A fresh adventure: the first-time tips may show again. */
   resetRun() { this.tipsShown.clear(); this.tip = null; },
 
@@ -89,6 +97,7 @@ export const Gathering = {
       n.syncCoastal();
       return n;
     });
+    ctx.resourceNodes=this.nodes;
     this.rest = new Map(Object.entries(data.rest)); this.tipsShown = new Set(data.tipsShown); this.tip = null;
   },
 
@@ -122,7 +131,8 @@ export const Gathering = {
       if (!n.ready) continue;
       const d = arcDist(P.up, n.up) - n.def.r; if (d > GATHER.reach + range) continue;
       const problem = this.toolProblem(n.def), tag = problem ? ` <span class="ctag">(needs ${n.def.tool === 'pick' && toolCheck(n.def, this.hotbarTool('pick')?.def.tool ?? null) === 'weak' ? 'a Copper Pickaxe' : `a ${TOOL_KINDS[n.def.tool].label.toLowerCase()}`})</span>` : '';
-      out.push({ dist: d, tool: n.def.tool ?? null, label: `${n.def.verb} the ${n.def.name.toLowerCase()}${tag}`, at: n.top(n.def.look === 'vein' ? 1.5 : 1), run: () => this.work({ node: n }) });
+      const guarded = guardOf(n) ? ' <span class="ctag">(guarded)</span>' : '';
+      out.push({ dist: d, tool: n.def.tool ?? null, label: `${n.def.verb} the ${n.def.name.toLowerCase()}${tag}${guarded}`, at: n.top(n.def.look === 'vein' ? 1.5 : 1), run: () => this.work({ node: n }) });
     }
     if (!w) return out;
     const scenery = (list, kind, ok) => {
@@ -164,6 +174,8 @@ export const Gathering = {
     if(job.node&&!job.node.ready)return;
     if(job.scenery==='tree'&&TREE_KINDS[job.spot?.kind]?.wood===false)return;
     if (!dryGround(job.node?.up ?? job.spot?.dir ?? job.at)) { toast('Wait for the water to recede.'); return; }
+    const guard = job.node && guardOf(job.node);
+    if (guard) { toast(`${guard.def.name.split(',')[0]} guards the ${job.node.def.name.toLowerCase()}s. Defeat it first!`); audio.fizzle?.(); return; }
     const need = job.node?.def ?? (job.scenery ? SCENERY[job.scenery] : job.need);
     const problem = this.toolProblem(need); if (problem) { toast(problem); audio.fizzle?.(); return; }
     const tool = need.tool ? this.hotbarTool(need.tool) : null;

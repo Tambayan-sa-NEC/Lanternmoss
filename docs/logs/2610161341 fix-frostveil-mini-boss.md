@@ -1,0 +1,17 @@
+# Fix: the balance report capped the Frostveil mini boss
+
+Clock reads: 13:41 (start), 13:44 (reproduced), bisect and probes until 14:49 (guards, reruns started), 15:01
+(reports done), 15:10 (suites), 15:12 (merge). Steps between reads are grouped at the next read.
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-16 13:44 | RESEARCH | TODO N/A | Reproduced on `develop` (seed 1) | fix/frostveil-mini-boss | Warrior capped with 71% of the Frost Hydra left (173 bites, 43 top-ups); Witch capped with 22% left | 0h 03m |
+| 2026-10-16 14:49 | RESEARCH | TODO N/A | Bisected `e521c77` (103.17 s) .. `a28e67a` in a temporary worktree | fix/frostveil-mini-boss | First bad commit `8dd269c` (26b mechanics lifecycle), which changed no combat code | 1h 05m (13:44-14:49, with the rows below) |
+| 2026-10-16 14:49 | RESEARCH | TODO N/A | Probed the fights | fix/frostveil-mini-boss | Warrior: zero casts in 300 s; the bot re-aimed an unlandable Leap Slam every frame. Ranger and Witch: Malgrath was awake from the start (the sim `boot()` wakes bosses by default and after every travel) and his arena (`BossGate.keepInside`) pulled the hero ~150 m whenever he engaged; the Hydra went home and healed. Several probes on the way misled (an unnormalised-vector comparison, a hero-position wrapper that did not fire); the culprit was found by wrapping every mutator of the hero's up vector | (above) |
+| 2026-10-16 14:49 | DECISION | TODO N/A | Harness fix, not a game change | fix/frostveil-mini-boss | Neither defect is reachable by a player (a boss only wakes when its conditions are met at its lair; a player re-aims a red Leap Slam). Fixed in balance.sim: sealed boot, wake before the boss fight, give up a refused ultimate aim; guards throw on both. Rejected: changing boot()'s default (other sims rely on it), tuning the Hydra | (above) |
+| 2026-10-16 14:49 | TEST | TODO N/A | Witch remeasured; bisected her 174 s (vs 126 s recorded) with the fixed harness patched into each commit | fix/frostveil-mini-boss | Same commit (123 -> 163 s), but seeds 1/2/3/4/7 give 174/129/167/283/135 s: seed variance, not a regression. Recorded as an open finding | (above) |
+| 2026-10-16 15:01 | BALANCE | TODO N/A | Full balance report, base and depth, seeds 1 and 7, corrected harness | fix/frostveil-mini-boss | No caps. Warrior 104.9 / Ranger 96.2 s on the Frost Hydra (recorded 103.2 / 96.2). Outside target: Witch Emberfall mini, seed 1 (194.0 s; seed 7 172.3 s). Depth: every boss >= 140.6 s | 0h 12m |
+| 2026-10-16 15:01 | DOCS | TODO N/A | balance.md: remeasured section (cause, both seeds, open Witch-variance finding), refreshed 28e depth table; TODO 28e note | fix/frostveil-mini-boss | The original seed-1 table kept as history | (above) |
+| 2026-10-16 15:10 | TEST | TODO N/A | `npm test`, `npm run sim`; guards checked without their fixes | fix/frostveil-mini-boss | 236/236, 50/50. Without the fixes the report stops with "the planet boss must stay sealed..." and "the bot kept an ultimate aim open..." | 0h 09m |
+| 2026-10-16 15:12 | MERGE | TODO N/A | Committed 7864342, merged into `develop` (28b7b80), pushed, deleted the branch; removed the bisect worktree (its node_modules junction unlinked first) | develop | | 0h 02m |
+| 2026-10-16 15:12 | TOTAL | TODO N/A | Frostveil mini-boss cap, start to log | develop | Two harness defects fixed and guarded; Witch mini-boss variance left as a finding | 1h 31m |

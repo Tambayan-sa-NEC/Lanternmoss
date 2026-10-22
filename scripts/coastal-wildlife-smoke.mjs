@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8108;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -35,7 +36,7 @@ try{
     camera.position.copy(at).addScaledVector(tangentFrame(tree.dir)[0],9).addScaledVector(tree.dir,3);camera.up.copy(tree.dir);camera.lookAt(at);camera.updateMatrixWorld();
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   });
-  await page.screenshot({path:join(root,'docs/screenshots/tidewhisper-flora.jpg'),type:'jpeg',quality:88});
+  await page.screenshot({path:shotPath('tidewhisper-flora'),type:'jpeg',quality:88});
   await page.evaluate(async()=>{const L=window.LANTERNMOSS,{ctx}=await import('/src/core/context.js');ctx.paused=false;L.player.root.visible=true;if(L.companion?.root)L.companion.root.visible=true;});
   const started=await page.evaluate(async()=>{
     const L=window.LANTERNMOSS,W=L.Mechanics.world,{offsetDir}=await import('/src/utils/sphere.js');const tree=W.spots.trees.find(t=>t.kind==='lanternPalm');
@@ -55,7 +56,7 @@ try{
     },key);
     assert.ok(await page.evaluate(async()=>{const {camera}=await import('/src/render/scene.js');return camera.position.distanceTo(window.coastalShot.pos)>3&&window.coastalShot.root.visible;}));
     await page.screenshot({path:join(tmpdir(),`lanternmoss-${key}-1080.png`)});
-    if(key==='pearlTurtle')await page.screenshot({path:join(root,'docs/screenshots/tidewhisper-pearl-turtle.jpg'),type:'jpeg',quality:88});
+    if(key==='pearlTurtle')await page.screenshot({path:shotPath('tidewhisper-pearl-turtle'),type:'jpeg',quality:88});
   }
   await page.evaluate(async()=>{
     const L=window.LANTERNMOSS,{ctx}=await import('/src/core/context.js'),{offsetDir}=await import('/src/utils/sphere.js'),{setShowcase}=await import('/src/systems/CameraSystem.js'),c=L.critters.find(c=>c.defKey==='pearlTurtle');

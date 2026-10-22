@@ -97,7 +97,8 @@ travel('emberfall'); assert.ok(!H.npcs.some(n => n.name === 'Tuva')); travel('fr
 assert.ok(H.npcs.find(n => n.name === 'Tuva').seen.has(0));
 // Early routes allow out-of-order wins: the last-listed boss alone is not campaign completion.
 game.planets.defeated.delete('emberfall'); H.wakeBoss(); damageEnemy(ctx.boss, ctx.boss.hp + 1, 'hero'); step(5);
-assert.equal(game.planets.complete, false); assert.equal(game.planets.state, 'playing');
+assert.equal(game.planets.complete, false); assert.equal(game.planets.state, 'loot');
+assert.equal(game.planets.nextPlanet.id, 'tidewhisper', 'the fourth world follows Frostveil');
 game.resetRun(); assert.equal(ctx.planetId, 'lanternmoss'); assert.equal(portal.stranded, null);
 assert.equal(portal.rewarded.size, 0); assert.equal(game.planets.defeated.size, 0); assert.equal(game.planets.miniDefeated.size, 0);
 assert.ok(ctx.boss.alive); assert.ok(H.Chests.list.every(c => !c.opened));

@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { PLANETS } from '../config/planets.js';
 import { addTo, G, part } from '../render/meshes.js';
+import { batchParts } from '../render/staticParts.js';
 import { addFace, buildHumanoid } from './humanoid.js';
 
 export function buildWizard() {
@@ -132,7 +133,7 @@ export function buildOutfit(planet, { headR = 0.36, color = 0xffffff, hat = fals
     addTo(g,part(new THREE.TorusGeometry(.26,.035,4,12),color),[0,-.32,0],[Math.PI/2,0,0]);
     addTo(g,part(G.box(.25,.08,.045),color),[0,-.43,.23]);
     if(!hat){addTo(g,part(G.cyl(.45,.45,.04,10),0xf4d18a),[0,.3,0]);addTo(g,part(G.cyl(.25,.3,.2,8),0xf4d18a),[0,.42,0]);}
-    return g;
+    batchParts(g); return g;
   }
   if (outfit === 'neckerchief') {                         // Emberfall: a bright neckerchief knotted at the front
     addTo(g, part(new THREE.TorusGeometry(0.27, 0.06, 4, 12), color), [0, -0.36, 0], [Math.PI / 2, 0, 0]);
@@ -143,7 +144,7 @@ export function buildOutfit(planet, { headR = 0.36, color = 0xffffff, hat = fals
     for (const y of [-0.5, -0.64]) addTo(g, part(G.box(0.15, 0.03, 0.07), 0xffffff, { outline: false }), [0.16, y, 0.24], [0.2, 0, 0.15]);
     if (!hat) for (const sx of [-1, 1]) addTo(g, part(G.ico(0.1, 1), 0xffffff), [sx * 0.37, 0, 0]);
   }
-  return g;
+  batchParts(g); return g;
 }
 
 // ---- indoor residents (src/gameplay/Houses.js): they live inside their house ----

@@ -76,6 +76,22 @@ test('wearing gear: totals, caps, the right hero only, and applied on top of the
   assert.match(equipProblem(get('honeyBun'), 'witch'), /can't be worn/);
 });
 
+test('gift-only rare-creature gear never joins the random loot pool', async () => {
+  const { PLANET_CATALOG } = await import('../src/config/planets.js');
+  const { rollGear } = await import('../src/gameplay/loot.js');
+  const gifts = [CRITTER_DEFS.pearlTurtle.rare.gift];
+  assert.deepEqual(gifts, ['pearlOfDeep'], 'the coastal rare creature gives its authored charm');
+  for (const id of gifts) {
+    assert.equal(get(id).props?.giftOnly, true, `${id} must be marked gift-only`);
+    // Roll every released world's real chest pool, including Tidewhisper once available.
+    const rolled = new Set();
+    let seed = 1; const rng = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    for (let planet = 0; planet < PLANET_CATALOG.filter(p => p.released).length; planet++)
+      for (let i = 0; i < 3000; i++) rolled.add(rollGear(planet, 'witch', 'chest', rng)?.item);
+    assert.ok(!rolled.has(id), `${id} must never drop from a released world's chest`);
+  }
+});
+
 test('recipes only use real items, and every material crafts something', () => {
   const ids = new Set(ITEM_DEFINITIONS.map(d => d.id));
   assert.equal(new Set(RECIPES.map(r => r.id)).size, RECIPES.length, 'recipe ids are unique');

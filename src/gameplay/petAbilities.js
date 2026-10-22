@@ -3,6 +3,7 @@
    healing, Scout's spotted monsters, Fetch's chest scent) tick in updatePetAbilities and show on the compass. */
 import * as THREE from 'three';
 import { ctx } from '../core/context.js';
+import { pointOf, distance, visible } from '../combat/space.js';
 import { damageEnemy } from '../combat/damage.js';
 import { targeting } from '../combat/targeting.js';
 import { ringFX } from '../fx/combatFx.js';
@@ -13,7 +14,10 @@ import { toast } from '../ui/toast.js';
 import { arcDist, offsetDir } from '../utils/sphere.js';
 import { buff } from './buffs.js';
 import { Chests } from './Chests.js';
+import { dayClock } from './dayClock.js';
+import { grantItem } from './pickups.js';
 import { rng } from '../utils/random.js';
+import { dryGround } from '../world/terrain.js';
 
 /** Lasting effects: spotted = [{ enemy, until }], scent = { dir, until } | null, mend = { left, perSec }. */
 export const petEffects = { spotted: [], scent: null, mend: null };
@@ -24,7 +28,7 @@ const alive = e => e.alive && !e.hidden;
 export const PET_ABILITIES = {
   /** Owl: spots every monster around, marking them. */
   scout(Pets, pet, a) {
-    const P = ctx.player, near = ctx.enemies.filter(e => alive(e) && arcDist(P.up, e.up) < a.radius);
+    const P = ctx.player, near = ctx.enemies.filter(e => alive(e) && distance(pointOf(P), pointOf(e)) < a.radius);
     pet.flourish?.('rise'); audio.hoot();
     if (!near.length) { toast(`${Pets.nameOf()} circles high... no monsters within ${a.radius}m.`); return true; }
     for (const e of near) { e.markT = Math.max(e.markT, a.mark); emote(e, '!', '#c7a8ff'); }
@@ -40,6 +44,7 @@ export const PET_ABILITIES = {
   },
   /** Fox: brings every item lying nearby to your feet, and sniffs out the nearest unopened chest. */
   fetch(Pets, pet, a) {
+    if (ctx.room) return false;   // cave rewards and their pickup context belong to 29d
     const P = ctx.player, items = ctx.worldItems.filter(w => arcDist(P.up, w.up) < a.radius && !w.bossLoot);
     items.forEach((w, i) => w.hopTo(offsetDir(P.up, i * 2.4, 0.6), 0.6 + i * 0.05));
     let best = null, bd = Infinity;
@@ -50,6 +55,22 @@ export const PET_ABILITIES = {
     toast(`${Pets.nameOf()} ${got}${best ? ` and sniffs out a chest ${Math.round(bd)}m away (on your compass)` : ''}!`);
     return items.length > 0 || !!best;
   },
+  /** Otter: harvest one ordinary clam bed while it is submerged; the bed's usual regrowth and a saved daily cap bound the yield. */
+  pearlDive(Pets, pet, a) {
+    if (ctx.planetId !== 'tidewhisper' || ctx.room) { toast(`${Pets.nameOf()} can dive for pearls only off Tidewhisper's shore.`); return false; }
+    const used = Pets.diveDay === dayClock.day ? Pets.divesToday : 0;
+    if (used >= a.perDay) { toast(`${Pets.nameOf()} has found enough pearls for today.`); return false; }
+    const bed = ctx.resourceNodes.filter(n => n.kind === 'clamBed' && n.regrowT <= 0 && !dryGround(n.up) && arcDist(ctx.player.up, n.up) <= a.radius)
+      .sort((a, b) => arcDist(ctx.player.up, a.up) - arcDist(ctx.player.up, b.up))[0];
+    if (!bed) { toast('Find a submerged clam bed near the shore for Pearl Dive.'); return false; }
+    bed.deplete(); Pets.diveDay = dayClock.day; Pets.divesToday = used + 1;
+    grantItem('pearl', a.yield);
+    ringFX(bed.top(0.2), 1.2, 0x70dfd7);
+    sparkles.emit(bed.top(0.4), { count: 18, color: 0xdffcff, speed: 1.4, up: bed.up, upBias: 1, life: 0.8, size: 0.3 });
+    pet.diveAt?.(bed.up); emote(pet, 'heart', '#70dfd7'); audio.plip();
+    toast(`${Pets.nameOf()} dives beneath the tide and brings back a pearl! (${Pets.divesToday}/${a.perDay} today)`);
+    return true;
+  },
   /** Wisp: warm healing over a few seconds (the wisp mends a little too). */
   mend(Pets, pet, a) {
     const P = ctx.player; if (P.hp >= P.stats.maxHp && Pets.hp >= Pets.maxHp()) { toast('Everyone is already fine.'); return false; }
@@ -59,7 +80,7 @@ export const PET_ABILITIES = {
   },
   /** Dragontoad: a booming croak around you: knocks back, hurts and stuns every monster close by. */
   bellow(Pets, pet, a) {
-    const P = ctx.player, hit = ctx.enemies.filter(e => alive(e) && e.pos.distanceTo(P.pos) < a.radius + e.hitR);
+    const P = ctx.player, hit = ctx.enemies.filter(e => alive(e) && e.pos.distanceTo(P.pos) < a.radius + e.hitR && visible(P.pos, e.pos));
     for (const e of hit) { damageEnemy(e, Math.round(a.damage * Pets.power()), { source: 'pet', knock: 6, from: P.pos, color: 0x9ff3a0 }); if (e.alive) e.stun(a.stun); }
     ringFX(P.pos, a.radius, 0x9ff3a0); ringFX(P.pos, a.radius * 0.6, 0xffffff, 0.35); audio.roar(); audio.howl();
     sparkles.emit(_p.copy(pet.pos).addScaledVector(pet.up, 0.6), { count: 30, color: 0x9ff3a0, speed: 3, up: pet.up, upBias: 1, life: 0.7, size: 0.36 });
@@ -68,9 +89,9 @@ export const PET_ABILITIES = {
   },
   /** Dragon whelp: a burst of flame around your target (or around you). */
   flame(Pets, pet, a) {
-    const P = ctx.player, t = [targeting.aim, targeting.lastHit].find(e => e && alive(e) && arcDist(P.up, e.up) < 16);
+    const P = ctx.player, t = [targeting.aim, targeting.lastHit].find(e => e && alive(e) && distance(pointOf(P), pointOf(e)) < 16);
     const at = t ? t.pos : P.pos, up = t ? t.up : P.up;
-    const hit = ctx.enemies.filter(e => alive(e) && e.pos.distanceTo(at) < a.radius + e.hitR);
+    const hit = ctx.enemies.filter(e => alive(e) && e.pos.distanceTo(at) < a.radius + e.hitR && visible(at, e.pos));
     for (const e of hit) damageEnemy(e, Math.round(a.damage * Pets.power()), { source: 'pet', knock: 3, from: at, color: 0xff7a3a });
     ringFX(at, a.radius, 0xff7a3a); audio.castFire();
     sparkles.emit(_p.copy(at).addScaledVector(up, 0.6), { count: 50, color: 0xff8a3a, speed: 4, up, upBias: 0.8, life: 0.8, size: 0.4 });
@@ -88,6 +109,6 @@ export function updatePetAbilities(dt) {
     if (m.left <= 0) petEffects.mend = null;
   }
   petEffects.spotted = petEffects.spotted.filter(s => s.until > ctx.time && alive(s.enemy));
-  if (petEffects.scent && (petEffects.scent.until < ctx.time || arcDist(P.up, petEffects.scent.dir) < 3)) petEffects.scent = null;
+  if (petEffects.scent && (petEffects.scent.until < ctx.time || distance(pointOf(P), petEffects.scent.dir) < 3)) petEffects.scent = null;
 }
 export function resetPetAbilities() { petEffects.spotted = []; petEffects.scent = null; petEffects.mend = null; }

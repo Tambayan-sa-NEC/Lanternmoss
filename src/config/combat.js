@@ -10,11 +10,27 @@ export const COMBAT = {
   autoAimAngle: 40,            // soft lock-on cone (degrees either side of where the hero faces; the camera doesn't aim)
   autoAimRange: 20,
   castFaceTime: 0.35,          // seconds the magician keeps facing her target after casting
+  // A monster that gives up a chase walks home healing `heal` of its health per second, and is whole once home. A mini
+  // boss keeps its damage on the way: it only starts healing once it has been out of combat for more than
+  // `miniBossHealDelay` seconds, so a fight that drifts past its short leash can be resumed.
+  // Who still gives up (TODO 45a, Enemy.leashed): a mini boss during its earlier forms, and a main boss. An ordinary
+  // monster never does - it keeps coming until the hero is safe, faints, travels or starts again - so its `aggro` is
+  // only how far away it first notices the hero, and its `leash` applies to wandering and to the forms above.
+  leashReturn: { heal: 0.3, miniBossHealDelay: 5 },
+  // Monsters fighting each other (TODO 45b, src/combat/damage.js). Only lesser monsters feud: a lesser monster's
+  // attack also lands on any other lesser monster caught in the same blow, and the one that is hit turns on its
+  // attacker. A mini boss's or main boss's attack never damages a lesser monster, and no monster hurts itself.
+  // damage: how much of the blow a monster takes compared with the hero (1 = the same).
+  // forget: seconds a provoked monster keeps after its attacker before it goes back to hunting the hero.
+  // arc: a swipe only catches monsters roughly in front (cosine of the half-angle; 0 = a full half-circle).
+  // earshot: a brawl further than this from the hero is neither heard nor felt - monsters now attack away from the
+  // hero, which they never used to do, and a fight across the valley should not thump in your ears.
+  mobFeud: { damage: 1, forget: 8, arc: 0.3, earshot: 30 },
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
     fireball: { name: 'Fireball', color: 0xff9a4a,
-                cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 },
+                cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, homing: 0, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 }, // homing: turn strength; 0 flies straight
     nova:     { name: 'Frost Nova', color: 0x9fe8ff,
                 cost: 28, cooldown: 8, damage: 12, radius: 4.5, slow: 0.55, slowTime: 3.5, knockback: 4 },
     blink:    { name: 'Blink', color: 0xbff4ff,
@@ -66,7 +82,7 @@ export const COMBAT = {
     // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
     //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
     hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,
-                 hp: 2800, speed: 1.6, radius: 1.5, height: 3.6, aggro: 14, leash: 18, turnRate: 2.2,
+                 hp: 3360, speed: 1.6, radius: 1.5, height: 3.6, aggro: 14, leash: 18, turnRate: 2.2,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 160, cooldown: 1.3,
                  attacks: {
                    bite:  { windup: 0.65, range: 6.5, arc: 70, damage: 16, knockback: 6, recover: 0.6, cooldown: 0.6 },
@@ -79,7 +95,7 @@ export const COMBAT = {
                    { below: 0.33, heads: 5, title: 'Five heads', attacks: ['bite', 'spit', 'sweep'], speedMul: 1.2, cooldownMul: 0.75 },
                  ] },
     basilisk:  { ai: 'boss', behavior: 'basilisk', miniBoss: true, name: 'The Basilisk, Stone-Gazer', color: 0x5a7a3a, capColor: 0xfff066,
-                 hp: 2200, speed: 3.4, radius: 1.1, height: 2.0, aggro: 15, leash: 22, turnRate: 3.5,
+                 hp: 2640, speed: 3.4, radius: 1.1, height: 2.0, aggro: 15, leash: 22, turnRate: 3.5,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 170, cooldown: 1.1,
                  attacks: {   // gaze: anyone FACING it when its eyes flare is turned to stone for `petrify` seconds (turn away!)
                    gaze:  { windup: 1.5, range: 20, damage: 12, petrify: 1.8, recover: 1.2, cooldown: 1.2, reuse: 7 },
@@ -91,7 +107,27 @@ export const COMBAT = {
                    { below: 1.0, attacks: ['gaze', 'whip', 'lunge'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Enraged', attacks: ['gaze', 'whip', 'lunge', 'spit'], speedMul: 1.2, cooldownMul: 0.8 },
                  ] },
-    // ---- lair seals: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
+    // Tidewhisper (TODO 27f). faceArc = half-angle (degrees) of the front that can be hurt; everywhere else is the bell,
+    // which only rings (bellRing: a shockwave after `delay`, at most once per `cooldown`; stun = seconds dazed).
+    // guarded = damage share while tucked in its shell; openBonus = extra while out of it (swap) or wedged in the sand
+    ironclaw:  { ai: 'boss', behavior: 'ironclaw', miniBoss: true, name: 'Old Ironclaw, Keeper of the Pearl Beds', color: 0xc8913a, capColor: 0xffc86a,
+                 hp: 800, speed: 2.2, radius: 1.5, height: 2.8, aggro: 13, leash: 20, turnRate: 2.4,
+                 knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 180, cooldown: 1.2,
+                 faceArc: 70, guarded: 0.6, openBonus: 0.4, wedge: 5, swap: 5.5, swapSpeed: 0.6,
+                 bellRing: { delay: 0.45, speed: 9, maxRadius: 9, width: 1.2, damage: 7, stun: 1.0, cooldown: 3 },
+                 attacks: {
+                   pinch:  { windup: 0.7, range: 4.2, arc: 80, damage: 12, knockback: 7, recover: 0.7, cooldown: 0.8 },
+                   charge: { windup: 0.9, minRange: 4, speed: 13, distance: 14, width: 2.0, damage: 14, knockback: 11, recover: 0.9, cooldown: 1.2, reuse: 4 },
+                   toll:   { windup: 1.0, speed: 8, maxRadius: 12, width: 1.2, damage: 10, knockback: 5, stun: 0.8, recover: 1.0, cooldown: 1.2, reuse: 6 },
+                 },
+                 phases: [   // each threshold: out of the shell (the kit's onPhase), then a new one
+                   { below: 1.0, attacks: ['pinch', 'charge'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.66, title: 'Second shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.1, cooldownMul: 0.9 },
+                   { below: 0.33, title: 'Last shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.2, cooldownMul: 0.8 },
+                 ] },
+    // ---- lair seals and lures: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
+    mireLure:  { ai: 'mireLure', object: true, static: true, name: 'Lantern lure', color: 0xffd36b, hp: 1, speed: 0, radius: 0.45, height: 1.5,
+                 aggro: 0, leash: 99, respawn: 0, xp: 0, knockResist: 1, slowResist: 1, staggerImmune: true },   // Mirelure's: one real, the rest false
     thornSeal: { ai: 'seal', object: true, static: true, name: 'Thorn Seal', color: 0xb48cff, hp: 90, speed: 0, radius: 0.75, height: 2.6,
                  aggro: 0, leash: 99, respawn: 0, xp: 12, knockResist: 1, slowResist: 1, staggerImmune: true },
     // ---- planet bosses: ai 'boss' + behavior = their own AI kit (src/entities/enemies/behaviors/boss/) ----
@@ -99,6 +135,26 @@ export const COMBAT = {
     // move; reuse = seconds before that same move can be picked again. phases: the last whose `below` (fraction of max HP)
     // is >= current HP is active; title shows on the boss bar, enraged/flying are read by the kit.
     // stunResist = share of a stun shrugged off (bosses are only stunned between attacks); tallHitbox = hit along the body column.
+    // planet 4 (TODO 27g). pool = the lagoon's radius (she never leaves it); lures: count (countLate after the reflood),
+    // radius range from the lair, breath = seconds between her breaths (the real lure dims on each), surface = seconds
+    // up after the real lure is struck, burst = a false lure's flash. drain: the sluice break's drain and its creeping
+    // reflood (seconds); diveDepth = water over her that ends the beaching
+    mirelure:  { ai: 'boss', behavior: 'mirelure', name: 'Mirelure, the Lantern Angler', color: 0x3d5a78, capColor: 0xffd36b,
+                 hp: 3250, speed: 3.0, radius: 2.4, height: 3.2, aggro: 20, leash: 34, turnRate: 2.2,
+                 knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.3,
+                 telegraph: true, respawn: 0, xp: 220, cooldown: 1.2, pool: 18, diveDepth: 1.0,
+                 lures: { count: 3, countLate: 4, radius: [5, 12], breath: 1.8, surface: 7, burst: { radius: 3, damage: 12, knockback: 6 } },
+                 sluice: { at: 16.5, smash: 2.4 }, drain: { seconds: 45, reflood: 22 },
+                 attacks: {
+                   geyser: { windup: 1.2, radius: 2.6, damage: 14, knockback: 8, recover: 0.4, cooldown: 1.8, reuse: 3 },
+                   bite:   { windup: 0.7, range: 5.5, arc: 80, damage: 18, knockback: 8, recover: 0.8, cooldown: 0.8 },
+                   thrash: { windup: 0.9, radius: 5.5, damage: 14, knockback: 10, recover: 0.8, cooldown: 0.8, reuse: 4 },
+                   roll:   { windup: 1.0, minRange: 5, speed: 10, distance: 14, width: 3.0, damage: 19, knockback: 12, recover: 1.0, cooldown: 1.0, reuse: 5 },
+                 },
+                 phases: [   // the moves themselves check her mode (deep / surfaced / beached)
+                   { below: 1.0, title: 'Lantern lights', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Beached', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1.15, cooldownMul: 0.85 },
+                 ] },
     gloomcap:  { ai: 'boss', behavior: 'gloomcap', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6,   // planet 1: the introduction
                  look: { skin: 0x6a4a7a, armor: 0x2e2638, cape: 0x2a1838, horn: 0xe8dcc4, trim: 0xffd36b, eye: 0xffe066, motif: 'moss' },   // src/models/bosses.js
                  hp: 6700, speed: 2.6, radius: 1.3, height: 4.6,

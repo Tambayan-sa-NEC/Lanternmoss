@@ -6,7 +6,7 @@
    Layout: vitals (health, level, mana / stamina / focus, XP) above the hotbar at the bottom centre, skills on the
    lower right, the pet card on the lower left (ui/petHud.js), the boss bar at the top. */
 import * as THREE from 'three';
-import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
+import { abilityText, CHARACTERS } from '../config/characters.js';
 import { HOTBAR_KEYS, keyLabel } from '../config/controls.js';
 import { HOTBAR, RARITIES } from '../config/items.js';
 import { NEEDS } from '../config/survival.js';
@@ -25,6 +25,7 @@ import { camera } from '../render/scene.js';
 import { clamp } from '../utils/math.js';
 import { dom, flashEl } from './dom.js';
 import { icon } from './icons.js';
+import { Talents } from '../gameplay/Talents.js';
 import { itemIconHtml } from './itemTooltip.js';
 
 const HUD = {
@@ -54,10 +55,10 @@ const boss = { el: dom.bossBar, fill: dom.bossFill, lag: dom.bossLag, value: dom
 let shownLevel = 0, shownRes = '';
 
 // ---------------------------------------------------------------- ability bar + tooltip
-let slots = {};
+let slots = {}, shownKit = null;
 
 export function buildSpellBar(abilities) {
-  dom.spells.innerHTML = ''; slots = {}; hideTip();
+  shownKit = abilities; dom.spells.innerHTML = ''; slots = {}; hideTip();
   for (const [id, s] of Object.entries(abilities)) {
     const el = document.createElement('div'); el.className = s.ult ? 'slot ult' : 'slot';
     el.innerHTML = `<kbd>${s.label}</kbd><div class="ico" style="--c:#${new THREE.Color(s.color).getHexString()}">${icon(id)}</div>` +
@@ -112,7 +113,7 @@ function renderHint() {
 }
 /** The hero's abilities for the controls panel. */
 export function setSkillHint(abilities) { hintAbilities = abilities; renderHint(); }
-onBindsChange(() => { renderHint(); if (hintAbilities) buildSpellBar(hintAbilities); });
+onBindsChange(() => { if (hintAbilities) { const abilities = ctx.player ? Talents.kit() : hintAbilities; setSkillHint(abilities); buildSpellBar(abilities); } });
 renderHint();
 
 const titleCase = w => w.charAt(0) + w.slice(1).toLowerCase();
@@ -121,14 +122,15 @@ function tipHtml(id, s) {
   const P = ctx.player, res = titleCase(CHARACTERS[P.charId].resource), dmg = v => Math.round(v * damageMultiplier(P.level)), stats = [];
   if (s.damage) stats.push(s.tick ? `${dmg(s.damage)} damage every ${s.tick}s for ${s.duration}s` : `${dmg(s.damage)} damage`);
   if (s.target) stats.push(`${s.radius} radius, up to ${s.range} away`);
-  else if (s.radius) stats.push(`${s.radius} radius`);
+  else if (s.radius) stats.push(`${s.blastRadius ?? s.radius} radius`);
+  if (s.arc && s.arc < 360) stats.push(`${s.arc}° arc`);
   if (s.stun) stats.push(`stuns ${s.stun}s`);
-  if (s.slow) stats.push(`slows ${Math.round(s.slow * 100)}%`);
+  if (s.slow) stats.push(`slows ${Math.round(s.slow * 100)}% for ${s.slowTime}s`);
   if (s.reduction) stats.push(`-${Math.round(s.reduction * 100)}% damage for ${s.duration}s`);
   if (s.invuln) stats.push(`${s.invuln}s invulnerable`);
   return `<h4>${s.name}${s.ult ? '<span class="u">Ultimate</span>' : ''}</h4>` +
     `<div class="k"><kbd>${s.label}</kbd>${s.mouse ? ' or click' : ''}${s.target ? ', then click a spot' : ''}</div>` +
-    `<p>${ABILITY_TEXT[id] ?? ''}</p>${stats.length ? `<div class="st">${stats.join(' · ')}</div>` : ''}` +
+    `<p>${abilityText(id, s)}</p>${stats.length ? `<div class="st">${stats.join(' · ')}</div>` : ''}` +
     `<div class="cc"><span class="cost">${s.cost} ${res}</span><span>${s.cooldown}s cooldown</span></div>`;
 }
 function showTip(id, s, el) {
@@ -236,9 +238,12 @@ function updateHint(dt) {
 }
 
 /** HUD size = fitted to the window (smaller on small screens, larger on big ones) x the HUD-size setting. */
+/** Numeric value of the --ui scale last applied by settings/resize; marker placement reads it without forcing style. */
+export let uiScale = 1;
 export function applyUiScale() {
   const fit = clamp(Math.min(innerWidth / 1280, innerHeight / 720), 0.75, 1.3);
-  document.documentElement.style.setProperty('--ui', (fit * settings.uiScale / 100).toFixed(3));
+  const value = (fit * settings.uiScale / 100).toFixed(3); uiScale = Number(value);
+  document.documentElement.style.setProperty('--ui', value);
 }
 /** Sets the HUD-size setting (1 = 100%); saved with the other settings. */
 export function setUiScale(s) { setSetting('uiScale', s * 100); applyUiScale(); }
@@ -246,7 +251,8 @@ applyUiScale();
 
 // ---------------------------------------------------------------- per frame
 export function updateCombatHud(dt, spellState, aimTarget) {
-  const P = ctx.player, C = P.stats, hero = CHARACTERS[P.charId], abilities = hero.abilities;
+  const P = ctx.player, C = P.stats, hero = CHARACTERS[P.charId], abilities = Talents.kit();   // cooldowns and costs after talents
+  if (shownKit !== abilities) { buildSpellBar(abilities); setSkillHint(abilities); }
   if (shownRes !== hero.resource) { shownRes = hero.resource; dom.combat.dataset.res = hero.resource; bars.mp.label.textContent = titleCase(hero.resource); }
   setBar(bars.hp, P.hp / C.maxHp, `${Math.ceil(P.hp)} / ${C.maxHp}`, dt);
   setBar(bars.mp, P.mana / C.maxMana, `${Math.floor(P.mana)} / ${C.maxMana}`, dt);

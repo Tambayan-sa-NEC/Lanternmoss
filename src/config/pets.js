@@ -10,8 +10,10 @@
      attack    { damage, cooldown, range, ...damageEnemy options (mark, stagger, slow + slowTime, knock) }
      ability   { id, name, key text, cooldown, ...its numbers } (effects: src/gameplay/petAbilities.js)
      unlock    null = always yours; { quest: id } | { chest: kind } | { bossChest: planet index } | { miniBoss: type };
+               planet = hide this pet until that world is released (test candidate catalogs can expose it);
                text = how to find it
    --------------------------------------------------------------------- */
+import { PLANETS } from './planets.js';
 
 export const PETS = {
   owl: {
@@ -62,7 +64,19 @@ export const PETS = {
       text: 'Bursts into flame around your target (or you): 30 damage to every monster within 4.5m.' },
     unlock: { bossChest: 1, text: 'An egg in Pyrrhax\'s treasure chest, on Emberfall.' },
   },
+  otter: {
+    name: 'Otter', defaultName: 'Ripple', role: 'Pearl diver', body: 'walk', model: 'otter', color: '#70dfd7', hp: 75,
+    blurb: 'A little lighthouse helper who can retrieve pearls from submerged clam beds.',
+    attack: { damage: 5, cooldown: 2.4, range: 9, knock: 0.8 },
+    ability: { id: 'pearlDive', name: 'Pearl Dive', cooldown: 90, radius: 14, perDay: 2, yield: 1,
+      text: 'Dives to a submerged clam bed within 14m for one pearl, up to twice each adventure day. The bed needs time to regrow.' },
+    unlock: { planet: 'tidewhisper', quest: 'darkLighthouse', text: 'Help Marlo relight the Tidewhisper lighthouse.' },
+  },
 };
+
+/** Only released worlds expose their tied pets in normal play; candidate catalogs can exercise them in tests. */
+export const petAvailable = id => !!PETS[id] && (!PETS[id].unlock?.planet || PLANETS.some(p => p.id === PETS[id].unlock.planet));
+export const availablePetIds = () => Object.keys(PETS).filter(petAvailable);
 
 /** localStorage key for the pet each hero last took ({ heroId: petId }). */
 export const PET_PICKS_KEY = 'lanternmoss.pets';

@@ -11,6 +11,7 @@ export const CRITTER_DEFS = {
   hermitCrab: {kind:'crab',build:'crab',coastal:true,fur:0xe9a077,shell:0xd5b89a,speed:.8,radius:.35},
   seaTurtle: {kind:'turtle',build:'turtle',coastal:true,fur:0x83b5a3,shell:0x5c9d86,belly:0xe3dbc1,speed:.7,radius:.48},
   harborSeal: {kind:'seal',build:'seal',coastal:true,fur:0x96afbd,belly:0xd6e7e3,speed:1,radius:.5},
+  otter: {kind:'otter',build:'otter',fur:0x8b604a,belly:0xf2dbc0,accent:0x70dfd7,speed:1.5,radius:.32},
   pearlTurtle: {kind:'turtle',build:'turtle',coastal:true,pearl:true,fur:0xa7e0d6,shell:0xb8dedb,scute:0x7cbbb6,belly:0xf2e9d3,speed:.7,radius:.48,
     rare:{name:'Pearl Turtle',gift:'pearlOfDeep',color:0xc1ffff}},
   catOrange: { kind: 'cat', fur: 0xffa65c, belly: 0xfff0dc, ear: 'point', tail: 'cat', tailCol: 0xff9444, len: 0.95, leg: 0.2, snout: 0.8 },

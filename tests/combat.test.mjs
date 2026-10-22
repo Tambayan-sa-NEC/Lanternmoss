@@ -7,7 +7,7 @@ import { COMBAT } from '../src/config/combat.js';
 import { PLANETS } from '../src/config/planets.js';
 import { scaleEnemyDef } from '../src/combat/enemyDefs.js';
 
-const BOSS_KITS = ['gloomcap', 'dragon', 'demonLord'];   // src/entities/enemies/behaviors/boss/
+const BOSS_KITS = ['gloomcap', 'dragon', 'demonLord', 'mirelure'];   // src/entities/enemies/behaviors/boss/
 
 test('ability ids are unique across heroes (they share one CAST table)', () => {
   const ids = Object.values(CHARACTERS).flatMap(c => Object.keys(c.abilities));
@@ -61,7 +61,7 @@ test('each planet has its own boss type and AI; planet 1 keeps Gloomcap', () => 
   const bosses = PLANETS.map(p => COMBAT.enemies[p.boss.type]);
   assert.equal(PLANETS[0].boss.type, 'gloomcap');
   assert.equal(new Set(PLANETS.map(p => p.boss.type)).size, PLANETS.length);
-  assert.deepEqual(bosses.map(b => b.behavior), BOSS_KITS);
+  assert.deepEqual(bosses.map(b => b.behavior), BOSS_KITS.slice(0, PLANETS.length));
 });
 
 test('every boss attack has a warning, a recovery and a cooldown', () => {

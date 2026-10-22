@@ -32,6 +32,8 @@ import { Farm } from './Farm.js';
 import { Fishing } from './Fishing.js';
 import { Gathering } from './Gathering.js';
 import { Stations } from './Stations.js';
+import { Bounties } from './Bounties.js';
+import { Dungeons } from './Dungeons.js';
 import { Pets } from './Pets.js';
 import { rareTarget } from '../entities/wildlife/wildlife.js';
 import { dayClock } from './dayClock.js';
@@ -291,9 +293,10 @@ export const Houses = {
 export function currentInteraction() {
   if (!ctx.started || Dialog.open || Houses.fade || Building.active) return null;
   if (Fishing.active) return Fishing.target();                      // fishing: E reels in
+  if (Dungeons.inside) return Dungeons.target();                    // in a cave: only its mouth
   let h = Houses.target();
   if (Houses.inside) return h;
-  for (const c of [Building.target(), Portals.target(), Chests.target(), Pets.target(), rareTarget(), Stations.target(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
+  for (const c of [Building.target(), Portals.target(), Chests.target(), Pets.target(), rareTarget(), Stations.target(), Bounties.target(), Dungeons.target(), Farm.target(), Fishing.target(), Gathering.target()]) if (c && (!h || c.dist < h.dist)) h = c;
   const P = ctx.player, n = nearestNPC(P, ctx.npcs);
   if (n && (!h || n.pos.distanceTo(P.pos) <= h.dist)) {
     return { label: `Talk to ${n.name}${Challenges.tagFor(n)}`, at: _w.copy(n.pos).addScaledVector(n.up, n.height + n.hover + 0.35).clone(), run: () => Dialog.start(n) };

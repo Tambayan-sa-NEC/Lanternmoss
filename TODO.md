@@ -194,7 +194,7 @@ Code: `src/ui/hud.js`, `src/ui/petHud.js`, `src/core/controls.js`, `src/config/c
   - Before picking, write a short brief on the game's look and feel (mood words, references), and compare 2–3
     candidate pairings in a mock-up of the HUD and the title screen.
   - Done: the brief, the three pairings compared (Fredoka, Grandstander or Fraunces, each with Nunito) and the choice,
-    **Grandstander + Nunito**, are in `docs/typography.md`. The specimen is in `docs/type-specimen.html`.
+    **Grandstander + Nunito**, are in `docs/wiki/technical/typography.md`. The specimen is in `docs/type-specimen.html`.
 - [x] **10.2 Item hotbar** at the lower centre of the screen:
   - Numbered slots (`1`–`9`). Pressing a number selects that slot and the hero **holds** that item; clicking a slot does
     the same.
@@ -749,7 +749,7 @@ snapshots). **Size:** L. **Needs:** 18.
   - Start with one slot, but make the slot a field in the format. Export / import is cheap and helps with bug reports,
     so do it in this item; extra slots are deferred.
 
-Implementation notes: [save format and ownership](docs/save-format.md), version-1 fixture, registry coverage and
+Implementation notes: [save format and ownership](docs/wiki/technical/save-format.md), version-1 fixture, registry coverage and
 real-system round trips. House interiors, active challenges and uncollected boss loot restore without replaying rewards.
 
 ## 20. Performance budget **(core)** ✓
@@ -763,8 +763,8 @@ support (40) need numbers to stay under.
 
 - [x] **A frame-rate overlay** (a setting, or a key): fps, frame time, draw calls and triangles (`renderer.info`).
 - [x] **Set the budget:** measure the busiest scene on each planet (the village at night in the heaviest weather) and
-      record it as the ceiling. The target is a steady 60 fps at 1080p on integrated graphics (Iris Xe class) at the
-      default quality. Write the numbers down in `docs/performance.md`.
+      record it as the ceiling. The target is a steady 60 fps at 1080p on the owner's Acer Nitro RTX 4050 at the
+      default quality. Write the numbers down in `docs/wiki/technical/performance.md`.
 - [x] **Density settings per feature** (scenery, grass, resource nodes, particles, weather counts), tied to the
       quality preset from 2a, so lower presets draw less, not only at a lower resolution.
 - [x] Batching, culling and level of detail where the overlay shows the need (scenery first).
@@ -772,8 +772,11 @@ support (40) need numbers to stay under.
 
 Implemented: F3 / Graphics overlay, five live density sliders, spatial scenery/grass batches, resource and static
 prop batching, distant actor culling, and a real-WebGL per-planet regression script. See [measurements, ceilings and
-reproduction steps](docs/performance.md). **Target status:** the available Intel UHD test machine remains below
-60 FPS; Iris Xe default-quality validation and further frame-time optimization remain performance work.
+reproduction steps](docs/wiki/technical/performance.md). **Target status:** the available Intel UHD test machine remains below
+60 FPS. On 2026-10-17 the owner replaced the uncertain Iris Xe device requirement with the Acer Nitro ANV15-51's
+RTX 4050 as the default desktop reference, preserving 1080p High, timing and count limits. Other machines supply
+additional functional/compatibility checks; mobile performance remains TODO 40. Default-reference validation and
+further frame-time optimization remain performance work.
 
 ---
 
@@ -798,7 +801,7 @@ Promoted from the suggested additions (tutorial, death screen). **Size:** M. **N
 
 Implemented: an action-driven, skippable first walk with pause-menu replay, Journal Help and saved progress/seen
 tips. Prompts follow the current hero and bindings; the fainting recap identifies enemies and hazard owners and
-preserves its countdown across Continue. Original v1 saves still load. See [tutorial notes and screenshots](docs/tutorial.md).
+preserves its countdown across Continue. Original v1 saves still load. See [tutorial notes and screenshots](docs/wiki/systems/tutorial.md).
 Verified: 134 unit tests, all 21 gameplay simulations, and real-browser refresh/replay, help and fainting checks
 at 720p and 1080p for all three heroes.
 
@@ -831,7 +834,7 @@ brews, and each combat piece has one replaceable rune without changing rarity. O
 independent potion/pet timers. Existing essential recipes stay available. Learned recipes, favourites, enchantments
 and meal timers persist in version-1 saves, including old-save defaults. Bulk exchanges preflight exact bag capacity
 and pool fuel before spending anything; their output counts toward crafting achievements. See
-[docs/crafting.md](docs/crafting.md) for recipes and discovery sources.
+[docs/wiki/systems/crafting.md](docs/wiki/systems/crafting.md) for recipes and discovery sources.
 
 ## 23. Balance and pacing pass **(core)**
 
@@ -854,7 +857,7 @@ Merges the two high-priority balance items from the suggested additions. **Size:
     intended, but by this much?).
 - [x] **Targets first** (risk 5), reported by the sims per hero: a regular monster falls in 2–6 s at the planet's
       expected level; a mini boss takes 1.5–3 min, a boss 3–5 min; a natural play-through reaches each boss's summon
-      level (2, 4, 6) without grinding. Write them in `docs/balance.md`.
+      level (2, 4, 6) without grinding. Write them in `docs/wiki/game-design/balance.md`.
 - [x] Balance and pacing (was a suggested addition): play through with each hero and tune the numbers that were set by
       hand and never tested together: energy drain, node regrow times, crop growth, fuel costs, mini boss health, coin
       prices and shop costs.
@@ -867,7 +870,7 @@ Merges the two high-priority balance items from the suggested additions. **Size:
 Implemented: combat/resource tuning, longer bosses and mini bosses, fairer melee dive punish windows,
 energy/growth/fuel and seed-price adjustments, and coin/XP budgets covering first visits without respawn grinding.
 All nine hero/planet timing profiles meet the documented targets. Reports expose individual monster outliers,
-Doom warnings, transition timing, flying damage and HP top-ups. See [docs/balance.md](docs/balance.md) for the
+Doom warnings, transition timing, flying damage and HP top-ups. See [docs/wiki/game-design/balance.md](docs/wiki/game-design/balance.md) for the
 target definitions, raw measurements, economy ledger and verification limits.
 
 ---
@@ -903,7 +906,7 @@ Code: `src/gameplay/PlanetProgression.js`, new `src/gameplay/Portals.js`, `src/w
 **Implemented (2026-10-11):** village lantern gates and a paused destination picker replace automatic departure.
 Wayfarer's Keys allow early one-way travel, with saved return restrictions and one-time no-hit rewards. Planet
 chest/resource deltas, farms, ground loot, defeated bosses and local progress survive revisits and Continue.
-Regular monsters respawn; resources regrow by elapsed unpaused play time. See [portal rules and saves](docs/portals.md).
+Regular monsters respawn; resources regrow by elapsed unpaused play time. See [portal rules and saves](docs/wiki/systems/portals.md).
 
 ## 25. Building **(core)**
 
@@ -931,13 +934,13 @@ Code: new `src/gameplay/Building.js`, `src/config/placeables.js`, `src/world/` (
 **25a implemented (2026-10-12):** a separate claimable cottage on each planet, five craftable furnishings in fixed
 indoor spots, bag/hotbar placement and safe furniture removal, and an own bed with naps/night sleep and energy
 recovery. Homes persist through portal visits, indoor Continue and version-1 saves; existing villagers keep their
-houses. 25b and 25c are implemented below. See [cottage controls, recipes, screenshots and saves](docs/home.md).
+houses. 25b and 25c are implemented below. See [cottage controls, recipes, screenshots and saves](docs/wiki/systems/home.md).
 
 **25b implemented (2026-10-13):** 13 craftable outdoor placeables, ground/grid ghost previews, quarter-turn rotation,
 protected terrain and occupied-footprint checks, safe pickup, 24-stack storage chests with quick-stacking,
 bag sorting that preserves the hotbar, working crafting stations and farm plots, outdoor bed rest, movement/camera
 colliders, bounded nearby lantern lighting, and separate per-planet saves through portal travel and Continue.
-Walls, floors and roofs are implemented in 25c below. See [building controls, recipes, screenshots and saves](docs/building.md).
+Walls, floors and roofs are implemented in 25c below. See [building controls, recipes, screenshots and saves](docs/wiki/systems/building.md).
 
 **25c implemented (2026-10-13):** craftable Timber Floors, wall/door/window panels and Shingled Roofs; connected
 4-metre tiles on a shared foundation plane; rotatable floor-edge attachments and opposite-wall roof support;
@@ -945,7 +948,7 @@ walkable square floors, open doorway movement, roof ceilings and camera cutaways
 stations; attachment management, safe dependency/connectivity-aware pickup and topological per-planet save restore.
 Shelters are ground level, bounded to five tiles per side where terrain permits; walk physically inside in the
 outdoor world. A separate indoor house instance and upper storeys are not part of this implementation. See
-[structure controls, recipes, screenshots and saves](docs/structures.md).
+[structure controls, recipes, screenshots and saves](docs/wiki/systems/structures.md).
 
 ---
 
@@ -981,7 +984,7 @@ counts across planets, which conflicts with a deliberately small Moon. These are
 | TODO | Whole-item estimate | Fits one five-hour session? | Replacement stages |
 | --- | --- | --- | --- |
 | 26 Groundwork | 9-16 h | No: registry, mechanic lifecycle, physics and progression are separate integration changes | 26a-26d |
-| 27 Tidewhisper | 18-33 h | No: moving water plus a complete ecosystem and two original fights | 27a-27h |
+| 27 Tidewhisper | 18-33 h core; 3-5 h otter follow-up | No: moving water plus a complete ecosystem and two original fights | 27a-27i functionally complete; public performance gate pending |
 | 28 Gear sets / hero depth | 12-21 h | No: set procs and three saved ability trees exceed the original M label | 28a-28e |
 | 29 Caves | 18-30 h | No: lighting, flat-space combat, saves, puzzles and five planet configurations | 29a-29g |
 | 30 Duskhollow | 20-37 h | No: lantern rules, four behaviors, accessibility and two light-dependent fights | 30a-30i |
@@ -989,6 +992,8 @@ counts across planets, which conflicts with a deliberately small Moon. These are
 | 32 Lantern Moon | 18-30 h | No: small terrain still needs gravity, three behaviors and a five-boss crossover | 32a-32g |
 
 **How stages land:** each letter is an independently tested feature branch following `AGENTS.md`, like 25a-25c.
+For multistep TODOs, each stage branches from and merges into its `feat/todo-<N>` parent; only the completed parent
+merges into `develop` after all required stages and combined acceptance checks pass.
 Stage completion is tracked below. Keep the original checklists as the parent acceptance criteria; finishing a letter
 does not finish its parent. Partial worlds and encounters can be exercised through a development harness, but stay out
 of normal campaign travel until their release stage passes the full checklist. Groundwork must distinguish the content
@@ -1000,7 +1005,8 @@ seeded object ids and the original three-world campaign must continue to work at
 rematches (31a-d) can land between worlds after their own dependencies; 31g is independent of the Moon. Expansion cave
 configs (29g) follow the released worlds they use, so Duskhollow only depends on the lighting stage, not its own cave.
 Tide/Dusk/Star set items land with their worlds and use the set system once 28a exists; this avoids 27 depending on 28.
-The 27h go/no-go result may revise later estimates before work starts.
+The 27h functional go/no-go result may revise later estimates before work starts. Tidewhisper's separate hardware
+performance certification gates public release to `master`, not the start of 28, 29g or 30.
 
 **Verification:** each stage adds focused rules/save/simulation checks for its behavior and runs both complete suites.
 Visible changes also need browser checks at 720p/1080p and the lowest quality preset; major world releases refresh the
@@ -1035,7 +1041,7 @@ saved object positions are preserved. Keys/direct transitions cannot reach unfin
 night-authorized trips survive dawn during their fade. Main completion excludes secrets, the Act I award requires its
 original bosses, and small secret rosters may declare a tested population minimum. All 174 unit tests, 29 simulations
 and the 720p/1080p browser checks passed, including v1 Continue and pre-extraction layout/arrival fixtures.
-See [catalog, release and compatibility rules](docs/planets.md).
+See [catalog, release and compatibility rules](docs/wiki/world/planets.md).
 
 **26b implemented (2026-10-13):** a pure mechanic registry and world-owned controller restore cleaned per-planet
 state and apply away time before entry and actor/resource population. Frame updates precede physics and freeze on
@@ -1043,7 +1049,7 @@ the title and pause; naps/sleep notify a separate bounded advancement hook once.
 retain one active instance, with exit/listener cleanup before world disposal. Optional v1 snapshots default safely
 for old saves and reject unknown/mismatched modules; the original fixture is unchanged. A development-only module
 proves ordering and independent state through real keyed travel and reload Continue. All 181 unit tests, 30 simulations
-and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/mechanics.md).
+and 720p/1080p browser checks passed. See [mechanic lifecycle and save hooks](docs/wiki/technical/planet-mechanics.md).
 Actual tides, lantern darkness and lunar gravity remain their owning world stages; shared progression follows in 26d below.
 
 **26c implemented (2026-10-13):** shared planet gravity composes with actor acceleration and Moon-Hop. Live pond
@@ -1054,7 +1060,7 @@ config and mechanic saves on Continue/travel and reset on disposal. Sea meshes/m
 once; the sea shader uses world-space ripples/glints. Development-only fixtures prove moving water, real hero
 gravity, high-water safety, crop/build preservation, keyed travel, Continue and old-v1 compatibility. All 186 unit
 tests, 31 simulations and 720p/1080p low-preset browser checks passed, including original layout digests and visible
-pond/sea captures with zero page/shader errors. See [shared gravity and moving water](docs/world-physics.md).
+pond/sea captures with zero page/shader errors. See [shared gravity and moving water](docs/wiki/technical/world-physics.md).
 No Tidewhisper content or timed tide cycle is enabled; Act II progression follows in 26d below.
 
 **26d implemented (2026-10-13):** cap 16 extends the unchanged XP curve, and old level-10 v1 saves resume gaining
@@ -1067,7 +1073,7 @@ recorded Iris Xe 720p low performance evidence. Only the secret Moon waives a mi
 farm/cave with a small population floor. Original Act I content is grandfathered through the common checks;
 its outstanding hardware target is not newly certified. All 195 unit tests, 32 simulations and 720p/1080p low
 browser checks passed, including Continue, portal release guards and masked secret text. See
-[progression and release acceptance](docs/content-release.md). Actual expansion content remains in TODOs 27/30/32;
+[progression and release acceptance](docs/wiki/technical/content-release.md). Actual expansion content remains in TODOs 27/30/32;
 the next main-world stage is 27a.
 
 - [x] **One file per planet** in `src/config/planets/<id>.js`, with `PLANETS` assembled in campaign order, each with
@@ -1100,14 +1106,15 @@ the next main-world stage is 27a.
 
 **Goal:** a planet of islands, tide pools and lighthouses, and the test run for the groundwork (26).
 Code: `src/config/planets/tidewhisper.js`, `src/world/mechanics/tides.js`, new behaviours and models, a boss in
-`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL, in eight stages. **Needs:** 26a-26d.
+`src/entities/enemies/behaviors/boss/angler.js`. New in Round 3. **Size:** XL, eight completed core stages plus an otter follow-up stage. **Needs:** 26a-26d.
 Reuses on purpose: swimming (11), fishing (16), fuel (17), facing-based aiming (14).
 **Risk:** the moving sea touches physics, spawning, monster AI (monsters that end up in water), nodes and the farm.
 **Recommendation:** keep the tide range small (about 1.5 m), mark the tidal band in the height field, and only place
 things meant for it there (tide pools, clams, driftwood). The farm sits above the high-tide line.
 
-**Five-hour assessment:** eight stages. The shared moving-water queries must work before the archipelago is built;
-bosses and release balancing each get their own session. The otter remains optional after the release budget is measured.
+**Five-hour assessment:** eight core stages. The shared moving-water queries must work before the archipelago is built;
+bosses and release balancing each get their own session. The owner placed the otter in the first pending stage (27i)
+after the 27h functional merge; it has a separate estimate and public-release performance gate.
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
@@ -1116,9 +1123,146 @@ bosses and release balancing each get their own session. The otter remains optio
 | [x] **27c. Resources, weather and music** | 27a | 2-4 h | Add the listed materials, low-tide clam beds, high-tide washups, rare pearl beds and food recipes; sea mist/squall and the procedural waltz with travel-safe theme switching. Prove washups cannot duplicate rewards after reload/time skips and farms remain above high water. Tide gear definitions arrive here, with set bonuses added through 28a. |
 | [x] **27d. Village and lighthouse quest** | 27b-27c | 2-4 h | Build the stilt village, fishing pier, two interiors, Marlo, lens/fuel quest and traveler outfits/arrival lines. Register level-8, quest and low-tide boss-gate conditions; test their predicates before the boss exists and preserve quest/interior progress through Continue and revisits. |
 | [x] **27e. Regular enemy roster** | 27a, 26d | 3-4.5 h | Implement Shellback/armoured, Jellybell/drifter and Surf skipper/amphibian modules, original models, sea-green returning wisps, loot and bestiary pages. Simulate front-shell refusal, tide drift/sting, surf retreat and recovery when the water changes. |
-| [ ] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
-| [ ] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
-| [ ] **27h. Campaign release and go/no-go** | 27a-27g | 1-3.5 h | Complete the content gate, three-hero pacing/balance, full travel/Continue browser path, performance measurement and affected tour/screenshots; then enable the released destination. Record actual session costs and groundwork fixes before approving work on Duskhollow. Otter work requires a separate estimate after this gate. |
+| [x] **27f. Old Ironclaw** | 27c, 27e | 2-4 h | Add the mini boss, bell shockwave, 66/33 shell changes, low-tide wedging vulnerability and pearl-bed reward. Verify telegraphs, damage windows, defeat persistence and fair access for every hero. |
+| [x] **27g. Mirelure encounter** | 27d-27f | 3-4.5 h | Implement false/real lures, surfacing, the 50% sluice break, beached moves, timed reflood, surf ring and Tide Crown. Test all phases, the configured gate, death/retry and reload without lost or duplicate rewards. |
+| [x] **27h. Functional integration and go/no-go** | 27a-27g | 1-3.5 h | Complete the non-performance content gate, three-hero pacing/balance, full travel/Continue/save/completion browser path through the test-only candidate, and affected screenshots/tour. Record the reference performance matrix and its verdict, actual session costs and groundwork fixes. Merge tested functional work to `develop` with Tidewhisper unreleased if the public-release performance gate is still failing. The otter needs a separate estimate. |
+| [x] **27i. Pearl-diving otter pet** | 27b, 27c, 27h | 3-5 h | Add an otter companion, its pearl-dive ability and Tidewhisper unlock using the existing pet system. Check bounded pearl yields, save/Continue, travel, menu and selection, all three heroes, a reviewed feature shot and rendering cost. Built behind the unreleased world fixture; include the otter in a fresh full Acer acceptance matrix before public enablement. The current 0/18 timing result gives no release headroom. |
+
+**27 release step 2 checkpoint (2026-10-21):** The 26 release-flag unit failures have been resolved in the
+validation branch. Both the hidden-world and temporary four-world unit suites pass 278/278; the latter run
+restored `released: false` afterward. The low-tide villager hint, cottage telescope placement, Silver Sprat fish
+tag, and Mirelure roll damage are corrected. The two-seed, three-hero balance gate passes 18/18 checked rows.
+Production travel/save/Continue checks and final integration remain open; see the
+[release handoff](docs/wiki/technical/tidewhisper-release.md#step-2-resolution-checkpoint-2026-10-21).
+
+**27 release step 3 checkpoint (2026-10-21):** The validation branch now enables the authored Tidewhisper
+destination. `npm test` passes 278/278. A production-entry Edge smoke, with no candidate fixture, passes title,
+portal, travel, partial save/Continue, return, Mirelure completion, one Tide Crown after reload and an older v1 save,
+with zero page/shader errors. Its portal shot was reviewed. Full suites, a fresh final-commit Acer matrix, the
+screenshot tour and integration remain step 4; the public `master` merge still needs separate confirmation.
+
+**27 release step 4 checkpoint (2026-10-22):** The four-world validation branch passes 278/278 unit tests,
+all 62 simulations, all 38 browser smokes after resolving legacy three-world expectations and rerunning one
+intermittent coastal bolt check, and the full screenshot tour (`errors: none`). The two-seed, three-hero Tidewhisper
+balance audit passes all 18 checked rows. Visual review caught a pier screenshot filmed through geometry; the
+staging was fixed and both campaign captures retaken. Fresh clean-commit Acer RTX 4050 matrices on the enabled
+branch, still using the historical candidate browser fixture, failed the unchanged 16.67 ms p95 limit: first 17/18 timing rows passed (seed 1 witch squall 17.0 ms),
+then 16/18 (the same row 18.2 ms and seed 7 witch night 17.1 ms). Render-count rows passed. **No integration
+into `develop` or public release is authorized by these results.** Repeat the full matrix under comparable idle
+machine conditions or improve the measured path, then rerun changed checks and complete the release workflow.
+The collector was then changed to require the ordinary production entry for `--release`; the final result follows.
+The earlier 18/18 reference used a prior commit and is retained as history, not final certification.
+
+**27 release accepted for `develop` (2026-10-22):** A clean production-entry Acer RTX 4050 run on commit
+`e81e2ad` passed all 18 timing and render-count rows at 1080p High with the otter in every row and zero
+page/shader errors. Frame p95 was 12.8-15.2 ms against the unchanged 16.67 ms limit; peaks were 476/550 draw
+calls and 210,141/230,000 triangles. The report is [the release evidence](docs/releases/tidewhisper.json).
+The earlier fixture runs are retained as failed diagnostics. Unit, simulation, browser, balance, production
+travel/Continue and reviewed screenshot checks above complete the TODO 27 acceptance gate. Tidewhisper is enabled
+for the tested `develop` integration; public `master` still requires the owner's release confirmation.
+
+**27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
+27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
+Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.
+
+**27i implemented (2026-10-20):** The Dark Lighthouse now unlocks a walking otter. Pearl Dive consumes a submerged,
+ready clam bed for one pearl, with a 90-second cooldown and two successful dives per day. Its count and cooldown
+survive Continue and travel. Candidate simulation checks all three heroes, yields, daily renewal and reset; the
+browser smoke checks real menu/ability input, 720p/1080p fit, Continue and error-free rendering. The reviewed
+feature shot is `docs/screenshots/pets/otter.jpg`; the model adds 14 meshes and 1,068 triangles. The authored
+Tidewhisper release flag stays off. A fresh full Acer 18-case acceptance run including the otter is still required
+before public enablement; the prior 0/18 timing result is not a pass.
+
+**27i integration decision (owner, 2026-10-20):** integrate the tested, hidden otter functionality into `develop`
+under the approved 27h functional/public gate split. This does not enable Tidewhisper or replace the required fresh
+18-case Acer acceptance matrix before public release.
+
+**27 release validation (2026-10-21):** the fresh Acer RTX 4050 matrix now includes the otter in every hero/seed/scene
+row and passes all 18 timing and render-count cases at 1080p High in the native display mode (p95 13.5–16.2 ms
+against 16.67 ms; peak 476 calls and 210,141 triangles). The content gate accepts the resulting real evidence.
+Tidewhisper remains `released: false`: enabling its production flag exposed 26 failing unit tests tied to the
+four-world transition, so the flag was restored. Bring those checks and the real production travel/Continue path
+through acceptance before declaring the destination releasable. See the [release handoff](docs/wiki/technical/tidewhisper-release.md#fresh-reference-result-and-production-no-go-2026-10-21).
+
+**27h gate split (approved 2026-10-19):** the owner's approved fallback separates functional completion from
+hardware certification after a clean 18-case Acer RTX 4050 rerun. Functional completion of 27h unblocks 28, 29g
+(still also needing 30i) and 30 on `develop`. It does **not** make Tidewhisper a released destination or authorize a
+`master` merge. The public-release gate remains the unchanged 60 FPS p95 frame-interval target at 1080p High, the
+550-call/230,000-triangle ceilings, all 18 hero/seed/scene cases on the Acer RTX 4050, the content gate, and the
+owner's separate release confirmation. Keep `released: false` and use only test fixtures for world-4 travel until
+that gate passes. A passing report and a separately tested destination enablement are required before public release.
+
+**27h synchronized hardware verdict (2026-10-19):** the primary display was confirmed at 165 Hz; visible Edge
+on the active RTX 4050 clocked 6.1/6.3 ms (median/p95). At the panel's supported 60 Hz mode its empty-page clock
+was 16.7/16.8 ms, setting the unchanged limit to 16.80 ms. On clean candidate `92d02e2` after the 29a-29f cave
+merge, all 18 cases completed with zero browser/shader errors. **0/18 timing rows passed** (p95 17.4–18.2 ms);
+**18/18 count rows passed** (peak 474/550 calls and 209,113/230,000 triangles). Average FPS was 59.04–60.03.
+No release artifact was written and the panel was restored to 165 Hz. This is a no-go for public enablement;
+functional checks and integration follow under the approved split. See the [full matrix and handoff](docs/wiki/technical/tidewhisper-release.md#synchronized-60-hz-acceptance-matrix-2026-10-19).
+
+**27h functionally implemented (2026-10-19):** on the cave-synchronized candidate, the readiness test finds only
+missing performance certification; six hero/seed profiles pass all 18 checked duel/roster bands with the same
+numbers as the pre-cave baseline, and the pacing audit passes level-8 XP, 281–360 coins for a 280-coin set,
+and one/two-day lighthouse plus gear material yields. The test-only candidate exercises real portal travel,
+partial quest/node save and Continue, return travel, the low-tide/quest gate, completion and one Tide Crown through
+reload at 720p/1080p. All 275 unit tests, 58 simulations and 25 relevant Edge browser scripts pass, including
+cave matrix/pixel equivalence and the four cave checks. The full screenshot tour completed with `errors: none`;
+Tidewhisper captures were reviewed and the boss shots were restaged to remove fixture HUD clutter and show
+Mirelure clearly. Unrelated check retakes were restored. Tidewhisper stays `released: false`; the 18-case frame
+gate is a public-release no-go. The measured session cost and go/no-go assessment are in the handoff and work log.
+
+**27h in progress (2026-10-15):** release validation continues on `feat/todo-27h-campaign-release`, from parent `feat/todo-27`.
+The earlier `feat/todo-27h-release-validation` checkpoint is preserved in its history.
+Mirelure's breathing clue now shares its clock with the bubbles, and diving cancels unfinished surface attacks.
+Candidate checks use the real fourth-world id and save schema; they exposed missing forage/chest configuration,
+which is now explicit. The normal release flag remains off. Initial Intel UHD diagnostics do not meet the required
+Iris Xe evidence under the original reference (superseded by the owner's Acer decision below). Duel balance now passes on both seeds for all heroes (Ironclaw wedges once per shell, HP 800;
+Mirelure HP 3250), and the pacing audit covers Tidewhisper's XP, coins (new Tide forge fees) and materials.
+Default-reference acceptance and the release itself remain. This is a **no-go** for
+release and for approving Duskhollow, pending the remaining checks. See the [27h handoff](docs/wiki/technical/tidewhisper-release.md).
+
+**27h sync/audit checkpoint (2026-10-17):** current child `feat/todo-27h-campaign-release` is synchronized from
+parent `feat/todo-27`; published old-stage history is preserved. 239 unit tests, all 52 simulations, affected
+content-gate rerun, campaign/encounter browser checks and 18 strict balance checks pass. Actual Acer UHD diagnostic:
+18 cases / 2,160 frames at 720p Low, 37.5-44.6 FPS and p95 26.4-32.8 ms; zero cases meet the fixed frame budget,
+and 8 exceed the 550-call ceiling (peak 636). Keep release/next-world approval pending; profile draw-call peaks
+and obtain target-device evidence. See the [current handoff](docs/wiki/technical/tidewhisper-release.md).
+
+**27h validation-machine decision (2026-10-17):** the owner selected the current Acer Nitro ANV15-51 / RTX 4050
+Laptop GPU as the default validation reference. Other available machines provide additional validation and
+compatibility coverage; Iris Xe access no longer blocks 27h. The collector now measures the existing desktop goal
+at 1920x1080 High rather than its earlier 720p Low diagnostic profile. The 60 FPS/frame-clock rule and 550-call /
+230,000-triangle ceilings are retained. First RTX 4050 matrix still fails timing/count acceptance; optimization
+and final clean-candidate validation are in progress. No destination release flag has changed.
+
+**27h step 1 diagnostic (2026-10-17):** completed a 24-row ABBA comparison of the hidden-actor matrix skip,
+all heroes/seeds 1/7, with identical fixed poses and per-frame draw counts. Four profiles improve p95, two worsen;
+this is render-only evidence, not a whole-game acceptance pass. Removed unchanged prompt/chip HTML rewrites and
+computed-style reads in the edge-marker loop. The new UI simulation and 720p/1080p browser check cover these
+changes; full regression suites, clean normal 18-case performance acceptance and release work remain pending.
+See [the comparison and trace findings](docs/wiki/technical/tidewhisper-release.md#step-1-controlled-render-comparison).
+
+**27h step 2 regression (2026-10-17):** 243 unit tests, all 53 simulations (including terrain timing), and all
+17 affected Edge browser checks pass. The tutorial check exposed a 3-pixel overflow in the 720p main pause page;
+its viewport height allowance is now scoped to that page, with the strict assertion retained and tutorial/save
+reruns passing. Older save/portal/tutorial checks now collect shader errors and close browsers with a bounded
+timeout; save checks cover both resolutions. Ordinary clean 18-case hardware acceptance is next; release stays off.
+See [the regression record](docs/wiki/technical/tidewhisper-release.md#step-2-full-regression-checks).
+
+**27h step 3 acceptance attempt (2026-10-17):** ordinary clean `da96f77` run, all 18 cases / 2160 samples on the
+RTX 4050 at 1080p High. All draw/triangle budgets pass, but only 5/18 cases meet the unchanged 16.67 ms p95 limit
+(76.02-102.24 average FPS; p95 13.8-20.7 ms). Zero page/shader errors. The collector correctly failed and wrote no
+release evidence. Step 3 remains open: diagnose the failing live scenes, improve frame pacing, recheck affected
+code and repeat clean acceptance before destination enablement. See [the result matrix](docs/wiki/technical/tidewhisper-release.md#step-3-ordinary-hardware-acceptance-attempt).
+
+**27h step 3 optimization checkpoint (2026-10-18):** profiled live rendering, skipped clean immutable subtree
+walks and added conservative actor-frustum bounds derived from geometry/current transforms. Pixel controls preserve
+all four worlds; paired six-profile render diagnostics improve with exact pose/draw matches. Final affected checks
+pass 248 units, six sims and three Edge browser scripts. A collector cleanup race was fixed and audited. Ordinary
+clean `c3375f0` acceptance still passes only 5/18 timing rows (p95 14.4-23.6 ms), although every count budget passes
+and page/shader errors are zero. Step 3 remains open; isolate live CPU/host-memory stalls and repeat full acceptance.
+Steps 4 (enable/production checks) and 5 (tour/docs/full integration) remain pending; Tidewhisper stays unreleased.
+See [the current handoff](docs/wiki/technical/tidewhisper-release.md#step-3-live-recheck-after-frustum-gating).
 
 **27a implemented (2026-10-13):** fixed six-island terrain, two tidal sandbars, sandy shores/shallow-water coloring,
 raised village/house sites and a reserved high-water-safe farm site. The registered tide mechanic follows one
@@ -1129,7 +1273,7 @@ Development-only borrowed actors/resources prove real low/high traversal, swimmi
 stable node positions, pause, sleep, keyed travel, reload Continue and original-v1 compatibility. All 199 unit tests, 33 simulations
 and 720p/1080p low browser checks passed. Tidewhisper remains unreleased; actual stilt-village content,
 flora/wildlife, resources/weather/music, enemies/fights and measured release performance remain 27b-27h.
-See [terrain, controls and development previews](docs/tidewhisper.md). Flora/wildlife follows in 27b below.
+See [terrain, controls and development previews](docs/wiki/world/tidewhisper.md). Flora/wildlife follows in 27b below.
 
 **27b implemented (2026-10-13):** lantern palms with glowing coconuts/wood gathering, shader-swaying kelp,
 non-wood coral fans, dune grass, sea thrift and sea lavender; original ambient crab/turtle/seal bodies;
@@ -1140,7 +1284,7 @@ Fixed scenery/animal/fish caps and quality-independent placement are tested. The
 drained water, gathering, respawn, charm/equipment Continue and disposal are verified in gameplay and low-preset
 browser checks. All 201 unit tests, 34 simulations and 720p/1080p low browser checks passed. Tidewhisper remains
 unreleased: resources/weather/music, village, enemies/fights and measured
-release performance remain 27c-27h. See [coastal flora/wildlife](docs/tidewhisper.md#coastal-flora-and-wildlife-27b).
+release performance remain 27c-27h. See [coastal flora/wildlife](docs/wiki/world/tidewhisper.md#coastal-flora-and-wildlife-27b).
 Stage 27c adds 54 resource nodes, saved washup claims, shore fishing, coastal recipes/Tide gear, dawn mist, squall whitecaps and a procedural waltz. All 205 unit tests, 35 simulations and 720p/1080p low browser checks pass; the world remains unreleased.
 
 **27d implemented (2026-10-13):** stilt village, supported high-water fishing pier, Saltwind Kitchen and keeper
@@ -1158,12 +1302,30 @@ tide and sting in a ring. Skippers lurk untargetable, then leap and retreat. A s
 monsters in the sea; stranded ones crawl back and recover when water returns. New optional `steer`/`refuses`
 behaviour hooks; sea-only projectile flight fixes (Act I balance report unchanged). All 208 unit tests, 38
 simulations (including a level-8 duel for each hero) and the 720p/1080p low browser checks pass. Tidewhisper remains
-unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper.md#regular-enemy-roster-27e).
+unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/wiki/world/tidewhisper.md#regular-enemy-roster-27e).
 
-- [ ] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
+**27f implemented (2026-10-14):** Old Ironclaw, a hermit crab in a sunken bronze bell, guards the black pearl beds on
+the far beach (beds refuse gathering while it lives). The bell refuses blows and rings a jumpable, stunning shockwave
+(pets only clang); the face takes a guarded share. It opens up (bonus damage from any side) while swapping shells at
+66%/33% and when a low-tide charge ploughs it into wet sand. Pinch, charge and toll have wind-up warnings. It drops two
+black pearls and stays beaten through Continue and revisits; a faint resets the fight. New optional `damageScale`
+hook. All 210 unit tests, 40 simulations and the 720p/1080p low browser checks pass. A level-8 duel for each hero wins
+on two seeds (mostly 148-195 s against the 90-180 s target; final pacing is 27h). Tidewhisper remains unreleased.
+Next: 27g, Mirelure. See [Old Ironclaw](docs/wiki/world/tidewhisper.md#old-ironclaw-27f).
+
+**27g implemented (2026-10-14):** Mirelure wakes through the level-8, relit-lighthouse and low-tide gate inside a ring
+of crashing surf. While the lagoon is full she is untargetable and lights false lures; the real one dims in time with
+her breathing bubbles and surfaces her when struck, and false ones burst. Geysers mark the hero. At 50% she smashes the
+sluice, the lagoon alone drains, and she is beached (thrash, roll, bite) while the water creeps back on a timer; then
+she dives to more lures. A faint, leaving or reload resets lures, lagoon and sluice; the Tide Crown comes once. Tide
+mechanic: optional gradual reflood and `activeTides()`. Level-8 duels for each hero win on two seeds in 175-265 s.
+Tidewhisper remains unreleased. Next: 27h, campaign release and go/no-go.
+See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
+
+- [x] **Shape and look:** an archipelago with the sea over most of the planet and a few big islands joined by
       sandbars. Sand, sea-green grass, turquoise shallows, deep blue water, and a peach-and-aqua sky. The village stands
       on stilts on the largest island, with a pier for fishing.
-- [ ] **Tides:** the sea rises and falls once a day (low in the afternoon, high at night). Low tide opens sandbars,
+- [x] **Tides:** the sea rises and falls once a day (low in the afternoon, high at night). Low tide opens sandbars,
       tide pools (crabs, clams, pearls) and the causeway to the boss lagoon; high tide floods them (swim across;
       swimming drains energy faster, 16). Driftwood and shells wash up on the flats at each high tide, a reason to come
       back. A tide chip sits next to the clock.
@@ -1174,10 +1336,10 @@ unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper
   - **Surf skippers:** mudskipper raiders that ambush from the surf and slip back into deep water where you can't
     follow on foot.
   - Returning: a few wisps, sea-green.
-- [ ] **Mini boss: Old Ironclaw,** a giant hermit crab wearing a sunken bronze bell. The bell takes no damage and rings
+- [x] **Mini boss: Old Ironclaw,** a giant hermit crab wearing a sunken bronze bell. The bell takes no damage and rings
       a stunning shockwave when hit; Ironclaw is open when it pulls out to swap shells (at 66% and 33%) or when a charge
       wedges it in the sand at low tide. It guards the black pearl beds on the far beach.
-- [ ] **Boss: Mirelure, the Lantern Angler,** a huge anglerfish whose lure is a lantern that once drew ships onto the rocks.
+- [x] **Boss: Mirelure, the Lantern Angler,** a huge anglerfish whose lure is a lantern that once drew ships onto the rocks.
   - Wakes when: level 8, Marlo's quest is done (the lighthouse relit) and the tide is low enough to cross the causeway.
   - Phase 1, lagoon flooded: only her lure shows, and she lights false lures around the lagoon. Strike the real one (it
     flickers in time with her breathing) and she surfaces; strike a false one and it bursts.
@@ -1197,7 +1359,7 @@ unreleased. Next: 27f, Old Ironclaw. See [regular enemy roster](docs/tidewhisper
 - [x] **People:** Marlo the lighthouse keeper (lines, tips for Mirelure, and the quest "The Dark Lighthouse": seaglass for a
       new lens and fuel to light it); stilt houses with two interiors; beach outfits for the travelling villagers.
 - [x] **Music:** a slow waltz over a sea-swell pad, made in code.
-- [ ] Optional, only if the world comes in under budget: an otter pet that dives for pearls.
+- [x] An otter pet that dives for pearls (27i; public unlock requires a passing release budget).
 - [ ] **Go / no-go check** once it plays end to end: how long it took, what the groundwork (26) got wrong, and whether
       the checklist was too much. Fix 26 before starting 30, or cut Duskhollow down to fit.
 
@@ -1213,11 +1375,70 @@ Keep trees small: each hero gets a bounded, documented set of ability upgrades/a
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **28a. Set bonuses** | 26d; 27c for Tide acquisition | 3-4.5 h | Count distinct equipped pieces, apply two/three-piece Moss/Ember/Frost effects, show bonuses in equipment UI and attach the Tide set. Test burn/chill/healing, equip/unequip, hero compatibility and load without duplicate procs. Dusk/Star definitions and acquisition belong to 30c/32b and reuse this contract. |
-| [ ] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
-| [ ] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
-| [ ] **28d. Warrior talents** | 28b | 2-4 h | Implement the warrior tree, including wider Cleave or another bounded variant. Test arcs, costs/cooldowns, reset, saves and boss windows; expose the tree only after these pass. |
-| [ ] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
+| [x] **28a. Set bonuses** | 26d; 27c for Tide acquisition | 3-4.5 h | Count distinct equipped pieces, apply two/three-piece Moss/Ember/Frost effects, show bonuses in equipment UI and attach the Tide set. Test burn/chill/healing, equip/unequip, hero compatibility and load without duplicate procs. Dusk/Star definitions and acquisition belong to 30c/32b and reuse this contract. |
+| [x] **28b. Talent rules, saves and UI** | 28a | 3-4.5 h | Add point accrual, prerequisite/cost rules, validated per-adventure saves, a clickable talent page and free village-wizard reset. Prove level-up/Continue cannot duplicate points and reset restores the base kit. Use a development fixture; expose a hero's tree only when its following stage is complete. |
+| [x] **28c. Witch talents** | 28b | 2-4 h | Implement a small real witch tree, including an ability alternative such as homing Fireball, descriptions and casts. Test selection/reset, projectiles, save round trips and pacing with base versus upgraded builds. |
+| [x] **28d. Warrior talents** | 28b | 2-4 h | Implement the warrior tree, including wider Cleave or another bounded variant. Test arcs, costs/cooldowns, reset, saves and boss windows; expose the tree only after these pass. |
+| [x] **28e. Ranger talents and depth acceptance** | 28c-28d | 2-4 h | Implement the ranger tree with equivalent bounded upgrades; verify all three trees, mixed set/talent effects, village reset, UI and balance together. Parent 28 is complete after later worlds also supply their promised set content. |
+
+**28a implemented (2026-10-15):** four sets in `src/config/sets.js`, each a world's armour, head and feet (Moss tier 1,
+Ember tier 2, Frost tier 3) plus the four-piece Tide set (still unreleased with Tidewhisper). Two distinct worn pieces
+turn on a bonus and three raise it: Moss heals 15/30% more (food, potions, regeneration, Mend); Ember hits burn for
+40/70% of the hit over 3 s in 0.5 s ticks (refreshed, never stacked; a burning kill pays XP); Frost hits chill 20/35%
+for 1.5/2 s (slowResist applies; a stronger slow is kept); Tide halves swimming's energy cost and its third piece adds
+a Breaker push. Only the hero's own hits proc, not pets or burn ticks. Effects live in `P.stats.setFx`, recomputed with
+every equip, unequip and load, so nothing is saved twice. The bag's equipment side lists worn sets with lit bonuses and
+set pieces' details show their set. Checked by `tests/sets.test.mjs`, `tests/sim/sets.sim.mjs` and
+`scripts/sets-smoke.mjs`. Balance targets use starting gear, so sets are optional power outside them (see
+`docs/wiki/game-design/balance.md`). The parent checklist stays open until the Dusk (30c) and Star (32b) sets exist.
+
+**28b implemented (2026-10-15):** talent rules, saves and the page, with every real tree still empty and
+`released: false` until 28c-28e. Points come from the level (one at 2, 4 ... 16: 8 by the cap) and are never stored,
+so level-ups and reloads cannot duplicate them; only the ranks are saved (`talents`, per adventure), and a load re-learns
+them in tree order against the level, dropping unknown talents, extra ranks, missing prerequisites and unearned points.
+A talent changes ability numbers per rank (`add`, `mul`, `set`); `kit()` rebuilds the hero's abilities from the base
+table every time, so casts, costs and the HUD cooldowns follow and a reset restores the base kit exactly. The page
+(`src/ui/TalentUI.js`) opens over the pause menu once a tree is released; Old Bramble offers a free reset in dialogue.
+Checked on a test-only tree (`tests/sim/lib/talentFixture.mjs`) by `tests/talents.test.mjs`, `tests/sim/talents.sim.mjs`
+and `scripts/talents-smoke.mjs`. Ability descriptions on other screens still show base numbers: each tree's stage
+(28c-28e) updates them with its talents.
+
+**28c implemented (2026-10-16):** the real Witch tree has Bright Bolt (up to +20% damage), Quick Frost
+(Nova 8 → 6 s), Light Step (Blink 15 → 11 mana), Seeking Flame (a two-point homing Fireball alternative, needs
+Bright Bolt), and Deep Freeze (Nova slows 3.5 → 4.5 s, needs Quick Frost). Ten points of choices fit an eight-point
+earned budget. Seeking Fireball captures the aimed foe, stops tracking dead/hidden targets and flies straight
+without a lock; its damage, blast, cost and range stay unchanged. The HUD, tooltips and Controls use the learned
+kit, including remapped keys. Checked by 234 unit tests, all 46 simulations, paired three-hero throughput samples
+on seeds 1 and 7, and production/fixture talent, save, tutorial and set browser checks (720p/1080p Low for the
+production tree; zero page/shader errors). The README tour was retaken and spot-checked. Staged on `feat/todo-28`,
+pending 28d/28e before integration into `develop`; Warrior and Ranger trees remain unreleased.
+See [tree, saves and checks](docs/wiki/systems/talents.md) and [pacing measurement limits](docs/wiki/game-design/balance.md#witch-talents-28c).
+
+**28d implemented (2026-10-16):** the real Warrior tree has Keen Edge (Axe Cleave up to +20% damage), Quick Spin
+(Whirlwind 7 → 5 s), Steady Guard (Guard 2.5 → 3.5 s), Wide Cleave (a two-point alternative, needs Keen Edge: the
+swing's arc 110° → 170°, same damage, reach, cost and cooldown) and Tempest (Whirlwind reach 3.4 → 4.2 m, needs Quick
+Spin): ten points of choices for eight. Shoulder Charge's per-frame sweep now reads the learned kit like every cast,
+and ability tooltips show a swing's arc. `tests/sim/warriorTalents.sim.mjs` (seeds 1 and 7) proves on real casts
+that a foe 70° aside of a locked target takes nothing from Axe Cleave and full damage from Wide Cleave, Tempest
+reaches a foe 4.6 m away, Guard still cuts a real Gloomcap hit three seconds in only with Steady Guard (32 → 10 HP),
+boss immunity still refuses every talent, and saves, Continue and Old Bramble's reset hold; paired pace samples in
+[balance](docs/wiki/game-design/balance.md#warrior-talents-28d). `scripts/warrior-talents-smoke.mjs` checks the page, HUD, Controls,
+tooltips, keys, reload Continue and the reset in Edge at 720p/1080p. Staged on `feat/todo-28`; the Ranger tree and
+the combined acceptance remain 28e.
+
+**28e implemented (2026-10-16):** the Ranger tree has Steady Aim (Arrow Shot up to +20% damage), Quick Fan (Arrow
+Fan 4 → 3 s), Light Feet (Evasive Leap 15 → 11), Wide Fan (a two-point alternative, needs Quick Fan: 7 arrows over
+60° instead of 5 over 40°, as tightly spaced, so one foe takes the same) and Bramble Snare (Thorn Arrow slow 3 → 4 s,
+needs Steady Aim). Depth acceptance: `tests/sim/talentDepth.sim.mjs` proves set bonuses ride on talent variants
+(Wide Cleave + Ember burns both foes, Wide Fan + Frost chills the foe aside, Seeking Fireball + Ember burns its
+target), Old Bramble resets talents only, unequipping removes set bonuses only, and Continue keeps both. A depth
+balance profile (`BALANCE_BUILD=depth`) found a 28a burn bug: a weaker hit kept a stronger burn alive, halving
+Emberfall fights; fixed, every boss now stays at or above 141 s with sets and talents (seeds 1 and 7; see
+[balance](docs/wiki/game-design/balance.md#sets-and-talents-together-28e)). Checked by `tests/talents.test.mjs`, the three hero
+talent sims, the depth sim, `scripts/ranger-talents-smoke.mjs` and the other talent/set smokes. Open finding, not
+from 28: the base balance report capped the Frostveil mini boss in some runs (resolved 2026-10-16: two harness
+defects, see [balance](docs/wiki/game-design/balance.md#remeasured-with-the-corrected-harness-2026-10-16)). Parent 28's checklist items stay
+open until the Dusk (30c) and Star (32b) sets exist.
 
 - [ ] **Gear sets:** wearing two or three pieces of a set gives a bonus (the Ember set: burning hits; the Frost set:
       chilling hits; the Moss set: more healing), shown in the bag's equipment side.
@@ -1242,18 +1463,121 @@ precedence over the old six-cave estimate. Expansion cave configs follow their w
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **29a. Shared local-light rendering** | 19, 20, 26b | 3-4.5 h | Implement hero/lantern shader light radii, emissive glow/bloom and readable minimum ambient/ink outlines in a small harness. Bound real point lights to about four across all active sources, including building lamps. Check lowest-preset readability, material caches, disposal and measured rendering cost. This is the only cave prerequisite for 30a. |
-| [ ] **29b. Seeded cave layout and traversal** | 29a, 26a | 3-4.5 h | Add the reusable room kit, seeded connections, surface entrance, flat-floor collisions/camera, entry/exit and safe death return. Prove deterministic room ids and no stranded player; keep the unfinished dungeon outside normal travel. |
-| [ ] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
-| [ ] **29d. Cave rewards and persistence** | 29c | 2-4 h | Register room/chest/ore/enemy progress, saved indoor pose and death/revisit/Continue behavior. Prove old-save defaults, portal isolation, unique cave ore and no reward duplication after reload or regeneration. |
-| [ ] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
-| [ ] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
+| [x] **29a. Shared local-light rendering** | 19, 20, 26b | 3-4.5 h | Implement hero/lantern shader light radii, emissive glow/bloom and readable minimum ambient/ink outlines in a small harness. Bound real point lights to about four across all active sources, including building lamps. Check lowest-preset readability, material caches, disposal and measured rendering cost. This is the only cave prerequisite for 30a. |
+| [x] **29b. Seeded cave layout and traversal** | 29a, 26a | 3-4.5 h | Add the reusable room kit, seeded connections, surface entrance, flat-floor collisions/camera, entry/exit and safe death return. Prove deterministic room ids and no stranded player; keep the unfinished dungeon outside normal travel. |
+| [x] **29c. Cave combat context** | 29b | 3-4.5 h | Adapt targeting, movement, projectiles, hazards, pets and enemy AI to the room coordinate frame while houses remain peaceful. Prove all three hero kits and a representative encounter work indoors, and restore surface state safely on exit. |
+| [x] **29d. Cave rewards and persistence** | 29c | 2-4 h | Register room/chest/ore/enemy progress, saved indoor pose and death/revisit/Continue behavior. Prove old-save defaults, portal isolation, unique cave ore and no reward duplication after reload or regeneration. |
+| [x] **29e. Puzzles, guardian and shortcut** | 29d | 3-4.5 h | Add lantern switches, push stones, plates, key/locked door, an end guardian with loot and a return shortcut. Test puzzle reset/reload, solvability and guardians without requiring a custom boss AI for every cave. |
+| [x] **29f. Original-world cave rollout** | 29a-29e | 2-4 h | Configure and release Lanternmoss/Emberfall/Frostveil caves with distinct palettes, rosters, unique ore and guardian loot. Exercise each entrance-to-shortcut path, save/Continue and performance; document the kit for later worlds. |
 | [ ] **29g. Expansion cave rollout** | 29f, 27h, 30i | 2-4 h | Configure/release Tidewhisper and Duskhollow caves from the proven kit, including tide-safe entrances and lantern readability. Check both complete paths and saved progress. No Moon cave or extra room technology; if either config needs new mechanics, split this rollout before coding. |
 
-- [ ] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
+**29a-29f merged into `develop` (2026-10-19), 29g deferred.** The six finished stages were merged on the owner's
+decision rather than held until the whole TODO was done: 29g needs **27h**, whose hardware performance acceptance is
+a recorded no-go, and **30i**, which has not been built, so waiting would have kept finished work out of integration
+for dependencies that are not its own. The `feat/todo-29` parent was deleted after the merge; when 29g becomes
+possible it takes a **fresh parent from `develop`**, which the branch rules allow for a partially completed TODO.
+Note that 29f put caves into worlds that are already released, so the next `develop` into `master` release would ship
+them; that release is unchanged by the merge and still needs confirmation. Cave frame timing is measured but **not
+certified**, because the Iris Xe target device is still unavailable, exactly as for 27h. The merge and its reasons
+are recorded in `docs/logs/2610191629 todo-29-merge-to-develop.md`.
+
+**29g dependency update (2026-10-19):** the approved 27h gate split makes its tested functional completion the
+dependency for 29g; the failing Tidewhisper hardware timing matrix remains a public-release gate. After 27h joins
+`develop`, 29g still waits on 30i, which is not built. The cave-specific Tidewhisper/Duskhollow rollout does not
+change either world's release flag by itself.
+
+**29a implemented (2026-10-16):** `src/render/lighting.js` (`RENDER.localLight`): light radii in every toon shader
+(patched on the material prototype, grass and kelp chained), up to 8 spots for the nearest sources, toon-banded and
+scaled by a place's darkness, so the surface (darkness 0) is unchanged; a minimum ambient keeps the dark readable; a
+pool of four real point lights shared by every source, switched on and off together (no one-by-one recompiles), off
+indoors where an interior keeps its single light; darkness dims the sun, sky light, sky and fog, and the hero carries
+a light. Home lamps are the first real sources (same brightness as before). Bloom on glowing lanterns is the existing
+pass. Checked by `tests/sim/lighting.sim.mjs`, `tests/sim/building.sim.mjs` and `scripts/lighting-smoke.mjs` (real
+WebGL compile, no recompiles, readable dark on Low and High) in a night-village harness; performance rerun as a
+diagnostic only, Iris Xe certification pending like 27h. See [local light](docs/wiki/technical/lighting.md).
+
+**29b implemented (2026-10-16):** a room kit (entrance, hall, chamber, end) joined into a tree on a 16 m grid by a
+seeded walk from each planet's own seed, so room ids (`<cave>:r<n>`) never change (`src/config/dungeons.js`,
+`src/world/caveLayout.js`); rooms built far below the planet with walls, corridors and local-light lanterns
+(`src/world/caves.js`); entering, a flat-floor walk under the room camera, leaving by the mouth or E, and safe exits
+on fainting, travel, a new adventure and saves (`src/gameplay/Dungeons.js`). Each original world works out a
+surface mouth spot placed last, but the caves stay unreleased: no mouth shows and there is no combat inside yet.
+Checked by `tests/caveLayout.test.mjs`, `tests/sim/caves.sim.mjs` and `scripts/caves-smoke.mjs`. See
+[caves](docs/wiki/world/caves.md).
+
+**29c implemented (2026-10-17):** `physics/RoomSpace.js` and `combat/space.js` provide floor physics, wall/body sweeps,
+room routes and coordinates for the existing hero kits, aiming, projectiles, hazards, pets, decals and shadows.
+Goblin melee, wisp shots and slime contact work in a test encounter; houses stay peaceful. Cave entry freezes surface
+enemies/pickups; exit/fainting/travel restores them and removes cave attacks and lights, including a lethal callback
+during an update. `tests/roomSpace.test.mjs` checks geometry; `tests/sim/caveCombat.sim.mjs` exercises all three kits
+and both pet bodies on seeds 1/7. `scripts/cave-combat-smoke.mjs` checks real mouse/key casts, aiming, movement,
+health bars, camera, overflow and E exit at 720p/1080p with zero page/shader errors. Caves stay unreleased and
+encounters use test fixtures. Rewards, saved room progress and indoor Continue remain 29d; chosen cave rosters
+and guardian behavior need later-stage audits. See [cave combat](docs/wiki/world/caves.md#combat-frame-and-surface-isolation-29c).
+
+**29d implemented (2026-10-19):** `world/caveLayout.js` `caveFixtures` decides a cave's chests, gloomquartz veins and
+monster spawns from each **room's own id** (so a room keeps its treasure whatever else changes), clear of every doorway
+and never in the entrance, which stays the safe room. `gameplay/CaveRewards.js` builds them in the room frame, rolls a
+chest's loot through the usual table straight into the bag and wallet (nothing is dropped on a floor about to be
+disposed), and mines a vein by the surface rules (pickaxe, swings, a better pick needs fewer). `CAVE_VEINS` is placed
+by no planet surface, so **Gloomquartz** (`config/items.js`) comes only out of a cave; it brews the Restorative Elixir
+in amethyst's place (`gloomElixir`). Rooms register as visited on entry and cleared when their monsters fall.
+`opened`/`mined`/`cleared`/`visited` save per planet (`caves` in `core/save.js`), and the player snapshot gains
+`cave`/`caveX`/`caveZ`, so **Continue now resumes underground at the saved room pose** (fainting still puts the hero
+out at the mouth, and a save written before 29d starts on the surface with every cave untouched). Ids are
+cave-prefixed and each planet's snapshot is cleaned to its own cave, so portal travel never carries progress across;
+an already-claimed chest or vein is rebuilt claimed, so nothing pays out twice. Checked by
+`tests/caveRewards.test.mjs`, `tests/sim/caveRewards.sim.mjs` and `scripts/cave-rewards-smoke.mjs` (real keys and E at
+720p/1080p, zero page/shader errors). Caves stay unreleased and the checks reach them through test-only fixtures.
+Not done here: puzzles, the locked door and the guardian (29e), and per-world ore, rosters and guardian loot (29f/29g);
+room monster rosters are configured but no cave spawns them in normal play yet. See
+[cave rewards](docs/wiki/world/caves.md#rewards-and-persistence-29d).
+
+**29e implemented (2026-10-19):** `world/caveLayout.js` `caveEnding` lays out the last stretch and
+`gameplay/CavePuzzles.js` runs it. The end room is never next to the entrance (depth >= 2 for every cave and seed,
+asserted over 600 seeds each), so its parent is always the **puzzle room** and the route to the end always passes
+through it; that room keeps no veins or ordinary chest. Each cave picks its puzzle in config: **lantern switches**
+(E lights each, light them all) or **push stones and pressure plates** (walk into a stone to shoulder it; each stone
+starts on a clear lane straight down the room from its plate, and the layout test walks that whole lane to prove it
+solvable). Solving it unseals the **key chest**, which gives the **Warden's Key**. The key turns the **warded door**
+once and is spent: while the ward is up it is a `RoomSpace` blocker, so because every reach, swept move and room route
+goes through `contains()`, it stops the hero, pets, monsters and their pathing alike, not just a prompt. Stepping into
+the end room wakes its **guardian**, one of the cave's own monsters made tougher by the existing `makeElite`, so no
+cave needs a boss AI of its own; beating it pays its loot into the bag and lights a **way home** back to the cave
+mouth. Lit switches, where stones were left, turned doors, beaten guardians and the open way home save per planet
+(`cavePuzzles`). A latent gap was fixed on the way: a monster that fell in a cave spawned its drops in the planet's
+sphere frame, so they were lost when the cave was torn down; underground, drops and Lantern Keys now go straight to
+the bag (`drops.js`, `Chests.js`), as cave chests already did. Checked by `tests/cavePuzzles.test.mjs`,
+`tests/sim/cavePuzzles.sim.mjs` and `scripts/cave-puzzles-smoke.mjs` (a real lantern puzzle at 720p and a real stone
+push at 1080p, zero page/shader errors). Caves stay unreleased. Not done here: the per-world ore, rosters and guardian
+loot that release the caves (29f/29g); ordinary room monsters still only come from test fixtures. See
+[the warden](docs/wiki/world/caves.md#puzzles-the-warden-and-the-way-home-29e).
+
+**29f implemented (2026-10-19):** all three original worlds' caves are **released** and reachable in normal play:
+Mossroot Hollow, the Cinder Warren and the Rimeglass Grotto, each with its own palette and lantern colour, its own
+ore (Gloomquartz / Cinderquartz / Rimequartz, each brewing the same potion its world's rare surface gem does, so a
+cave is another way to the same bottle and never a new power), its own puzzle, its own warden and its own keepsake.
+A cave's roster (`caveMonsters` in `world/caveLayout.js`, spawned by `CaveRewards.populate`) is drawn from the kinds
+that already roam that world, so releasing the caves adds **no** enemy type to the bestiary or journal goals; a
+room's monsters arrive the first time the hero walks in and stay gone once it is cleared, and the entrance, puzzle
+room and warden's room hold none. Every roster is sized to fit the smallest cave its room range can generate. A
+found bug: a warden is made elite by the same helper a planet's elites use, so it dropped a **boss-summon sigil** —
+underground, in the wrong frame, and a way around the lair's own conditions; `BossGate` now gives sigils only to the
+planet's own elites. Checked by `tests/caveRollout.test.mjs` and `tests/sim/caveRollout.sim.mjs` (the whole of each
+cave as a player walks it: the real Enter prompt, its monsters fought, its ore mined, a save and Continue in the
+middle, its puzzle, the key through the ward, the warden and its purse, the way home, and out), plus the four cave
+browser checks. **Performance:** a cave room is a far smaller scene than a surface (196-240 calls / 4.9k-6.2k
+triangles empty, 303 / 7.2k populated, against 722-969 calls / 236k-273k on a surface), the new mouths leave every
+surface ceiling intact (969/1050, 784/900, 722/850 calls), and `PERFORMANCE_BUDGET.cave` guards it. Those are
+**diagnostics on a development machine**: frame timing is still certified only on the Iris Xe target, which remains
+unavailable, so the develop-to-master release stays gated as before. The screenshot tour was retaken (`errors:
+none`). Not done here: 29g (Tidewhisper and Duskhollow caves), which waits on 27h and 30i. See
+[the three caves](docs/wiki/world/caves.md#the-three-caves-29f).
+
+- [x] **A cave or dungeon per main planet (five; no Moon cave),** entered from the surface: a few rooms with monsters, chests and ore veins
       that are found nowhere else.
-- [ ] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
-- [ ] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
+- [x] **Light puzzles:** lantern switches, pushable stones, pressure plates, a locked door and its key.
+- [x] **A guardian** at the end with its own loot, and a shortcut back to the entrance.
 - [ ] Caves are dark: lanterns and glowcaps light the way.
   - **The light tech:** a light radius around the hero and around lanterns, done in the shaders (a few light positions
     passed to the materials) plus emissive glow and bloom. At most about four real point lights (risk 6).
@@ -1429,11 +1753,24 @@ Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts,
 Code: new `src/gameplay/Bounties.js`, `src/config/bounties.js`, a board prop in each village, `src/ui/` (the board).
 **Size:** S. **Needs:** 19.
 
-- [ ] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
+- [x] **A board in the square** with three rotating daily tasks: bring items ("5 iron ingots"), defeat monsters
       ("3 ramhorns"), catch a fish ("a Golden Koi"), harvest a crop.
   - Generated from the planet's config (roster, nodes, fish, crops), so every world gets bounties without extra writing.
-- [ ] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
-- [ ] The journal counts bounties finished, with an achievement or two.
+- [x] Rewards in coins, materials and now and then a rare piece; a new set each day (the day clock, 5).
+- [x] The journal counts bounties finished, with an achievement or two.
+
+**34 implemented (2026-10-15):** a notice board near every village square (`src/gameplay/Bounties.js`, model in
+`models/stations.js`, window `src/ui/BountyUI.js`, data `src/config/bounties.js`). Each day it posts three jobs of
+different kinds, generated deterministically from the planet's roster, own resource drops and material, common fish and
+farm (`gameplay/bountyRules.js`; the golden koi, ingots and other worlds' items are never asked for, and worlds without a
+farm skip harvests). Defeats (not a boss's summons), catches and harvests on that planet count once a job is posted;
+bring jobs hand the items over. Rewards: coins (about 23-35 a day across Act I, see `docs/wiki/game-design/balance.md`), 1-2 of the
+planet's material and a rare piece on 8% of jobs. Saved per planet (`bounties`), so travel keeps each board and Continue
+keeps progress; a new day posts a new set. The board is placed last, clear of the gate and resource nodes, so no saved
+world position moves for it (`planetCatalog` sim). The journal counts claims (Notice Board, Helping Hand achievements). Also
+fixed: the journal now keeps its fish, harvest and gathering counters across reloads (they were dropped on load, so
+Angler, Harvest Festival and Forager progress reset). Checked by `tests/bounties.test.mjs`,
+`tests/sim/bounties.sim.mjs` and `scripts/bounty-smoke.mjs`.
 
 ## 35. Pet care **(suggested)**
 
@@ -1491,9 +1828,18 @@ take the planet's colours; give the first three worlds their own versions only i
 **Goal:** a cozy, pretty game is one people want to take pictures of.
 Code: `src/systems/CameraSystem.js` (the showcase camera already exists), new `src/ui/PhotoMode.js`. **Size:** S.
 
-- [ ] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
-- [ ] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
-- [ ] Save the picture as an image file.
+- [x] Hide the HUD; move the camera freely around the hero (limited range), tilt and zoom.
+- [x] A few filters (warm, night, pastel), a frame or border, and the hero striking a pose or emote.
+- [x] Save the picture as an image file.
+
+**39 implemented (2026-10-15):** `K` opens photo mode (`src/ui/PhotoMode.js`, data in `src/config/photo.js`). The world
+pauses like the pet menu and the HUD hides. A free orbit camera (`setPhotoView`) stays within 1.6-12 m of the hero, with
+pitch and a +/-0.6 rad horizon tilt, and props pull it in as in play. Warm/night/pastel filters and polaroid/storybook
+frames are drawn by the existing paper post-processing pass, so they are in the picture; poses (wave with the free
+hand, cheer, bow) and emote bubbles run on the mode's own clock while the pet shows off. Save renders a fresh frame and
+downloads it as `lanternmoss-<planet>-<date>-<time>.png`. Checked by `tests/photo.test.mjs` and
+`scripts/photo-smoke.mjs` (real K/drag/wheel/Q/E input, toolbar, a downloaded PNG with the frame in its pixels,
+720p/1080p, close restores play, zero page/shader errors).
 
 ---
 
@@ -1612,7 +1958,7 @@ it does not require every suggested feature, multiplayer or the wiki to be finis
 Code/docs: release packaging under `scripts/` if needed, `docs/releases/`, launch/dependency instructions,
 Git release tags and an optional maintenance branch/worktree. **Size:** M–L, in four stages.
 **Needs:** 18–20 for verification, save export and performance evidence; an explicitly chosen, accepted release
-scope from the current track. No dependency on implementing the [visual upgrade plan](docs/plans/visual-upgrade.md).
+scope from the current track. No dependency on implementing the [visual upgrade plan](docs/wiki/plans/visual-upgrade.md).
 **Risk:** a Git snapshot restores source but not browser saves or remote dependencies; a ZIP that still loads
 Three.js/fonts from CDNs is not a self-contained backup. **Recommendation:** use the same repository, an immutable
 named release tag and a verified runnable archive. Use a second working folder when both editions are needed.
@@ -1649,6 +1995,113 @@ branch completion workflow in `docs/logs/`. The detailed visual plan remains **n
 
 ---
 
+## 44. UI and HUD visual overhaul **(suggested, lowest priority)**
+
+**Goal:** a fresher, more consistent look for every screen: the in-play HUD, the bag and its tabs, menus, dialogue and
+windows, with the same information and controls as today.
+Code: `styles/main.css`, `index.html`, `src/ui/` (HUD, bag, journal, menus, windows), `src/ui/itemArt.js` and icons.
+**Size:** L. **Needs:** nothing, but it comes **last**: after the remaining worlds and features, so screens are restyled
+once, when their content has settled. Added 2026-10-15 at the user's request as the least concern.
+**Risk:** hiding combat information (cooldowns, key hints, telegraphs, boss bars) for a cleaner look, or a restyle
+that breaks layouts at 720p. **Recommendation:** restyle shared parts first (panel, button, slot, text), keep every
+value and key hint visible, and recheck each screen with its existing smoke at 720p and 1080p. If the
+[visual upgrade plan](docs/wiki/plans/visual-upgrade.md) is ever activated, its V13 (interface) replaces this item rather
+than running alongside it.
+
+- [ ] **Shared look:** one set of panel surfaces, spacing, borders, buttons, slots and text sizes for every window.
+- [ ] **HUD:** vitals, skills, hotbar, pet and boss cards, compass, prompts, quest and tutorial panels, toasts.
+- [ ] **Menus and windows:** title, character/pet select, bag/craft/enchant, shop, journal, portals, home/building,
+      bounty board, photo mode, pause, settings and keys.
+- [ ] **Check it:** every existing browser smoke passes; 720p/1080p have no overlap; text scaling and keyboard focus still
+      work; the README tour is retaken and spot-checked.
+
+---
+
+# Phase H: Enemy pursuit and faction combat
+
+## 45. Unbounded mob pursuit and provoked faction fights **(suggested)** ✓
+
+**Goal:** ordinary mobs keep pursuing the player without a leash, evolved mini bosses stop returning home once they reach their final form/state, and mobs can damage and provoke one another into fights.
+Code: `src/entities/enemies/Enemy.js`, `src/config/combat.js`, `src/combat/` (targeting, damage and projectiles), `src/entities/enemies/behaviors/`, and `tests/sim/`.
+**Size:** L across three stages. **Needs:** 18, 23. These are foundations for repeatable combat simulations and the current leash/aggro and balance rules.
+**Risk:** removing return limits can strand enemies behind unreachable terrain or leave encounters active across world transitions; cross-faction hits can credit or reward the wrong attacker. **Recommendation:** pursue indefinitely within the current world using reachable paths; let normal world-transition/reset cleanup end the pursuit. Keep mini-boss leash rules through earlier phases, then disable the leash when the final form/state begins. Preserve one clear damage owner and award each defeat once.
+
+| Stage | Needs | Session estimate | Scope and acceptance |
+| --- | --- | --- | --- |
+| [x] **45a. Pursuit and final-form leash rules** | 18, 23 | 2-4 h | Remove home-distance and aggro-distance give-up/return behavior for ordinary mobs: they continue to pursue the player indefinitely within their current world, including after the player outruns their current aggro radius. Do not add another leash or quiet distance cutoff. Keep mini-boss leash/return behavior during earlier forms/phases; remove it when the encounter enters its final form/state, and keep pursuit active until the existing encounter ends or the world resets. Define unreachable-route and world-transition cleanup explicitly. Test ordinary archetypes, long chases, obstacles, phase transitions, encounter resets and travel/Continue. |
+| [x] **45b. Mob damage and provoked retaliation** | 45a | 3-4.5 h | Allow mob-owned attacks, including ghost projectiles, to hit other mobs. A lesser mob damaged by another lesser mob can target and retaliate against its attacker; their attacks can continue the fight. Main-boss and mini-boss attacks must not damage lesser mobs, including through projectiles, melee or area effects. Cover same-world targeting, damage and aggro outcomes for each attacker/target class, death during retaliation, and interaction with existing boss summons/pack behavior. Preserve correct damage attribution and prevent duplicate XP, drops or defeat events. |
+| [x] **45c. Integrated acceptance and documentation** | 45a-45b | 2-4.5 h | Add deterministic simulations for pursuit beyond every old cutoff, final-form mini-boss leash removal (with earlier phases still leashed), ghost-to-goblin projectile damage, lesser-mob provocation/retaliation, and main/mini-boss attacks that overlap lesser mobs without damaging or provoking them. Cover cleanup on death/travel/reset/Continue. Run the full required checks and relevant browser smokes, inspect affected combat visuals, update the combat wiki and this TODO's implementation note, and verify ordinary surface AI/balance remains within documented targets without weakening them. |
+
+- [x] **Ordinary mobs never give up the chase:** no home leash, return-home state, or aggro-distance timeout while the player remains in the same world; pursue around reachable obstacles.
+- [x] **Mini-boss final form:** retain the existing leash before the final form/state, then remove it for the remainder of that encounter. Regression-check each phased mini-boss and reset/retry behavior.
+**45a implemented (2026-10-19):** one rule in one place, `Enemy.leashed` (`src/entities/enemies/Enemy.js`): an
+ordinary monster never gives up a chase on distance, a mini boss keeps its leash through its earlier forms and loses
+it once `bossPhase` reaches its last (the idiom the gloomcap kit already used), and a main boss is unchanged because
+its arena bounds it. An ordinary monster's `aggro` is now only how far off it first notices the hero. A chase ends
+instead at the village safe radius, on fainting, on travel, on a new adventure or on Continue, each of which already
+tears the encounter down; where the ground gives out a chaser keeps pressing as far as it can walk and never resets
+its health. Checked by `tests/sim/pursuit.sim.mjs` (four ordinary archetypes chasing 43-58 m past their old leashes
+and closing to 2-9 m; the safe radius, fainting, travel and Continue each ending it cleanly; a real mini-boss
+encounter leashed in its first form and unleashed in its last; all 19 monster kinds against the rule their class
+implies), with a negative control proving it fails without the change. `miniBossLeash.sim.mjs` and `pets.sim.mjs`
+were updated: the first asserted the old "ordinary monsters walk home and heal" rule, and the second needed its
+quiet made deliberately, because chasers now accumulate around a hero dragged across the world.
+
+**45a open balance finding - resolve in 45c before 45 is done.** Removing the final-form leash puts one measured
+fight outside its target: ranger / Emberfall / the Basilisk on **seed 1** goes **97.3 s to 198.2 s**, past the 180 s
+`miniBoss` ceiling (damage taken 575 to 895, bot top-ups 9 to 14), confirmed by a clean A/B with the change reverted.
+Seed 7 is 100.5 s and inside; witch and knight are inside on both; all nine roster medians are unchanged. No target
+was loosened and nothing was retuned to hide it. This lands in the same area as the earlier recorded leash decision
+(mini bosses keeping damage on give-up, +20% mini-boss health), so choosing between retuning that fight and
+narrowing the final-form rule is a design decision for the owner, not a measurement fix. See
+[pursuit](docs/wiki/game-design/balance.md#pursuit-and-who-gives-up-a-chase-45a).
+
+**45b implemented (2026-10-20):** one rule in one place, `canHarmMob` (`src/combat/damage.js`): only lesser monsters
+feud (`Enemy.lesser`, anything that is not a mini boss, a main boss or a lair seal). A lesser monster's blow - the
+core swipe, slam and contact, and the bomber, burrower, charger, drifter, amphibian and armoured kits, and a ghost's
+orb through `Projectile` - also lands on the lesser monsters caught in it, through `hitMob` / `hitMobs`. The one that
+is hit turns on its attacker (`Enemy.foe`, set by `provoke`) and fights back with its ordinary AI until one of them
+is down, `COMBAT.mobFeud.forget` seconds pass, or the hero hits it, which always wins its attention back. A mini
+boss's and a main boss's attacks never damage a lesser monster, in any form, and neither is drawn into a brawl.
+Every attack keeps its own hit test on the hero exactly as it was, so the hero's own fight is unchanged. A monster
+that falls to another monster credits the hero with nothing: no XP, no coins, no loot (`drops.js`), no bestiary tally
+(`Journal.js`), no bounty progress (`Bounties.js`), and exactly one `enemydefeated` event, which now carries the
+`killer`. Checked by `tests/sim/mobCombat.sim.mjs` (eight checks: a goblin brawl that is answered, a wisp's orb
+provoking a goblin across kinds, a death credited to nobody, the hero reclaiming a monster, a feud timing out, no
+self / burrowed / cross-space hits, all 19 kinds by class, and a boss's summon brawling like any other), with a
+negative control proving it fails without the change. `pets.sim.mjs` now clears grudges in its `quiet()` helper,
+because monsters in a pack clip one another and the fight would otherwise restart.
+
+**45b open balance note - resolved in 45c, see below.** Pack friendly fire is new: a monster swinging at the hero also
+catches the neighbours standing in the blow, so packs wear each other down during an ordinary fight. It is a change
+in the hero's favour and is not yet measured against the seeds 1 / 7 targets for all three heroes.
+
+**45c implemented (2026-10-20):** integrated acceptance for the whole of 45. `tests/sim/mobFactions.sim.mjs` drives
+the two rules together in real encounters: two planet bosses swinging real telegraphed attacks (13 and 6 of them)
+over a goblin standing in the blows, which keeps all its health and is never provoked, and never damages the boss
+either; a mini boss driven into its final form, unleashed by 45a and still harmless to the goblin beside it; and
+feud cleanup with nothing left behind on a foe's death, on travel, on Continue and on a new adventure. A negative
+control (letting `canHarmMob` ignore the classes) fails it. `scripts/mob-combat-smoke.mjs` (port 8128) is the browser
+check at 720p and 1080p: a brawl that lands real damage, a ghost's orb across kinds, no damage numbers for a brawl,
+the hero reclaiming a monster mid-fight, a boss harmless to the monster underfoot, no overflow, zero page and shader
+errors, and the feature screenshot `docs/screenshots/mobs/mob-brawl.jpg`. A brawl beyond `COMBAT.mobFeud.earshot`
+is now neither heard nor felt, since monsters attack away from the hero for the first time.
+
+**45 balance verified (45c).** `npm run sim -- balance` before 45b and after, seeds 1 and 7, all three heroes, nine
+profiles each; seed 1 rerun on the same build reproduced all nine exactly. Profiles outside a documented band:
+**20 before, 19 after**. The one that changed is 45a's open finding, and it closes on its own: ranger / Emberfall /
+the Basilisk on seed 1 goes **198.2 s -> 106.55 s**, back inside the 90-180 s band (damage taken 895 -> 477), because
+the monsters joining that fight now wear each other down instead of adding every blow to the hero. Seed 7 is
+unchanged at 100.6 s. No target was loosened and no monster was retuned. The other 19 are identical before and
+after and all predate TODO 45: Frostveil's slow single-monster kills and three sub-2 s fast kills, recorded in
+[the balance wiki](docs/wiki/game-design/balance.md#what-45b-did-to-the-measured-fights-45c) rather than hidden.
+
+
+- [x] **Mob-on-mob combat:** lesser mobs can damage and provoke other lesser mobs; a goblin can retaliate after a ghost projectile. Main bosses and mini bosses cannot damage lesser mobs with any attack. Test both damage and aggro, and credit damage/rewards once to the correct source.
+- [x] **No stranded fights:** unreachable paths, death, travel, save/Continue and encounter teardown cannot leave stale targets or active enemies; preserve existing house/cave safety rules and documented balance targets.
+
+---
+
 ## Suggested additions
 
 Smaller ideas, and where the promoted ones went.
@@ -1674,6 +2127,7 @@ Smaller ideas, and where the promoted ones went.
       storage into 25b (done).
 - [x] **Gameplay checks in the repo (suggested):** promoted to item 18 (done).
 - [~] **Performance budget (suggested):** promoted to item 20.
+- [~] **Mob pursuit and faction combat (suggested):** promoted to item 45; ordinary mobs pursue without a leash, phased mini bosses lose theirs on entering their final form/state, and mobs can damage and provoke one another into fights.
 - [ ] **Small fixes (suggested):** add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`). (The `favicon.ico` was done in 18.)
 - [ ] **A fourth new world, Windward (suggested, parked):** tall mesas above a sea of clouds, with updrafts and a leaf
       glider. Parked because gliding needs new movement, a new camera and falling rules, and the clouds below need a

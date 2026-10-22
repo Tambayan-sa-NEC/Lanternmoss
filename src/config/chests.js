@@ -28,6 +28,19 @@ export const CHEST_KINDS = {
 };
 
 export const LOOT_TABLES = {
+  // A cave warden's purse (TODO 29f): the planet's own forage material and a piece of gear. The cave's own ore is
+  // added on top by config/dungeons.js (CAVES[].guardianExtra), so the haul differs by world through both.
+  caveGuardian: {
+    coins: [16, 22], rolls: 2,
+    guaranteed: [{ item: '@material', qty: [3, 4] }],
+    pool: [
+      { item: '@gear', rarity: 'rare', weight: 4 },
+      { item: 'moonberryTart', qty: 2, weight: 2 },
+      { item: 'honeyBun', qty: 2, weight: 2 },
+      { item: 'featherCharm', qty: 1, weight: 1 },
+      { item: 'moonHopCharm', qty: 1, weight: 1 },
+    ],
+  },
   common: {
     coins: [4, 6], rolls: 2,
     pool: [
@@ -84,7 +97,7 @@ export const GEAR_RARITY = {
 
 /** What a mini boss (hydra, basilisk) leaves where it falls: one roll of this table, every time, plus its own
     `extra` items (by monster type). */
-export const MINI_BOSS_LOOT = { table: 'rare', extra: { hydra: [['frogHat', 1]] } };
+export const MINI_BOSS_LOOT = { table: 'rare', extra: { hydra: [['frogHat', 1]], ironclaw: [['blackPearl', 2]] } };
 
 export const MONSTER_DROPS = {
   chance: 0.1,             // base chance a defeated monster drops something...

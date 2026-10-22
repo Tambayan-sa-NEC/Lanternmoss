@@ -1,6 +1,6 @@
-// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c; village: 27d; regular enemies: 27e. Fights/release: 27f-27h.
+// Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c; village: 27d; regular enemies: 27e; Old Ironclaw: 27f; Mirelure: 27g. Release: 27h.
 import { COASTAL_NPCS, COASTAL_HOUSES } from '../coastalVillage.js';
-export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
+export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: true, secret: false,
   village:{coastal:true},outfit:'beach',outfitColors:[0x4bacc0,0xf4d18a,0xff987b,0x6dc39b],npcs:COASTAL_NPCS,houses:COASTAL_HOUSES,
   expectedLevel: [7, 10], lowLevel: 9,
   roster: [   // coastal groups: near 'beach' | 'shallows' | 'surf' (src/combat/spawning.js); the returning wisps glow sea-green
@@ -8,6 +8,8 @@ export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false
     { type: 'wisp', count: 3, overrides: { color: 0x5fe8c0, look: { robe: 0x1d5a56, face: 0x0e3438 } } },
   ], scale: { hp: 2.9, damage: 2, speed: 1.25, cooldown: 0.78, xp: 2.6 },
   material: 'seaglass', music: 'seaWaltz', weather: { clear: 5, breezy: 3, seaMist: 2, squall: 2 },
+  forage: [], // Coastal gathering/washups supply the loose materials; do not inherit Act I forage.
+  chests: [{ kind: 'common', count: 8 }, { kind: 'rare', count: 3 }],
   resources: { coastal: true, catches: [['silverSprat',80],['goldenKoi',3]], nodes: [['driftwood',6],['shells',6],['seaweed',5],['seaglass',6],['saltPan',4],['clamBed',6],['coralReef',5],['shipwreckIron',3],['pebbles',6,'village'],['sweetleaf',5,'village']], rare: [['blackPearlBed',2]] },
   seed: 271828, mechanic: 'tides', physics: { seaLevel: 71, seaMaxLevel: 72.5 },
   tides: { low: 71, high: 72.5, lowAt: 0.4, drainLevel: 68.8, drainSeconds: 40 },
@@ -29,4 +31,5 @@ export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false
     birds:6,flocks:1,plumage:[{species:'gull',body:0xf4f6ee,belly:0xffffff,wing:0xa5b6bd},{species:'tern',body:0xd7e3e7,belly:0xffffff,wing:0x778f9d}],
     shoals:3,fishPerShoal:8,lanternfish:8},
   arrival: 'Tidewhisper. Afternoon low tide opens the sandbars; at night the sea takes them back. The village and farm stay above high water.',
-  boss: { type: 'mirelure', summon:{level:8,quest:'darkLighthouse',lowTide:true} } };
+  miniBosses: [{ type: 'ironclaw', near: 'pearlBeach' }],   // guards the black pearl beds on the far beach (27f)
+  boss: { type: 'mirelure', trophy: 'tideCrown', summon:{level:8,quest:'darkLighthouse',lowTide:true}, arena: { wall: 'surf' } } };

@@ -1,0 +1,20 @@
+# TODO 28d: Warrior talents
+
+Clock reads: 08:04 (start), 08:12 (docs), 08:17 (suites), 08:27 (smokes, tour, merge). Steps between the first two
+are grouped at 08:12.
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-16 08:12 | CHORE | TODO 28d | Pulled `feat/todo-28` (0 behind `develop`), branched `feat/todo-28d-warrior-talents` from it (new multistep rule) | feat/todo-28d-warrior-talents | | 0h 08m (08:04-08:12, with the rows below) |
+| 2026-10-16 08:12 | RESEARCH | TODO 28d | Reviewed 28c (tree shape, variant text, HUD/Controls, sim, smoke, balance table) and the knight's ability code | feat/todo-28d-warrior-talents | Cleave, Whirlwind and Guard read the kit; Shoulder Charge's per-frame sweep read the base table directly | (above) |
+| 2026-10-16 08:12 | DECISION | TODO 28d | Warrior tree (user: "go ahead with 28d") | feat/todo-28d-warrior-talents | Mirrors the Witch: three row-1 talents (2 ranks x 1), a two-point gated variant and a gated rank-2 talent, ten points for eight. Wide Cleave widens only the arc (110 -> 170 degrees), keeping damage, reach, cost and cooldown, so it helps crowds, not single targets. Rejected: a damage-raising variant (overlaps Keen Edge), Shoulder Charge changes (its i-frames are the Warrior's evasion; left for 28e's acceptance) | (above) |
+| 2026-10-16 08:12 | FEATURE | TODO 28d | Tree in config/talents.js (released with this stage); Wide Cleave text; dash sweep via Talents.kit(); tooltip shows a swing's arc; witch smoke no longer asserts the Warrior tree is hidden | feat/todo-28d-warrior-talents | | (above) |
+| 2026-10-16 08:12 | TEST | TODO 28d | Unit tests | feat/todo-28d-warrior-talents | The 28c test "only the witch tree is released" failed as expected once the Warrior tree was released; updated, and a Warrior tree test added. 235/235 | (above) |
+| 2026-10-16 08:12 | TEST | TODO 28d | `tests/sim/warriorTalents.sim.mjs`, seeds 1 and 7 | feat/todo-28d-warrior-talents | Failures on the way: the base swing hit a lone side foe because the soft lock turns the swing toward it (the test now locks a foe ahead and checks one 70 degrees aside); reach distances now allow for the ogre's 0.85 m body; one save build spent 7 of 8 points (test error). Passes: side foe 0 -> 21 damage; reach and cost unchanged; Tempest reaches 4.6 m; Whirlwind 7 -> 5 s; Guard vs a real Gloomcap hit 3 s in 32 -> 10 HP; immunity refuses the talents; Continue x2 and Bramble's reset hold | (above) |
+| 2026-10-16 08:12 | BALANCE | TODO 28d | Paired level-8 pace samples, seeds 1 and 7 | feat/todo-28d-warrior-talents | Warrior goblin 1.867 -> 1.433 s, ogre 2.300 -> 1.867 s on both seeds; Witch and Ranger controls unchanged. No target changed; combined acceptance is 28e | (above) |
+| 2026-10-16 08:12 | TEST | TODO 28d | `scripts/warrior-talents-smoke.mjs` (port 8121) | feat/todo-28d-warrior-talents | Passed first run; opened `huds/warrior-talents.jpg`: readable, nothing clipped | (above) |
+| 2026-10-16 08:12 | DOCS | TODO 28d | README talents paragraph and shot, smoke list, file map; TODO 28d note; docs/talents.md Warrior section; balance.md Warrior table | feat/todo-28d-warrior-talents | | (above) |
+| 2026-10-16 08:17 | TEST | TODO 28d | `npm test`, `npm run sim` | feat/todo-28d-warrior-talents | 235/235 tests, 47/47 sims | 0h 05m |
+| 2026-10-16 08:27 | TEST | TODO 28d | witch-talents, warrior-talents, talents and sets smokes; README tour | feat/todo-28d-warrior-talents | All smokes pass; their incidental retakes restored. Tour: errors: none; combat and talents shots spot-checked | 0h 10m |
+| 2026-10-16 08:27 | MERGE | TODO 28d | Committed a4a7652, merged into `feat/todo-28` (23747f5), pushed the parent, deleted the stage branch | feat/todo-28 | Not merged into `develop`: TODO 28 waits for 28e and the combined acceptance | 0h 01m |
+| 2026-10-16 08:28 | TOTAL | TODO 28d | Warrior talents, start to log | feat/todo-28 | Warrior tree complete on the TODO 28 parent | 0h 24m |

@@ -140,7 +140,9 @@ export const Chests = {
     if (ctx.worldItems.some(w => w.itemId === KEYS.item)) return;          // one's already lying around
     if (++this.sinceKey < KEYS.pity && rng() >= KEYS.dropChance) return;
     this.sinceKey = 0;
-    spawnWorldItem(KEYS.item, 1, spawnSpot(e.up, 0.6, 1.4, 0.3), { from: e.up, popTime: 0.5, stepAway: false });
+    // Underground a key cannot lie on the floor (and that floor goes with the cave): it goes straight into the bag.
+    if (ctx.room) grantItem(KEYS.item, 1);
+    else spawnWorldItem(KEYS.item, 1, spawnSpot(e.up, 0.6, 1.4, 0.3), { from: e.up, popTime: 0.5, stepAway: false });
     toast(`The ${e.def.name?.split(",")[0] ?? e.type} dropped a Lantern Key!`); audio.sparkle();
   },
 

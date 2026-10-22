@@ -9,6 +9,7 @@ import { itemBuff } from './buffs.js';
 import { RecipeBook } from './RecipeBook.js';
 import { equipFromSlot } from './equipment.js';
 import { Needs } from './Needs.js';
+import { healAmount } from '../combat/damage.js';
 
 /** Actions run by other systems (tools: ./Gathering.js, seeds: ./Farm.js), registered there to keep this file free of
     them: action id -> (inventory, slot, def) => { ok, message }. */
@@ -16,7 +17,7 @@ export const ACTION_HANDLERS = {};
 
 /** effect id -> (effect entry) => did it change anything? */
 const EFFECTS = {
-  heal: e => { const P = ctx.player; if (P.hp >= P.stats.maxHp) return false; P.hp = Math.min(P.stats.maxHp, P.hp + e.amount); return true; },
+  heal: e => { const P = ctx.player; if (P.hp >= P.stats.maxHp) return false; P.hp = Math.min(P.stats.maxHp, P.hp + healAmount(e.amount)); return true; },
   mana: e => { const P = ctx.player; if (P.mana >= P.stats.maxMana) return false; P.mana = Math.min(P.stats.maxMana, P.mana + e.amount); return true; },
   energy: e => Needs.eat(e.amount),
   buff: (e, def) => { itemBuff(e.kind, e.seconds, def.tags.includes('meal')); return true; },

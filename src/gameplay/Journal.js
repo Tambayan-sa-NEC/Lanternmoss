@@ -85,7 +85,7 @@ export const Journal = {
 };
 
 // ---------------------------------------------------------------- listening
-encounterEvents.addEventListener('enemydefeated', e => Journal.defeat(e.detail.enemy));
+encounterEvents.addEventListener('enemydefeated', e => { if (!e.detail.killer) Journal.defeat(e.detail.enemy); });   // TODO 45b: only the hero's own defeats
 encounterEvents.addEventListener('bossdefeated', e => Journal.bossWon(e.detail.boss));
 encounterEvents.addEventListener('playerhurt', () => { if (Journal.fight) Journal.fight.hit = true; });
 encounterEvents.addEventListener('enemyhit', e => { const f = Journal.fight; if (f && e.detail.source === 'pet' && e.detail.enemy === f.boss) f.pet = true; });
@@ -97,6 +97,7 @@ gameEvents.addEventListener('rarefriend', () => Journal.add('rareFriends'));
 gameEvents.addEventListener('gathered', () => Journal.add('gathered'));
 gameEvents.addEventListener('fishcaught', () => Journal.add('fish'));
 gameEvents.addEventListener('harvested', () => Journal.add('harvests'));
+gameEvents.addEventListener('bountydone', () => Journal.add('bounties'));
 gameEvents.addEventListener('petfound', e => { Journal.data.pets[e.detail.id] = true; Journal.changed(); });
 /** The bag: every kind of item found, and every kind found at Legendary rarity (src/core/Game.js hooks this up). */
 export function watchBag(bag) {

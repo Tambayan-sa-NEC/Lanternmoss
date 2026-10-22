@@ -71,3 +71,23 @@ function animateRanger(H, dt, hs) {
 
 /** CHARACTERS[id] -> pose overlay run after animateHero. */
 export const HERO_POSES = { witch: animateWitch, knight: animateKnight, ranger: animateRanger };
+
+/** Photo mode (PHOTO.poses): runs while the world is paused, on photo mode's own clock t. The hero stands still; a pose
+    eases the arms and body in on top of the resting pose, then the hero's overlay keeps staff, axe and bow in hand.
+    The wave uses the free hand: the witch's staff and the knight's axe are in the right, the ranger's bow in the left. */
+export function animatePhotoPose(H, pose, dt, t) {
+  animateHero(H, dt, 0);
+  if (H.photoPose !== pose) { H.photoPose = pose; H.photoW = 0; }                   // a new pose eases in from rest
+  const w = H.photoW = Math.min(1, (H.photoW ?? 0) + dt * 4), to = (part, axis, v) => { part.rotation[axis] += (v - part.rotation[axis]) * w; };
+  H.head.rotation.z = 0;
+  if (pose === 'wave') {
+    const right = H.charId === 'ranger', arm = right ? H.armR : H.armL, side = right ? 1 : -1;
+    to(arm, 'x', -2.75); to(arm, 'z', side * (0.25 + Math.sin(t * 9) * 0.32)); H.head.rotation.z = side * -0.08;
+  } else if (pose === 'cheer') {
+    to(H.armL, 'x', -2.6); to(H.armL, 'z', -0.9); to(H.armR, 'x', -2.6); to(H.armR, 'z', 0.9);   // a V beside the head
+    H.body.position.y = Math.abs(Math.sin(t * 5)) * 0.1; H.head.rotation.x = -0.15;
+  } else if (pose === 'bow') {
+    to(H.body, 'x', 0.5); H.head.rotation.x = 0.3; to(H.armL, 'x', 0.25); to(H.armR, 'x', 0.25);
+  }
+  HERO_POSES[H.charId]?.(H, dt, 0);
+}

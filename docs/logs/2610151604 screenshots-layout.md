@@ -1,0 +1,14 @@
+# Screenshots organised into subject folders
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-15 15:33 | RESEARCH | TODO N/A | Opened the ambiguous shots and README alt texts to classify all 68 | feat/todo-34-bounty-board | Done while waiting for TODO 34; read only. Corrections to the first guess: dragontoad is Puddle the pet, meadow shows critters, rare is the Golden Moonbunny | 0h 10m |
+| 2026-10-15 16:05 | DECISION | TODO N/A | Folder names (user left them to me) | chore/screenshots-layout | characters, pets, critters, mobs, bosses, npcs, village, building, world, activities, huds. The map lives once in `scripts/shots.mjs` and every script saves through `shotPath()`, which throws for a shot without a folder. Rejected: hard-coding folder paths in each of the 20 scripts | 0h 01m |
+| 2026-10-15 16:08 | CHORE | TODO N/A | `git mv` of 68 shots; rewrote links in README and 8 docs; switched 19 scripts to `shotPath()`; removed dead dir constants and unused imports | chore/screenshots-layout | 64 doc links all resolve. Historical logs keep their old paths. A first scripted import insert left duplicate imports (mixed line endings); caught by `node --check` and fixed | 0h 03m |
+| 2026-10-15 16:10 | FIX | TODO N/A | Tour staging: `scripts/screenshots.mjs` now skips the guide | chore/screenshots-layout | The "First walk" card covered the left of every gameplay shot (already in the committed shots before TODO 34) | 0h 01m |
+| 2026-10-15 16:12 | TEST | TODO N/A | `tests/shots.test.mjs`: layout matches the map, no loose or duplicate shots, every doc link exists | chore/screenshots-layout | Passes; fails when a README link is pointed at the old path | 0h 02m |
+| 2026-10-15 16:14 | DOCS | TODO N/A | Retook the README tour (`node scripts/screenshots.mjs`, Chrome) | chore/screenshots-layout | 36 saved, errors: none. Opened village, combat, arena, rare, chest and controls: no guide card, nothing clipped, Controls page unchanged | 0h 05m |
+| 2026-10-15 16:41 | TEST | TODO N/A | All 17 smokes that save shots | chore/screenshots-layout | All pass; every shot written into its folder, none at the top level. Their retakes were restored afterwards (not part of this task). `performance.mjs` only syntax-checked (long benchmark) | 0h 27m |
+| 2026-10-15 16:47 | TEST | TODO N/A | `npm test`, `npm run sim` | chore/screenshots-layout | 222/222 tests, 43/43 sims | 0h 05m |
+| 2026-10-15 16:48 | MERGE | TODO N/A | Committed 5c14f0b, merged into `develop` (cfe25e7), pushed, deleted the branch | develop | `develop` matches `origin/develop` | 0h 01m |
+| 2026-10-15 16:48 | TOTAL | TODO N/A | Screenshot layout, from branch to log | develop | 68 shots in 11 subject folders, one map, a guard test, and a cleaner README tour | 0h 44m |

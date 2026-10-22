@@ -6,7 +6,7 @@
    sting, until there's water under it again. Popped, it bursts into light. */
 import * as THREE from 'three';
 import { ctx } from '../../../core/context.js';
-import { hurtPlayer } from '../../../combat/damage.js';
+import { hitMobs, hurtPlayer } from '../../../combat/damage.js';
 import { ringFX } from '../../../fx/combatFx.js';
 import { sparkles } from '../../../fx/sparkles.js';
 import { audio } from '../../../systems/AudioSystem.js';
@@ -80,6 +80,7 @@ function pulse(e, dist, w) {
   const d = e.def, P = ctx.player, level = w?.level ?? e.r;
   e.state = 'recover'; e.timer = d.cooldown * 0.5; e.cool = d.cooldown; e.hideTele();
   ringFX(e.pos, d.pulseRadius, d.color, 0.5, level); ringFX(e.pos, d.pulseRadius * 0.6, LIGHT, 0.35, level);
-  sparkles.emit(e.center(), { count: 20, color: d.color, speed: 3, up: e.up, upBias: 0.3, life: 0.5, size: 0.32 }); audio.nova();
-  if (!P.dead && dist < d.pulseRadius + P.radius && P.r - level < d.reachUp) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
+  sparkles.emit(e.center(), { count: 20, color: d.color, speed: 3, up: e.up, upBias: 0.3, life: 0.5, size: 0.32 }); if (e.heard) audio.nova();
+  if (!P.dead && e.distP < d.pulseRadius + P.radius && P.r - level < d.reachUp) hurtPlayer(d.damage, e.pos, d.knockback, { source: e });
+  hitMobs(e, e.pos, d.pulseRadius, d.damage, { knock: d.knockback });        // TODO 45b
 }

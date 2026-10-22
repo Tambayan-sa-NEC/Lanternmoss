@@ -15,7 +15,7 @@ test('one 1.5 m cycle per adventure day: afternoon low, night high, bounded and 
   const c=tidewhisper.tides;near(tideAt(0.4*DAY.length,c).level,71);near(tideAt(0.9*DAY.length,c).level,72.5);
   assert.equal(tideAt(0.4*DAY.length,c).label,'Low tide');assert.equal(tideAt(0.9*DAY.length,c).label,'High tide');
   for(let s=0;s<DAY.length;s+=0.5){const t=tideAt(s,c);assert.ok(t.level>=71&&t.level<=72.5);near(t.level,tideAt(s+DAY.length*1000,c).level);}
-  assert.equal(mechanicDefinition('tides'),tides);assert.equal(tidewhisper.released,false);
+  assert.equal(mechanicDefinition('tides'),tides);
 });
 test('archipelago is mostly sea, with protected land and a sandbar that opens only at low water',()=>{
   ponds.length=0;setTerrain(tidewhisper.terrain,tidewhisper.seed);const layout=archipelagoLayout(tidewhisper.terrain.archipelago,spawn);

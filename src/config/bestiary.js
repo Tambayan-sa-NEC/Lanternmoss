@@ -95,6 +95,25 @@ export const BESTIARY_ENTRIES = {
       ['Tail whip', 'A spin through the marked circle around it.'], ['Lunge', 'It marks a lane and darts along it, jaws first.'], ['Venom', 'Once enraged: a fan of venom.']],
     counters: ['When its eyes blaze, turn your back: run away from it until they flare, then turn and strike.', 'Jump over the tail whip.', 'Sidestep the lunge, then punish it while it recovers.'],
   },
+  ironclaw: {
+    lore: 'The bell hung in the old lighthouse until the night the Lantern Angler drew a ship onto the rocks and both went down. '
+      + 'Ironclaw found it on the sea bed, crawled in, and has been carrying it about ever since. It hates being rung.',
+    blurb: 'A mini boss: a giant hermit crab in a sunken bronze bell, guarding the black pearl beds on the far beach. The bell takes no damage at all.',
+    attacks: [['Pinch', 'Rears its great claw over a wedge in front of it, then snaps.'], ['Charge', 'Marks a lane and barrels along it.'],
+      ['Bell ring', 'Strike the bell and it rings out a stunning shockwave after a short glow.'], ['Toll', 'From its second shell: it rears and slams the bell down, sending a shockwave rolling out.']],
+    counters: ['Jump over the shockwaves.', 'Hit its face, not the bell: tucked in its shell it only takes a little damage.',
+      'At 66% and 33% it crawls out to swap shells: that\'s your window, from any side.', 'At low tide, bait a charge across the wet sand: it gets stuck, soft and open. It only falls for it once per shell.'],
+    drops: 'Two black pearls, and the pearl beds it guards are yours to gather.',
+  },
+  mirelure: {
+    lore: "Ships once steered by the lighthouse at Tidewhisper. Then a second light began to glow in the lagoon, softer and nearer, "
+      + "and the ships turned toward it. Mirelure has hidden in the deep ever since Marlo's lamp went dark, and she does not like it lit again.",
+    blurb: 'The Lantern Angler of Tidewhisper, hiding in the lagoon with only her lantern lures showing. At half health she smashes the sluice and is beached.',
+    attacks: [['False lures', 'She lights several lures; strike a false one and it bursts in your face.'], ['Geyser', 'A warning circle under you, then a spout of water.'],
+      ['Bite', 'Surfaced or beached: a snap over a wedge in front.'], ['Thrash', 'Beached: she flails, hitting all around her.'], ['Roll', 'Beached: she marks a lane and rolls along it.']],
+    counters: ['Watch her breathing bubbles: the real lure dims in time with them. Strike it and she surfaces.', 'Step out of geyser circles.',
+      'Once the lagoon drains, she is beached and open to everything: hit hard before the water creeps back.', 'Sidestep the roll and stay out of the thrash circle.'],
+  },
   gloomcap: {
     lore: 'Once the gentlest mushroom of the old woods, it drank the gloom that pooled under the lanterns until it grew a crown of it. '
       + 'The villagers sealed its glade with three thorn stones, and it has been sulking behind them ever since.',

@@ -10,7 +10,7 @@
      credits   who made it (config/credits.js); title screen only
    Esc on a sub-page goes back to the main page; Esc / P on the main page resumes.
    The title screen opens single pages with openPanel(page) (no pausing): Back / Esc closes the panel again. */
-import { ABILITY_TEXT, CHARACTERS } from '../config/characters.js';
+import { abilityText, CHARACTERS } from '../config/characters.js';
 import { AIM_CONTROLS, FIXED_CONTROLS, KEYBINDS, keyLabel } from '../config/controls.js';
 import { CREDITS } from '../config/credits.js';
 import { PLANETS } from '../config/planets.js';
@@ -24,6 +24,8 @@ import { releaseAllKeys } from '../systems/InputSystem.js';
 import { dom } from './dom.js';
 import { icon } from './icons.js';
 import { JournalUI } from './JournalUI.js';
+import { TalentUI } from './TalentUI.js';
+import { Talents } from '../gameplay/Talents.js';
 import { toast } from './toast.js';
 
 const keys = list => list.map(k => `<kbd>${k}</kbd>`).join(' ');
@@ -59,6 +61,7 @@ const PAGES = {
         <button type="button" data-go="save">Save</button>
         <div class="row2"><button type="button" data-go="export">Export Save</button><button type="button" data-go="import">Import Save</button></div>
         <button type="button" data-go="journal">Journal</button>
+        ${Talents.open ? '<button type="button" data-go="talents">Talents</button>' : ''}
         <div class="row2"><button type="button" data-go="help">Help</button><button type="button" data-go="tutorial">Restart guided walk</button></div>
         <button type="button" data-go="settings">Settings</button>
         <button type="button" data-go="controls">Controls</button>
@@ -70,9 +73,9 @@ const PAGES = {
     <div class="menu row2"><button type="button" class="quiet" data-go="reset">Reset to defaults</button><button type="button" class="primary" data-go="main">Back</button></div>
     <div class="foot">Changes apply right away and are remembered on this device · <kbd>Esc</kbd> back</div>`,
   controls: () => {
-    const hero = CHARACTERS[ctx.player.charId], abilities = Object.entries(hero.abilities).map(([id, s]) =>
+    const hero = CHARACTERS[ctx.player.charId], abilities = Object.entries(Talents.kit()).map(([id, s]) =>
       `<div class="krow ab"><span class="keys">${keys(s.label.split('/'))}${s.mouse ? ' <kbd>Click</kbd>' : ''}</span>
-        <span class="ic" style="--c:#${s.color.toString(16).padStart(6, '0')}">${icon(id)}</span><span><b>${s.name}</b>${s.ult ? ' <em>ultimate</em>' : ''}<small>${ABILITY_TEXT[id] ?? ''}</small></span></div>`).join('');
+        <span class="ic" style="--c:#${s.color.toString(16).padStart(6, '0')}">${icon(id)}</span><span><b>${s.name}</b>${s.ult ? ' <em>ultimate</em>' : ''}<small>${abilityText(id, s)} ${s.cost} ${hero.resource.toLowerCase()} · ${s.cooldown}s cooldown.</small></span></div>`).join('');
     const rows = list => list.map(([k, what]) => `<div class="krow"><span class="keys">${keys(k)}</span><span>${what}</span></div>`).join('');
     const bound = g => KEYBINDS.filter(b => b.group === g && g !== 'Skills').map(b => `<div class="krow"><span class="keys">${bindKbd(b.id, true)}</span><span>${b.label}</span></div>`).join('');
     const skillKeys = KEYBINDS.filter(b => b.group === 'Skills').map(b => bindKbd(b.id)).join(' ');
@@ -159,6 +162,7 @@ export const PauseMenu = {
     if (go === 'reset-keys') { resetBinds(); this.bindMsg = 'Keys are back to their defaults.'; this.show('settings'); return; }
     if (go === 'resume') this.close();
     else if (go === 'journal') JournalUI.open();                         // on top; closing it comes back here
+    else if (go === 'talents') TalentUI.open();                          // on top too (only listed once the tree is released)
     else if (go === 'help') JournalUI.open('help');
     else if (go === 'tutorial') { this.close(); this.handlers.onTutorial?.(); }
     else if (go === 'save') this.handlers.onSave();

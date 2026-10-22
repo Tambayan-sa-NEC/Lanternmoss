@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import puppeteer from 'puppeteer-core';
+import { shotPath } from './shots.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url)),port=8111;
 const server=spawn(process.execPath,['scripts/serve.mjs',String(port)],{cwd:root,stdio:['ignore','pipe','pipe']});
 let browser,stderr='';server.stderr.on('data',d=>{stderr+=d;});
@@ -21,8 +22,9 @@ try{
   });await install();await page.click('[data-act="play"]');
   const roster=await page.evaluate(async()=>{
     const L=window.LANTERNMOSS,{dayClock}=await import('/src/gameplay/dayClock.js'),{DAY}=await import('/src/config/day.js');
+    (await import('/src/utils/random.js')).seedPlay(1); // seed before the roster spawns, including its initial facing
     L.CharacterSelect.pick('witch');L.begin();L.Tutorial.skip();L.player.invuln=10000;L.Pets.command('passive');
-    (await import('/src/utils/random.js')).seedPlay(1);(await import('/src/core/context.js')).ctx.paused=true;   // only the script's own 60 fps steps advance the game
+    (await import('/src/core/context.js')).ctx.paused=true;   // only the script's own 60 fps steps advance the game
     dayClock.skip((.4*DAY.length-dayClock.t+DAY.length)%DAY.length,'test');
     const n=t=>L.enemies.filter(e=>e.type===t).length;return [n('shellback'),n('jellybell'),n('surfSkipper'),n('wisp')];
   });assert.deepEqual(roster,[15,12,9,5]);
@@ -32,8 +34,12 @@ try{
       const L=window.LANTERNMOSS,{dirAlong,tangentToward}=await import('/src/utils/sphere.js'),{encounterEvents}=await import('/src/combat/events.js');
       const c=window.crab??=L.enemies.find(e=>e.type==='shellback');for(const e of L.enemies)if(e!==c&&e.alive&&e!==L.boss&&e.up.distanceTo(c.up)*72<35)e.vanish();   // a quiet duel: nothing else for auto-aim to pick
       if(!window.refusals){window.refusals=0;encounterEvents.addEventListener('enemyrefused',()=>window.refusals++);}
-      c.state='idle';c.timer=99;const at=dirAlong(c.up,side==='front'?c.fwd:c.fwd.clone().negate(),4);
+      // Hold the plate's facing for both shots; an aggro turn can otherwise move the crab out of the rear bolt's path.
+      c.def={...c.def,aggro:0};c.state='idle';c.timer=99;c.speed=0;const at=dirAlong(c.up,side==='front'?c.fwd:c.fwd.clone().negate(),4);
       L.player.placeAt(at);L.player.fwd.copy(tangentToward(at,c.up));L.cam.fwd.copy(L.player.fwd);window.before={hp:c.hp,refused:window.refusals};
+      // Combat casts before it refreshes auto-aim each frame. Teleporting between the two shots leaves the old lock in place.
+      const {targeting,updateAim}=await import('/src/combat/targeting.js');updateAim();
+      if(targeting.aim!==c)throw new Error(`Shellback aim lost from ${side}`);
     },side);
     const frames=n=>page.evaluate(async n=>{const {ctx}=await import('/src/core/context.js');ctx.paused=false;for(let i=0;i<n;i++)window.LANTERNMOSS.update(1/60);ctx.paused=true;},n);
     await page.keyboard.down('KeyZ');await frames(2);await page.keyboard.up('KeyZ');await frames(50);
@@ -76,7 +82,7 @@ try{
       return {crab:crab.root.visible,jelly:jelly.root.visible&&!jelly.stranded&&!!waterAt(jelly.up),skip:skip.root.visible&&!skip.hidden,wisp:wisp.root.visible&&wisp.def.color===0x5fe8c0};
     });assert.deepEqual(shown,{crab:true,jelly:true,skip:true,wisp:true});
     await page.screenshot({path:join(tmpdir(),`lanternmoss-27e-roster-${height}.png`)});
-    if(height===720)await page.screenshot({path:join(root,'docs/screenshots/tidewhisper-enemies.jpg'),type:'jpeg',quality:88});
+    if(height===720)await page.screenshot({path:shotPath('tidewhisper-enemies'),type:'jpeg',quality:88});
     console.log(`PASS ${width}x${height} low: Shellback, floating Jellybell, surfaced Surf skipper and sea-green wisp render`);
   }
   await page.evaluate(()=>{if(!window.LANTERNMOSS.saves.save().ok)throw new Error('save');});

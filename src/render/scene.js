@@ -7,11 +7,15 @@ export const PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, RENDER.maxPixe
 export const FOG_COLOR = new THREE.Color();
 
 export const scene = new THREE.Scene();
+// The scene remains at the origin. Rebuilding its identity every frame would force all static world matrices dirty.
+scene.updateMatrix(); scene.matrixAutoUpdate = false;
 scene.fog = new THREE.Fog(FOG_COLOR, RENDER.fog.near, RENDER.fog.far);
 
 export const camera = new THREE.PerspectiveCamera(RENDER.fov, innerWidth / innerHeight, RENDER.near, RENDER.far);
 
 /** Fog distances as shared uniforms (outlines and water read them too), so weather can thicken the fog everywhere. */
 export const FOG_NEAR = { value: RENDER.fog.near }, FOG_FAR = { value: RENDER.fog.far };
+/** How bright the sky is drawn (1 normally): render/lighting.js dims it in the dark. Shared by every sky (world/sky.js). */
+export const SKY_DIM = { value: 1 };
 export function setFogColor(hex) { FOG_COLOR.set(hex); scene.fog.color.set(hex); }
 export function setFogRange(near, far) { FOG_NEAR.value = scene.fog.near = near; FOG_FAR.value = scene.fog.far = far; }

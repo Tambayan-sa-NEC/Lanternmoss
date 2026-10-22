@@ -5,10 +5,12 @@ import { GEAR_KINDS, ITEM_CATEGORIES, ITEM_EFFECTS, RARITIES, TOOL_KINDS } from 
 import { CROPS } from '../config/resources.js';
 import { FUEL, RECIPES } from '../config/crafting.js';
 import { RUNES } from '../config/magic.js';
+import { SETS } from '../config/sets.js';
 import { BUFF_NAMES } from '../gameplay/buffs.js';
 import { formatStat, gearStats, itemRarity } from '../items/gear.js';
 import { ITEM_ACTIONS, actionFor } from '../items/itemActions.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
+import { setOf } from '../items/sets.js';
 import { itemArtSvg } from './itemArt.js';
 
 const hex = n => '#' + n.toString(16).padStart(6, '0');
@@ -37,12 +39,14 @@ export function describeItem(def, stack, o = {}) {
   const rarity = RARITIES[itemRarity(def, stack?.props)], action = actionFor(def);
   const res = o.hero ? titleCase(CHARACTERS[o.hero].resource) : 'mana';
   const crop = def.props.crop && CROPS[def.props.crop];
+  const set = SETS[setOf(def.id)];   // a set piece lists its set's bonuses under its stats (config/sets.js)
   const lines = def.equip ? Object.entries(gearStats(def, stack?.props)).map(([k, v]) => `<li>${formatStat(k, v, res.toLowerCase())}</li>`)
     : def.tool ? [`<li>${titleCase(TOOL_KINDS[def.tool.kind].use)}</li>`]
     : crop ? [`<li>Grows into ${crop.name} after ${crop.days < 1 ? 'less than a day' : `${Math.ceil(crop.days)} days`} of watering</li>`]
     : def.use.map(e => `<li>${describeEffect(e)}</li>`);
   const kind = def.equip ? `${GEAR_KINDS[def.equip.slot].label}${def.equip.hero ? ` · ${CHARACTERS[def.equip.hero].title} only` : ''}`
     : def.tool ? `Tool · ${TOOL_KINDS[def.tool.kind].label}` : ITEM_CATEGORIES[def.category];
+  if (set) lines.push(`<li class="inv-d-set" style="--set:${set.color}"><b>${set.name}</b> (${set.pieces.length}): ${set.bonuses.map(b => `${b.at} worn: ${b.text}`).join(' · ')}</li>`);
   const qty = def.stackable ? `${stack.quantity} / ${def.maxStack}` : '1 (doesn\'t stack)';
   const wrongHero = def.equip?.hero && o.hero && def.equip.hero !== o.hero;
   return `<div class="inv-d-head">${itemIconHtml(def)}<div><div class="inv-d-name" style="color:${rarity.color}">${def.name}</div>` +

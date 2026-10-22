@@ -1,0 +1,544 @@
+{
+  "startedAt": "2026-10-17T14:24:53.005Z",
+  "candidateCommit": "3be9e00fe9ff0008a79e881f1a50727c36782766",
+  "scope": "step 2 functional/browser regressions; no FPS certification",
+  "browserExecutable": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+  "planned": [
+    "hud-performance",
+    "coastal-enemies",
+    "coastal-wildlife",
+    "coastal-village",
+    "coastal-resources",
+    "witch-talents",
+    "warrior-talents",
+    "ranger-talents",
+    "ironclaw",
+    "mirelure",
+    "tidewhisper-campaign",
+    "portals",
+    "save",
+    "sets",
+    "photo",
+    "lighting",
+    "tutorial"
+  ],
+  "results": [
+    {
+      "name": "hud-performance",
+      "startedAt": "2026-10-17T14:24:53.055Z",
+      "finishedAt": "2026-10-17T14:25:06.028Z",
+      "seconds": 12.973,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS 1280x720: no unchanged prompt/chip mutations; live coins/key/scale updates; no computed-style marker reads or overflow\nPASS 1920x1080: no unchanged prompt/chip mutations; live coins/key/scale updates; no computed-style marker reads or overflow\nPASS actual rebound keyboard interaction; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [],
+      "scriptSha256": "cd74f1fab51e721ada01d92ca44f403492506ad95b2caeda097767f565cb6073",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "coastal-enemies",
+      "startedAt": "2026-10-17T14:25:06.088Z",
+      "finishedAt": "2026-10-17T14:25:39.659Z",
+      "seconds": 33.571,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS keyboard Arcane Bolt: refused by the Shellback plate from the front, lands from behind\nPASS ambush: surfaces, leaps, bites the hero on the beach, stands exposed and slips back under\nPASS 1280x720 low: Shellback, floating Jellybell, surfaced Surf skipper and sea-green wisp render\nPASS 1920x1080 low: Shellback, floating Jellybell, surfaced Surf skipper and sea-green wisp render\nPASS reload Continue rebuilds the full roster; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/mobs/tidewhisper-enemies.jpg"
+      ],
+      "scriptSha256": "97c7cf63218a4ba90297cb597315a6e07b95fb545e5cdf4d50e8a36e206949d5",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "coastal-wildlife",
+      "startedAt": "2026-10-17T14:25:39.764Z",
+      "finishedAt": "2026-10-17T14:26:31.021Z",
+      "seconds": 51.257,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  720p low: real coastal builders and kelp shader, bounded animals/fish, palm gathering and coral wood refusal\nPASS  1080p low: original crab/turtle/seal/Pearl Turtle models, actual E friendship, reload Continue without duplicate charm and night lanternfish; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/critters/tidewhisper-pearl-turtle.jpg",
+        "docs/screenshots/world/tidewhisper-flora.jpg"
+      ],
+      "scriptSha256": "37d92cfaaf2f6badb76a1779fb8efd4afdb9b009175ba81029c58bb6e7e60bef",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "coastal-village",
+      "startedAt": "2026-10-17T14:26:31.138Z",
+      "finishedAt": "2026-10-17T14:27:56.618Z",
+      "seconds": 85.48,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS 1280x720 low: stilt village, lit lighthouse, beach outfits and dry high-water pier\nPASS 1920x1080 low: stilt village, lit lighthouse, beach outfits and dry high-water pier\nPASS actual E dialogue accept/hand-ins, partial and completed reload Continue, both interior doors and one-time gifts; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/village/tidewhisper-village.jpg"
+      ],
+      "scriptSha256": "f606987de215f5a30485846c5f3018264a95639204fba213bf2f67e4c462994e",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "coastal-resources",
+      "startedAt": "2026-10-17T14:27:56.748Z",
+      "finishedAt": "2026-10-17T14:28:28.634Z",
+      "seconds": 31.886,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS 1280x720 low: coastal models, high-tide beds, safe farm and squall shader\nPASS 1920x1080 low: coastal models, high-tide beds, safe farm and squall shader\nPASS actual E gathering, reload Continue claim persistence, one travel-safe three-beat music loop and zero browser/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [],
+      "scriptSha256": "141e4b7b526da6a89a0dc31e73b5c751efcee27caca671c9ee975467a525fb06",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "witch-talents",
+      "startedAt": "2026-10-17T14:28:28.689Z",
+      "finishedAt": "2026-10-17T14:28:58.082Z",
+      "seconds": 29.393,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  production Witch tree: real Learn clicks, prerequisites, eight-point budget, 720p/1080p low layout\nPASS  live Controls/HUD/tooltip describe the learned variant and timings; remapped keys refresh\nPASS  full reload + Continue restores production ranks and live spell bar without a fixture\nPASS  real E with Old Bramble resets for free, base name returns; learning Light Step updates HUD cost and tooltip; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/talents.jpg",
+        "docs/screenshots/huds/witch-talents-1080.jpg"
+      ],
+      "scriptSha256": "fd5871cbfbe2e7673a8a0faf9d000a6327f6c6f884da45c080f845f5b70143ad",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "warrior-talents",
+      "startedAt": "2026-10-17T14:28:58.193Z",
+      "finishedAt": "2026-10-17T14:29:32.608Z",
+      "seconds": 34.415,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  production Warrior tree: real Learn clicks, prerequisites, eight-point budget, 720p/1080p low layout\nPASS  live Controls/HUD/tooltip describe the learned variant and timings; remapped keys refresh\nPASS  full reload + Continue restores production ranks and live spell bar without a fixture\nPASS  real E with Old Bramble resets for free, base name returns; learning Steady Guard updates the Guard tooltip (3.5 s); zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/warrior-talents-1080.jpg",
+        "docs/screenshots/huds/warrior-talents.jpg"
+      ],
+      "scriptSha256": "2698fd265f92300786fd77f43ee927fd47d0132f8163e20af53900218d794508",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "ranger-talents",
+      "startedAt": "2026-10-17T14:29:32.735Z",
+      "finishedAt": "2026-10-17T14:30:03.599Z",
+      "seconds": 30.864,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  production Ranger tree: real Learn clicks, prerequisites, eight-point budget, 720p/1080p low layout\nPASS  live Controls/HUD/tooltip describe the learned variant and timings; remapped keys refresh\nPASS  full reload + Continue restores production ranks and live spell bar without a fixture\nPASS  real E with Old Bramble resets for free, base name returns; learning Light Feet updates the Evasive Leap cost (11); zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/ranger-talents-1080.jpg",
+        "docs/screenshots/huds/ranger-talents.jpg"
+      ],
+      "scriptSha256": "8197e977247460dfc2873195993fe5192289adb501f05e6d270b89a479c619f9",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "ironclaw",
+      "startedAt": "2026-10-17T14:30:03.689Z",
+      "finishedAt": "2026-10-17T14:30:42.212Z",
+      "seconds": 38.523,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS keyboard Arcane Bolt: the bell refuses and rings a shockwave that hurts; its face takes the hit\nPASS a low-tide charge across the wet pearl flat wedges it\nPASS 1280x720 low: Old Ironclaw in its bell and out of it\nPASS 1920x1080 low: Old Ironclaw in its bell and out of it\nPASS defeat persists through reload Continue and the pearl beds stay free; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/bosses/tidewhisper-ironclaw.jpg"
+      ],
+      "scriptSha256": "18278c7e57c8b818ceeb45b0a2be393d5672a94d0561c9113011adfe704a8945",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "mirelure",
+      "startedAt": "2026-10-17T14:30:42.338Z",
+      "finishedAt": "2026-10-17T14:31:23.544Z",
+      "seconds": 41.206,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS gate wakes her in a ring of surf; keyboard Arcane Bolt bursts a false lure and surfaces her from the real one\nPASS 1280x720 low: the lit lagoon in its ring of surf\nPASS 1920x1080 low: the lit lagoon in its ring of surf\nPASS 1280x720 low: Mirelure beached on the drained floor\nPASS 1920x1080 low: Mirelure beached on the drained floor\nPASS the win gives one Tide Crown and stays won through reload Continue; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/bosses/tidewhisper-mirelure-beached.jpg",
+        "docs/screenshots/bosses/tidewhisper-mirelure-lures.jpg"
+      ],
+      "scriptSha256": "b901f7f883f14093c3aba9b2874888b8b235484d313c086f1d98469ff5e695c8",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "tidewhisper-campaign",
+      "startedAt": "2026-10-17T14:31:23.656Z",
+      "finishedAt": "2026-10-17T14:32:12.865Z",
+      "seconds": 49.209,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS real portal UI into world 4, partial quest/node reload Continue, return travel and revisit\nPASS actual Tidewhisper 720p/1080p low screenshots and viewport bounds\nPASS low-tide/quest gate, four-world completion and one Tide Crown through full browser reload; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/world/tidewhisper-campaign-1080.jpg",
+        "docs/screenshots/world/tidewhisper-campaign-720.jpg"
+      ],
+      "scriptSha256": "9088d07ec07cf70fff27726da8f6cd1de4a205481cb92dbab5258551c0621288",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "portals",
+      "startedAt": "2026-10-17T14:32:12.984Z",
+      "finishedAt": "2026-10-17T14:34:39.519Z",
+      "seconds": 146.535,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS real E/picker/keyboard/cancel, one-way key travel, reload restriction and keyed return\nPASS witch: free destination buttons, world rebuilds and local villagers\nPASS knight: free destination buttons, world rebuilds and local villagers\nPASS ranger: free destination buttons, world rebuilds and local villagers\nAll portal browser checks passed (720p/1080p, real WebGL, zero page/shader errors).\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/portal-destinations.jpg",
+        "docs/screenshots/huds/portal-one-way.jpg"
+      ],
+      "scriptSha256": "427efc0bde82493df23e7267a4e0fdd07a91c1f1069fe70dc8832672b2d6b135",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "save",
+      "startedAt": "2026-10-17T14:34:39.635Z",
+      "finishedAt": "2026-10-17T14:35:30.708Z",
+      "seconds": 51.073,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  reload, Continue, manual Save, quit, new-adventure confirmation, export and import; menus fit 720p/1080p; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/continue.jpg",
+        "docs/screenshots/huds/save-menu.jpg",
+        "docs/screenshots/huds/title.jpg"
+      ],
+      "scriptSha256": "73a36a3231051af8d4ea07971226a3fca5bbd80b348e5623fdea98fcc78bcd70",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "sets",
+      "startedAt": "2026-10-17T14:35:30.828Z",
+      "finishedAt": "2026-10-17T14:35:53.200Z",
+      "seconds": 22.372,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  real I and clicks (piece, then Equip) equip the pieces; the equipment side lists each set and lights its bonuses at 2 and 3 pieces; swapping a piece for another set steps the bonus back down\nPASS  the Ember Mail tooltip shows \"Ember set (3): 2 worn: Hits burn for 40% more over 3 s · 3 worn: Hits burn for 70% more over 3 s\"\nPASS  720p and 1080p fit; zero page or shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/gear-sets.jpg"
+      ],
+      "scriptSha256": "f4c142f23e7c0f200076cd708beb84de16d9f0b3dc5d3e7abb3b87383c745442",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "photo",
+      "startedAt": "2026-10-17T14:35:53.334Z",
+      "finishedAt": "2026-10-17T14:37:26.889Z",
+      "seconds": 93.555,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  K opens photo mode: the world pauses, the HUD hides, the toolbar and free camera take over\nPASS  drag orbits, the wheel zooms and Q / E tilt the horizon, each within its limits\nPASS  filter, frame, pose and emote from the toolbar; Enter saved lanternmoss-lanternmoss-20261017-223707.png (1280x720) with the polaroid frame in its pixels\nPASS  number keys cycle filter / frame / pose (storybook in the picture), H hides the bar; 720p and 1080p fit\nPASS  Esc / K close it: play, HUD, follow camera and plain finish return; zero page or shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/activities/photo-mode.jpg",
+        "docs/screenshots/activities/photo-storybook.jpg"
+      ],
+      "scriptSha256": "cfe9d8e792a8663d3bfa0cbfcaa82240d8e28463b7c8f04ade60a3ca588b582e",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "lighting",
+      "startedAt": "2026-10-17T14:37:27.019Z",
+      "finishedAt": "2026-10-17T14:38:14.417Z",
+      "seconds": 47.398,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  every patched shader compiles; darkness 0 -> 1 -> 0 compiles no new program (25 programs)\nPASS  the harness (night, darkness 1, three lanterns): lit ground 116/192/80 and unlit 43 on Low, 112/190/82 and 34 on High (0-255 luminance)\nPASS  removing the lanterns turns all four real lights off together\nINFO  render cost at 1080p High in SwiftShader: darkness 0 17.8 ms, darkness 1 8.0 ms per frame (software rendering; not a hardware measurement)\nPASS  720p and 1080p; zero page or shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/world/lighting-harness.jpg"
+      ],
+      "scriptSha256": "128bc94991397b144af841df2df22d8ae3b68b5eddda7a634d8596aa0072830d",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "tutorial",
+      "startedAt": "2026-10-17T14:38:14.532Z",
+      "finishedAt": "2026-10-17T14:38:45.670Z",
+      "seconds": 31.138,
+      "exitCode": 1,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: pause menu fits\r\n    at file:///C:/Users/kenne/DevProjects/Personal/lanternmoss/scripts/tutorial-smoke.mjs:74:12 {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: false,\r\n  expected: true,\r\n  operator: '==',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.18.1\r\n",
+      "passed": false,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/help.jpg",
+        "docs/screenshots/huds/tutorial.jpg"
+      ],
+      "scriptSha256": "faba8ed3124caec61f5fb66f2b190f4ca26f16a49044a039c4542b2781e570d0",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "tutorial",
+      "startedAt": "2026-10-17T14:39:32.305Z",
+      "finishedAt": "2026-10-17T14:40:04.990Z",
+      "seconds": 32.685,
+      "exitCode": 1,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: pause menu fits 1280,720: {\"top\":106.13313293457031,\"bottom\":613.8668975830078,\"scroll\":614,\"client\":611,\"viewport\":720}\r\n    at file:///C:/Users/kenne/DevProjects/Personal/lanternmoss/scripts/tutorial-smoke.mjs:79:12 {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: false,\r\n  expected: true,\r\n  operator: '==',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.18.1\r\n",
+      "passed": false,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/help.jpg",
+        "docs/screenshots/huds/tutorial.jpg"
+      ],
+      "scriptSha256": "81f5cadbd14665d1052fe3ed3e67195a26836e0982d2b229f1ca841892934fb8",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "tutorial",
+      "startedAt": "2026-10-17T14:41:21.051Z",
+      "finishedAt": "2026-10-17T14:41:54.998Z",
+      "seconds": 33.946,
+      "exitCode": 1,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: pause menu fits 1280,720: {\"top\":50.40625,\"bottom\":669.59375,\"scroll\":614,\"client\":611,\"viewport\":720}\r\n    at file:///C:/Users/kenne/DevProjects/Personal/lanternmoss/scripts/tutorial-smoke.mjs:83:12 {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: false,\r\n  expected: true,\r\n  operator: '==',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.18.1\r\n",
+      "passed": false,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/help.jpg",
+        "docs/screenshots/huds/tutorial.jpg"
+      ],
+      "scriptSha256": "5fbd5e11be81ebfe4a78faf675457384b66ad1a38dee85b81124f462c6e3db86",
+      "diagnosis": "Waiting for the opening animation completed still leaves scrollHeight 614 vs clientHeight 611 at 720p: genuine main-menu overflow.",
+      "styleVersion": "baselineGitBlob"
+    },
+    {
+      "name": "tutorial",
+      "startedAt": "2026-10-17T14:42:23.642Z",
+      "finishedAt": "2026-10-17T14:43:27.155Z",
+      "seconds": 63.512,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  browser guide, Help, skip/reload/replay, rebound hero prompts, menu bounds at 720p/1080p, fainting and paused countdown; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/fainted.jpg",
+        "docs/screenshots/huds/help.jpg",
+        "docs/screenshots/huds/tutorial.jpg"
+      ],
+      "scriptSha256": "5fbd5e11be81ebfe4a78faf675457384b66ad1a38dee85b81124f462c6e3db86",
+      "styleVersion": "testedGitBlob"
+    },
+    {
+      "name": "save",
+      "startedAt": "2026-10-17T14:43:27.274Z",
+      "finishedAt": "2026-10-17T14:44:17.996Z",
+      "seconds": 50.722,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  reload, Continue, manual Save, quit, new-adventure confirmation, export and import; menus fit 720p/1080p; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/continue.jpg",
+        "docs/screenshots/huds/save-menu.jpg",
+        "docs/screenshots/huds/title.jpg"
+      ],
+      "scriptSha256": "73a36a3231051af8d4ea07971226a3fca5bbd80b348e5623fdea98fcc78bcd70",
+      "styleVersion": "testedGitBlob"
+    },
+    {
+      "name": "save",
+      "startedAt": "2026-10-17T14:45:08.403Z",
+      "finishedAt": "2026-10-17T14:46:05.484Z",
+      "seconds": 57.081,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "PASS  reload, Continue, manual Save, quit, new-adventure confirmation, export and import; menus fit 720p/1080p; zero page/shader errors\n",
+      "stderr": "",
+      "passed": true,
+      "restoredSmokeCaptures": [
+        "docs/screenshots/huds/continue.jpg",
+        "docs/screenshots/huds/save-menu.jpg",
+        "docs/screenshots/huds/title.jpg"
+      ],
+      "scriptSha256": "cbf4e186262486472592681827f502c85216a6aaae553933d5c29b59b82b70a4",
+      "styleVersion": "testedGitBlob"
+    }
+  ],
+  "updatedAt": "2026-10-17T14:46:05.595Z",
+  "summary": {
+    "units": {
+      "command": "npm test",
+      "initialPassed": 243,
+      "finalPassed": 243,
+      "failed": 0,
+      "skipped": 0,
+      "finalDurationMs": 7103.3423,
+      "finalCompletedAtLocal": "2026-10-17 22:46:26"
+    },
+    "simulations": {
+      "command": "npm run sim",
+      "passed": 53,
+      "failed": 0,
+      "seed": 1,
+      "startedAtLocal": "2026-10-17 22:12:38",
+      "finishedAtLocal": "2026-10-17 22:24:27",
+      "terrainTimingPassed": true
+    },
+    "browser": {
+      "planned": 17,
+      "latestPassed": 17,
+      "attempts": 22,
+      "earlierFailedAttempts": 3,
+      "latestResults": {
+        "hud-performance": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:25:06.028Z",
+          "scriptSha256": "cd74f1fab51e721ada01d92ca44f403492506ad95b2caeda097767f565cb6073"
+        },
+        "coastal-enemies": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:25:39.659Z",
+          "scriptSha256": "97c7cf63218a4ba90297cb597315a6e07b95fb545e5cdf4d50e8a36e206949d5"
+        },
+        "coastal-wildlife": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:26:31.021Z",
+          "scriptSha256": "37d92cfaaf2f6badb76a1779fb8efd4afdb9b009175ba81029c58bb6e7e60bef"
+        },
+        "coastal-village": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:27:56.618Z",
+          "scriptSha256": "f606987de215f5a30485846c5f3018264a95639204fba213bf2f67e4c462994e"
+        },
+        "coastal-resources": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:28:28.634Z",
+          "scriptSha256": "141e4b7b526da6a89a0dc31e73b5c751efcee27caca671c9ee975467a525fb06"
+        },
+        "witch-talents": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:28:58.082Z",
+          "scriptSha256": "fd5871cbfbe2e7673a8a0faf9d000a6327f6c6f884da45c080f845f5b70143ad"
+        },
+        "warrior-talents": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:29:32.608Z",
+          "scriptSha256": "2698fd265f92300786fd77f43ee927fd47d0132f8163e20af53900218d794508"
+        },
+        "ranger-talents": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:30:03.599Z",
+          "scriptSha256": "8197e977247460dfc2873195993fe5192289adb501f05e6d270b89a479c619f9"
+        },
+        "ironclaw": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:30:42.212Z",
+          "scriptSha256": "18278c7e57c8b818ceeb45b0a2be393d5672a94d0561c9113011adfe704a8945"
+        },
+        "mirelure": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:31:23.544Z",
+          "scriptSha256": "b901f7f883f14093c3aba9b2874888b8b235484d313c086f1d98469ff5e695c8"
+        },
+        "tidewhisper-campaign": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:32:12.865Z",
+          "scriptSha256": "9088d07ec07cf70fff27726da8f6cd1de4a205481cb92dbab5258551c0621288"
+        },
+        "portals": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:34:39.519Z",
+          "scriptSha256": "427efc0bde82493df23e7267a4e0fdd07a91c1f1069fe70dc8832672b2d6b135"
+        },
+        "save": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:46:05.484Z",
+          "scriptSha256": "cbf4e186262486472592681827f502c85216a6aaae553933d5c29b59b82b70a4"
+        },
+        "sets": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:35:53.200Z",
+          "scriptSha256": "f4c142f23e7c0f200076cd708beb84de16d9f0b3dc5d3e7abb3b87383c745442"
+        },
+        "photo": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:37:26.889Z",
+          "scriptSha256": "cfe9d8e792a8663d3bfa0cbfcaa82240d8e28463b7c8f04ade60a3ca588b582e"
+        },
+        "lighting": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:38:14.417Z",
+          "scriptSha256": "128bc94991397b144af841df2df22d8ae3b68b5eddda7a634d8596aa0072830d"
+        },
+        "tutorial": {
+          "passed": true,
+          "finishedAt": "2026-10-17T14:43:27.155Z",
+          "scriptSha256": "5fbd5e11be81ebfe4a78faf675457384b66ad1a38dee85b81124f462c6e3db86"
+        }
+      }
+    },
+    "simulationSourceUnchanged": true,
+    "noHardwareFpsCertification": true
+  },
+  "styleSource": {
+    "path": "styles/main.css",
+    "baselineGitBlob": "d39abea9e484d80c9fdd1092450052a7beae2dc5",
+    "testedGitBlob": "26249e8d31eba565250d272313c3bc01597357cf",
+    "fix": "Only #pause .panel.main gets viewport-minus-32px maximum height; strict tutorial/save content fit assertions pass."
+  },
+  "failureResolution": {
+    "name": "tutorial",
+    "before": {
+      "viewport": [
+        1280,
+        720
+      ],
+      "scrollHeight": 614,
+      "clientHeight": 611
+    },
+    "animationWaitAlonePassed": false,
+    "correctedChecks": [
+      "tutorial",
+      "save"
+    ],
+    "assertionToleranceUnchanged": true
+  },
+  "visualReview": {
+    "captures": [
+      "lanternmoss-save-layout-720.png",
+      "lanternmoss-save-layout-1080.png"
+    ],
+    "location": "system temporary directory",
+    "reviewed": true,
+    "finding": "All main pause actions and footer are visible inside the panel; incidental banners removed."
+  },
+  "finishedAt": "2026-10-17T14:47:17.410Z"
+}

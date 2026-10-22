@@ -8,6 +8,7 @@ import { boundCodes, is } from './keybinds.js';
 import { confirmAim, kit, tryCast } from '../combat/casting.js';
 import { cancelAim, isAiming, nudgeAim } from '../combat/aiming.js';
 import { groundUnderScreen } from '../combat/area.js';
+import { distance, pointOf, toward } from '../combat/space.js';
 import { Fishing } from '../gameplay/Fishing.js';
 import { Hotbar } from '../gameplay/hotbar.js';
 import { currentInteraction } from '../gameplay/Houses.js';
@@ -15,7 +16,7 @@ import { Pets } from '../gameplay/Pets.js';
 import { audio } from '../systems/AudioSystem.js';
 import { dragCamera, zoomCamera } from '../systems/CameraSystem.js';
 import { initInput, pointer } from '../systems/InputSystem.js';
-import { arcDist, tangentToward } from '../utils/sphere.js';
+
 import { CharacterSelect } from '../ui/CharacterSelect.js';
 import { MainMenu } from '../ui/MainMenu.js';
 import { Dialog } from '../ui/Dialog.js';
@@ -23,6 +24,7 @@ import { toggleHint } from '../ui/hud.js';
 import { InventoryUI } from '../ui/InventoryUI.js';
 import { PauseMenu } from '../ui/PauseMenu.js';
 import { PetMenu } from '../ui/PetMenu.js';
+import { PhotoMode } from '../ui/PhotoMode.js';
 import { JournalUI } from '../ui/JournalUI.js';
 import { ShopUI } from '../ui/ShopUI.js';
 import { toast } from '../ui/toast.js';
@@ -30,19 +32,24 @@ import { PortalUI } from '../ui/PortalUI.js';
 import { Building } from '../gameplay/Building.js';
 import { BuildingUI } from '../ui/BuildingUI.js';
 import { HomeUI } from '../ui/HomeUI.js';
+import { BountyUI } from '../ui/BountyUI.js';
+import { TalentUI } from '../ui/TalentUI.js';
 
 /** Keys whose browser default (page scroll, quick-find, focus moves...) would get in the way. */
-const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen || BuildingUI.isOpen ? code === 'Escape' : code === 'Escape' || Building.active && code === 'Enter' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
+const GAME_KEYS = { has: code => PortalUI.isOpen || HomeUI.isOpen || BountyUI.isOpen || TalentUI.isOpen || BuildingUI.isOpen ? code === 'Escape' : code === 'Escape' || Building.active && code === 'Enter' || HOTBAR_KEYS.includes(code) || boundCodes().has(code) };
 
 function onKey(code) {
   if (is('togglePerformance', code) && !PauseMenu.capture) { setSetting('perfOverlay', !settings.perfOverlay); return; }
   const player = ctx.player;
   if (BuildingUI.isOpen) { BuildingUI.key(code); return; }
   if (HomeUI.isOpen) { HomeUI.key(code); return; }
+  if (BountyUI.isOpen) { BountyUI.key(code); return; }
+  if (TalentUI.isOpen) { TalentUI.key(code); return; }   // over the pause menu: Esc comes back to it
   if (PortalUI.isOpen) { PortalUI.key(code); return; }
   if (JournalUI.isOpen) { JournalUI.key(code); return; }  // the journal sits on top of everything (even the pause menu)
   if (PauseMenu.isOpen) { PauseMenu.key(code); return; }  // paused: only the menu listens
   if (PetMenu.isOpen) { PetMenu.key(code); return; }      // the pet menu pauses too
+  if (PhotoMode.isOpen) { PhotoMode.key(code); return; }  // so does photo mode
   if (ctx.transitioning) return;                       // travelling between planets
   if (ctx.cutscene && code !== 'Escape' && !is('pause', code)) return;   // a boss is waking: only pausing works
   if (Building.active && code === 'Escape') { Building.cancel(); return; }
@@ -61,6 +68,7 @@ function onKey(code) {
   }
   if (is('bag', code)) { if (Dialog.open) Dialog.close(); InventoryUI.toggle(); return; }
   if (is('petMenu', code)) { PetMenu.open(); return; }
+  if (is('photoMode', code)) { PhotoMode.open(); return; }
   if (is('journal', code)) { JournalUI.open(); return; }
   const slot = HOTBAR_KEYS.indexOf(code); if (slot >= 0) { Building.cancel(); Hotbar.select(slot); return; }   // hold / use a hotbar item (bag open or not)
   if (is('jump', code) && !player.dead) player.jumpBuf = 0.14;
@@ -89,7 +97,7 @@ function onClick() {
 }
 function faceClick() {
   const P = ctx.player; if (!pointer.over || P.dead || P.motion || !ctx.started || ctx.cutscene) return;
-  const d = groundUnderScreen(pointer.x, pointer.y); if (d && arcDist(P.up, d) > 0.4) P.fwd.copy(tangentToward(P.up, d));
+  const d = groundUnderScreen(pointer.x, pointer.y); if (d && distance(pointOf(P), d) > 0.4) P.fwd.copy(toward(pointOf(P), d));
 }
 /** Right click: cancels aiming, otherwise uses the held hotbar item. */
 function onRightClick() {
@@ -106,7 +114,7 @@ export function initControls(canvas) {
     onMenuKey: code => MainMenu.key(code),
     onKey, onClick,
     onCancel: onRightClick,
-    onDrag: dragCamera,
-    onZoom: sign => (isAiming() ? nudgeAim(-sign) : zoomCamera(sign)),   // wheel up = farther while aiming
+    onDrag: (dx, dy) => (PhotoMode.isOpen ? PhotoMode.drag(dx, dy) : dragCamera(dx, dy)),
+    onZoom: sign => (PhotoMode.isOpen ? PhotoMode.zoom(sign) : isAiming() ? nudgeAim(-sign) : zoomCamera(sign)),   // wheel up = farther while aiming
   });
 }

@@ -10,5 +10,5 @@ export const LEVELING = {
   perLevel: { maxHp: 6, maxMana: 4, manaRegen: 0.5, hpRegen: 0.3 },   // added to the character's base stats for every level above 1
   damagePerLevel: 0.05,                // hero ability damage +5% per level above 1 (x1.45 at 10, x1.75 at 16); pets grow too
   healOnLevelUp: true,                 // refill HP and mana/stamina on level-up
-  creditSources: ['player', 'pet'],    // damageEnemy sources whose killing blow grants XP (no source = the hero's own abilities)
+  creditSources: ['player', 'pet', 'burn'],    // damageEnemy sources whose killing blow grants XP (no source = the hero's own abilities)
 };
