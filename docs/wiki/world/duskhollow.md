@@ -1,6 +1,6 @@
 # Duskhollow: twilight terrain and the lantern
 
-## In brief (stages 30a-30d, unreleased)
+## In brief (stages 30a-30e, unreleased)
 
 Duskhollow is the fifth world: deep valleys under a canopy of giant lumen caps, where your lantern decides what you
 can see. Stage 30a builds its terrain, its endless dusk, the belt lantern with its Oil bar, and the glowmoss that
@@ -10,9 +10,10 @@ your light. Stage 30c gives it an economy and a sky of its own: lumen ore, ingot
 guarded moonstone vein, lantern oil, shade mushrooms, the craftable Dusk set, spore drift and deep dark, the
 dripping caps that water the farm where no rain falls, and a music box theme. Stage 30d gives it people and a
 purpose: Wick the lamplighter in a stalk you can walk into, the travellers' lines, the village brazier, the Old
-Road's waylamps and the three moonwells his quest asks you to relight, and the gate that keeps Umbra asleep. The
-rest of the planned checklist - the four monsters (30e-30f), Grandmother Gloomweaver (30g), Umbra herself (30h) and
-campaign release (30i) - is **not built yet**.
+Road's waylamps and the three moonwells his quest asks you to relight, and the gate that keeps Umbra asleep. Stage
+30e sends the first monsters after you: shadelings, which only your light can touch, and mosslurks, which look
+exactly like the glowcaps they are sitting among. The rest of the planned checklist - gloomweavers and snuffers
+(30f), Grandmother Gloomweaver (30g), Umbra herself (30h) and campaign release (30i) - is **not built yet**.
 
 Duskhollow stays `released: false`: it cannot be selected, generated or travelled to in normal play. The checks run
 it through a development fixture (`tests/sim/lib/duskhollowFixture.mjs`) that copies this world's content into the
@@ -200,6 +201,49 @@ bookshelf carries the lamplighter's round and the night Umbra came.
 level 11 **and** the three moonwells burn. The sealed lair, its status chip and the bestiary all say so through the
 ordinary [boss gate](monsters-and-bosses.md). Her fight, her trophy and her arena arrive with 30h.
 
+## Shadelings and mosslurks (30e)
+
+Duskhollow's first two monsters both take their rules from the thing the whole world is about.
+
+### The shadeling
+
+Out in the dusk a shadeling is **only a shadow**: a dark stain sliding over the ground after you, with two pale eyes
+in it. Nothing can hit it there - and, by exactly the same rule, **it cannot hit you**. It may follow, but it never
+even begins a blow. An unreadable monster, in other words, can never land one.
+
+Where the ground is lit it **stands up solid**: a hunched smoke-coloured figure with three wisps turning around its
+head, which fights, and which you can fight. What counts as lit is everything that makes light here, through
+`OldRoad.litAt()`: the village gap, the lantern on your belt (full, or down to its safe ember), the brazier, and
+every waylamp and moonwell relit on [the Old Road](#wick-and-the-old-road-30d). **A road you lit is a road you can
+fight on**, which is the quiet reward for Wick's quest.
+
+A **burst** of light drives it off - light that was not there a moment ago, never light you merely walked closer to:
+a waylamp or moonwell catching, or an empty lantern refilled beside it. So does fire: the witch's Fireball and
+Meteor carry it, and so does an Ember-set burn. Every hero has the first counter, since every hero carries a
+lantern here.
+
+![A shadeling solid in the hero's lantern light](../../screenshots/mobs/duskhollow-shadeling.jpg)
+
+### The mosslurk
+
+A cluster of glowcaps with teeth. While it is disguised it is scenery: nothing can hit it, it has no health bar, it
+does not move, and it offers the prompt a real glowcap patch offers - **"Pick the glowcap patch"**. Reaching for it
+is the ambush. So is walking right over it.
+
+Springing is never a free hit. It rears up with a warning circle on the ground for its whole wind-up before the
+first bite, so a hero who reached for the wrong caps can still step out of it, and it is slow enough afterwards to
+back away from. Nothing about a mimic is saved: they are rebuilt with the planet's roster, always disguised, so a
+save can neither leave one sprung nor remember which patch bit you.
+
+![A mosslurk reared up beside the hero, caps and teeth](../../screenshots/mobs/duskhollow-mosslurk.jpg)
+
+| | Shadeling | Mosslurk |
+| --- | --- | --- |
+| Where | Camps of three through the hollows | Beside the real glowcaps (`near: 'glowcaps'`) |
+| Untouchable while | It is standing in the dark | It is still disguised |
+| Counter | Light: carry it, or relight the road. Fire drives it off | Watch the warning circle; count the caps - a real patch does not blink |
+| Leaves | Often lumen dust | Often the glowcaps it was wearing |
+
 ## What is checked
 
 | Check | What it proves |
@@ -216,10 +260,13 @@ ordinary [boss gate](monsters-and-bosses.md). Her fight, her trophy and her aren
 | `npm test` (`tests/oldRoad.test.mjs`) | The saved lit lamps and flame, cleaned and bounded; taking fire, the relay, a flame that runs dry, the three moonwells counted once; Wick, his stalk and the level-11 gate |
 | `npm run sim -- oldRoad` | The road is built where the fiction says, Wick offers and tracks his quest, the flame is carried and runs dry through the real interactions, Continue and portal travel keep the road lit, the three wells finish the quest, and level 11 unseals the lair |
 | `node scripts/old-road-smoke.mjs` | In a real browser: real `E` takes the village flame and lights a waylamp, a lit lamp hands out fire again, running dry costs no health, the village gap is still safe light, and a relit lamp's light reaches the shader |
+| `npm test` (`tests/duskMonsters.test.mjs`) | The authored stats, roster placement, pages and drops, and the arithmetic that keeps every counter reachable: a lantern, an ember, a waylamp and a moonwell each light brightly enough to bind a shade |
+| `npm run sim -- duskMonsters` | A shadow that cannot be hit and cannot hit back, the lantern and a relit waylamp standing one up solid, a lamp catching and a hit of fire driving it off, an empty lantern staying safe, the gather prompt and both ways of springing a mimic, and Continue/travel leaving none sprung |
+| `node scripts/dusk-monsters-smoke.mjs` | In a real browser: both kinds render, a shadeling really cannot be hit in the dark and really can in the light, a waylamp coming on really drives it off, and real `E` on a mosslurk's caps springs it with its warning circle first |
 
 ## Not built yet
 
-Shadelings, Gloomweavers, Mosslurks, Snuffers, Grandmother Gloomweaver, Umbra herself and the campaign release. No
-enemy roster is configured, so Duskhollow still fails the content gate by design, and nothing yet answers the gate
-Wick's quest opens. Spider silk has no source in the world until the gloomweavers' webs arrive in 30f, and the
-moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is simply mineable.
+Gloomweavers, Snuffers, Grandmother Gloomweaver, Umbra herself and the campaign release. The roster holds only two
+of its four regular monsters and no mini boss, so Duskhollow still fails the content gate by design, and nothing yet
+answers the gate Wick's quest opens. Spider silk has no source in the world until the gloomweavers' webs arrive in
+30f, and the moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is simply mineable.

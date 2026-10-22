@@ -15,7 +15,7 @@ export const SHOT_FOLDERS = {
   characters: ['select', 'swim'],
   pets: ['pets', 'pet-field', 'select-pet', 'dragontoad', 'otter'],
   critters: ['meadow', 'rare', 'tidewhisper-pearl-turtle', 'duskhollow-wildlife'],
-  mobs: ['combat', 'basilisk', 'hydra', 'tidewhisper-enemies', 'mob-brawl'],
+  mobs: ['combat', 'basilisk', 'hydra', 'tidewhisper-enemies', 'mob-brawl', 'duskhollow-shadeling', 'duskhollow-mosslurk'],
   bosses: ['boss-demon', 'boss-dragon', 'lair', 'summon', 'arena', 'balance-flight', 'tidewhisper-ironclaw',
     'tidewhisper-mirelure-beached', 'tidewhisper-mirelure-lures'],
   npcs: ['dialogue', 'duskhollow-wick'],
