@@ -1141,6 +1141,18 @@ portal, travel, partial save/Continue, return, Mirelure completion, one Tide Cro
 with zero page/shader errors. Its portal shot was reviewed. Full suites, a fresh final-commit Acer matrix, the
 screenshot tour and integration remain step 4; the public `master` merge still needs separate confirmation.
 
+**27 release step 4 checkpoint (2026-10-22):** The four-world validation branch passes 278/278 unit tests,
+all 62 simulations, all 38 browser smokes after resolving legacy three-world expectations and rerunning one
+intermittent coastal bolt check, and the full screenshot tour (`errors: none`). The two-seed, three-hero Tidewhisper
+balance audit passes all 18 checked rows. Visual review caught a pier screenshot filmed through geometry; the
+staging was fixed and both campaign captures retaken. Fresh clean-commit Acer RTX 4050 matrices on the enabled
+branch, still using the historical candidate browser fixture, failed the unchanged 16.67 ms p95 limit: first 17/18 timing rows passed (seed 1 witch squall 17.0 ms),
+then 16/18 (the same row 18.2 ms and seed 7 witch night 17.1 ms). Render-count rows passed. **No integration
+into `develop` or public release is authorized by these results.** Repeat the full matrix under comparable idle
+machine conditions or improve the measured path, then rerun changed checks and complete the release workflow.
+The collector now requires the ordinary production entry for `--release`; that final matrix is still pending.
+The earlier 18/18 reference used a prior commit and is retained as history, not final certification.
+
 **27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
 27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
 Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.

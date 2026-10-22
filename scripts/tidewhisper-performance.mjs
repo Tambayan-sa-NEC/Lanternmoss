@@ -8,6 +8,7 @@ import { tidewhisperBrowser } from './lib/tidewhisper-browser.mjs';
 import { discardWebGL } from './lib/discard-webgl.mjs';
 import { PERFORMANCE_BUDGET, PERFORMANCE_REFERENCE, referenceProfile, referenceRenderer } from '../src/config/render.js';
 import { frameLimitMs } from '../src/config/contentGate.js';
+import { PLANETS } from '../src/config/planets.js';
 const release = process.argv.includes('--release');
 const gpuTiming = process.argv.includes('--gpu-timing');
 const headed = !process.argv.includes('--headless');
@@ -22,7 +23,8 @@ const dirty = !!execFileSync('git', ['status','--porcelain'], { cwd, encoding:'u
 const host = { platform: platform(), osRelease: osRelease(), cpu: cpus()[0]?.model, totalMemoryBytes: totalmem(), freeMemoryBeforeBrowserBytes: freemem() };
 const viewport = { width: PERFORMANCE_REFERENCE.viewport[0], height: PERFORMANCE_REFERENCE.viewport[1] };
 const quality = PERFORMANCE_REFERENCE.quality;
-const { browser, page, errors, close } = await tidewhisperBrowser({ port: 8115, software: false,
+assert.ok(!release || PLANETS.some(p => p.id === 'tidewhisper'), 'release measurement requires the authored Tidewhisper world');
+const { browser, page, errors, close } = await tidewhisperBrowser({ port: 8115, candidate: !release, software: false,
   highPerformance: true, viewport, quality, headless: !headed });
 try {
   await page.setCacheEnabled(false);
@@ -136,7 +138,7 @@ try {
     const report = { measuredAt: new Date().toISOString(), candidateCommit, dirty, gpuTiming,
       rowCleanup: 'await previous WebGL context loss, then dispose before reload, outside measured frames', device: gpu,
       target: `${PERFORMANCE_REFERENCE.machine} / ${PERFORMANCE_REFERENCE.renderer}`, host, gpuDevices: gpuInfo?.devices ?? [],
-      browser: { ...device, headless: !headed }, quality, viewport: [viewport.width,viewport.height], candidate: true,
+      browser: { ...device, headless: !headed }, quality, viewport: [viewport.width,viewport.height], candidate: !release,
       profile: 'fresh reload and empty test storage per row; play stream seeded before hero/travel setup; stationary invulnerable hero at village spawn, passive unlocked otter pet, authored generation seed; fixed day/tide phase; 120 explicit setup updates, 30 warmup and 120 real render intervals per row; empty-clock page measured with game tab frozen',
       frameMetric: 'p95FrameMs = real interval between rendered frames; p95CpuMs (game loop) omits browser work; optional --gpu-timing adds query/readback overhead and is diagnostic only (p95GpuMs is otherwise null)',
       errors, frameClock, rows };
