@@ -32,6 +32,8 @@ export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, 
     fish: [{ body: 0xe8eef0, spot: 0xcfe4ff, fin: 0xf4fbff }, { body: 0xdfe8ff, spot: 0xffffff, fin: 0xe8f4ff }] },   // pale blind fish in the glowing pools
   roster: [   // 30e: the shades of the hollows, and the mimics hiding among the real glowcaps ('glowcaps' placement)
     { type: 'shadeling', groups: 4, size: 3 }, { type: 'mosslurk', count: 7, near: 'glowcaps' },
+    // 30f: the spinners string their own webs where they stand; the thieves roam for lantern oil
+    { type: 'gloomweaver', groups: 2, size: 2 }, { type: 'snuffer', count: 6 },
   ],
   weather: { clear: 4, fog: 2, breezy: 2, sporeDrift: 3, deepDark: 2 },   // no rain under the canopy (30c)
   music: 'musicBox', material: 'lumenDust',

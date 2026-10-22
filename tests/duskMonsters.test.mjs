@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-// Duskhollow's monsters (TODO 30e) as authored data and pure rules: no browser, no scene, no world.
+// Duskhollow's monsters (TODO 30e shadelings and mosslurks, 30f gloomweavers and snuffers) as authored data and
+// pure rules: no browser, no scene, no world.
 const duskhollow = (await import('../src/config/planets/duskhollow.js')).default;
 const { COMBAT } = await import('../src/config/combat.js');
 const { BESTIARY_ENTRIES } = await import('../src/config/bestiary.js');
@@ -13,14 +14,17 @@ const { releasedEnemyTypes } = await import('../src/config/releasedEnemies.js');
 const { PLANET_CATALOG } = await import('../src/config/planets.js');
 
 const ITEMS = new Set([...ITEM_DEFINITIONS, ...DUSK_ITEMS].map(i => i.id));
-const DUSK = ['shadeling', 'mosslurk'];
+const { LANTERN } = await import('../src/config/lantern.js');
+const LANTERN_MAX = LANTERN.oil.max;
+const DUSK = ['shadeling', 'mosslurk', 'gloomweaver', 'snuffer'];
+const group = type => duskhollow.roster.find(g => g.type === type);
 
-test('Duskhollow fields the two monsters its stage authored, placed where each belongs', () => {
+test('Duskhollow fields the monsters its stages authored, placed where each belongs', () => {
   assert.deepEqual(duskhollow.roster.map(g => g.type), DUSK);
-  const shades = duskhollow.roster[0], lurks = duskhollow.roster[1];
-  assert.ok(shades.groups > 0 && shades.size > 0, 'shadelings come in groups, as the hollows are haunted in packs');
-  assert.equal(lurks.near, 'glowcaps', 'a mimic is only a mimic where there are real caps to hide among');
-  assert.ok(lurks.count > 0);
+  assert.ok(group('shadeling').groups > 0 && group('shadeling').size > 0, 'shadelings come in groups: the hollows are haunted in packs');
+  assert.equal(group('mosslurk').near, 'glowcaps', 'a mimic is only a mimic where there are real caps to hide among');
+  assert.ok(group('gloomweaver').groups > 0, 'weavers come in pairs, so their webs overlap');
+  assert.ok(group('snuffer').count > 0 && !group('snuffer').near, 'thieves roam the whole world looking for a lit lantern');
   for (const type of DUSK) assert.ok(COMBAT.enemies[type], `${type} has stats`);
 });
 
@@ -53,6 +57,41 @@ test('a mosslurk ambush is an ambush, not a free hit', () => {
   assert.ok(d.damage > 0 && d.hp > 0 && d.xp > 0);
 });
 
+test('a gloomweaver fences you in with webs, and the webs are objects with their own rules', () => {
+  const d = COMBAT.enemies.gloomweaver, w = COMBAT.enemies[d.web.type];
+  assert.equal(d.ai, 'weaver');
+  assert.ok(d.web.max > 0 && d.web.max <= 6, `a weaver holds a bounded number of webs (${d.web.max})`);
+  assert.ok(d.web.every > 0 && d.web.at > 0, 'and spins them on a timer, a little ahead of itself');
+  assert.ok(w, 'the web it spins is a real enemy definition');
+  assert.equal(w.object, true, 'but an object, not a monster: no page, no drops, no kill counted');
+  assert.equal(w.static, true);
+  assert.ok(w.mire > 0 && w.mire < 1, `a web slows, it never stops you dead (${w.mire})`);
+  assert.ok(w.hp > 0, 'a blade has to cut it');
+  assert.ok(w.life > 0, 'and an uncut web rots away, so a hollow cannot silt up');
+  const [item, [lo, hi]] = w.silk;
+  assert.ok(ITEMS.has(item) && lo >= 1 && hi >= lo, `it leaves real silk: ${item} ${lo}-${hi}`);
+  assert.equal(item, 'spiderSilk', 'which is the source this world was missing');
+});
+
+test('a snuffer can only take what the tank holds, and always gives back more', () => {
+  const d = COMBAT.enemies.snuffer, s = d.steal;
+  assert.equal(d.ai, 'thief');
+  assert.ok(s.oil > 0 && s.oil < LANTERN_MAX, `one theft is a draught, not the whole tank (${s.oil} of ${LANTERN_MAX})`);
+  assert.ok(s.interest > 1, 'catching it is worth more than it took');
+  assert.ok(s.escape > 0 && s.speedUp > 1, 'and it runs off quicker than it arrived');
+  assert.ok(d.damage < COMBAT.enemies.shadeling.damage, 'it barely fights: the chase is the point');
+});
+
+test('the beetle silhouette is one setting, shared by every spider on the world', async () => {
+  const { SETTINGS_SCHEMA } = await import('../src/config/settings.js');
+  const items = SETTINGS_SCHEMA.flatMap(g => g.items);
+  const toggle = items.find(i => i.key === 'roundBeetles');
+  assert.ok(toggle, 'the Settings screen offers it');
+  assert.equal(toggle.type, 'toggle');
+  assert.equal(toggle.default, false, 'off by default: the spiders are the authored look');
+  assert.match(toggle.label, /beetle/i);
+});
+
 test('fire is named in the spells that carry it, so every flee rule has a source', () => {
   assert.equal(COMBAT.spells.fireball.fire, true);
   assert.equal(COMBAT.spells.meteor.fire, true);
@@ -60,7 +99,7 @@ test('fire is named in the spells that carry it, so every flee rule has a source
   assert.deepEqual(others, [], 'and nothing else claims to be fire');
 });
 
-test('both monsters have a journal page and leave something of this world behind', () => {
+test('every monster has a journal page and leaves something of this world behind', () => {
   for (const type of DUSK) {
     const page = BESTIARY_ENTRIES[type];
     assert.ok(page?.name && page.blurb, `${type} has a page`);
@@ -72,6 +111,9 @@ test('both monsters have a journal page and leave something of this world behind
   }
   assert.match(BESTIARY_ENTRIES.shadeling.counters.join(' '), /light/i);
   assert.match(BESTIARY_ENTRIES.mosslurk.counters.join(' '), /circle/i);
+  assert.match(BESTIARY_ENTRIES.gloomweaver.counters.join(' '), /beetle/i, 'and the weaver page names the accessibility setting');
+  assert.match(BESTIARY_ENTRIES.snuffer.counters.join(' '), /interest|back/i);
+  assert.equal(BESTIARY_ENTRIES[COMBAT.enemies.gloomweaver.web.type], undefined, 'a web is an object, so it gets no page');
 });
 
 test('an unreleased world\'s monsters stay out of the journal\'s goals', () => {

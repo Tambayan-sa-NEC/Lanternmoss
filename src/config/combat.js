@@ -96,6 +96,27 @@ export const COMBAT = {
                  aggro: 7, leash: 14, turnRate: 5, range: 1.8, damage: 13, windup: 0.6, windupTurn: 5, recover: 0.7,
                  cooldown: 1.8, knockback: 6, triggerRange: 1.2, pickReach: 2.2, knockResist: 0.4, telegraph: true,
                  respawn: 55, xp: 24 },
+    // ---- Duskhollow (TODO 30f): the spinners and the thieves
+    // A Gloomweaver strings sticky webs between the stalks and bites what walks into them. Its `web` block tunes the
+    // webs it spins: `max` live at once per weaver, `every` seconds between spinnings, `at` metres ahead of it,
+    // `type` the web object below. The accessibility toggle `roundBeetles` (config/settings.js) draws every spider
+    // on this world as a round beetle instead, the regular ones and the mini boss alike (models/duskMonsters.js).
+    gloomweaver:{ ai: 'weaver', color: 0x5a4a78, capColor: 0xd8c0ff, hp: 95, speed: 3.2, radius: 0.5, height: 1.0,
+                 aggro: 13, leash: 20, turnRate: 6, range: 1.7, damage: 11, windup: 0.45, windupTurn: 6, recover: 0.5,
+                 cooldown: 1.6, knockback: 5, web: { max: 3, every: 6, at: 4.5, type: 'gloomweb' },
+                 respawn: 50, xp: 22 },
+    // A sticky web: an object, not a monster. It slows whoever stands in it (`mire`, a share of walking speed) and is
+    // cut by a blade or burnt away by fire, leaving `silk`. `fire` = a hit carrying fire destroys it outright.
+    gloomweb:  { ai: 'web', object: true, static: true, name: 'Sticky web', color: 0xd8c0ff, hp: 8, speed: 0,
+                 radius: 1.5, height: 0.6, aggro: 0, leash: 99, respawn: 0, xp: 0,
+                 knockResist: 1, slowResist: 1, staggerImmune: true,
+                 mire: 0.45, silk: ['spiderSilk', [1, 2]], life: 240 },
+    // A Snuffer darts in, steals `oil` from the belt lantern and runs off with it. Catch it and the lantern gets it
+    // back with interest (`interest`); `escape` is how long it keeps running before it settles down again.
+    snuffer:   { ai: 'thief', color: 0x3b3356, capColor: 0xffc06a, hp: 55, speed: 4.6, radius: 0.35, height: 0.95,
+                 aggro: 16, leash: 24, turnRate: 9, range: 1.4, damage: 4, windup: 0.35, windupTurn: 9, recover: 0.4,
+                 cooldown: 2.6, knockback: 2, steal: { oil: 18, interest: 1.5, escape: 6, speedUp: 1.35 },
+                 respawn: 45, xp: 18 },
     // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
     //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
     hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,

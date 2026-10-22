@@ -1,6 +1,6 @@
 # Duskhollow: twilight terrain and the lantern
 
-## In brief (stages 30a-30e, unreleased)
+## In brief (stages 30a-30f, unreleased)
 
 Duskhollow is the fifth world: deep valleys under a canopy of giant lumen caps, where your lantern decides what you
 can see. Stage 30a builds its terrain, its endless dusk, the belt lantern with its Oil bar, and the glowmoss that
@@ -12,8 +12,10 @@ dripping caps that water the farm where no rain falls, and a music box theme. St
 purpose: Wick the lamplighter in a stalk you can walk into, the travellers' lines, the village brazier, the Old
 Road's waylamps and the three moonwells his quest asks you to relight, and the gate that keeps Umbra asleep. Stage
 30e sends the first monsters after you: shadelings, which only your light can touch, and mosslurks, which look
-exactly like the glowcaps they are sitting among. The rest of the planned checklist - gloomweavers and snuffers
-(30f), Grandmother Gloomweaver (30g), Umbra herself (30h) and campaign release (30i) - is **not built yet**.
+exactly like the glowcaps they are sitting among. Stage 30f adds the other two: gloomweavers, round fuzzy spiders
+that fence the ground with sticky webs, and snuffers, little thieves who want what is in your lantern. The rest of
+the planned checklist - Grandmother Gloomweaver (30g), Umbra herself (30h) and campaign release (30i) - is **not
+built yet**.
 
 Duskhollow stays `released: false`: it cannot be selected, generated or travelled to in normal play. The checks run
 it through a development fixture (`tests/sim/lib/duskhollowFixture.mjs`) that copies this world's content into the
@@ -244,6 +246,49 @@ save can neither leave one sprung nor remember which patch bit you.
 | Counter | Light: carry it, or relight the road. Fire drives it off | Watch the warning circle; count the caps - a real patch does not blink |
 | Leaves | Often lumen dust | Often the glowcaps it was wearing |
 
+## Gloomweavers, their webs, and snuffers (30f)
+
+### The gloomweaver and its webs
+
+A round, fuzzy spider that bites like any other biter - and, between bites, **spins**. Every few seconds it lays a
+sticky web a couple of paces ahead of itself, up to its own cap at a time, so a weaver fences you in rather than
+out-damaging you. It tries several bearings before it gives up, so one facing a rock still strings what it can.
+
+A **web** is an object, not a monster: no bestiary page, no drops, no kill counted, and you walk into it rather than
+bumping into it. While you stand in one you wade at `mire` of your walking speed.
+
+| Getting out | What happens |
+| --- | --- |
+| **A blade** | Ordinary blows cut it down; it has a little health to work through |
+| **Fire** | One touch burns the whole thing away, whatever its health (the witch's Fireball and Meteor carry `fire`) |
+| **Waiting** | An uncut web rots away after `life` seconds, so a hollow can never silt up with old ones |
+
+Either way it leaves **spider silk** - the source this world had been missing since 30c, when the Dusk set first
+asked for it.
+
+![A gloomweaver among its webs](../../screenshots/mobs/duskhollow-gloomweaver.jpg)
+
+**Accessibility: "Draw spiders as beetles".** A toggle in Settings → Gameplay draws every spider on this world as a
+round beetle instead. Both silhouettes are built into the model and one is hidden, so the switch lands on the very
+next frame and costs nothing to render; the regular gloomweaver and (in 30g) Grandmother Gloomweaver share the one
+setting, so it can never leave a hero facing one of each. Nothing about the fight changes: same body, same health,
+same webs.
+
+![The same scene with "Draw spiders as beetles" on](../../screenshots/mobs/duskhollow-beetles.jpg)
+
+### The snuffer
+
+A little hooded thief that does not want to fight you. It darts in, takes a draught of lantern oil straight out of
+the tank - the Oil bar moves, and so does the saved value - and runs off with it, quicker than it came, with the
+stolen flask showing on its belt.
+
+**Catch it and you get the oil back with interest.** A snuffer carrying oil pours `oil * interest` into the lantern
+when it goes down, so chasing one is always worth more than what it took. It can rob you again and again, and each
+theft is only as big as the tank still holds: an empty lantern has nothing for it, so a snuffer can never leave you
+worse off than empty.
+
+![A snuffer beside the hero with a full flask of stolen oil](../../screenshots/mobs/duskhollow-snuffer.jpg)
+
 ## What is checked
 
 | Check | What it proves |
@@ -263,10 +308,12 @@ save can neither leave one sprung nor remember which patch bit you.
 | `npm test` (`tests/duskMonsters.test.mjs`) | The authored stats, roster placement, pages and drops, and the arithmetic that keeps every counter reachable: a lantern, an ember, a waylamp and a moonwell each light brightly enough to bind a shade |
 | `npm run sim -- duskMonsters` | A shadow that cannot be hit and cannot hit back, the lantern and a relit waylamp standing one up solid, a lamp catching and a hit of fire driving it off, an empty lantern staying safe, the gather prompt and both ways of springing a mimic, and Continue/travel leaving none sprung |
 | `node scripts/dusk-monsters-smoke.mjs` | In a real browser: both kinds render, a shadeling really cannot be hit in the dark and really can in the light, a waylamp coming on really drives it off, and real `E` on a mosslurk's caps springs it with its warning circle first |
+| `npm run sim -- duskWeavers` | A weaver spinning up to its cap and no further, a web slowing the hero and freeing them the moment it is cut, fire burning one away, silk left behind, oil stolen and repaid with interest, an empty lantern having nothing to steal, the beetle toggle swapping every spider, and Continue/travel leaving no held oil and no standing webs |
+| `node scripts/dusk-weavers-smoke.mjs` | In a real browser: real `W` walking into a web really slows the hero, a blade really frees them and leaves silk, one touch of fire really burns a web away, a snuffer really drains the Oil bar and really pays it back, and the beetle toggle really swaps every spider on screen |
 
 ## Not built yet
 
-Gloomweavers, Snuffers, Grandmother Gloomweaver, Umbra herself and the campaign release. The roster holds only two
-of its four regular monsters and no mini boss, so Duskhollow still fails the content gate by design, and nothing yet
-answers the gate Wick's quest opens. Spider silk has no source in the world until the gloomweavers' webs arrive in
-30f, and the moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is simply mineable.
+Grandmother Gloomweaver, Umbra herself and the campaign release. All four regular monsters are in, but the world has
+no mini boss and no boss fight, so Duskhollow still fails the content gate by design, and nothing yet answers the
+gate Wick's quest opens. The moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is
+simply mineable.
