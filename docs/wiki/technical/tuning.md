@@ -71,6 +71,9 @@
 | The Moonmoth Wing charm and how much it widens the lantern | `src/config/lantern.js` → `LANTERN.charm` |
 | When the dripping caps water Duskhollow's farm, and how much the deep dark thickens its dusk | `src/config/lantern.js` → `LANTERN.drip`, `LANTERN.dusk.deepDark`, `LANTERN.light.deepDarkShrink` |
 | Duskhollow's materials, lantern oil, shade crop and Dusk set, and every recipe that makes them | `src/config/duskResources.js` → `DUSK_ITEMS`, `DUSK_RECIPES` |
+| The Old Road: how its branches leave the village, how long the carried village flame lasts, and how many lit waylamps pool light at once | `src/config/oldRoad.js` → `OLD_ROAD` ([docs](../world/duskhollow.md)) |
+| Wick, the travellers' arrival lines and what is inside Duskhollow's stalk houses | `src/config/duskVillage.js` → `DUSK_NPCS`, `DUSK_HOUSES` |
+| What wakes Umbra (level and Wick's quest) | `src/config/planets/duskhollow.js` → `boss.summon` |
 | Its veins and patches, the shade crop's growth, and which worlds water their own plots | `src/config/resources.js` → `NODE_KINDS`, `CROPS`, `FARM` |
 | Spore drift and deep dark | `src/config/weather.js` → `WEATHER_KINDS` (`spores`, `deepDark`) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |

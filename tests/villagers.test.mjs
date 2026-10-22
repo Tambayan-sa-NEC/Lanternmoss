@@ -8,6 +8,7 @@ import { ITEM_DEFINITIONS } from '../src/config/items.js';
 import { PLANETS, PLANET_CATALOG } from '../src/config/planets.js';
 import { QUESTS } from '../src/config/quests.js';
 import { SHOP } from '../src/config/shop.js';
+import { OLD_ROAD } from '../src/config/oldRoad.js';
 import { planetSources } from '../src/gameplay/resourceRules.js';
 import { TRAVELER_NAMES } from '../src/config/npcs.js';
 
@@ -52,7 +53,9 @@ test('every quest refers to real villagers, items, monsters and planets', () => 
       if (s.to) assert.ok(VILLAGERS.includes(s.to) && s.say, `${id} step ${i}: talks to ${s.to}`);
       if (s.kind === 'defeat') assert.ok(s.enemy === 'any' || COMBAT.enemies[s.enemy], `${id} step ${i}: enemy ${s.enemy}`);
       if (s.kind === 'reach') assert.ok(s.planet < PLANETS.length, `${id} step ${i}: planet`);
-      assert.ok(['collect', 'deliver', 'talk', 'defeat', 'reach'].includes(s.kind), `${id} step ${i}: kind ${s.kind}`);
+      // a 'light' step asks for the moonwells of the Old Road (30d): never more than the world actually has
+      if (s.kind === 'light') assert.ok(s.count > 0 && s.count <= OLD_ROAD.branches.gaps.length, `${id} step ${i}: ${s.count} moonwells`);
+      assert.ok(['collect', 'deliver', 'talk', 'defeat', 'reach', 'light'].includes(s.kind), `${id} step ${i}: kind ${s.kind}`);
       for (const [it] of s.give ?? []) assert.ok(ITEMS[it]);
     });
     for (const [it] of q.reward.items ?? []) assert.ok(ITEMS[it], `${id}: reward ${it}`);

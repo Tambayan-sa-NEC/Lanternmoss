@@ -48,6 +48,7 @@ export const TRANSIENT_SYSTEMS = {
   'gameplay/Dungeons.js': 'The cave itself is rebuilt from the planet seed; which cave the hero is in and where they stand is saved with the player, and its chests, veins and rooms by CaveRewards.',
   'gameplay/Stations.js': 'Station models and proximity are rebuilt from the planet.',
   'gameplay/petAbilities.js': 'Visual scouting/fetch targets are transient; lasting buffs and cooldowns are saved.',
+  'gameplay/OldRoad.js': "The waylamps, moonwells and brazier are rebuilt from the planet's authored canopy gaps; which of them are alight, and the carried village flame, are saved per planet by the lantern mechanic.",
 };
 // The coverage test scans gameplay exports; every new state owner needs an explicit classification.
 export const SAVE_OWNERS = {

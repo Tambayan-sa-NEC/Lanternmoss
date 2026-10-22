@@ -59,14 +59,15 @@ test('deep valleys: the terrain is tall enough to hollow out and identical for t
   setTerrain(null, 0);
 });
 
-test('oil is the only saved field: bounded, cleaned and defaulted', () => {
-  assert.deepEqual(lantern.clean(undefined), { oil: LANTERN.oil.start });
-  assert.deepEqual(lantern.clean({ oil: -5 }), { oil: 0 });
-  assert.deepEqual(lantern.clean({ oil: 1e9 }), { oil: LANTERN.oil.max });
-  assert.deepEqual(lantern.clean({ oil: 'full', junk: true }), { oil: LANTERN.oil.start });
-  assert.deepEqual(lantern.clean({ oil: NaN }), { oil: LANTERN.oil.start });
+test('the saved fields are bounded, cleaned and defaulted', () => {
+  const dark = { lamps: [], wells: [], flame: 0 };
+  assert.deepEqual(lantern.clean(undefined), { oil: LANTERN.oil.start, ...dark });
+  assert.deepEqual(lantern.clean({ oil: -5 }), { oil: 0, ...dark });
+  assert.deepEqual(lantern.clean({ oil: 1e9 }), { oil: LANTERN.oil.max, ...dark });
+  assert.deepEqual(lantern.clean({ oil: 'full', junk: true }), { oil: LANTERN.oil.start, ...dark });
+  assert.deepEqual(lantern.clean({ oil: NaN }), { oil: LANTERN.oil.start, ...dark });
   const saved = cleanMechanicSnapshot({ id: 'lantern', state: { oil: 12, injected: true }, at: 40 }, 'lantern');
-  assert.deepEqual(saved.state, { oil: 12 }); assert.equal(saved.at, 40);
+  assert.deepEqual(saved.state, { oil: 12, ...dark }); assert.equal(saved.at, 40);
   assert.equal(cleanMechanicSnapshot({ id: 'lantern', state: {}, at: 0 }, 'tides'), null);
 });
 

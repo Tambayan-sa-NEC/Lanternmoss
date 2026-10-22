@@ -40,7 +40,7 @@ function updateChips(dt) {
   const sky = world?.weather; h += `<div class="chip time ${dayClock.phase}">${dayClock.phase === 'night' ? '☾' : '☀'} ${dayClock.label} · Day ${dayClock.day}${sky && sky.kind !== 'clear' ? ` · ${sky.label}` : ''}</div>`;
   if (world?.mechanics.id === 'lantern') {
     const lamp = world.mechanics.active.instance.status;
-    h += `<div class="chip lantern">☾ ${lamp.label} · Lantern ${lamp.lit ? `${Math.ceil(lamp.oil)} oil` : 'ember'}</div>`;
+    h += `<div class="chip lantern">☾ ${lamp.label} · Lantern ${lamp.lit ? `${Math.ceil(lamp.oil)} oil` : 'ember'}${lamp.carrying ? ` · Flame ${Math.ceil(lamp.flame)}s` : ''}</div>`;
   }
   if (world?.mechanics.id === 'tides') {
     const tide = world.mechanics.active.instance.status;

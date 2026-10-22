@@ -165,6 +165,7 @@ src/
 │   ├── Gathering.js       resource nodes, chopping trees and mining rocks, tool jobs (swing, drops, regrow), tips
 │   ├── Fishing.js         casting, the bite, the reeling meter, catches
 │   ├── Fireflies.js       Duskhollow's firefly swarms: their drifting lights, catching one with E, saved timers
+│   ├── OldRoad.js         Duskhollow's Old Road: the village brazier, its waylamps and moonwells, and carrying the flame
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
