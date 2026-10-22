@@ -41,6 +41,6 @@ try {
   H.inventory.add('tideBoots',1);const {bagCommands}=await imp('gameplay/bagCommands.js');assert.ok(bagCommands(H.inventory).equip(H.inventory.find('tideBoots'),'feet').ok);
   assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());assert.equal(P.equipment.feet.itemId,'tideBoots');
   ctx.paused=true;const time=dayClock.t;step(1);assert.equal(dayClock.t,time);ctx.paused=false;
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false);
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true);
   console.log('PASS  sea fishing provides cooking fish; dawn mist clears, squall whitecaps render, music follows travel and pause freezes clock');console.log('all passed');
 } finally {H.Mechanics.exit();fixture.restore();}

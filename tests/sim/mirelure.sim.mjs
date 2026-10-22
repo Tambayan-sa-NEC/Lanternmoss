@@ -124,5 +124,5 @@ try{
   assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());step(1);
   assert.equal(crowns(),1,'still one after Continue');assert.ok(!ctx.boss?.alive);assert.equal(G.state,'beaten');assert.ok(!Chests.bossChest||Chests.bossChest.opened,'no second treasure chest');
   console.log('PASS  the win drops one chest with one Tide Crown; Continue keeps her beaten without a second chest or crown');
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false);console.log('all passed');
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true);console.log('all passed');
 }finally{H.Mechanics.exit();fixture.restore();}

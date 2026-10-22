@@ -46,10 +46,10 @@ try {
   travel('emberfall');assert.equal(H.Mechanics.id,null);assert.equal(seaLevel(),null);assert.deepEqual(waterRegions(),[]);
   dayClock.skip(DAY.length*3,'sleep');travel('lanternmoss');assert.equal(instance().toJSON().drainRemaining,0);assert.deepEqual(nodes(),expectedNodes);
   atPhase(.4);assert.ok(instance().status.causewayOpen);atPhase(.9);assert.equal(instance().status.causewayOpen,false);
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false,'actual unfinished world stays outside campaign travel');
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true,'released Tidewhisper is available for campaign travel');
   const {parseSave}=await imp('core/save.js'),{readFileSync}=await import('node:fs');
   const old=parseSave(readFileSync(new URL('../fixtures/save-v1.json',import.meta.url),'utf8'));assert.ok(H.saves.restore(old.data));assert.equal(H.Mechanics.id,null);assert.equal(seaLevel(),null);
   W.dispose();assert.deepEqual(waterRegions(),[]);
-  console.log('PASS  real keyed travel isolates water rules, away-time refloods and placement stays seeded; original v1 remains valid and unfinished Tidewhisper is inaccessible');
+  console.log('PASS  real keyed travel isolates water rules, away-time refloods and placement stays seeded; original v1 remains valid and Tidewhisper is available');
   console.log('all passed');
 } finally { H.Mechanics.exit();fixture.restore(); }

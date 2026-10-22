@@ -112,5 +112,5 @@ try{
   assert.ok(!ironclaw()?.alive,'Continue: still beaten');assert.ok(H.Gathering.nodes.filter(n=>n.def.guardedBy).every(n=>!guardOf(n)));
   H.goToPlanet('emberfall');H.goToPlanet('lanternmoss');step(.5);assert.ok(!ironclaw()?.alive,'revisit: still beaten');
   console.log('PASS  defeat drops two black pearls, frees the beds, and stays beaten through Continue and a revisit');
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false);console.log('all passed');
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true);console.log('all passed');
 }finally{H.Mechanics.exit();fixture.restore();}
