@@ -18,17 +18,23 @@ import { dryGround } from '../../../world/terrain.js';
 import { freeOfColliders } from '../../../physics/colliders.js';
 import { showSpiderLook } from '../../../models/duskMonsters.js';
 
-const _p = new THREE.Vector3();
+const _p = new THREE.Vector3(), _fwd = new THREE.Vector3();
 
 /** The webs this weaver has out right now (a cut one drops off the list by itself). */
 const liveWebs = e => (e.webs = (e.webs ?? []).filter(w => w.alive));
 
-/** Lays one web a little ahead of the weaver, if there is clear dry ground for it. */
+/** Lays one web a little ahead of the weaver: straight ahead if the ground there is clear and dry, otherwise a
+    little to either side, so a weaver facing a rock still fences the ground it can reach. */
 export function spin(e) {
   const W = e.def.web;
   if (liveWebs(e).length >= W.max) return null;
-  const at = dirAlong(e.up.clone(), e.fwd, W.at);
-  if (!dryGround(at, 1) || !freeOfColliders(at, 0.8)) return null;
+  let at = null;
+  for (const turn of [0, 0.7, -0.7, 1.5, -1.5, 2.4, -2.4, 3.14]) {
+    const dir = _fwd.copy(e.fwd).applyAxisAngle(e.up, turn);
+    const spot = dirAlong(e.up.clone(), dir, W.at);
+    if (dryGround(spot, 1) && freeOfColliders(spot, 0.8)) { at = spot; break; }
+  }
+  if (!at) return null;
   const w = addEnemy(W.type, at);
   e.webs.push(w);
   sparkles.emit(_p.copy(at).multiplyScalar(w.r + 0.5), { count: 14, color: e.def.capColor, speed: 1.6, up: at, upBias: 0.5, life: 0.7, size: 0.3 });

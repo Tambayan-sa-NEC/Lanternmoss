@@ -81,6 +81,8 @@ node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
 node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
                                    # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/dusk-weavers-smoke.mjs # Duskhollow (unreleased, 30f): webs that slow and are cut or burnt, oil
+                                  # theft and its repayment, and the beetle accessibility toggle
 node scripts/dusk-monsters-smoke.mjs # Duskhollow (unreleased, 30e): shadows and mimics, the light that makes a
                                   # shadeling solid, and real E springing a mosslurk
 node scripts/old-road-smoke.mjs   # Duskhollow (unreleased, 30d): Wick's quest, real E carrying the village flame and
@@ -150,7 +152,16 @@ its warning circle on the ground before the bite. It captures `mobs/duskhollow-s
 `mobs/duskhollow-mosslurk.jpg`.
 `node tests/sim/duskMonsters.sim.mjs` covers the same ground headlessly and adds placement, fire, an empty lantern,
 and Continue/travel leaving no mimic sprung; `node --test tests/duskMonsters.test.mjs` covers the authored stats,
-pages, drops and the brightness arithmetic that makes every counter reachable.
+pages, drops and the brightness arithmetic that makes every counter reachable (30e and 30f both).
+
+`node scripts/dusk-weavers-smoke.mjs` owns port 8134 and checks 30f in the browser: a weaver really spins up to its
+own cap of webs, real `W` walking into one really slows the hero, a blade really cuts it and frees them and leaves
+spider silk, one touch of fire really burns a whole web away, a snuffer really drains the Oil bar and really pays it
+back with interest, and the beetle toggle really swaps every spider on screen without touching the fight. It
+captures `mobs/duskhollow-gloomweaver.jpg`, `mobs/duskhollow-beetles.jpg` and `mobs/duskhollow-snuffer.jpg`.
+`node tests/sim/duskWeavers.sim.mjs` covers the same ground headlessly and adds the web cap and placement, repeated
+theft, an empty lantern having nothing to steal, and Continue/travel rebuilding them with no held oil and no
+standing webs.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High

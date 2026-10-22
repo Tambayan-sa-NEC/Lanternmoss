@@ -90,12 +90,15 @@ try {
   live(1.5);
   assert.ok(arcDist(thief.up, P.up) > gone, 'it puts distance between you while it flees');
 
+  // leave room in the tank for the interest, or the refill would simply stop at the brim and prove nothing
+  lamp().burn(LANTERN.oil.max * 0.6);
   const robbed = lamp().status.oil, carrying = thief.stolen;
   damageEnemy(thief, thief.def.hp * 3);
   assert.ok(!thief.alive);
   const back = lamp().status.oil - robbed;
   assert.ok(back > carrying, `catching it gives the oil back with interest (+${back.toFixed(0)} for ${carrying.toFixed(0)} taken)`);
-  assert.ok(Math.abs(back - carrying * S.interest) < 0.5);
+  assert.ok(Math.abs(back - carrying * S.interest) < 0.5, `exactly ${S.interest}x what it took (${back.toFixed(1)})`);
+  assert.ok(lamp().status.oil <= LANTERN.oil.max, 'and never over the brim');
   pass(`a snuffer steals ${S.oil} oil and gives back ${S.interest}x when it is caught`);
 
   // ---- robbed twice, and an empty lantern has nothing to take ------------------------------------------------------------

@@ -105,6 +105,8 @@ src/
 ├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
 │   ├── duskCreatures.js   Duskhollow's glow snail, lantern bat, cricket and Moonmoth
+│   ├── duskMonsters.js    Duskhollow's shadeling and mosslurk, and the spider/beetle pair its weavers wear
+│   │                      (showSpiderLook swaps them for the `roundBeetles` accessibility setting)
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── resources.js       resource nodes (bushes, herbs, branches, veins), the farm (fence, plots, scarecrow), crops, the float
 │   ├── stations.js        the four crafting stations (glowing coals, a bubbling pot, flasks on a stand)

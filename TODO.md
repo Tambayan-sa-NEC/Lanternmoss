@@ -1563,10 +1563,39 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [x] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
 | [x] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
 | [x] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
-| [ ] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
+| [x] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
 | [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
 | [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30f implemented (2026-10-22):** Duskhollow's other two monsters are in, and with them the silk the world has been
+asking for since 30c.
+**Gloomweavers** (`src/entities/enemies/behaviors/weaver.js`) are round, fuzzy spiders that bite like any other
+biter and, between bites, **spin**: every `web.every` seconds they lay a sticky web a couple of paces ahead, up to
+`web.max` of their own at a time, trying several bearings so one facing a rock still strings what it can. A **web**
+(`behaviors/web.js`) is an object, not a monster -- no page, no drops, no kill counted -- and it is walk-through,
+never solid: standing in one makes the hero wade at `mire` of walking speed, through a new transient `Player.mireK`
+that nothing saves. **A blade cuts it** (ordinary blows, a little health to work through) and **fire burns the whole
+thing away in one** (the `fire` option added in 30e). Either way it leaves **spider silk**, and an uncut web rots
+after `life` seconds so a hollow can never silt up.
+**Snuffers** (`behaviors/thief.js`) dart in, take `steal.oil` straight out of the tank through the lantern
+mechanic's own `burn()` -- so the Oil bar and the saved value move together -- and run off quicker than they came
+with the flask showing on their belt. **Catch one and the lantern gets it back with interest** (`steal.interest`).
+A theft is only ever as big as the tank still holds, so an empty lantern has nothing to steal and a snuffer can
+never leave the hero worse off than empty.
+**Accessibility:** a new `roundBeetles` setting (Settings -> Gameplay) draws every spider on this world as a round
+beetle. Both silhouettes are built into the model and one is hidden (`showSpiderLook` in
+`src/models/duskMonsters.js`), so the toggle lands the next frame, costs no rebuild, and the regular weaver and
+Grandmother Gloomweaver (30g) will share the one switch. Nothing about the fight changes.
+Checked by `tests/duskMonsters.test.mjs` (now the world's four monsters), `tests/sim/duskWeavers.sim.mjs` and
+`node scripts/dusk-weavers-smoke.mjs` (port 8134; real `W` walking into a web, a blade freeing the hero and leaving
+silk, one hit of fire burning a web away, the Oil bar really drained and really repaid, and the toggle swapping
+every spider on screen), plus three reviewed shots. Full suites passed: 310 unit tests and 68 simulations. One sim
+assertion had to be made honest on the way: the repayment check filled a nearly full tank, so the refill stopped at
+the brim and the interest could not be seen; it now leaves room first and asserts the exact multiple. All four
+regular monsters are in, but the world has no mini boss or boss fight, so it still fails the content gate by design
+and stays `released: false`. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: Grandmother
+Gloomweaver, Umbra and the release (30g-30i).
 
 **30e implemented (2026-10-22):** Duskhollow's first monsters take their rules from its light.
 **Shadelings** (`src/entities/enemies/behaviors/lightbound.js`) are only shadows where the ground is dark: a flat
@@ -1692,13 +1721,13 @@ music, Wick's waylamps, every monster and the release (30b-30i).
 - [x] **Your lantern:** it hangs from the hero's belt and has an Oil bar beside Energy, refilled with glowcaps, firefly
       jars and lumen oil. An empty lantern shrinks to a small glow; it never hurts you. The village and its lamp posts
       are safe light. Relight **waylamps** along the roads and they stay lit (per-planet state, 24), making safe paths.
-- [ ] **Monsters (new):** (shadelings and mosslurks built in 30e; gloomweavers and snuffers are 30f)
+- [x] **Monsters (new):** (shadelings and mosslurks built in 30e; gloomweavers and snuffers in 30f)
   - [x] **Shadelings:** only shadows outside your light, solid and hittable inside it. A burst of light (fire spells, a
     flare) sends them fleeing.
-  - **Gloomweavers:** round, fuzzy spiders that string sticky webs between the stalks. Webs slow you; fire or a blade
+  - [x] **Gloomweavers:** round, fuzzy spiders that string sticky webs between the stalks. Webs slow you; fire or a blade
     cuts them. (Accessibility: an option draws them as round beetles.)
   - [x] **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
-  - **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
+  - [x] **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
 - [ ] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
       her down, where she fights and spins new anchors. She guards the moonstone vein.
 - [ ] **Boss: Umbra, the Moth of the Last Light.**

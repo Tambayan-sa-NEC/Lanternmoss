@@ -77,6 +77,10 @@
 | How bright the ground must be for a shadeling to stand up solid, and what drives it off | `src/config/combat.js` → `COMBAT.enemies.shadeling` (`bindAt`, `fleeFire`, `fleeTime`) |
 | A mosslurk's ambush: how close springs it, how far the gather prompt reaches, its wind-up | `src/config/combat.js` → `COMBAT.enemies.mosslurk` |
 | Which hero spells count as fire | `src/config/combat.js` → `COMBAT.spells.*.fire` |
+| How many webs a gloomweaver holds, how often it spins and how far ahead | `src/config/combat.js` → `COMBAT.enemies.gloomweaver.web` |
+| How much a web slows, how long it lasts and what silk it leaves | `src/config/combat.js` → `COMBAT.enemies.gloomweb` (`mire`, `life`, `silk`) |
+| How much oil a snuffer takes, how much it gives back and how fast it runs | `src/config/combat.js` → `COMBAT.enemies.snuffer.steal` |
+| Drawing Duskhollow's spiders as beetles | `src/config/settings.js` → `roundBeetles` |
 | Its veins and patches, the shade crop's growth, and which worlds water their own plots | `src/config/resources.js` → `NODE_KINDS`, `CROPS`, `FARM` |
 | Spore drift and deep dark | `src/config/weather.js` → `WEATHER_KINDS` (`spores`, `deepDark`) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
