@@ -128,6 +128,22 @@ export const BESTIARY_ENTRIES = {
       ['Tail whip', 'A spin through the marked circle around it.'], ['Lunge', 'It marks a lane and darts along it, jaws first.'], ['Venom', 'Once enraged: a fan of venom.']],
     counters: ['When its eyes blaze, turn your back: run away from it until they flare, then turn and strike.', 'Jump over the tail whip.', 'Sidestep the lunge, then punish it while it recovers.'],
   },
+  grandweaver: {
+    lore: 'Wick says she was spinning in the hollows before the waylamps went up, and that she is the reason they went up at all. '
+      + 'Every web in Duskhollow is a grandchild of hers, and she has never once come down from her own.',
+    blurb: 'A mini boss: an enormous spider hanging in a canopy of her own web over the moonstone vein. While she is up there, nothing you do can touch her.',
+    attacks: [['Weave', 'Marks the ground you are standing on and drops a sticky web on it.'],
+      ['Silk spit', 'A fan of thrown silk that hurts and leaves you wading.'],
+      ['Bite', 'On the ground: a wedge of fangs in front of her.'],
+      ['Leg sweep', 'From her second web on: a ring of legs sweeping the ground around her.']],
+    counters: ['Do not fight her in the air: burn the three anchor strands and she comes down.',
+      'A blade will not cut a strand. Hold a lit lantern against one, or hit it with fire.',
+      'Keep oil in the tank before you start: an empty lantern cannot burn anything.',
+      'She lies dazed for a moment where she lands: that is your best window.',
+      'She climbs back up and spins fresh strands at 60% and 30%, so expect to do it three times.',
+      'If spiders are not for you, turn on "Draw spiders as beetles" in Settings: she changes with her grandchildren.'],
+    drops: 'Spider silk and a moonstone, and the moonstone vein she guards is yours to mine.',
+  },
   ironclaw: {
     lore: 'The bell hung in the old lighthouse until the night the Lantern Angler drew a ship onto the rocks and both went down. '
       + 'Ironclaw found it on the sea bed, crawled in, and has been carrying it about ever since. It hates being rung.',

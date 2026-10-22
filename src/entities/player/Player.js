@@ -45,6 +45,7 @@ export class Player extends Walker {
     this.equipment = Object.fromEntries(Object.keys(EQUIP_SLOTS).map(k => [k, null]));   // worn gear (src/gameplay/equipment.js)
     this.energy = NEEDS.start; this.regenK = 1; this.sprintK = 1;                      // gameplay/Needs.js
     this.mireK = 1;                      // 1 = free; a sticky web presses it down (behaviors/web.js), transient, never saved
+    this.silkT = 0; this.silkK = 1;      // a hit of thrown silk (30g): the same slow on its own timer, also transient
     // the hero's items: slots 0-8 are the hotbar, the rest the bag (kept across planets and fainting; emptied on a new adventure)
     this.inventory = new Inventory(HOTBAR.size + INVENTORY.slots, itemRegistry,
       { fillOrder: hotbarFirst(HOTBAR.size, HOTBAR.size + INVENTORY.slots, HOTBAR.holdCategories) });

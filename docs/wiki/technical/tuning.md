@@ -80,7 +80,10 @@
 | How many webs a gloomweaver holds, how often it spins and how far ahead | `src/config/combat.js` → `COMBAT.enemies.gloomweaver.web` |
 | How much a web slows, how long it lasts and what silk it leaves | `src/config/combat.js` → `COMBAT.enemies.gloomweb` (`mire`, `life`, `silk`) |
 | How much oil a snuffer takes, how much it gives back and how fast it runs | `src/config/combat.js` → `COMBAT.enemies.snuffer.steal` |
-| Drawing Duskhollow's spiders as beetles | `src/config/settings.js` → `roundBeetles` |
+| Drawing Duskhollow's spiders as beetles (the regular weavers and the mini boss alike) | `src/config/settings.js` → `roundBeetles` |
+| Grandmother Gloomweaver's strands: how many, how high she hangs, how long she falls and lies dazed | `src/config/combat.js` → `COMBAT.enemies.grandweaver.anchors` |
+| How long a lit lantern takes to burn through a strand, and from how far | `src/config/combat.js` → `COMBAT.enemies.gloomAnchor` (`burnTime`, `reach`) |
+| What she leaves behind | `src/config/chests.js` → `MINI_BOSS_LOOT.extra.grandweaver` |
 | Its veins and patches, the shade crop's growth, and which worlds water their own plots | `src/config/resources.js` → `NODE_KINDS`, `CROPS`, `FARM` |
 | Spore drift and deep dark | `src/config/weather.js` → `WEATHER_KINDS` (`spores`, `deepDark`) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |

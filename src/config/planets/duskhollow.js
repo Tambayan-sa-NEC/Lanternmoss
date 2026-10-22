@@ -35,6 +35,7 @@ export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, 
     // 30f: the spinners string their own webs where they stand; the thieves roam for lantern oil
     { type: 'gloomweaver', groups: 2, size: 2 }, { type: 'snuffer', count: 6 },
   ],
+  miniBosses: [{ type: 'grandweaver' }],   // 30g: she guards the moonstone vein, which the rare placement puts by her
   weather: { clear: 4, fog: 2, breezy: 2, sporeDrift: 3, deepDark: 2 },   // no rain under the canopy (30c)
   music: 'musicBox', material: 'lumenDust',
   chests: [{ kind: 'common', count: 8 }, { kind: 'rare', count: 3 }],

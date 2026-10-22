@@ -157,3 +157,27 @@ export function buildGloomweb(def = {}) {
   for (let ring = 1; ring <= 2; ring++) addTo(body, part(new THREE.TorusGeometry(r * ring / 2.4, 0.02, 3, 12).rotateX(Math.PI / 2), silk, { outline: false }), [0, 0.15, 0]);
   return { root, body, sheet };
 }
+
+/** Grandmother Gloomweaver: the same spider (or beetle) her grandchildren are, grown huge, with a pale shawl of old
+    silk over her back. Parts: the ones buildSpiderLook returns, plus `shawl`. */
+export function buildGrandweaver(def = {}) {
+  const parts = buildSpiderLook(def, 2.3);
+  const shawl = addTo(parts.spider, part(G.ico(0.5, 1), 0xe8d0ff, { glow: true, intensity: 0.9 }), [0, 0.6, -0.16], [0, 0, 0], [1.25, 0.5, 1.2]);
+  addTo(parts.beetle, part(G.ico(0.5, 1), 0xe8d0ff, { glow: true, intensity: 0.9 }), [0, 0.62, -0.1], [0, 0, 0], [1.2, 0.45, 1.3]);
+  return { ...parts, shawl };
+}
+
+/** An anchor strand: a thick cable of silk running up out of sight, with an ember at the top once it starts to char.
+    Parts: body, strand (shrinks back up the stalk as it burns), ember. */
+export function buildGloomAnchor(def = {}) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  const silk = def.color ?? 0xe8d0ff, h = def.height ?? 6;
+  const strand = group(body, 0, 0, 0);
+  addTo(strand, part(G.cyl(0.07, 0.11, h, 5), silk, { glow: true, intensity: 0.8 }), [0, h / 2, 0]);
+  for (let i = 0; i < 3; i++) addTo(strand, part(G.cyl(0.03, 0.03, h * 0.8, 4), silk, { outline: false }),
+    [Math.cos(i * 2.1) * 0.16, h * 0.44, Math.sin(i * 2.1) * 0.16], [0.03, 0, 0.03]);
+  for (const r of [0.5, 0.34]) addTo(body, part(new THREE.TorusGeometry(r, 0.03, 3, 10).rotateX(Math.PI / 2), silk, { outline: false }), [0, 0.12, 0]);
+  const ember = addTo(body, part(G.ico(0.2, 0), 0xff9a4a, { glow: true, intensity: 3 }), [0, h, 0]);
+  ember.visible = false;
+  return { root, body, strand, ember };
+}

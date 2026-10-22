@@ -57,7 +57,7 @@ export const NODE_KINDS = {
   lumenVein: { name: 'Lumen vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, look: 'vein', color: 0xbfa8ff, glow: true,
     drops: [['lumenOre', [1, 2]], ['lumenDust', [0, 1]]], regrow: 210, r: 1.0 },
   moonstoneVein: { name: 'Moonstone vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xdfe8ff, glow: true,
-    drops: [['moonstone', 1], ['lumenDust', 1]], regrow: 450, r: 1.1, rare: true, guardedBy: 'gloomweaver' },
+    drops: [['moonstone', 1], ['lumenDust', 1]], regrow: 450, r: 1.1, rare: true, guardedBy: 'grandweaver' },
 };
 
 export const SCENERY = {

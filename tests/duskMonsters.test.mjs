@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-// Duskhollow's monsters (TODO 30e shadelings and mosslurks, 30f gloomweavers and snuffers) as authored data and
-// pure rules: no browser, no scene, no world.
+// Duskhollow's monsters (TODO 30e shadelings and mosslurks, 30f gloomweavers and snuffers, 30g Grandmother
+// Gloomweaver) as authored data and pure rules: no browser, no scene, no world.
 const duskhollow = (await import('../src/config/planets/duskhollow.js')).default;
 const { COMBAT } = await import('../src/config/combat.js');
 const { BESTIARY_ENTRIES } = await import('../src/config/bestiary.js');
@@ -82,6 +82,35 @@ test('a snuffer can only take what the tank holds, and always gives back more', 
   assert.ok(d.damage < COMBAT.enemies.shadeling.damage, 'it barely fights: the chase is the point');
 });
 
+test('the grandmother hangs on strands that only burn, and comes down three times', () => {
+  const d = COMBAT.enemies.grandweaver, a = d.anchors, strand = COMBAT.enemies[a.type];
+  assert.equal(d.miniBoss, true); assert.equal(d.ai, 'boss'); assert.equal(d.behavior, 'grandweaver');
+  assert.equal(a.count, 3, 'three anchor strands, as the design asks');
+  assert.ok(a.hang > 4, `she hangs out of reach (${a.hang} m)`);
+  assert.ok(a.drop > 0 && a.dazed > 0, 'she falls, then lies open for a moment');
+  assert.ok(strand?.object === true && strand.static === true, 'a strand is an object, not a monster');
+  assert.ok(strand.reach > 0 && strand.burnTime > 0, 'and it burns, by lantern, over a time');
+  assert.equal(strand.hp, 1, 'its health is nominal: nothing but fire ever takes it');
+  // one round per phase: the set she starts on, and one at each threshold
+  assert.equal(d.phases.length, 3);
+  assert.deepEqual(d.phases.map(p => p.below), [1, 0.6, 0.3]);
+  for (const p of d.phases) assert.ok(p.attacks.every(id => d.attacks[id]), `${p.title ?? 'first web'} names real moves`);
+  assert.ok(d.phases[0].attacks.includes('weave') && d.phases[0].attacks.includes('bite'),
+    'she threatens from the air and on the ground from the start');
+  assert.equal(d.attacks.weave.damage, 0, 'the web she drops is the threat, not the dropping of it');
+  assert.ok(d.attacks.spit.slow > 0 && d.attacks.spit.slowTime > 0, 'and her silk leaves you wading');
+});
+
+test('she guards the moonstone vein, and leaves her own keepsake', async () => {
+  const { NODE_KINDS } = await import('../src/config/resources.js');
+  const { MINI_BOSS_LOOT } = await import('../src/config/chests.js');
+  assert.equal(NODE_KINDS.moonstoneVein.guardedBy, 'grandweaver', 'the rare vein waits behind her, not behind a regular weaver');
+  assert.equal(NODE_KINDS.moonstoneVein.rare, true, 'so the rare placement puts it beside her');
+  assert.deepEqual(duskhollow.miniBosses.map(m => m.type), ['grandweaver']);
+  for (const [item] of MINI_BOSS_LOOT.extra.grandweaver) assert.ok(ITEMS.has(item), `her keepsake is a real item: ${item}`);
+  assert.ok(MINI_BOSS_LOOT.extra.grandweaver.some(([item]) => item === 'moonstone'), 'including a moonstone of her own');
+});
+
 test('the beetle silhouette is one setting, shared by every spider on the world', async () => {
   const { SETTINGS_SCHEMA } = await import('../src/config/settings.js');
   const items = SETTINGS_SCHEMA.flatMap(g => g.items);
@@ -113,6 +142,11 @@ test('every monster has a journal page and leaves something of this world behind
   assert.match(BESTIARY_ENTRIES.mosslurk.counters.join(' '), /circle/i);
   assert.match(BESTIARY_ENTRIES.gloomweaver.counters.join(' '), /beetle/i, 'and the weaver page names the accessibility setting');
   assert.match(BESTIARY_ENTRIES.snuffer.counters.join(' '), /interest|back/i);
+  const granny = BESTIARY_ENTRIES.grandweaver;
+  assert.ok(granny?.lore && granny.blurb, 'the mini boss has her page and her story');
+  assert.match(granny.counters.join(' '), /burn/i, 'which says to burn the strands');
+  assert.match(granny.counters.join(' '), /beetle/i, 'and names the accessibility setting too');
+  assert.equal(BESTIARY_ENTRIES[COMBAT.enemies.grandweaver.anchors.type], undefined, 'a strand is an object, so it gets no page');
   assert.equal(BESTIARY_ENTRIES[COMBAT.enemies.gloomweaver.web.type], undefined, 'a web is an object, so it gets no page');
 });
 

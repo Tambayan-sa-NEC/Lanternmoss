@@ -1604,9 +1604,34 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [x] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
 | [x] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
 | [x] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
-| [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
+| [x] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
 | [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30g implemented (2026-10-22):** Duskhollow has its mini boss, and her fight is the world's own rule once more.
+**Grandmother Gloomweaver** (`src/entities/enemies/behaviors/boss/grandweaver.js`, on the shared boss framework)
+hangs in a canopy of her own web over the **moonstone vein** she guards, `anchors.hang` metres up on three anchor
+strands. Up there she **refuses every blow**, so hitting her is not the answer; she drops the same sticky webs her
+grandchildren spin (30f) and spits fans of slowing silk.
+An **anchor strand** (`behaviors/anchor.js`) is an object that **cannot be cut, only burnt**: a blade glances off,
+but a **lit belt lantern** held within `reach` chars one through over `burnTime` -- which every hero can do, and an
+empty lantern cannot -- and a hit carrying `fire` takes one in a single touch. The last strand parts and she crashes
+down, lying dazed and open for `anchors.dazed` seconds before she fights on the ground (bite, sweep, the same spit).
+At **60%** and **30%** she climbs back up and spins a fresh set, so the fight is three rounds of burn-the-strands
+and fight-her-down. She wears the same spider/beetle pair as the regular weavers, so one `roundBeetles` setting
+covers the grandmother and her grandchildren in the same frame. Beaten, she leaves spider silk and a moonstone, and
+`guardedBy` on the moonstone vein moved from the regular weaver to her, so the rare placement now puts it beside
+her and the "(guarded)" prompt clears when she falls.
+Her thrown silk slows the hero through the `mireK` added in 30f, on its own timer, so nothing new is saved.
+Checked by `tests/duskMonsters.test.mjs`, `tests/sim/duskBoss.sim.mjs` and `node scripts/dusk-boss-smoke.mjs`
+(port 8135; she really refuses every blow up there, a strand really refuses a blade and really ignores an empty
+lantern, real `W` walking up with a lit one really burns it through, and the beetle toggle really swaps her and her
+grandchildren together), plus a reviewed shot. Full suites passed: 312 unit tests and 69 simulations.
+This stage also merged the owner's **Tidewhisper release** from `develop` into the TODO 30 parent first: one
+conflict in `scripts/lib/tidewhisper-browser.mjs`, where their new `candidate: false` option and this branch's
+`bootstrap` option both had to survive, and all six Duskhollow browser checks were rerun against the merged tree.
+Duskhollow's boss is still only a name in the catalogue, so the world fails the content gate by design and stays
+`released: false`. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: Umbra and the release (30h-30i).
 
 **30f implemented (2026-10-22):** Duskhollow's other two monsters are in, and with them the silk the world has been
 asking for since 30c.
@@ -1768,7 +1793,7 @@ music, Wick's waylamps, every monster and the release (30b-30i).
     cuts them. (Accessibility: an option draws them as round beetles.)
   - [x] **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
   - [x] **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
-- [ ] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
+- [x] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
       her down, where she fights and spins new anchors. She guards the moonstone vein.
 - [ ] **Boss: Umbra, the Moth of the Last Light.**
   - Wakes when: level 11, and the three moonwell lanterns on the Old Road are relit for Wick's quest by carrying the

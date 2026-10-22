@@ -1,6 +1,6 @@
 # Duskhollow: twilight terrain and the lantern
 
-## In brief (stages 30a-30f, unreleased)
+## In brief (stages 30a-30g, unreleased)
 
 Duskhollow is the fifth world: deep valleys under a canopy of giant lumen caps, where your lantern decides what you
 can see. Stage 30a builds its terrain, its endless dusk, the belt lantern with its Oil bar, and the glowmoss that
@@ -13,9 +13,10 @@ purpose: Wick the lamplighter in a stalk you can walk into, the travellers' line
 Road's waylamps and the three moonwells his quest asks you to relight, and the gate that keeps Umbra asleep. Stage
 30e sends the first monsters after you: shadelings, which only your light can touch, and mosslurks, which look
 exactly like the glowcaps they are sitting among. Stage 30f adds the other two: gloomweavers, round fuzzy spiders
-that fence the ground with sticky webs, and snuffers, little thieves who want what is in your lantern. The rest of
-the planned checklist - Grandmother Gloomweaver (30g), Umbra herself (30h) and campaign release (30i) - is **not
-built yet**.
+that fence the ground with sticky webs, and snuffers, little thieves who want what is in your lantern. Stage 30g
+hangs Grandmother Gloomweaver over the moonstone vein, where the only way to reach her is to burn the three strands
+holding her up. The rest of the planned checklist - Umbra herself (30h) and campaign release (30i) - is **not built
+yet**.
 
 Duskhollow stays `released: false`: it cannot be selected, generated or travelled to in normal play. The checks run
 it through a development fixture (`tests/sim/lib/duskhollowFixture.mjs`) that copies this world's content into the
@@ -289,6 +290,33 @@ worse off than empty.
 
 ![A snuffer beside the hero with a full flask of stolen oil](../../screenshots/mobs/duskhollow-snuffer.jpg)
 
+## Grandmother Gloomweaver (30g)
+
+The world's mini boss: an enormous spider hanging in a canopy of her own web over the **moonstone vein** she guards.
+While she is up there **nothing you do touches her** - every blow glances off - so hitting her is simply not the
+answer. From the canopy she drops the same sticky webs her grandchildren spin and spits fans of slowing silk.
+
+![Grandmother Gloomweaver hanging on her strands](../../screenshots/bosses/duskhollow-grandweaver.jpg)
+
+**The three strands.** She rides three anchor strands, and a strand cannot be cut - a blade glances off a cable that
+thick. It has to burn, and there are exactly two ways:
+
+| | How |
+| --- | --- |
+| **A lit belt lantern** | Stand against a strand with oil in the tank and it chars through in a few seconds. Every hero carries one, so nobody is locked out of the fight - but an empty lantern burns nothing, so keep oil in it before you start |
+| **Fire** | A hit carrying fire (the witch's Fireball or Meteor, an Ember-set burn) takes a whole strand in one touch |
+
+**The cycle.** The last strand parts and she crashes down, lying dazed and open to everything for a moment before
+she finds her feet and fights on the ground: a wedge of fangs, a sweep of legs, and the same silk. At **60%** and
+**30%** she climbs back up and spins a fresh set, so the fight is three rounds of burn-the-strands and
+fight-her-down.
+
+Beaten, she leaves spider silk and a moonstone of her own, and the vein behind her is finally yours to mine. She
+does not come back: a beaten grandmother stays beaten across Continue and travel, like every mini boss.
+
+She wears the same spider silhouette her grandchildren do, so the **"Draw spiders as beetles"** setting takes her
+off the screen with them, in the same frame.
+
 ## What is checked
 
 | Check | What it proves |
@@ -310,10 +338,11 @@ worse off than empty.
 | `node scripts/dusk-monsters-smoke.mjs` | In a real browser: both kinds render, a shadeling really cannot be hit in the dark and really can in the light, a waylamp coming on really drives it off, and real `E` on a mosslurk's caps springs it with its warning circle first |
 | `npm run sim -- duskWeavers` | A weaver spinning up to its cap and no further, a web slowing the hero and freeing them the moment it is cut, fire burning one away, silk left behind, oil stolen and repaid with interest, an empty lantern having nothing to steal, the beetle toggle swapping every spider, and Continue/travel leaving no held oil and no standing webs |
 | `node scripts/dusk-weavers-smoke.mjs` | In a real browser: real `W` walking into a web really slows the hero, a blade really frees them and leaves silk, one touch of fire really burns a web away, a snuffer really drains the Oil bar and really pays it back, and the beetle toggle really swaps every spider on screen |
+| `npm run sim -- duskBoss` | She hangs over the vein and refuses every blow, a strand refuses a blade and ignores an empty lantern but burns to a lit one, fire takes one in a touch, the last drop leaves her dazed and open, she re-anchors at 60% and 30%, the beetle toggle covers her, and a beaten grandmother leaves her loot, frees the vein and stays beaten |
+| `node scripts/dusk-boss-smoke.mjs` | In a real browser: she really hangs out of reach, real `W` walking up with a lit lantern really burns a strand through, an empty one does not, and the beetle toggle really swaps her and her grandchildren together |
 
 ## Not built yet
 
-Grandmother Gloomweaver, Umbra herself and the campaign release. All four regular monsters are in, but the world has
-no mini boss and no boss fight, so Duskhollow still fails the content gate by design, and nothing yet answers the
-gate Wick's quest opens. The moonstone vein's guard arrives with Grandmother Gloomweaver in 30g, so for now it is
-simply mineable.
+Umbra herself and the campaign release. The world has all four regular monsters and its mini boss now, but its boss
+is still only a name in the catalogue, so Duskhollow fails the content gate by design and nothing yet answers the
+gate Wick's quest opens.
