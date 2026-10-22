@@ -106,7 +106,8 @@ export const MONSTER_DROPS = {
   table: 'monster',
   // a monster's own extra, rolled after (and apart from) the drop above: { chance, items: [[item, qty or [min, max]]] }
   extra: { shellback: { chance: 0.5, items: [['shell', [1, 2]]] }, jellybell: { chance: 0.35, items: [['seaglass', 1]] },
-    surfSkipper: { chance: 0.4, items: [['silverSprat', 1]] } },
+    surfSkipper: { chance: 0.4, items: [['silverSprat', 1]] },
+    shadeling: { chance: 0.45, items: [['lumenDust', [1, 2]]] }, mosslurk: { chance: 0.55, items: [['glowcap', [2, 3]]] } },
 };
 
 export const LOOT = {

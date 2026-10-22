@@ -1562,11 +1562,37 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [x] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
 | [x] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
 | [x] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
-| [ ] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
+| [x] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
 | [ ] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
 | [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
 | [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30e implemented (2026-10-22):** Duskhollow's first monsters take their rules from its light.
+**Shadelings** (`src/entities/enemies/behaviors/lightbound.js`) are only shadows where the ground is dark: a flat
+stain that follows you, untargetable like a burrowed thornmole - and, by the same rule, unable to strike, so an
+unreadable monster never lands a blow. Where there is light they stand up solid and fight. What counts as light is
+answered by the new `OldRoad.litAt(dir)`: the village gap, the belt lantern (full or down to its safe ember), the
+brazier, and every waylamp and moonwell relit in 30d, so **the road you lit is the road you can fight on**. A
+**burst** of light drives them off - light that was not there a moment ago, never light you merely walked closer to:
+OldRoad emits `lightflare` when a lamp or moonwell catches and when an empty lantern is refilled. Fire does the same;
+the witch's Fireball and Meteor now carry `fire` through to `damageEnemy`, read by a new behaviour hook `onHurt`
+beside the existing `refuses` and `damageScale`.
+**Mosslurks** (`behaviors/mimic.js`) are scenery until something reaches for them: a disguised one is untargetable,
+motionless and offers the real glowcap patch's prompt, *"Pick the glowcap patch"*. Picking it or walking over it
+springs the ambush, always with a warning circle on the ground for the whole wind-up first. They hold no saved state,
+so Continue and travel can never leave one sprung. A new roster placement `near: 'glowcaps'` plants them beside the
+world's real glowcaps.
+Models are in `src/models/duskMonsters.js` (a shadeling draws either its ground stain or its solid body; a mosslurk
+hides its mouth, eyes and legs under its caps), with bestiary pages and drops (lumen dust, glowcaps).
+Checked by `tests/duskMonsters.test.mjs`, `tests/sim/duskMonsters.sim.mjs` and `node scripts/dusk-monsters-smoke.mjs`
+(port 8133; both kinds render, a shadow really cannot be hit, the lantern really stands one up solid, a waylamp
+coming on really drives it off, and real `E` springs a mimic), plus two reviewed shots. Full suites passed: 307 unit
+tests and 67 simulations. Two gate tests had to be re-pointed: they used Duskhollow as "a draft with no generation
+data", which a roster makes untrue, so the Moon now plays that part and Duskhollow is asserted to be blocked by the
+content gate instead. The roster is two of four regular monsters with no mini boss, so Duskhollow still fails the
+content gate by design and stays `released: false`. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here:
+gloomweavers and snuffers, Grandmother Gloomweaver, Umbra and the release (30f-30i).
 
 **30d implemented (2026-10-22):** Duskhollow has people and a purpose. `src/config/duskVillage.js` adds **Wick the
 lamplighter** (the keeper look and swinging lantern Tidewhisper's Marlo already wears), the four travellers' arrival
@@ -1666,12 +1692,12 @@ music, Wick's waylamps, every monster and the release (30b-30i).
 - [x] **Your lantern:** it hangs from the hero's belt and has an Oil bar beside Energy, refilled with glowcaps, firefly
       jars and lumen oil. An empty lantern shrinks to a small glow; it never hurts you. The village and its lamp posts
       are safe light. Relight **waylamps** along the roads and they stay lit (per-planet state, 24), making safe paths.
-- [ ] **Monsters (new):**
-  - **Shadelings:** only shadows outside your light, solid and hittable inside it. A burst of light (fire spells, a
+- [ ] **Monsters (new):** (shadelings and mosslurks built in 30e; gloomweavers and snuffers are 30f)
+  - [x] **Shadelings:** only shadows outside your light, solid and hittable inside it. A burst of light (fire spells, a
     flare) sends them fleeing.
   - **Gloomweavers:** round, fuzzy spiders that string sticky webs between the stalks. Webs slow you; fire or a blade
     cuts them. (Accessibility: an option draws them as round beetles.)
-  - **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
+  - [x] **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
   - **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
 - [ ] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
       her down, where she fights and spins new anchors. She guards the moonstone vein.

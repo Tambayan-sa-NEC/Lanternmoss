@@ -81,6 +81,8 @@ node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
 node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
                                    # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/dusk-monsters-smoke.mjs # Duskhollow (unreleased, 30e): shadows and mimics, the light that makes a
+                                  # shadeling solid, and real E springing a mosslurk
 node scripts/old-road-smoke.mjs   # Duskhollow (unreleased, 30d): Wick's quest, real E carrying the village flame and
                                   # lighting waylamps, a flame that runs dry, and the lair's level-11 gate
 node scripts/dusk-economy-smoke.mjs # Duskhollow (unreleased, 30c): real E mining a lumen vein, the Craft tab, a glowcap
@@ -139,6 +141,16 @@ relit lamp's light reaches the shader that draws the dark hollow. It captures `w
 `node tests/sim/oldRoad.sim.mjs` covers the same route headlessly and adds Continue, portal travel, the quest
 completing, the local-light budget of a road relit end to end, and the level-11 gate sealing and unsealing the
 lair; `node --test tests/oldRoad.test.mjs` covers the pure flame, lamp and moonwell rules and the saved shape.
+
+`node scripts/dusk-monsters-smoke.mjs` owns port 8133 and checks 30e in the browser, through the roster fixture
+`tests/sim/lib/duskMonsterFixture.mjs`: both kinds render (shadelings as shadows, mosslurks as glowcap patches), a
+shadeling out in the dusk really cannot be hit and really stands up solid when the hero brings a lit lantern, a
+waylamp coming on beside one really drives it off, and a real `E` on a mosslurk's caps springs the ambush and puts
+its warning circle on the ground before the bite. It captures `mobs/duskhollow-shadeling.jpg` and
+`mobs/duskhollow-mosslurk.jpg`.
+`node tests/sim/duskMonsters.sim.mjs` covers the same ground headlessly and adds placement, fire, an empty lantern,
+and Continue/travel leaving no mimic sprung; `node --test tests/duskMonsters.test.mjs` covers the authored stats,
+pages, drops and the brightness arithmetic that makes every counter reachable.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High

@@ -52,10 +52,10 @@ export const ULTIMATES = {
       sparkles.emit(_tv.copy(P.pos).addScaledVector(P.up, 2.2), { count: 26, color: s.color, speed: 2.4, up: P.up, upBias: 2.5, life: 0.8, size: 0.4 });
       audio.meteorCall();
       addHazard(new Blast({ owner: 'player', team: 'player', center: target, radius: s.radius, delay: s.delay, damage: s.damage, color: s.color,
-        knock: s.knockback, falloff: s.falloff, fall: 'meteor', size: 1.3, shake: 0.8, stop: 0.09, sound: 'meteorImpact',
+        knock: s.knockback, falloff: s.falloff, fire: s.fire, fall: 'meteor', size: 1.3, shake: 0.8, stop: 0.09, sound: 'meteorImpact',
         onImpact: b => {
           ringFX(b.point, s.radius * 1.35, 0xffe0a0, 0.8);
-          if (s.burn) addHazard(new Zone({ owner: 'player', team: 'player', center: b.center, radius: s.radius * 0.7, color: s.color, rain: 'embers', ...s.burn }));
+          if (s.burn) addHazard(new Zone({ owner: 'player', team: 'player', center: b.center, radius: s.radius * 0.7, color: s.color, rain: 'embers', fire: s.fire, ...s.burn }));
         } }));
     },
   },

@@ -57,6 +57,6 @@ function explode(pos, s) {
   sparkles.emit(pos, { count: 40, color: s.color, speed: 4.2, up, upBias: 0.5, life: 0.8, size: 0.42 });
   sparkles.emit(pos, { count: 16, color: 0xfff0a0, speed: 2.2, up, upBias: 0.8, life: 0.6, size: 0.36 });
   for (const e of ctx.enemies) { if (!e.alive) continue; const d = e.center().distanceTo(pos);
-    if (touchesEnemy(e, pos, s.blastRadius) && visible(pos, e.pos)) damageEnemy(e, s.damage * (1 - s.blastFalloff * clamp(d / s.blastRadius, 0, 1)), { from: pos, knock: s.knockback }); }
+    if (touchesEnemy(e, pos, s.blastRadius) && visible(pos, e.pos)) damageEnemy(e, s.damage * (1 - s.blastFalloff * clamp(d / s.blastRadius, 0, 1)), { from: pos, knock: s.knockback, fire: s.fire }); }
   shakeCamera(0.32); audio.explode();
 }

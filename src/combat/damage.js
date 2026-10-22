@@ -68,6 +68,7 @@ export function damageEnemy(e, amount, o = {}) {
   if (o.slow) { e.slowT = o.slowTime; e.slowAmt = o.slow * (1 - (e.def.slowResist || 0)); }
   if (o.mark) e.markT = o.mark;
   if (!o.source) setOnHit(e, amount);
+  e.behavior?.onHurt?.(e, o);                                        // a reaction to what the blow was (a Shadeling flees fire)
   if (o.stagger) e.interrupt(o.stagger);
   if (o.stun && e.hp > 0) e.stun(o.stun);
   if (o.source !== 'pet' && o.source !== 'mob') noteHit(e);

@@ -8,6 +8,9 @@
    waylamps hold a shared local light, so a road relit end to end costs the same as a road with three lamps lit.
    Nothing here can hurt the hero. Take fire at the brazier or at any lit waylamp, light the next lamp before the
    flame gutters out, and if it does, walk back to the last lit waylamp and take fire again.
+   Whenever a light here actually comes on -- a waylamp, a moonwell, or an empty lantern refilled -- it emits
+   'lightflare' { dir, radius }. That is a burst of light, as opposed to light you merely walked closer to, and
+   Duskhollow's shadelings (30e) are driven out of one.
    The world owns it: PlanetProgression.populate sets it up, travel and disposal clear it. */
 import * as THREE from 'three';
 import { OLD_ROAD } from '../config/oldRoad.js';
@@ -20,6 +23,8 @@ import { scene } from '../render/scene.js';
 import { audio } from '../systems/AudioSystem.js';
 import { toast } from '../ui/toast.js';
 import { arcDist, frameQuat, offsetDir, tangentToward } from '../utils/sphere.js';
+import { canopyCover } from '../world/mechanics/lantern.js';
+import { clamp } from '../utils/math.js';
 import { addCollider } from '../physics/colliders.js';
 import { placed } from '../world/placement.js';
 import { groundHeight } from '../world/terrain.js';
@@ -64,6 +69,9 @@ function stand(group, dir, spawn) {
   scene.add(group);
 }
 
+/** 1 at the light itself, falling to 0 at the edge of its reach. */
+function reach(dir, at, radius) { return radius > 0 ? clamp(1 - arcDist(dir, at) / radius, 0, 1) : 0; }
+
 /** One road light: alight or dark, through the shared local lights the dusk already uses. */
 function roadLight(at, config, on) {
   const handle = LocalLights.add({ at: () => at, radius: config.radius, color: config.color, intensity: on ? config.intensity : 0 });
@@ -72,6 +80,7 @@ function roadLight(at, config, on) {
 
 export const OldRoad = {
   lamps: [], wells: [], lampPool: [], brazier: null, flameLight: null, carried: false, sparkT: 0, poolT: 0,
+  points: [], pointsAt: -1, wasLit: null,
 
   /** Builds the road on a world whose mechanic carries a lantern; every other world gets nothing. */
   setup(world, planet) {
@@ -115,6 +124,7 @@ export const OldRoad = {
     }
     for (const slot of this.lampPool) slot.light.remove();
     this.lamps = []; this.wells = []; this.lampPool = []; this.brazier = null; this.carried = false; this.sparkT = 0; this.poolT = 0;
+    this.points = []; this.pointsAt = -1;
     this.flameLight?.remove(); this.flameLight = null;
   },
 
@@ -139,9 +149,15 @@ export const OldRoad = {
     });
   },
 
-  /** The carried flame is a light of its own while it lasts, and a quiet trickle of sparks. */
+  /** The carried flame is a light of its own while it lasts, and a quiet trickle of sparks. Watching the belt
+      lantern here, rather than inside the pure mechanic, is what lets an empty lantern coming back to life count as
+      a burst of light like any other. */
   update(dt) {
-    const road = activeLantern()?.road, carrying = !!road?.carrying;
+    const mechanic = activeLantern(), road = mechanic?.road, carrying = !!road?.carrying;
+    const lit = !!mechanic?.status.lit;
+    if (mechanic && lit && this.wasLit === false && ctx.player && !ctx.indoors)
+      emit('lightflare', { dir: ctx.player.up.clone(), radius: mechanic.status.radius });
+    this.wasLit = mechanic ? lit : null;
     if (carrying && !this.flameLight) {
       const F = OLD_ROAD.flame.light;
       this.flameLight = LocalLights.add({ at: v => v.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1.1),
@@ -155,6 +171,33 @@ export const OldRoad = {
     this.sparkT = 0.22;
     sparkles.emit(_v.copy(ctx.player.pos).addScaledVector(ctx.player.up, 1.2),
       { count: 1, color: OLD_ROAD.flame.light.color, speed: 0.4, up: ctx.player.up, upBias: 0.9, life: 0.9, size: 0.22 });
+  },
+
+  /** How brightly a spot on this world is lit right now, 0 (the deep dusk) .. 1 (standing in a flame).
+      Everything that makes light here answers: the village gap, which is safe light by itself; the lantern on the
+      hero's belt, full or down to its ember; the village brazier; and every waylamp and moonwell already alight.
+      The shadelings of 30e read this to decide where they are solid, so a relit road is also a road you can fight
+      on. The source list is rebuilt at most once a frame, so a hollow full of shades costs one pass, not one each. */
+  litAt(dir) {
+    const mechanic = activeLantern(); if (!mechanic) return 1;          // no lantern world: ordinary daylight rules
+    const layout = mechanic.layout;
+    if (layout && canopyCover(dir, layout) <= layout.villageCover + 1e-6) return 1;
+    let best = 0;
+    const beam = mechanic.status, hero = ctx.player;
+    if (hero && !ctx.indoors) best = Math.max(best, reach(dir, hero.up, beam.radius) * (beam.lit ? 1 : 0.45));
+    for (const point of this.litPoints()) best = Math.max(best, reach(dir, point.dir, point.radius));
+    return clamp(best, 0, 1);
+  },
+  /** Every fixed light burning on the road right now, rebuilt once a frame. */
+  litPoints() {
+    if (this.pointsAt === ctx.time) return this.points;
+    const road = activeLantern()?.road;
+    this.points = []; this.pointsAt = ctx.time;
+    if (!road) return this.points;
+    if (this.brazier) this.points.push({ dir: this.brazier.dir, radius: OLD_ROAD.brazier.light.radius });
+    for (const l of this.lamps) if (road.lamps.includes(l.index)) this.points.push({ dir: l.dir, radius: OLD_ROAD.lamp.light.radius });
+    for (const w of this.wells) if (road.wells.includes(w.index)) this.points.push({ dir: w.dir, radius: OLD_ROAD.well.light.radius });
+    return this.points;
   },
 
   /** Where fire can be taken: the village brazier, and every waylamp already alight. */
@@ -195,6 +238,7 @@ export const OldRoad = {
     sparkles.emit(l.pos, { count: 22, color: OLD_ROAD.lamp.light.color, speed: 1.8, up: l.dir, upBias: 0.5, life: 1.1, size: 0.3 });
     toast(`Waylamp ${mechanic.road.lampsLit} of ${this.lamps.length} is lit.`);
     emit('waylamplit', { index: l.index });
+    emit('lightflare', { dir: l.dir, radius: OLD_ROAD.lamp.light.radius });
     return true;
   },
   lightWell(w) {
@@ -203,6 +247,7 @@ export const OldRoad = {
     sparkles.emit(w.pos, { count: 34, color: OLD_ROAD.well.light.color, speed: 2.4, up: w.dir, upBias: 0.7, life: 1.4, size: 0.34 });
     toast(`Moonwell ${mechanic.road.wellsLit} of ${this.wells.length} burns again.`);
     emit('moonwelllit', { index: w.index });
+    emit('lightflare', { dir: w.dir, radius: OLD_ROAD.well.light.radius });
     return true;
   },
 };
