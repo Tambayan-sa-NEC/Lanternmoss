@@ -275,7 +275,7 @@ See [the warden](../world/caves.md#puzzles-the-warden-and-the-way-home-29e).
 ![The cave's warden, an elite of its own kind, standing over the end room](../../screenshots/world/cave-guardian.jpg)
 
 **A fourth-world gate.** With Frostveil cleared, the village portal offers Tidewhisper as the next destination.
-The release-candidate browser check follows that real route, saves on the coast, returns home and revisits it.
+The production browser check follows that real route, saves on the coast, returns home and revisits it.
 Duskhollow and the secret Moon remain unavailable. See [Tidewhisper](../world/tidewhisper.md).
 
 ![The portal offers Tidewhisper after Frostveil](../../screenshots/huds/tidewhisper-portal.jpg)

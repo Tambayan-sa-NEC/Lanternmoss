@@ -1150,8 +1150,16 @@ branch, still using the historical candidate browser fixture, failed the unchang
 then 16/18 (the same row 18.2 ms and seed 7 witch night 17.1 ms). Render-count rows passed. **No integration
 into `develop` or public release is authorized by these results.** Repeat the full matrix under comparable idle
 machine conditions or improve the measured path, then rerun changed checks and complete the release workflow.
-The collector now requires the ordinary production entry for `--release`; that final matrix is still pending.
+The collector was then changed to require the ordinary production entry for `--release`; the final result follows.
 The earlier 18/18 reference used a prior commit and is retained as history, not final certification.
+
+**27 release accepted for `develop` (2026-10-22):** A clean production-entry Acer RTX 4050 run on commit
+`e81e2ad` passed all 18 timing and render-count rows at 1080p High with the otter in every row and zero
+page/shader errors. Frame p95 was 12.8-15.2 ms against the unchanged 16.67 ms limit; peaks were 476/550 draw
+calls and 210,141/230,000 triangles. The report is [the release evidence](docs/releases/tidewhisper.json).
+The earlier fixture runs are retained as failed diagnostics. Unit, simulation, browser, balance, production
+travel/Continue and reviewed screenshot checks above complete the TODO 27 acceptance gate. Tidewhisper is enabled
+for the tested `develop` integration; public `master` still requires the owner's release confirmation.
 
 **27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
 27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the

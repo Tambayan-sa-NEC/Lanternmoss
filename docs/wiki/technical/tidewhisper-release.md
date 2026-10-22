@@ -1,10 +1,9 @@
 # Tidewhisper 27h: validation and hardware handoff
 
-Status: **production enabled on the validation branch; hardware acceptance and integration remain**.
+Status: **production entry and hardware accepted for `develop`; public release awaits owner confirmation**.
 The authored Tidewhisper entry is `released: true` on `feat/todo-27-release-validation`. The initial flag probe
 exposed 26 unit failures; steps 1–2 audited and resolved them, and step 3 passed the production browser path.
-No `develop` or `master` merge or release tag has been made. The earlier Acer hardware evidence predates these code
-changes; fresh step 4 matrices missed the fixed timing target.
+The tested validation branch joins `develop`; no `master` merge or release tag has been made.
 On October 17 the owner selected the available Acer Nitro ANV15-51 / RTX 4050 Laptop GPU as
 the default desktop validation machine. Other machines supply additional checks; Iris Xe access is no longer required.
 
@@ -23,17 +22,20 @@ otter in every hero/seed/scene row. Both calibrated the empty page at 6.1 ms med
 unchanged 16.67 ms limit. The first passed 17/18 timing rows: seed 1 witch squall was 17.0 ms. The second passed
 16/18: that row was 18.2 ms and seed 7 witch night was 17.1 ms. All 18 render-count rows passed in each run, with
 zero page/shader errors. These runs still used the historical candidate browser fixture, despite the authored
-release flag being enabled on the branch. The collector now uses the ordinary production entry for `--release`;
-that final matrix remains pending. The latest diagnostic report is at
-[the performance report](../../tidewhisper-performance.json).
+release flag being enabled on the branch. The collector was then changed to use the ordinary production entry
+for `--release`. The latest full report is at [the performance report](../../tidewhisper-performance.json).
 The prior 18/18 report in `docs/releases/tidewhisper.json` belongs to commit `0d6b656` and does not certify the
 changed candidate. Free physical memory before the first squall row was about 3.4 GB in that earlier pass and
 about 1.9 GB in the second failed run; this is a correlation, not a proven cause. No target has been relaxed.
 
-Keep the validation branch out of `develop`. Next, repeat the complete matrix under comparable idle machine
-conditions or improve the measured path, then rerun any affected checks. Once the final clean candidate passes,
-update documentation, synchronize and merge it into `develop` under the standing workflow. The public `master`
-merge and tag still require separate owner confirmation.
+The final clean production-entry run on commit `e81e2ad` passed all **18/18 timing and render-count rows** on the
+Acer RTX 4050 at 1920×1080 High, visible Edge, native 165 Hz, with the otter in every row. Frame p95 ranged
+12.8-15.2 ms under the unchanged 16.67 ms limit; peak calls were 476/550 and triangles 210,141/230,000.
+The empty-page calibration was 6.1/6.3 ms median/p95, with zero page/shader errors. The collector loaded the
+ordinary production entry (`candidate: false`) and wrote [current release evidence](../../releases/tidewhisper.json).
+The two earlier failing fixture runs remain part of the audit, while the final production run satisfies the
+hardware gate. The complete unit, simulation, browser, balance and screenshot checks above permit `develop`
+integration. A public `master` merge and tag require separate owner confirmation.
 
 The synchronized 2026-10-19 candidate passed **275 unit tests, all 58 simulations, 25 relevant Edge browser
 scripts**, the three-hero duel and pacing audits, and the full screenshot tour (`errors: none`). The browser

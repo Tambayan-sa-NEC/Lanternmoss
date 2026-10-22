@@ -1,14 +1,12 @@
 # Tidewhisper terrain and tides
 
-## In brief (release candidate; hardware acceptance pending)
+## In brief (validated on `develop`; public release pending)
 
-TODO 27h's functional content, balance, pacing and candidate travel/Continue path passed after the TODO 29 cave
-merge. On the release-validation branch, `released: true` exposes the authored fourth world. Its production
-portal, save/Continue, return travel, boss completion and old-v1-save browser path pass. The complete unit,
-simulation, browser and screenshot-tour checks pass. Fresh Acer RTX 4050 matrices on the changed candidate missed
-the fixed frame-time target in one and then two of 18 rows, so this branch has not joined `develop` and remains a
-release candidate. The earlier 18/18 matrix covers a prior commit. A public `master` release separately needs
-owner confirmation. See the [current release handoff](../technical/tidewhisper-release.md#step-4-acceptance-checkpoint-2026-10-22).
+TODO 27's functional content, balance, pacing and production travel/Continue path pass on the four-world build.
+The authored `released: true` entry exposes Tidewhisper on `develop`. Unit, simulation, browser, screenshot-tour
+and production-entry Acer RTX 4050 performance checks pass. Earlier candidate-fixture hardware runs missed the
+timing target and remain documented with the final passing matrix. A public `master` release separately needs
+owner confirmation. See the [release handoff](../technical/tidewhisper-release.md#step-4-acceptance-checkpoint-2026-10-22).
 
 These summaries moved here from the root README; each is detailed in its section below.
 
