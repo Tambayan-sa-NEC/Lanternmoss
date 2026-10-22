@@ -1128,6 +1128,39 @@ after the 27h functional merge; it has a separate estimate and public-release pe
 | [x] **27h. Functional integration and go/no-go** | 27a-27g | 1-3.5 h | Complete the non-performance content gate, three-hero pacing/balance, full travel/Continue/save/completion browser path through the test-only candidate, and affected screenshots/tour. Record the reference performance matrix and its verdict, actual session costs and groundwork fixes. Merge tested functional work to `develop` with Tidewhisper unreleased if the public-release performance gate is still failing. The otter needs a separate estimate. |
 | [x] **27i. Pearl-diving otter pet** | 27b, 27c, 27h | 3-5 h | Add an otter companion, its pearl-dive ability and Tidewhisper unlock using the existing pet system. Check bounded pearl yields, save/Continue, travel, menu and selection, all three heroes, a reviewed feature shot and rendering cost. Built behind the unreleased world fixture; include the otter in a fresh full Acer acceptance matrix before public enablement. The current 0/18 timing result gives no release headroom. |
 
+**27 release step 2 checkpoint (2026-10-21):** The 26 release-flag unit failures have been resolved in the
+validation branch. Both the hidden-world and temporary four-world unit suites pass 278/278; the latter run
+restored `released: false` afterward. The low-tide villager hint, cottage telescope placement, Silver Sprat fish
+tag, and Mirelure roll damage are corrected. The two-seed, three-hero balance gate passes 18/18 checked rows.
+Production travel/save/Continue checks and final integration remain open; see the
+[release handoff](docs/wiki/technical/tidewhisper-release.md#step-2-resolution-checkpoint-2026-10-21).
+
+**27 release step 3 checkpoint (2026-10-21):** The validation branch now enables the authored Tidewhisper
+destination. `npm test` passes 278/278. A production-entry Edge smoke, with no candidate fixture, passes title,
+portal, travel, partial save/Continue, return, Mirelure completion, one Tide Crown after reload and an older v1 save,
+with zero page/shader errors. Its portal shot was reviewed. Full suites, a fresh final-commit Acer matrix, the
+screenshot tour and integration remain step 4; the public `master` merge still needs separate confirmation.
+
+**27 release step 4 checkpoint (2026-10-22):** The four-world validation branch passes 278/278 unit tests,
+all 62 simulations, all 38 browser smokes after resolving legacy three-world expectations and rerunning one
+intermittent coastal bolt check, and the full screenshot tour (`errors: none`). The two-seed, three-hero Tidewhisper
+balance audit passes all 18 checked rows. Visual review caught a pier screenshot filmed through geometry; the
+staging was fixed and both campaign captures retaken. Fresh clean-commit Acer RTX 4050 matrices on the enabled
+branch, still using the historical candidate browser fixture, failed the unchanged 16.67 ms p95 limit: first 17/18 timing rows passed (seed 1 witch squall 17.0 ms),
+then 16/18 (the same row 18.2 ms and seed 7 witch night 17.1 ms). Render-count rows passed. **No integration
+into `develop` or public release is authorized by these results.** Repeat the full matrix under comparable idle
+machine conditions or improve the measured path, then rerun changed checks and complete the release workflow.
+The collector was then changed to require the ordinary production entry for `--release`; the final result follows.
+The earlier 18/18 reference used a prior commit and is retained as history, not final certification.
+
+**27 release accepted for `develop` (2026-10-22):** A clean production-entry Acer RTX 4050 run on commit
+`e81e2ad` passed all 18 timing and render-count rows at 1080p High with the otter in every row and zero
+page/shader errors. Frame p95 was 12.8-15.2 ms against the unchanged 16.67 ms limit; peaks were 476/550 draw
+calls and 210,141/230,000 triangles. The report is [the release evidence](docs/releases/tidewhisper.json).
+The earlier fixture runs are retained as failed diagnostics. Unit, simulation, browser, balance, production
+travel/Continue and reviewed screenshot checks above complete the TODO 27 acceptance gate. Tidewhisper is enabled
+for the tested `develop` integration; public `master` still requires the owner's release confirmation.
+
 **27i priority (owner, 2026-10-20):** the otter is the next pending TODO item. It follows the already merged
 27h functional gate and does not add a prerequisite to 29g or 30. Develop and measure it as a separate stage; the
 Tidewhisper destination and pet unlock stay unavailable to players until the unchanged public-release gate passes.
@@ -1143,6 +1176,13 @@ before public enablement; the prior 0/18 timing result is not a pass.
 **27i integration decision (owner, 2026-10-20):** integrate the tested, hidden otter functionality into `develop`
 under the approved 27h functional/public gate split. This does not enable Tidewhisper or replace the required fresh
 18-case Acer acceptance matrix before public release.
+
+**27 release validation (2026-10-21):** the fresh Acer RTX 4050 matrix now includes the otter in every hero/seed/scene
+row and passes all 18 timing and render-count cases at 1080p High in the native display mode (p95 13.5–16.2 ms
+against 16.67 ms; peak 476 calls and 210,141 triangles). The content gate accepts the resulting real evidence.
+Tidewhisper remains `released: false`: enabling its production flag exposed 26 failing unit tests tied to the
+four-world transition, so the flag was restored. Bring those checks and the real production travel/Continue path
+through acceptance before declaring the destination releasable. See the [release handoff](docs/wiki/technical/tidewhisper-release.md#fresh-reference-result-and-production-no-go-2026-10-21).
 
 **27h gate split (approved 2026-10-19):** the owner's approved fallback separates functional completion from
 hardware certification after a clean 18-case Acer RTX 4050 rerun. Functional completion of 27h unblocks 28, 29g

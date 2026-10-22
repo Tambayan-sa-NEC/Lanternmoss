@@ -13,8 +13,8 @@ export function resolveLootItem(item, planet) {
   return item;
 }
 
-// Explicit acquisition stays out of random rewards: crafted-only pieces, and gifts that belong to one unreleased
-// world's creature (props.giftOnly), which must never turn up in a released world's chest.
+// Explicit acquisition stays out of random rewards: crafted-only pieces and rare-creature gifts
+// marked giftOnly, including after their world releases.
 const GEAR = ITEM_DEFINITIONS.filter(d => d.equip && !GEAR_KINDS[d.equip.slot].vanity && !d.props?.craftedOnly && !d.props?.giftOnly);
 const NAMES = Object.fromEntries(ITEM_DEFINITIONS.map(d => [d.id, d.name]));
 

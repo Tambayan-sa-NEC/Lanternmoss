@@ -1,24 +1,24 @@
 # Tidewhisper terrain and tides
 
-## In brief (functionally complete, unreleased)
+## In brief (validated on `develop`; public release pending)
 
-TODO 27h's functional content, balance, pacing and test-only campaign travel/Continue path passed again after the
-TODO 29 cave merge on 2026-10-19. The clean Acer RTX 4050 acceptance matrix still failed the unchanged p95 frame
-gate in all 18 cases at 1080p High on a 60 Hz display (17.4–18.2 ms versus 16.80 ms). The owner-approved gate split
-allows the functional work to join `develop` while `released: false` remains in force. Performance certification,
-destination enablement and the confirmed public `master` release are still pending.
+TODO 27's functional content, balance, pacing and production travel/Continue path pass on the four-world build.
+The authored `released: true` entry exposes Tidewhisper on `develop`. Unit, simulation, browser, screenshot-tour
+and production-entry Acer RTX 4050 performance checks pass. Earlier candidate-fixture hardware runs missed the
+timing target and remain documented with the final passing matrix. A public `master` release separately needs
+owner confirmation. See the [release handoff](../technical/tidewhisper-release.md#step-4-acceptance-checkpoint-2026-10-22).
 
 These summaries moved here from the root README; each is detailed in its section below.
 
-Tidewhisper's unreleased economy stage adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
+Tidewhisper's economy adds tide-gated pearl/coral beds, shipwreck iron, washups with saved
 claims, shore fishing, three coastal meals and craftable Tide gear. Dawn sea mist, rain/wind/whitecaps and a
 procedural sea waltz accompany the coast. See [resources, weather and music](#coastal-resources-weather-and-music-27c).
 
-The unreleased Tidewhisper village now has stilt buildings, a supported fishing pier, Marlo and two coastal
+The Tidewhisper village has stilt buildings, a supported fishing pier, Marlo and two coastal
 interiors. Restore the lighthouse with seaglass and wood; the saved quest joins level 8 and low tide as the
 future boss gate. See [village and lighthouse](#stilt-village-and-lighthouse-27d).
 
-Tidewhisper's unreleased monsters read the live tide. Shellbacks turn a barnacled plate that blocks hits from the
+Tidewhisper's monsters read the live tide. Shellbacks turn a barnacled plate that blocks hits from the
 front, so circle round them. Jellybells drift onto the flats with the rising tide and sting in a ring, and are
 stranded when it falls. Surf skippers lurk untargetable in the surf, then leap at anyone near the water.
 Sea-green wisps return from Act I. See [regular enemy roster](#regular-enemy-roster-27e).
@@ -32,9 +32,8 @@ time with her breathing and she surfaces. At half health she smashes the sluice 
 back. Her trophy is the Tide Crown. See [Mirelure](#mirelure-the-lantern-angler-27g).
 
 TODOs 27a-27g implement the coast, ecosystem, economy, weather, music, stilt village, lighthouse quest, regular
-monsters, Old Ironclaw and Mirelure. Tidewhisper remains `released: false`: campaign release requires 27h.
-The development fixture borrows encounter/resource data in the original Lanternmoss save slot to exercise real
-gameplay, Continue and portals. Those borrowed definitions are test-only and do not satisfy the content gate.
+monsters, Old Ironclaw and Mirelure. The authored catalog entry is now `released: true` on the validation branch.
+The earlier development fixture remains test-only; the production browser check uses the authored entry directly.
 
 The config in `src/config/planets/tidewhisper.js` describes six islands, two connecting sandbars, a lagoon,
 sea-green land, sandy shores, turquoise shallows, deep blue water and a peach/aqua sky. Terrain is baked once;
@@ -139,13 +138,15 @@ shipwreck iron needs a Copper Pickaxe. Shell beds, coral branches, salt crystals
 models; there are no extra lights. Farm plots remain above declared high water. Squall rain waters crops using
 the existing farming rule; sea mist does not.
 
-Driftwood gives wood. Shell washups give shells and seaglass; seaweed and glass have their own washups. Each
+Driftwood gives wood; Marlo's lighthouse chest gives three starter wood, and lantern palms can also be chopped.
+Shell washups give shells and seaglass; seaweed and glass have their own washups. Each
 washup can be claimed once per high-water crest (90% of the adventure day). Its optional `claimedCycle` field
 lives in the existing gathering v1 snapshot, even after the cooldown expires. A calendar skip exposes only the
 latest batch; it never creates accumulated rewards. Continue and revisits preserve claims and requested node
 ids. Earlier saves without the field default to an unclaimed node. World/quality changes do not add save owners.
 
-With a rod on the hotbar, **E** near seawater fishes using the existing bite/reeling meter. Silver sprats are the
+With a rod on the hotbar, **E** near seawater fishes using the existing bite/reeling meter. Silver sprats carry the
+same fish tag as Act I catches and are the
 common coastal catch and golden koi remain rare. The float follows the live tide and cancels if its water dries.
 At a cooking pot, make salted fish (sprat + salt), seaweed rolls (seaweed + sprat) and coastal chowder (clams +
 sprat + salt). At a forge, craft the Tide Circlet, Mantle and Boots from glass, pearls, coral and shells; a Tide
@@ -187,10 +188,11 @@ Coastal Chowders once. The lighthouse's emissive beacon follows the saved quest'
 extra persistent owner or point light. Partial hand-ins, completion, house gifts/lore and indoor position use the
 existing v1 save systems and survive Continue and revisits. Away from Marlo, the tracker points back to Tidewhisper.
 
-Mirelure's registered summon conditions require level 8, the completed quest and low tide. The shared boss gate
+Mirelure's registered summon conditions require level 8, the completed quest and low tide. Villagers give a low-tide
+hint when it is the remaining condition. The shared boss gate
 reports these predicates and seals again if the tide rises before awakening. The development fixture borrows a
 sealed original boss to exercise the live gate; it does not implement Mirelure. That encounter is 27g, and the
-world stays unreleased. Actual low-tide causeway geometry/physics continues to come from 27a.
+world stayed unreleased at that stage. Actual low-tide causeway geometry/physics continues to come from 27a.
 
 ![Relit lighthouse development preview](../../screenshots/village/tidewhisper-village.jpg)
 
@@ -318,6 +320,8 @@ arena ring is crashing surf (`ARENA_WALLS.surf`). Her kit is `src/entities/enemi
   and open to everything: she thrashes (a marked circle), rolls along a marked lane and bites. After 23 s the water
   creeps back over 22 s (`drainLagoon(seconds, reflood)`); once there is 1 m of water over her she dives, and four
   lures return.
+- Her roll's base hit is 19 damage (38 after the fourth-world scale), keeping its peak single hit above Malgrath's
+  36.75 while retaining the same warning, travel and recovery timing.
 - **Retries**: a faint, walking away or a reload resets the fight. The lures go out, the lagoon refills and the sluice
   is mended, so a saved drain never outlives its fight. The win drops her treasure chest with the **Tide Crown**, once;
   Continue keeps her beaten without a second chest or crown.

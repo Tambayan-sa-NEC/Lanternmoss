@@ -2,7 +2,7 @@
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
-export async function tidewhisperBrowser({ port = 8114, software = true, highPerformance = false,
+export async function tidewhisperBrowser({ port = 8114, candidate = true, software = true, highPerformance = false,
   viewport = { width: 1280, height: 720 }, quality = 'low', headless = true } = {}) {
   const root = fileURLToPath(new URL('../..', import.meta.url));
   const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore','pipe','pipe'] });
@@ -33,15 +33,17 @@ export async function tidewhisperBrowser({ port = 8114, software = true, highPer
     page.setDefaultTimeout(90000); await page.setViewport({ ...viewport, deviceScaleFactor: 1 });
     page.on('pageerror', e => errors.push(String(e)));
     page.on('console', m => { if (m.type() === 'error' && /shader|WebGLProgram|VALIDATE_STATUS/i.test(m.text())) errors.push(m.text()); });
-    await page.setRequestInterception(true);
-    page.on('request', request => {
-      const url = new URL(request.url());
-      if (url.pathname === '/src/main.js' && !url.searchParams.has('candidate-entry')) {
-        return request.respond({ status: 200, contentType: 'application/javascript', body:
-          "import {installTidewhisperCandidate} from '/tests/sim/lib/tidewhisperCandidate.mjs'; installTidewhisperCandidate(); await import('/src/main.js?candidate-entry');" });
-      }
-      return request.continue();
-    });
+    if (candidate) {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        const url = new URL(request.url());
+        if (url.pathname === '/src/main.js' && !url.searchParams.has('candidate-entry')) {
+          return request.respond({ status: 200, contentType: 'application/javascript', body:
+            "import {installTidewhisperCandidate} from '/tests/sim/lib/tidewhisperCandidate.mjs'; installTidewhisperCandidate(); await import('/src/main.js?candidate-entry');" });
+        }
+        return request.continue();
+      });
+    }
     await page.goto(`http://localhost:${port}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.LANTERNMOSS);
     await page.evaluate(async quality => {

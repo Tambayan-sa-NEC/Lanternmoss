@@ -58,8 +58,8 @@ try {
       const { tangentToward } = await import('/src/utils/sphere.js'), { ctx } = await import('/src/core/context.js');
       const { dom } = await import('/src/ui/dom.js');
       dayClock.t = .4 * DAY.length; L.setWeather('clear'); L.weather.timer = 1e9;
-      L.player.placeAt(L.planets.world.coast.pier.start); L.player.fwd.copy(tangentToward(L.player.up,L.planets.world.coast.pier.end));
-      L.cam.pitch=.45; L.cam.dist=13; resetView(L.player.fwd); snapCamera(L.player.up,L.player.fwd);
+      L.player.placeAt(L.planets.world.coast.pier.end); L.player.fwd.copy(tangentToward(L.player.up,L.planets.world.coast.pier.start));
+      L.cam.pitch=.32; L.cam.dist=9; resetView(L.player.fwd); snapCamera(L.player.up,L.player.fwd);
       ctx.paused=false;for(let i=0;i<30;i++)L.update(1/60);ctx.paused=true;
       document.getElementById('toast').style.opacity=0;
       dom.prompt.style.visibility='hidden'; dom.saveNotice.style.visibility='hidden';

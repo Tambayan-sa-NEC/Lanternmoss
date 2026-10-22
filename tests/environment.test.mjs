@@ -23,7 +23,8 @@ test('every planet grows its own trees, each kind drawn and collidable', () => {
   for (const p of PLANETS) {
     assert.ok(Object.keys(p.flora.trees).length >= 3, `${p.name}: at least three kinds of tree`);
     for (const k of Object.keys(p.flora.trees)) assert.ok(TREE_KINDS[k], `${p.name}: tree kind ${k}`);
-    assert.ok(p.flora.flowers?.length && p.flora.tallGrass?.length, `${p.name}: wildflower and tall grass colours`);
+    if (p.flora.coastal) assert.ok(p.flora.coastal.plants.duneGrass && p.flora.coastal.plants.seaThrift && p.flora.coastal.plants.seaLavender, `${p.name}: coastal plants`);
+    else assert.ok(p.flora.flowers?.length && p.flora.tallGrass?.length, `${p.name}: wildflower and tall grass colours`);
   }
 });
 
@@ -42,7 +43,7 @@ test('weather: kinds are sane and every planet has a mix of its own', () => {
 test('animals: every planet\'s wildlife exists; rare creatures give real gear', () => {
   for (const p of PLANETS) {
     const w = p.wildlife;
-    for (const [key, n, where] of w.critters) assert.ok(CRITTER_DEFS[key] && n > 0 && [undefined, 'ponds', 'far'].includes(where), `${p.name}: ${key}`);
+    for (const [key, n, where] of w.critters) assert.ok(CRITTER_DEFS[key] && n > 0 && [undefined, 'ponds', 'far', ...(w.coastal ? ['beach', 'rocks'] : [])].includes(where), `${p.name}: ${key}`);
     assert.ok(CRITTER_DEFS[w.rare]?.rare, `${p.name}: rare creature ${w.rare}`);
   }
   const rares = Object.values(CRITTER_DEFS).filter(c => c.rare);
@@ -64,5 +65,5 @@ test('mini bosses: real types with an AI kit, a model and a bestiary page, place
     assert.ok(BESTIARY_ENTRIES[t]?.attacks.length && BESTIARY_ENTRIES[t].lore, `${t}: a bestiary page with lore`);
     for (const ph of d.phases) for (const a of ph.attacks) assert.ok(d.attacks[a], `${t}: phase attack ${a}`);
   }
-  for (const p of PLANETS) for (const m of p.miniBosses ?? []) assert.ok(['lake', 'far'].includes(m.near), `${p.name}: ${m.type} placement`);
+  for (const p of PLANETS) for (const m of p.miniBosses ?? []) assert.ok(['lake', 'far', ...(p.resources?.coastal ? ['pearlBeach'] : [])].includes(m.near), `${p.name}: ${m.type} placement`);
 });

@@ -13,7 +13,8 @@ const { DAY } = await imp('config/day.js');
 const { TRANSITION } = await imp('config/planets.js');
 const baseline = JSON.parse(readFileSync(new URL('../fixtures/planet-layout-v1.json', import.meta.url), 'utf8'));
 
-for (let i = 0; i < PLANETS.length; i++) {
+// The v1 fixture records the original three worlds; Tidewhisper has its own release checks.
+for (let i = 0; i < 3; i++) {
   H.goToPlanet(i);
   assert.deepEqual(planetLayout(game, H, ctx), baseline.worlds[H.planetId], `${H.planetId}: original ids and positions`);
   const locals = H.npcs.filter(n => n.def.local);

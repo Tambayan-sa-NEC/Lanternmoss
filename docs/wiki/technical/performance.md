@@ -1,23 +1,26 @@
 # Performance budget
 
-Tidewhisper 27h is currently a development candidate, with separate
-[diagnostic results](../../tidewhisper-performance.json) and a [release handoff](tidewhisper-release.md).
+Tidewhisper has a passing otter-inclusive Acer reference matrix in
+[release evidence](../../releases/tidewhisper.json), but production enablement checks remain open; see the
+[release handoff](tidewhisper-release.md). It remains `released: false`.
 Its real fourth-world village/night/squall collector uses visible fullscreen Edge, 1920x1080 High at DPR 1,
 30 warmup frames and 120 samples per scene, with a fresh adventure for each row.
 It passes a scene against max(16.67 ms, the p95 of a valid empty-page 60 Hz clock measured in the same run).
 Calibration requires a median within 5% of the target; faster or slower display clocks retain the fixed 16.67 ms limit.
 Historical Intel UHD results do not certify the current reference. Run `node scripts/tidewhisper-performance.mjs`
 for diagnostics; `--release` requires a clean candidate, a visible browser, an actual RTX 4050 Laptop GPU renderer and passing frame/draw budgets
-before it writes a release evidence file. Tidewhisper remains unreleased.
+before it writes a release evidence file. The 2026-10-21 native-mode run passed 18/18 rows with the otter selected
+in each row (p95 13.5–16.2 ms against 16.67 ms; peak 476 calls and 210,141 triangles).
 
-The [latest synchronized reference attempt](tidewhisper-release.md#synchronized-60-hz-acceptance-matrix-2026-10-19)
+The [historical 2026-10-19 reference attempt](tidewhisper-release.md#synchronized-60-hz-acceptance-matrix-2026-10-19)
 used clean candidate `92d02e2` after the cave rollout. The actual panel was 165 Hz; visible Edge on the active RTX
 4050 measured 6.1 ms median / 6.3 ms p95 on an empty page. It was switched to supported 60 Hz for the unchanged
 gate, yielding a 16.80 ms calibrated limit. All 18 count rows passed (peak 474/550 calls and 209,113/230,000
 triangles), but **0/18 timing rows passed** (p95 17.4–18.2 ms). Average cadence was 59.04–60.03 FPS. The complete
 matrix is retained as a no-go; no release artifact was written, and the panel was restored to 165 Hz. Under the
-owner-approved split, Tidewhisper's functional 27h integration can reach `develop`, while this unchanged desktop
-performance gate still blocks destination enablement and public `master` release.
+owner-approved split allowed Tidewhisper's functional 27h integration to reach `develop` while hardware acceptance
+was still failing. The 2026-10-21 native-mode matrix above is the newer passing hardware evidence; production
+enablement and its full checks still block the destination and public `master` release.
 
 The owner selected the **Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, NVIDIA RTX 4050 Laptop GPU** as the default
 desktop validation machine on 2026-10-17. The target remains **60 FPS at a 1920 × 1080 viewport**, DPR 1, default
@@ -45,8 +48,8 @@ Recommended machine roles, recorded at the owner's request on 2026-10-17:
 | Other available machines, including Iris Xe if available | Additional hardware/browser coverage; an Iris Xe run is optional and no longer blocks 27h. |
 
 The Acer's RTX 4050 profile replaces the named validation hardware only. Existing frame-clock rules and render-count
-ceilings remain in force. Tidewhisper stays unreleased until this profile passes and the destination is separately
-enabled and checked before a confirmed `master` release.
+ceilings remain in force. Tidewhisper's native-mode profile passed on 2026-10-21; the destination remains unreleased
+until production enablement is separately checked before a confirmed `master` release.
 
 Earlier on 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
 8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
