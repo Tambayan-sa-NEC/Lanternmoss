@@ -8,6 +8,8 @@
                  talk     { to, say }                  talk to `to`
                  defeat   { enemy ('any' or a type), count }
                  reach    { planet }                   travel to that planet (index)
+                 light    { count }                     have this many of the world's moonwells alight (30d: the
+                                                        Old Road's, through the live lantern mechanic)
                any step may also give: [[itemId, n]] items to the hero when it completes
      give      optional [[itemId, n]] handed over when the quest is accepted
      reward    { coins, xp, items: [[itemId, n]] } when the last step is done
@@ -16,6 +18,19 @@
    --------------------------------------------------------------------- */
 
 export const QUESTS = {
+  oldRoad: {
+    giver:'Wick',title:'Light the Old Road',planet:'duskhollow',
+    steps:[
+      {kind:'talk',to:'Wick',text:'Ask Wick where the Old Road starts',say:'The brazier by the square never goes out. Take fire from it, light the waylamps as you walk, and each lit lamp will give you fire again.'},
+      {kind:'light',count:3,text:'Relight the three moonwells on the Old Road'},
+      {kind:'talk',to:'Wick',text:'Tell Wick the moonwells are lit',say:'Three wells burning and a road you can walk at any hour. That is the hollow put right.'},
+    ],
+    reward:{coins:140,xp:200,items:[['lumenOil',2]]},
+    text:{offer:'The Old Road runs out to three moonwells and every lamp on it is dark. Carry the village flame out and light them for me?',
+      accept:'Take fire at the brazier. Keep ahead of it: a flame that gutters out means walking back to the last lamp you lit.',
+      decline:'The dark has waited this long. It can wait for you.',
+      done:'Two flasks of lumen oil, and a word: Umbra dives at the brightest light there is. Light something that is not you.'},
+  },
   darkLighthouse: {
     giver:'Marlo',title:'The Dark Lighthouse',planet:'tidewhisper',
     steps:[

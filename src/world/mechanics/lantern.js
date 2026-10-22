@@ -3,11 +3,16 @@
    the calendar, the authored canopy gaps (planets/duskhollow.js) let starlight through, and the product of the two is
    the darkness this mechanic asks for. Its presentation -- the shared local light, the lantern on the hero's belt and
    the glowmoss trail -- lives in lanternView.js, which the World owns, exactly as the World owns the tide's water.
-   Oil is the single saved field. It burns while you actually play this world outdoors, never indoors, in a cave, in a
+   Oil is the first saved field. It burns while you actually play this world outdoors, never indoors, in a cave, in a
    menu, or over skipped and away time, so sleeping through a night can never empty the tank. An empty lantern only
    shrinks to a small safe ember: nothing here damages the hero.
+   The Old Road (30d, config/oldRoad.js) saves beside it: which waylamps and moonwells are alight, and how long the
+   carried village flame has left. A relit lamp stays lit for the rest of the adventure; the flame burns by the same
+   rule as the oil, and running dry only means walking back to the last lit waylamp. Its models, lights and the E
+   prompts are gameplay/OldRoad.js, as the glowmoss and the belt lantern are lanternView.js.
    activeLantern() is the live instance, for the view, the HUD and later encounters. */
 import { LANTERN } from '../../config/lantern.js';
+import { OLD_ROAD } from '../../config/oldRoad.js';
 import { DAY } from '../../config/day.js';
 import { clamp, smoothstep } from '../../utils/math.js';
 import { arcDist, offsetDir } from '../../utils/sphere.js';
@@ -45,11 +50,20 @@ export function duskAt(seconds, config = LANTERN.dusk) {
 }
 
 const number = (v, max) => typeof v === 'number' && Number.isFinite(v) ? clamp(v, 0, max) : null;
+/** Saved lit indices: whole numbers inside the authored range, each one once, in order. A road that is re-authored
+    shorter therefore drops the lamps it no longer has instead of lighting something that isn't there. */
+const litList = (value, count) => [...new Set((Array.isArray(value) ? value : [])
+  .filter(i => Number.isInteger(i) && i >= 0 && i < count))].sort((a, b) => a - b);
+export const WELL_COUNT = OLD_ROAD.branches.gaps.length;
 let live = null;
 export const activeLantern = () => live;
 
 export const lantern = {
-  clean(value) { return { oil: number(value?.oil, LANTERN.oil.max) ?? LANTERN.oil.start }; },
+  clean(value) {
+    return { oil: number(value?.oil, LANTERN.oil.max) ?? LANTERN.oil.start,
+      lamps: litList(value?.lamps, OLD_ROAD.branches.maxLamps), wells: litList(value?.wells, WELL_COUNT),
+      flame: number(value?.flame, OLD_ROAD.flame.seconds) ?? 0 };
+  },
 
   create(env) {
     let state = lantern.clean(null), time = 0;
@@ -85,6 +99,7 @@ export const lantern = {
         const b = beam(), dusk = duskAt(env.clock()), cover = canopyCover(place(), layout);
         return { oil: state.oil, max: O.max, lit: b.lit, radius: b.radius, intensity: b.intensity, charm: b.charm, cover,
           darkness: darkness(), deepDark: deepDark(), watersFarm: instance.watersFarm, shaded: true,
+          flame: state.flame, carrying: state.flame > 0, wellsLit: state.wells.length, lampsLit: state.lamps.length,
           label: cover <= layout.villageCover + 1e-6 ? 'Village light' : cover < layout.cover ? 'Starlight gap' : dusk.label,
           low: state.oil / O.max < L.lowOil, indoors: !!env.indoors };
       },
@@ -99,6 +114,36 @@ export const lantern = {
         const before = state.oil; state.oil = clamp(before + amount, 0, O.max);
         return state.oil - before;
       },
+      // ---------------------------------------------------------------- the Old Road (30d)
+      /** Everything the road's models, lights, prompts and the quest read: what is alight and what you carry. */
+      get road() {
+        return { lamps: [...state.lamps], wells: [...state.wells], flame: state.flame,
+          carrying: state.flame > 0, wellsLit: state.wells.length, lampsLit: state.lamps.length };
+      },
+      /** True once every moonwell on the road is alight (the `light` quest step and Umbra's gate read this). */
+      get wellsLit() { return state.wells.length; },
+      lampLit(index) { return state.lamps.includes(index); },
+      wellLit(index) { return state.wells.includes(index); },
+      /** Takes fire from the village brazier or from a waylamp that is already lit: a full carried flame. */
+      takeFlame() { state.flame = OLD_ROAD.flame.seconds; return state.flame; },
+      /** Drops the carried flame (it gutters out); the lamps already lit stay lit. */
+      dropFlame() { const had = state.flame > 0; state.flame = 0; return had; },
+      /** Lights a waylamp with the carried flame. The lamp stays lit for the rest of the adventure and hands the
+          hero a fresh flame, so a lit road is a chain of relays rather than one long sprint from the village. */
+      lightLamp(index) {
+        if (state.flame <= 0 || !Number.isInteger(index) || index < 0 || index >= OLD_ROAD.branches.maxLamps) return false;
+        const fresh = !state.lamps.includes(index);
+        if (fresh) state.lamps = [...state.lamps, index].sort((a, b) => a - b);
+        instance.takeFlame();
+        return fresh;
+      },
+      /** Lights a moonwell with the carried flame: one of Wick's three, and part of Umbra's gate. */
+      lightWell(index) {
+        if (state.flame <= 0 || !Number.isInteger(index) || index < 0 || index >= WELL_COUNT || state.wells.includes(index)) return false;
+        state.wells = [...state.wells, index].sort((a, b) => a - b);
+        return true;
+      },
+
       /** Burns oil directly (a snuffer's theft in 30f, or a scripted scene); never takes the hero below empty. */
       burn(amount) {
         if (!Number.isFinite(amount) || amount <= 0) return 0;
@@ -107,14 +152,16 @@ export const lantern = {
       },
 
       load(value) { state = lantern.clean(value); },
-      toJSON() { return { oil: state.oil }; },
+      toJSON() { return { oil: state.oil, lamps: [...state.lamps], wells: [...state.wells], flame: state.flame }; },
       /** Skipped and away time move the dusk on, but never burn oil: sleeping can't leave you in the dark. */
       advance() {},
       enter() { live = instance; },
       update(dt) {
         time += dt;
-        if (!env.indoors && state.oil > 0)                            // the worn Dusk set makes a tank last longer
+        if (env.indoors) return;                                      // indoors nothing burns: not the tank, not the flame
+        if (state.oil > 0)                                            // the worn Dusk set makes a tank last longer
           state.oil = clamp(state.oil - O.burn * (1 - clamp(setFx().lanternOil ?? 0, 0, 0.9)) * dt, 0, O.max);
+        if (state.flame > 0) state.flame = Math.max(0, state.flame - dt);   // run dry and you start again from the last lit lamp
       },
       exit() { if (live === instance) live = null; },
     };

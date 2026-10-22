@@ -1,12 +1,16 @@
 /* Planned world: content and release acceptance belong to its own TODO.
    Terrain, endless dusk and the belt lantern: 30a. Flora and wildlife: 30b; economy, weather and music: 30c;
    Wick and the Old Road: 30d; regular enemies: 30e-30f; Grandmother Gloomweaver: 30g; Umbra: 30h. Release: 30i.
+   `boss.summon` is Umbra's gate (30d): level 11 and Wick's quest, whose three moonwells stand in the first three
+   gaps below. Her fight, trophy and arena arrive with 30h.
    `canopy` is the giant lumen caps overhead, read by src/world/mechanics/lantern.js:
      height       metres the caps hang above the ground (the canopy models arrive in 30b)
      village      radius in metres of the gap the village sits in, the world's safe light
      gaps         the authored gaps of starlight, as { angle (radians around the village), distance (metres),
                   radius (metres of open sky) }; LANTERN.canopy supplies cover, gapCover, villageCover and fade. */
+import { DUSK_NPCS, DUSK_HOUSES } from '../duskVillage.js';
 export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, secret: false,
+  npcs: DUSK_NPCS, houses: DUSK_HOUSES,
   expectedLevel: [10, 13], lowLevel: 12, scale: { hp: 3.4, damage: 2.25, speed: 1.3, cooldown: 0.75, xp: 3.1 },
   seed: 161803, mechanic: 'lantern',
   terrain: { hills: { amp: 3.4, freq: 1.9 }, ridges: { amp: 13, freq: 1.25 }, lakes: 1 },
@@ -35,4 +39,4 @@ export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, 
     rare: [['moonstoneVein', 2]] },
   tagline: 'an endless dusk under glowing caps',
   arrival: 'Duskhollow. The caps hold back the sky here, so the day never quite arrives. Keep the lantern on your belt fed, and the moss will light your way home.',
-  boss: { type: 'umbra' } };
+  boss: { type: 'umbra', summon: { level: 11, quest: 'oldRoad' } } };
