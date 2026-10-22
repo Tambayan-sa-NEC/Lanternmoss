@@ -79,6 +79,22 @@ export const BESTIARY_ENTRIES = {
       'Stand well back from the water and it has to show itself in the shallows first.', 'Stagger it as it surfaces and it flounders in the shallows, open to everything.'],
     drops: 'Sometimes a silver sprat as well.',
   },
+  shadeling: {
+    name: 'Shadeling', blurb: 'A shape that is only a shadow until your light catches it. Out in the dusk it slides over the ground after you; it cannot be touched there, and it cannot touch you either.',
+    attacks: [['Clawing dark', 'Rears up and strikes - but only where it is standing in light.']],
+    counters: ['It is solid only in light. Keep it inside your lantern, or fight it where a waylamp or moonwell burns.',
+      'A sudden light drives it off: relight a lamp beside it, or pour oil into an empty lantern.',
+      'Fire sends it fleeing too, so a Fireball or a burning set clears a path.',
+      'If your lantern runs dry it cannot hurt you, but you cannot hurt it either: refill and try again.'],
+    drops: 'Often a pinch of lumen dust as well.',
+  },
+  mosslurk: {
+    name: 'Mosslurk', blurb: 'A cluster of glowcaps with teeth. It sits among the real ones, perfectly still, and waits for someone to reach for it.',
+    attacks: [['Ambush', 'Springs when you pick it, or when you walk right over it, rearing up over a warning circle before the first bite.']],
+    counters: ['It always shows its warning circle before biting: step back out of it.',
+      'Count the caps. A real patch does not blink.', 'It is slow once sprung, so back away and fight it at range.'],
+    drops: 'Often a few glowcaps as well - the ones it was wearing.',
+  },
   hydra: {
     lore: 'Old Bramble swears the lake hydra was a single, harmless eel until somebody tried to chop it in half. '
       + 'Now it guards the deep water, and a warm, speckled egg it will not explain.',

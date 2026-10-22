@@ -29,14 +29,15 @@ export const COMBAT = {
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
-    fireball: { name: 'Fireball', color: 0xff9a4a,
+    // fire: this blow is a burst of flame. Duskhollow's Shadelings flee it (behaviors/lightbound.js); nothing else reads it yet
+    fireball: { name: 'Fireball', color: 0xff9a4a, fire: true,
                 cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, homing: 0, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 }, // homing: turn strength; 0 flies straight
     nova:     { name: 'Frost Nova', color: 0x9fe8ff,
                 cost: 28, cooldown: 8, damage: 12, radius: 4.5, slow: 0.55, slowTime: 3.5, knockback: 4 },
     blink:    { name: 'Blink', color: 0xbff4ff,
                 cost: 15, cooldown: 3, distance: 6.5, invuln: 0.35 },            // evasion: was 5 s
     // ultimate (src/combat/abilities/ultimates.js): aim a spot (target: 'ground'), the meteor lands `delay` s later
-    meteor:   { name: 'Meteor', color: 0xff7a3a, ult: true, target: 'ground',
+    meteor:   { name: 'Meteor', color: 0xff7a3a, ult: true, target: 'ground', fire: true,
                 cost: 40, cooldown: 30, damage: 110, range: 18, radius: 5.5, delay: 1.1, falloff: 0.35, knockback: 9,
                 burn: { duration: 3, tick: 0.5, damage: 5 } },                   // the crater keeps burning for a moment
   },
@@ -79,6 +80,22 @@ export const COMBAT = {
     surfSkipper:{ ai: 'amphibian', color: 0x7f9a5c, hp: 70, speed: 3.6, swimSpeed: 4.2, radius: 0.45, height: 0.8, aggro: 14, leash: 22,
                  turnRate: 8, ambushRange: 6.5, windup: 0.6, leapSpeed: 12, leapTime: 0.55, leapLift: 7, width: 1.1, damage: 11, knockback: 7,
                  exposed: 1.8, cooldown: 2.0, fenceDepth: 0.3, hideDepth: 0.9, respawn: 45, xp: 18 },
+    // ---- Duskhollow (TODO 30e): monsters the lantern decides the rules of (behaviours: lightbound, mimic)
+    // A Shadeling is only a shadow where the ground is dark: untargetable, and unable to attack, so an unreadable
+    // monster can never land a blow. bindAt = how brightly lit (gameplay/OldRoad.js litAt, 0..1) the ground must be
+    // for it to stand up solid. A light that actually comes on inside its reach drives it off (OldRoad 'lightflare'),
+    // and so does fire when fleeFire is set. boundColor tints its eyes and the wisps around its head.
+    shadeling: { ai: 'lightbound', color: 0x241c38, boundColor: 0xbfa8ff, hp: 70, speed: 3.9, radius: 0.42, height: 1.5,
+                 aggro: 15, leash: 22, turnRate: 7, range: 1.6, damage: 10, windup: 0.5, windupTurn: 6, recover: 0.5,
+                 cooldown: 1.5, knockback: 4, bindAt: 0.12, fleeFire: true, fleeTime: 3.2, fleeSpeed: 1.3,
+                 respawn: 45, xp: 20 },
+    // A Mosslurk is scenery until something reaches for it: triggerRange = walking this close springs it anyway;
+    // pickReach = how close the "Pick the glowcap patch" prompt appears. The wind-up and its warning circle are what
+    // keep the ambush fair.
+    mosslurk:  { ai: 'mimic', color: 0x6a4a7a, capColor: 0x9ff0ff, hp: 105, speed: 2.6, radius: 0.5, height: 1.1,
+                 aggro: 7, leash: 14, turnRate: 5, range: 1.8, damage: 13, windup: 0.6, windupTurn: 5, recover: 0.7,
+                 cooldown: 1.8, knockback: 6, triggerRange: 1.2, pickReach: 2.2, knockResist: 0.4, telegraph: true,
+                 respawn: 55, xp: 24 },
     // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
     //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
     hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,
