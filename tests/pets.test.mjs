@@ -44,10 +44,11 @@ test('unlocks point at real quests, chest kinds and planets; every hero starts w
   assert.ok(Object.values(PETS).filter(p => p.unlock).length >= 3, 'at least three pets to find');
 });
 
-test('unreleased Tidewhisper hides its otter without making the all-pets goal impossible', () => {
+test('Tidewhisper release controls otter availability and the all-pets goal', () => {
   assert.equal(PETS.otter.unlock.quest, 'darkLighthouse');
-  assert.equal(petAvailable('otter'), false);
-  assert.ok(!availablePetIds().includes('otter'));
+  const released=PLANET_CATALOG.find(p=>p.id==='tidewhisper').released;
+  assert.equal(petAvailable('otter'), released);
+  assert.equal(availablePetIds().includes('otter'), released);
 });
 
 test('commands, keys, growth and care numbers make sense', () => {

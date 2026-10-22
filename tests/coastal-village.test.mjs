@@ -14,5 +14,5 @@ test('coastal village references two public interiors, a keeper, traveler reacti
     const total=tide.resources.nodes.reduce((sum,[kind,n])=>sum+n*NODE_KINDS[kind].drops.filter(([id])=>id===step.item).reduce((s,[,q])=>s+(Array.isArray(q)?q[0]:q),0),0);
     assert.ok(total>=step.count,`${step.item} has enough actual coastal sources`);
   }
-  assert.deepEqual(tide.boss.summon,{level:8,quest:'darkLighthouse',lowTide:true});assert.equal(tide.released,false);
+  assert.deepEqual(tide.boss.summon,{level:8,quest:'darkLighthouse',lowTide:true});
 });

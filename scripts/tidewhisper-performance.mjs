@@ -8,6 +8,7 @@ import { tidewhisperBrowser } from './lib/tidewhisper-browser.mjs';
 import { discardWebGL } from './lib/discard-webgl.mjs';
 import { PERFORMANCE_BUDGET, PERFORMANCE_REFERENCE, referenceProfile, referenceRenderer } from '../src/config/render.js';
 import { frameLimitMs } from '../src/config/contentGate.js';
+import { PLANETS } from '../src/config/planets.js';
 const release = process.argv.includes('--release');
 const gpuTiming = process.argv.includes('--gpu-timing');
 const headed = !process.argv.includes('--headless');
@@ -22,7 +23,8 @@ const dirty = !!execFileSync('git', ['status','--porcelain'], { cwd, encoding:'u
 const host = { platform: platform(), osRelease: osRelease(), cpu: cpus()[0]?.model, totalMemoryBytes: totalmem(), freeMemoryBeforeBrowserBytes: freemem() };
 const viewport = { width: PERFORMANCE_REFERENCE.viewport[0], height: PERFORMANCE_REFERENCE.viewport[1] };
 const quality = PERFORMANCE_REFERENCE.quality;
-const { browser, page, errors, close } = await tidewhisperBrowser({ port: 8115, software: false,
+assert.ok(!release || PLANETS.some(p => p.id === 'tidewhisper'), 'release measurement requires the authored Tidewhisper world');
+const { browser, page, errors, close } = await tidewhisperBrowser({ port: 8115, candidate: !release, software: false,
   highPerformance: true, viewport, quality, headless: !headed });
 try {
   await page.setCacheEnabled(false);
@@ -98,7 +100,11 @@ try {
         const { setSetting } = await import('/src/core/settings.js'); setSetting('quality', quality); setSetting('pauseOnBlur', false);
         const { seedPlay } = await import('/src/utils/random.js'); seedPlay(seed);
         const L = window.LANTERNMOSS; dayClock.t = phase * DAY.length;
-        L.CharacterSelect.pick(hero); L.begin(); L.Tutorial.skip(); L.Pets.command('passive'); L.goToPlanet('tidewhisper');
+        L.CharacterSelect.pick(hero); L.begin(); L.Tutorial.skip(); L.goToPlanet('tidewhisper');
+        // The TODO 27i release matrix must carry the otter in every hero/seed/scene row.
+        L.Pets.unlock('otter');
+        if (!L.Pets.choose('otter', true)) throw new Error('otter could not be selected for release measurement');
+        L.Pets.command('passive');
         L.setWeather(weather); L.weather.timer = 1e9;
         L.player.placeAt(L.planets.world.spawnDir); L.player.invuln = 1e9;
         L.cam.pitch = .38; L.cam.dist = 8.5; resetView(L.player.fwd); snapCamera(L.player.up, L.player.fwd);
@@ -123,7 +129,7 @@ try {
       });
       assert.equal(measurement.planetId, 'tidewhisper'); assert.equal(measurement.quality, quality);
       assert.deepEqual(measurement.drawingBuffer, [viewport.width,viewport.height]);
-      assert.equal(measurement.heroId, hero); assert.equal(measurement.started, true);
+      assert.equal(measurement.heroId, hero); assert.equal(measurement.petId, 'otter'); assert.equal(measurement.started, true);
       assert.equal(measurement.paused, false); assert.equal(measurement.hidden, false); assert.equal(measurement.samples, 120);
       const row = { seed, hero, scene, phase, weather, freeMemoryBeforeRowBytes, ...measurement }; rows.push(row); console.log(JSON.stringify(row));
     }
@@ -132,8 +138,8 @@ try {
     const report = { measuredAt: new Date().toISOString(), candidateCommit, dirty, gpuTiming,
       rowCleanup: 'await previous WebGL context loss, then dispose before reload, outside measured frames', device: gpu,
       target: `${PERFORMANCE_REFERENCE.machine} / ${PERFORMANCE_REFERENCE.renderer}`, host, gpuDevices: gpuInfo?.devices ?? [],
-      browser: { ...device, headless: !headed }, quality, viewport: [viewport.width,viewport.height], candidate: true,
-      profile: 'fresh reload and empty test storage per row; play stream seeded before hero/travel setup; stationary invulnerable hero at village spawn, passive default pet, authored generation seed; fixed day/tide phase; 120 explicit setup updates, 30 warmup and 120 real render intervals per row; empty-clock page measured with game tab frozen',
+      browser: { ...device, headless: !headed }, quality, viewport: [viewport.width,viewport.height], candidate: !release,
+      profile: 'fresh reload and empty test storage per row; play stream seeded before hero/travel setup; stationary invulnerable hero at village spawn, passive unlocked otter pet, authored generation seed; fixed day/tide phase; 120 explicit setup updates, 30 warmup and 120 real render intervals per row; empty-clock page measured with game tab frozen',
       frameMetric: 'p95FrameMs = real interval between rendered frames; p95CpuMs (game loop) omits browser work; optional --gpu-timing adds query/readback overhead and is diagnostic only (p95GpuMs is otherwise null)',
       errors, frameClock, rows };
     writeFileSync(output, JSON.stringify(report, null, 2) + '\n');

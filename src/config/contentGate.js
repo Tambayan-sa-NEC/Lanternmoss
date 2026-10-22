@@ -121,6 +121,7 @@ export function contentProblems(p, catalog, r) {
   require(rows.length === expected.length && keys.size === expected.length && expected.every(key => keys.has(key)),
     'release performance needs every hero, both seeds and all three scenes exactly once');
   for (const row of rows) {
+    if (p.id === 'tidewhisper') require(row.petId === 'otter', 'release performance must include the otter in every scene');
     require(referenceRenderer(row.gpu) && row.quality === PERFORMANCE_REFERENCE.quality
       && row.drawingBuffer?.[0] === PERFORMANCE_REFERENCE.viewport[0] && row.drawingBuffer?.[1] === PERFORMANCE_REFERENCE.viewport[1]
       && row.samples >= 90 && positive(row.p95FrameMs) && row.p95FrameMs <= frameLimit

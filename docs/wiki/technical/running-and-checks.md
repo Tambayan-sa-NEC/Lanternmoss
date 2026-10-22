@@ -3,7 +3,7 @@
 `node scripts/static-transforms-smoke.mjs` checks immutable branch traversal in Edge on port 8141. It uses real
 movement input and explicit simulation frames, compares world matrices and raw canvas pixels after forcing all
 visible immutable branches on all four worlds and a locally lit cave at 720p/1080p, checks overflow and page/shader errors, and saves diagnostic
-captures to the system temp folder. Tidewhisper is installed through the test-only candidate fixture.
+captures to the system temp folder. Tidewhisper is installed through the test-only candidate fixture in this check.
 It also restores distance-only actor gates and requires identical raw canvas pixels, checking that frustum-gated
 rigs contribute no visible geometry in those fixtures. The cave fixture places an enemy behind the room camera
 within the distance gate and requires at least one branch to be restored before comparing pixels.
@@ -97,12 +97,18 @@ gets a scene in `scripts/screenshots.mjs` and a spot in the tour above; every ne
 
 ## Tidewhisper candidate checks (27h)
 
-These use a test catalog substitute; the authored destination stays unreleased. Install optional Puppeteer Core
+These use a test catalog substitute without changing the authored release flag. Install optional Puppeteer Core
 as above. `node scripts/tidewhisper-campaign-smoke.mjs` owns port 8114 and checks the real fourth-world portal UI,
 quest/node Continue, revisit, quest/tide gate, one crown and 720p/1080p bounds with zero page/shader errors.
 After the approved 2026-10-19 gate split, these functional checks may pass and merge to `develop` while hardware
-performance remains a public-release blocker. They never enable the authored Tidewhisper release flag.
+performance remains a public-release blocker. The candidate checks do not enable the authored release flag.
 It captures `world/tidewhisper-campaign-{720,1080}.jpg` through `shots.mjs`.
+
+`node scripts/tidewhisper-production-smoke.mjs` owns port 8143 and loads the ordinary browser entry with the
+authored fourth-world release flag. It rejects candidate-module loading, checks the title and real E-key portal at
+720p/1080p, saves a partial coastal quest/node state, reloads Continue, returns and revisits, completes Mirelure,
+reloads the single Tide Crown, then opens an old v1 save. It asserts zero page/shader errors and captures the
+reviewed `huds/tidewhisper-portal.jpg`. Run it only on a branch where Tidewhisper is intentionally released.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
@@ -169,8 +175,10 @@ on the owner's Acer RTX 4050 reference (the collector requests the high-performa
 It opens visible fullscreen Edge for desktop acceptance. `--headless` and `--gpu-timing` are optional diagnostics;
 neither can be combined with `--release`.
 Omit `--output` for the historical default diagnostic path; use a separate output for a new device/run.
-`--release` additionally requires a clean commit, the actual RTX 4050 Laptop GPU renderer and passing timing/count budgets before
-writing certification. Run performance alone, with no simulation suite or screenshot job competing for resources.
+`--release` additionally requires a clean commit, the authored Tidewhisper world in the production catalog,
+the actual RTX 4050 Laptop GPU renderer and passing timing/count budgets before writing certification. It loads
+the ordinary production entry; diagnostic runs still use the test candidate. Run performance alone, with no
+simulation suite or screenshot job competing for resources.
 Every performance row uses a fresh reload and empty ephemeral test storage, seeds play before hero/travel setup,
 then runs 120 setup updates, 30 warmup frames and 120 real render intervals. Previous rows cannot carry state forward.
 See the [handoff](tidewhisper-release.md).

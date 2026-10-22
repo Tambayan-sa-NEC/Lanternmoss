@@ -27,6 +27,7 @@ try{
   const done=()=>Object.fromEntries(G.requirements().map(r=>[r.kind,r.done]));
   P.level=7;phase(.4);assert.deepEqual(done(),{level:false,quest:false,lowTide:true});assert.equal(G.state,'sealed');
   P.level=8;Quests.st('darkLighthouse').status='done';phase(.9);assert.deepEqual(done(),{level:true,quest:true,lowTide:false});assert.equal(G.state,'sealed');
+  assert.match(G.lineFor({name:'Test Keeper'}).t,/low tide/i,'villager gives the remaining tide hint without throwing');
   phase(.4);assert.ok(G.met);assert.equal(G.state,'ready');
   P.placeAt(lairEdge());for(let i=0;i<60*8&&G.state!=='awake';i++)step(1/60);assert.equal(G.state,'awake','walking into the lair wakes her');P.placeAt(shore());
   assert.equal(G.wall.kind,'surf','a ring of crashing surf');
@@ -123,5 +124,5 @@ try{
   assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());step(1);
   assert.equal(crowns(),1,'still one after Continue');assert.ok(!ctx.boss?.alive);assert.equal(G.state,'beaten');assert.ok(!Chests.bossChest||Chests.bossChest.opened,'no second treasure chest');
   console.log('PASS  the win drops one chest with one Tide Crown; Continue keeps her beaten without a second chest or crown');
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false);console.log('all passed');
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true);console.log('all passed');
 }finally{H.Mechanics.exit();fixture.restore();}

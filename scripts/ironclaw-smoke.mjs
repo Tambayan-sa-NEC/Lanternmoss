@@ -34,10 +34,11 @@ try{
   /** Hero `side` ('face' | 'bell') of a calm Ironclaw, 5 m off, facing it. */
   const stand=side=>page.evaluate(async side=>{
     const L=window.LANTERNMOSS,ic=window.ic,{dirAlong,tangentToward}=await import('/src/utils/sphere.js');
-    ic.state='recover';ic.timer=99;ic.cool=99;const at=dirAlong(ic.up,side==='face'?ic.fwd:ic.fwd.clone().negate(),5);
-    L.player.placeAt(at);L.player.fwd.copy(tangentToward(at,ic.up));L.cam.fwd.copy(L.player.fwd);L.player.invuln=0;window.before={hp:ic.hp,hurts:window.hurts.length};
+    // Hold the target still and start each shot with casting resources after the earlier bell wave.
+    ic.state='recover';ic.timer=99;ic.cool=99;ic.speed=0;const at=dirAlong(ic.up,side==='face'?ic.fwd:ic.fwd.clone().negate(),5);
+    L.player.placeAt(at);L.player.mana=L.player.stats.maxMana;L.player.fwd.copy(tangentToward(at,ic.up));L.cam.fwd.copy(L.player.fwd);L.player.invuln=0;window.before={hp:ic.hp,hurts:window.hurts.length};
   },side);
-  const bolt=async()=>{await page.keyboard.down('KeyZ');await frames(2);await page.keyboard.up('KeyZ');await frames(20);};
+  const bolt=async()=>{await page.keyboard.down('KeyZ');await frames(2);await page.keyboard.up('KeyZ');await frames(40);};
   await stand('bell');await bolt();
   assert.deepEqual(await page.evaluate(()=>({unhurt:window.ic.hp===window.before.hp,ringing:window.ic.ringAt>0||window.ic.waves.length>0})),{unhurt:true,ringing:true},'a bolt into the bell is refused and rings it');
   await page.evaluate(()=>{window.ic.state='recover';window.ic.timer=99;});await frames(90);

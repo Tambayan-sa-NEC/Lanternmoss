@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { SAVE_SYSTEMS, SAVE_OWNERS, DEVICE_SYSTEMS, STATELESS_EXPORTS, TRANSIENT_SYSTEMS,
   SAVE_KEY, SaveStore, SaveRegistry, sanitizeSave, parseSave, cleanState } from '../src/core/save.js';
-import { PLANETS } from '../src/config/planets.js';
+import { PLANETS, PLANET_CATALOG } from '../src/config/planets.js';
 
 const fixture = () => JSON.parse(readFileSync(new URL('fixtures/save-v1.json', import.meta.url), 'utf8'));
 test('v1 fixture remains readable, with independent planet snapshots and one explicit slot', () => {
@@ -20,13 +20,14 @@ test('v1 fixture remains readable, with independent planet snapshots and one exp
   assert.equal(clean.planets.emberfall.farm.plots[0].crop, 'carrot');
   assert.deepEqual(sanitizeSave(clean), clean);
 });
-test('otter dive state is bounded and an unreleased pet cannot be imported into normal play', () => {
+test('otter dive state is bounded and availability follows Tidewhisper release', () => {
   const raw = fixture();
   raw.systems.pets.unlocked.push('otter'); raw.systems.pets.active = 'otter';
   raw.systems.pets.diveDay = 4; raw.systems.pets.divesToday = 999;
   const pets = sanitizeSave(raw).systems.pets;
-  assert.ok(!pets.unlocked.includes('otter'));
-  assert.equal(pets.active, 'owl');
+  const released=PLANET_CATALOG[3].released;
+  assert.equal(pets.unlocked.includes('otter'),released);
+  assert.equal(pets.active,released?'otter':'owl');
   assert.equal(pets.diveDay, 4); assert.equal(pets.divesToday, 2);
 });
 test('damaged, foreign, missing-player and future saves are rejected without overwriting', () => {
@@ -98,7 +99,8 @@ test('every state export is registered, device-local or explicitly transient', (
   assert.deepEqual([...seen].sort(), Object.keys(SAVE_SYSTEMS).sort());
 });
 test('planet ids are stable and gameplay has no numeric planet equality checks', () => {
-  assert.deepEqual(PLANETS.map(p => p.id), ['lanternmoss', 'emberfall', 'frostveil']);
+  assert.deepEqual(PLANETS.map(p => p.id), PLANET_CATALOG.filter(p => p.released).map(p => p.id));
+  assert.deepEqual(PLANETS.slice(0,3).map(p=>p.id), ['lanternmoss', 'emberfall', 'frostveil']);
   for (const url of files(new URL('../src/', import.meta.url)).filter(u => u.pathname.endsWith('.js'))) {
     assert.doesNotMatch(readFileSync(url, 'utf8'), /\bplanet\s*={2,3}\s*\d+/, url.pathname);
   }

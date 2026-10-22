@@ -36,7 +36,7 @@ CharacterSelect.key('Enter');
 check(CharacterSelect.step === 'pet' && !ctx.started && dom.start.classList.contains('petstep'), 'Enter: on to the pet step (not into the game yet)');
 check(dom.selHead.textContent === 'Choose your pet', 'heading says so');
 const cards = dom.petCards.innerHTML;
-check((cards.match(/data-pet=/g) || []).length === 6 && (cards.match(/ locked/g) || []).length === 4, 'every pet is listed; the four still to find are locked');
+check((cards.match(/data-pet=/g) || []).length === 7 && (cards.match(/ locked/g) || []).length === 5, 'every released pet is listed; the five still to find are locked');
 check(CharacterSelect.petView === 'wolf' && dom.petDetail.innerHTML.includes('Howl') && dom.petDetail.innerHTML.includes('health'), "the knight's own wolf is picked, with its stats and ability");
 step(3); const pd = camera.position.distanceTo(ctx.companion.pos); const petMove = still(3);
 check(pd < 4 && petMove < 0.05, `the camera frames the pet, still (${pd.toFixed(2)} m away, moved ${petMove.toFixed(3)})`);

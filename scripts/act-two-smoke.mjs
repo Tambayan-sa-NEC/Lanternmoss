@@ -26,7 +26,7 @@ try {
         fits:box.left>=0&&box.right<=innerWidth&&box.bottom<=innerHeight,text:el.textContent};
     });
     assert.deepEqual(title.names,['Lanternmoss','Emberfall','Frostveil','Tidewhisper','Duskhollow','?']);
-    assert.deepEqual(title.acts,['Act I','Act II']);assert.equal(title.planned,3);assert.equal(title.actions,0);assert.ok(title.fits);
+    assert.deepEqual(title.acts,['Act I','Act II']);assert.equal(title.planned,2);assert.equal(title.actions,0);assert.ok(title.fits);
     assert.ok(!title.text.includes('Nyxra')&&!title.text.includes('Lantern Moon'));
     await page.screenshot({path:join(tmpdir(),`lanternmoss-act-two-${height}.png`)});
     if(height===1080)await page.screenshot({path:shotPath('title'),type:'jpeg',quality:88});
@@ -52,14 +52,15 @@ try {
     const parsed=parseSave(JSON.stringify(raw));if(!parsed.ok||!L.saves.restore(parsed.data))throw new Error('Old v1 restore failed');
     const {gainXp}=await import('/src/progression/experience.js'),{xpToNext}=await import('/src/progression/leveling.js');gainXp(xpToNext(10));
     const {ACHIEVEMENTS}=await import('/src/config/achievements.js');
-    return {level:L.player.level,planet:L.planetId,futureAwards:ACHIEVEMENTS.filter(a=>['fiveWorlds','tideBoss','duskBoss','moonBoss'].includes(a.id)).length,
+    return {level:L.player.level,planet:L.planetId,tideAwards:ACHIEVEMENTS.filter(a=>a.id==='tideBoss').length,
+      futureAwards:ACHIEVEMENTS.filter(a=>['fiveWorlds','duskBoss','moonBoss'].includes(a.id)).length,
       original:ACHIEVEMENTS.find(a=>a.id==='allBosses').goal.bosses};
   });
-  assert.equal(old.level,11);assert.equal(old.planet,'emberfall');assert.equal(old.futureAwards,0);assert.deepEqual(old.original,['gloomcap','pyrrhax','malgrath']);
+  assert.equal(old.level,11);assert.equal(old.planet,'emberfall');assert.equal(old.tideAwards,1);assert.equal(old.futureAwards,0);assert.deepEqual(old.original,['gloomcap','pyrrhax','malgrath']);
   console.log('PASS  real level 10→11→16 progression and reload Continue; old v1 resumes XP and original awards stay intact');
   await page.evaluate(()=>{const L=window.LANTERNMOSS;L.player.invuln=10000;L.inventory.add('wayfarerKey',99);L.player.placeAt(L.Portals.gate.dir);});
   await page.keyboard.press('KeyE');await page.waitForFunction(()=>window.LANTERNMOSS.PortalUI.isOpen);
-  assert.deepEqual(await page.$$eval('[data-destination]',els=>els.map(e=>e.dataset.destination)),['lanternmoss','emberfall','frostveil']);
+  assert.deepEqual(await page.$$eval('[data-destination]',els=>els.map(e=>e.dataset.destination)),['lanternmoss','emberfall','frostveil','tidewhisper']);
   const secret=await page.evaluate(async()=>{
     const L=window.LANTERNMOSS;L.PortalUI.close();const {ACHIEVEMENTS}=await import('/src/config/achievements.js');
     ACHIEVEMENTS.push({id:'browserSecretProbe',group:'Firsts',icon:'boss',name:'Spoiler probe',text:'Spoiler text',secret:true,goal:{bosses:['never']}});

@@ -119,5 +119,5 @@ try{
   assert.equal(sea.length,goblin.length+1,'the Shellback adds its own extra to the usual drop');assert.equal(sea.at(-1),'shell');assert.ok(!goblin.includes('shell'));
   assert.equal(dropped('jellybell').at(-1),'seaglass');assert.equal(dropped('surfSkipper').at(-1),'silverSprat');
   console.log('PASS  sea monsters add their own extra drop (shell / seaglass / sprat) without changing older monsters\' rolls');
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false);console.log('all passed');
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true);console.log('all passed');
 }finally{H.Mechanics.exit();fixture.restore();}

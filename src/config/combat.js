@@ -187,7 +187,7 @@ export const COMBAT = {
                    geyser: { windup: 1.2, radius: 2.6, damage: 14, knockback: 8, recover: 0.4, cooldown: 1.8, reuse: 3 },
                    bite:   { windup: 0.7, range: 5.5, arc: 80, damage: 18, knockback: 8, recover: 0.8, cooldown: 0.8 },
                    thrash: { windup: 0.9, radius: 5.5, damage: 14, knockback: 10, recover: 0.8, cooldown: 0.8, reuse: 4 },
-                   roll:   { windup: 1.0, minRange: 5, speed: 10, distance: 14, width: 3.0, damage: 18, knockback: 12, recover: 1.0, cooldown: 1.0, reuse: 5 },
+                   roll:   { windup: 1.0, minRange: 5, speed: 10, distance: 14, width: 3.0, damage: 19, knockback: 12, recover: 1.0, cooldown: 1.0, reuse: 5 },
                  },
                  phases: [   // the moves themselves check her mode (deep / surfaced / beached)
                    { below: 1.0, title: 'Lantern lights', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1, cooldownMul: 1 },

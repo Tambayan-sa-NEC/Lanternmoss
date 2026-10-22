@@ -39,5 +39,5 @@ try{
   const food=H.inventory.count('silverSprat');assert.ok(H.saves.save().ok);assert.ok(H.saves.continue());step(.1);assert.ok(game.world.lighthouseLamp.visible);assert.equal(Quests.st('darkLighthouse').status,'done');
   assert.ok(Houses.opened.has('lanternmoss:4'));assert.equal(Houses.lore['lanternmoss:4'],0);enter(1);Houses.use(Houses.inside.room.spots.find(s=>s.kind==='chest'));Dialog.close();assert.equal(H.inventory.count('silverSprat'),food);leave();
   H.goToPlanet('emberfall');assert.equal(game.world.lighthouseLamp,null);assert.ok(!keeper());H.goToPlanet('lanternmoss');step(.1);assert.ok(game.world.lighthouseLamp.visible);assert.equal(P.coins,coins+80);
-  assert.equal(game.planets.canTravelTo('tidewhisper'),false);console.log('PASS  supported pier fishing stays dry at high tide; two themed interiors preserve one-time gifts/lore, keeper and beacon restore across travel');console.log('all passed');
+  assert.equal(game.planets.canTravelTo('tidewhisper'),true);console.log('PASS  supported pier fishing stays dry at high tide; two themed interiors preserve one-time gifts/lore, keeper and beacon restore across travel');console.log('all passed');
 }finally{H.Mechanics.exit();fixture.restore();}

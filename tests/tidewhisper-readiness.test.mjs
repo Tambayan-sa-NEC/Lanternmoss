@@ -30,7 +30,10 @@ test('Tidewhisper candidate has complete runtime content but cannot pass without
   r.releases.tidewhisper = { device: PERFORMANCE_REFERENCE.renderer, quality: 'high', viewport: [1920,1080],
     dirty:false,gpuTiming:false,browser:{headless:false},candidateCommit:'a'.repeat(40),
     rows: PERFORMANCE_REFERENCE.heroes.flatMap(hero => PERFORMANCE_REFERENCE.seeds.flatMap(seed => PERFORMANCE_REFERENCE.scenes.map(scene =>
-      ({ hero,seed,scene,gpu:PERFORMANCE_REFERENCE.renderer,quality:'high',drawingBuffer:[1920,1080],samples:90,p95FrameMs:10,calls:450,triangles:190000 })))) };
+      ({ hero,seed,scene,petId:'otter',gpu:PERFORMANCE_REFERENCE.renderer,quality:'high',drawingBuffer:[1920,1080],samples:90,p95FrameMs:10,calls:450,triangles:190000 })))) };
   assert.deepEqual(contentProblems(tide, PLANET_CATALOG, r), []);
+  delete r.releases.tidewhisper.rows[0].petId;
+  assert.ok(contentProblems(tide, PLANET_CATALOG, r).some(problem => /otter/.test(problem)),
+    'the release gate rejects a matrix that omitted the otter');
   assert.equal(tide.released, released, 'readiness tests must not change the authored release state');
 });

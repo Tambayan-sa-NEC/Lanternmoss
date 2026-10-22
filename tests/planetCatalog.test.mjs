@@ -18,8 +18,9 @@ const destinations = (catalog, defeated, state = {}, keys = 100) => Object.fromE
 test('catalog distinguishes released Act I from incomplete Act II metadata', () => {
   assert.deepEqual(PLANETS.map(p => [p.id, p.seed, p.act]), [
     ['lanternmoss', 20260930, 1], ['emberfall', 77412, 1], ['frostveil', 31415, 1],
+    ...(PLANET_CATALOG[3].released ? [['tidewhisper', 271828, 2]] : []),
   ]);
-  assert.deepEqual(PLANET_CATALOG.filter(p => !p.released).map(p => p.id), ['tidewhisper', 'duskhollow', 'lanternMoon']);
+  assert.deepEqual(PLANET_CATALOG.filter(p => !p.released).map(p => p.id), PLANET_CATALOG[3].released ? ['duskhollow', 'lanternMoon'] : ['tidewhisper', 'duskhollow', 'lanternMoon']);
   assert.equal(PLANET_CATALOG.at(-1).secret, true);
   assert.deepEqual(releasedPlanets(PLANET_CATALOG), PLANETS);
   assert.throws(() => validatePlanetCatalog([...PLANET_CATALOG, PLANETS[0]]), /duplicate/);
@@ -34,11 +35,14 @@ test('catalog distinguishes released Act I from incomplete Act II metadata', () 
 
 test('keys and defeated ids cannot reach unreleased worlds or jump over a release gap', () => {
   const d = destinations(PLANET_CATALOG, ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper']);
-  assert.equal(d.tidewhisper, undefined); assert.equal(d.duskhollow, undefined); assert.equal(d.lanternMoon, undefined);
-  const catalog = [...PLANET_CATALOG.slice(0, 4), { ...PLANETS[2], id: 'duskhollow', act: 2 }];
+  if (PLANET_CATALOG[3].released) assert.equal(d.tidewhisper.enabled, true);
+  else assert.equal(d.tidewhisper, undefined);
+  assert.equal(d.duskhollow, undefined); assert.equal(d.lanternMoon, undefined);
+  const catalog = [...PLANET_CATALOG.slice(0, 3), { ...PLANET_CATALOG[3], released: false }, { ...PLANETS[2], id: 'duskhollow', act: 2 }];
   assert.equal(destinations(catalog, ['frostveil', 'tidewhisper']).duskhollow.enabled, false);
   assert.equal(nextCampaignPlanet(catalog, 'frostveil'), null);
-  assert.deepEqual(portalDestinations('tidewhisper', [], null, 999), []);
+  assert.equal(nextCampaignPlanet(PLANET_CATALOG, 'frostveil')?.id ?? null, PLANET_CATALOG[3].released ? 'tidewhisper' : null);
+  assert.equal(portalDestinations('tidewhisper', [], null, 999).length > 0, PLANET_CATALOG[3].released);
 });
 
 test('a released secret requires its configured boss, night and rare-friend gates independently of keys', () => {
@@ -61,10 +65,10 @@ test('campaign completion and successors exclude secrets and unfinished metadata
   assert.equal(campaignComplete(PLANET_CATALOG, ['lanternmoss', 'frostveil']), false);
   assert.equal(campaignComplete(PLANET_CATALOG, PLANETS.map(p => p.id)), true);
   assert.equal(campaignComplete([...PLANETS, moon], PLANETS.map(p => p.id)), true);
-  const tide = { ...PLANETS[2], id: 'tidewhisper', act: 2 };
-  assert.equal(campaignComplete([...PLANETS, tide, moon], PLANETS.map(p => p.id)), false);
-  assert.equal(nextCampaignPlanet([...PLANETS, tide, moon], 'frostveil'), tide);
-  assert.equal(nextCampaignPlanet([...PLANETS, tide, moon], tide.id), null);
+  const base=PLANETS.slice(0,3),tide = { ...PLANETS[2], id: 'tidewhisper', act: 2 };
+  assert.equal(campaignComplete([...base, tide, moon], base.map(p => p.id)), false);
+  assert.equal(nextCampaignPlanet([...base, tide, moon], 'frostveil'), tide);
+  assert.equal(nextCampaignPlanet([...base, tide, moon], tide.id), null);
   assert.equal(campaignComplete([], []), false);
 });
 
@@ -83,10 +87,10 @@ test('local story memory and house ownership derive from planet data, including 
   assert.ok(storyKeyAllowed([future], 'Marlo'), 'legacy unqualified local keys remain supported');
   assert.equal(storyKeyAllowed([{ ...future, released: false }], 'tidewhisper:Marlo'), false);
   assert.equal(storyKeyAllowed([future], 'frostveil:Marlo'), false);
-  assert.deepEqual(Object.keys(cleanState('story', { Cinder: {}, 'emberfall:Cinder': {}, 'frostveil:Cinder': {}, Tuva: {} })),
-    ['Cinder', 'emberfall:Cinder', 'Tuva']);
+  assert.deepEqual(Object.keys(cleanState('story', { Cinder: {}, 'emberfall:Cinder': {}, 'frostveil:Cinder': {}, Tuva: {}, 'tidewhisper:Marlo': {} })),
+    ['Cinder', 'emberfall:Cinder', 'Tuva', ...(PLANET_CATALOG[3].released ? ['tidewhisper:Marlo'] : [])]);
   assert.equal(resolveHouse(4, 'emberfall').owner, 'Cinder'); assert.equal(resolveHouse(5, 'frostveil').owner, 'Tuva');
-  assert.equal(resolveHouse(4, 1).owner, 'Cinder'); assert.equal(resolveHouse(4, 'tidewhisper'), null);
+  assert.equal(resolveHouse(4, 1).owner, 'Cinder'); assert.equal(resolveHouse(4, 'tidewhisper')?.owner ?? null, PLANET_CATALOG[3].released ? 'Marlo' : null);
 });
 
 test('version-1 saves keep their campaign snapshots but discard unreleased destination/state claims', () => {
@@ -96,9 +100,15 @@ test('version-1 saves keep their campaign snapshots but discard unreleased desti
   old.planetId = 'tidewhisper'; old.planets.tidewhisper = { chests: {} };
   old.systems.progression.defeated.push('tidewhisper');
   const cleaned = sanitizeSave(old);
-  assert.equal(cleaned.planetId, 'lanternmoss'); assert.equal(cleaned.planets.tidewhisper, undefined);
-  assert.equal(cleaned.systems.progression.defeated.includes('tidewhisper'), false);
-  assert.equal(cleanState('portals', { stranded: { at: 'tidewhisper', from: 'frostveil' } }).stranded, null);
+  const released=PLANET_CATALOG[3].released;
+  assert.equal(cleaned.planetId, released ? 'tidewhisper' : 'lanternmoss');
+  assert.equal(!!cleaned.planets.tidewhisper, released);
+  assert.equal(cleaned.systems.progression.defeated.includes('tidewhisper'), released);
+  assert.equal(!!cleanState('portals', { stranded: { at: 'tidewhisper', from: 'frostveil' } }).stranded, released);
+  old.planetId='duskhollow';old.planets.duskhollow={chests:{}};old.systems.progression.defeated.push('duskhollow');
+  const blocked=sanitizeSave(old);
+  assert.equal(blocked.planetId,'lanternmoss');assert.equal(blocked.planets.duskhollow,undefined);
+  assert.equal(blocked.systems.progression.defeated.includes('duskhollow'),false);
 });
 
 test('the original three-world achievement requires those bosses rather than any three boss wins', () => {

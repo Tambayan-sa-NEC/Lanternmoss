@@ -33,7 +33,8 @@ try{
       const L=window.LANTERNMOSS,{dirAlong,tangentToward}=await import('/src/utils/sphere.js'),{encounterEvents}=await import('/src/combat/events.js');
       const c=window.crab??=L.enemies.find(e=>e.type==='shellback');for(const e of L.enemies)if(e!==c&&e.alive&&e!==L.boss&&e.up.distanceTo(c.up)*72<35)e.vanish();   // a quiet duel: nothing else for auto-aim to pick
       if(!window.refusals){window.refusals=0;encounterEvents.addEventListener('enemyrefused',()=>window.refusals++);}
-      c.state='idle';c.timer=99;const at=dirAlong(c.up,side==='front'?c.fwd:c.fwd.clone().negate(),4);
+      // Hold the plate's facing for both shots; an aggro turn can otherwise move the crab out of the rear bolt's path.
+      c.def={...c.def,aggro:0};c.state='idle';c.timer=99;c.speed=0;const at=dirAlong(c.up,side==='front'?c.fwd:c.fwd.clone().negate(),4);
       L.player.placeAt(at);L.player.fwd.copy(tangentToward(at,c.up));L.cam.fwd.copy(L.player.fwd);window.before={hp:c.hp,refused:window.refusals};
     },side);
     const frames=n=>page.evaluate(async n=>{const {ctx}=await import('/src/core/context.js');ctx.paused=false;for(let i=0;i<n;i++)window.LANTERNMOSS.update(1/60);ctx.paused=true;},n);

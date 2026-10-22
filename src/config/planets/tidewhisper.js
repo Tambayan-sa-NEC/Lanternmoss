@@ -1,6 +1,6 @@
 // Terrain/tides: 27a; flora/wildlife: 27b; economy/weather/music: 27c; village: 27d; regular enemies: 27e; Old Ironclaw: 27f; Mirelure: 27g. Release: 27h.
 import { COASTAL_NPCS, COASTAL_HOUSES } from '../coastalVillage.js';
-export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: false, secret: false,
+export default { id: 'tidewhisper', name: 'Tidewhisper', act: 2, released: true, secret: false,
   village:{coastal:true},outfit:'beach',outfitColors:[0x4bacc0,0xf4d18a,0xff987b,0x6dc39b],npcs:COASTAL_NPCS,houses:COASTAL_HOUSES,
   expectedLevel: [7, 10], lowLevel: 9,
   roster: [   // coastal groups: near 'beach' | 'shallows' | 'surf' (src/combat/spawning.js); the returning wisps glow sea-green
