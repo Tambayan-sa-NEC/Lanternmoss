@@ -81,6 +81,8 @@ node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
 node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
                                    # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/dusk-boss-smoke.mjs  # Duskhollow (unreleased, 30g): Grandmother Gloomweaver hanging out of reach,
+                                  # and real W walking up with a lit lantern to burn a strand through
 node scripts/dusk-weavers-smoke.mjs # Duskhollow (unreleased, 30f): webs that slow and are cut or burnt, oil
                                   # theft and its repayment, and the beetle accessibility toggle
 node scripts/dusk-monsters-smoke.mjs # Duskhollow (unreleased, 30e): shadows and mimics, the light that makes a
@@ -168,6 +170,15 @@ captures `mobs/duskhollow-gloomweaver.jpg`, `mobs/duskhollow-beetles.jpg` and `m
 `node tests/sim/duskWeavers.sim.mjs` covers the same ground headlessly and adds the web cap and placement, repeated
 theft, an empty lantern having nothing to steal, and Continue/travel rebuilding them with no held oil and no
 standing webs.
+
+`node scripts/dusk-boss-smoke.mjs` owns port 8135 and checks 30g in the browser, through the mini-boss fixture
+`tests/sim/lib/duskBossFixture.mjs`: she really hangs out of reach over the vein she guards and really refuses every
+blow; a strand really refuses a blade and really ignores an empty lantern; really walking up to one with a lit
+lantern really burns it through; fire takes one in a touch; the last one drops her; she really re-anchors at a
+threshold; and the beetle toggle really swaps her and her grandchildren together. It captures
+`bosses/duskhollow-grandweaver.jpg`.
+`node tests/sim/duskBoss.sim.mjs` covers the same fight headlessly and adds all three rounds, the dazed window, the
+loot, the vein she frees, and a defeat that survives Continue and travel.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
