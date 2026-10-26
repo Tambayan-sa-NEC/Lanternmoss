@@ -813,6 +813,9 @@ body.paused #tutorial, body.menu #tutorial, body.menu #faint-screen, body.cutsce
 .portal-destinations button small { font-size: 13px; line-height: 1.5; }
 .portal-destinations button:disabled { opacity: .6; cursor: default; background: #eae1df; }
 .portal-destinations button:not(:disabled):hover { background: #e2f2d9; border-color: #749468; }
+/* A world whose beaten boss will fight again (TODO 31a) */
+.portal-destinations button[data-rematch] { border-color: #c98a4a; }
+.portal-rematch { font-size: 12px; font-style: normal; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: #ffd9a1; color: #6a3f14; }
 .portal-panel button:focus-visible { outline: 3px solid #8051ac; outline-offset: 3px; }
 .portal-warning { padding: 12px; border-radius: 12px; background: #f8dfbb; }
 .portal-foot { font-size: 13px; line-height: 1.6; margin-bottom: 0; }

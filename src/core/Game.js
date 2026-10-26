@@ -25,6 +25,7 @@ import { InventoryUI } from '../ui/InventoryUI.js';
 import { installItemNotices } from '../ui/itemNotices.js';
 import { Challenges } from '../gameplay/challenges/Challenges.js';
 import { Quests } from '../gameplay/quests/Quests.js';
+import { Rematch } from '../gameplay/Rematch.js';
 import { bagCommands } from '../gameplay/bagCommands.js';
 import { Chests } from '../gameplay/Chests.js';
 import { CaveRewards } from '../gameplay/CaveRewards.js';
@@ -125,7 +126,7 @@ export class Game {
     const chat = npc => npc.reaction() || Quests.offerFor(npc) || BossGate.lineFor(npc) || Challenges.lineFor(npc);
     Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
       || shopLineFor(npc, n => chat(n) || n.nextLine()) || Talents.wizardLine(npc, n => chat(n) || n.nextLine()) || chat(npc);
-    Quests.init(); ShopUI.init();
+    Quests.init(); Rematch.init(); ShopUI.init();
     Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
     Home.callbacks = { inside: () => Houses.inside, refresh: () => Houses.refreshHome(), save: () => this.saves?.save({ quiet: true }) };
     Building.callbacks = { open: entry => BuildingUI.open(entry), preview: active => BuildingUI.showPreview(active), gate: () => Portals.gate?.dir, save: () => this.saves?.save({ quiet: true }) };
@@ -183,7 +184,7 @@ export class Game {
     if (!ctx.room) {
       this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
       BossGate.update(dt);                                           // the sealed lair, the waking sequence, the arena ring
-      Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt);
+      Challenges.update(dt); Quests.update(dt); ShopUI.update(); Houses.update(dt); Chests.update(dt); Rematch.update(dt);
     }
     Dungeons.update(dt); Hotbar.update(dt); Journal.update(dt);
     Gathering.update(dt); Fishing.update(dt); Farm.update(dt); Stations.update(dt); Bounties.update(dt); Needs.update(dt);   // after the hero's own animation: a tool swing poses the arm
@@ -224,7 +225,7 @@ export class Game {
       world.mechanics.exit();                                     // old rules/listeners leave before clocks and adventure state reset
       BuildingUI.close(); Building.clear(); HomeUI.close(); BountyUI.close(); TalentUI.close(); PortalUI.close(); Dialog.close(); InventoryUI.close(); PetMenu.close(); PhotoMode.close(); Home.reset();
       Tutorial.reset(); RecipeBook.reset(); Talents.clear(); JournalUI.close();
-      resetRareGifts(); Challenges.reset(); Quests.reset(); ShopUI.close(); Houses.resetRun(); Dungeons.reset(); Chests.resetRun(); CaveRewards.resetRun(); CavePuzzles.resetRun(); Hotbar.reset(); Pets.reset();
+      resetRareGifts(); Challenges.reset(); Quests.reset(); Rematch.reset(); ShopUI.close(); Houses.resetRun(); Dungeons.reset(); Chests.resetRun(); CaveRewards.resetRun(); CavePuzzles.resetRun(); Hotbar.reset(); Pets.reset();
       Fishing.end(); Gathering.resetRun(); Farm.resetRun(); Needs.reset();
       for (const n of ctx.npcs) n.resetLines();
       resetBuffs(); dayClock.reset();

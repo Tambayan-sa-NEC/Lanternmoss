@@ -41,6 +41,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
+  rematch: 'adventure',
   building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', cavePuzzles: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
@@ -60,6 +61,7 @@ export const SAVE_OWNERS = {
   'gameplay/storyState.js:StoryMemory': 'story', 'gameplay/dayClock.js:dayClock': 'dayClock',
   'gameplay/buffs.js:buffs': 'buffs', 'gameplay/buffs.js:BuffState': 'buffs', 'gameplay/Needs.js:Needs': 'buffs',
   'gameplay/Houses.js:Houses': 'houses', 'gameplay/PlanetProgression.js:PlanetProgression': 'progression',
+  'gameplay/Rematch.js:Rematch': 'rematch',
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
   'gameplay/Chests.js:Chests': 'chests', 'gameplay/CaveRewards.js:CaveRewards': 'caves', 'gameplay/CavePuzzles.js:CavePuzzles': 'cavePuzzles', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
@@ -116,6 +118,9 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
   const s = record(value);
   switch (key) {
     case 'mechanics': return cleanMechanicSnapshot(value);
+    // Only the count of rematches won per encounter is kept: a fight in progress is never saved (TODO 31a).
+    case 'rematch': return { wins: Object.fromEntries(Object.entries(record(s.wins))
+      .filter(([type]) => Object.hasOwn(COMBAT.enemies, type)).map(([type, n]) => [type, integer(n, 0, 0, 9999)])) };
     case 'building': return cleanBuildings(value, cleanStack);
     case 'home': return cleanHomeState(value);
     case 'crafting': {

@@ -13,6 +13,7 @@ import { clearTargets } from '../combat/targeting.js';
 import { NPC } from '../entities/npc/NPC.js';
 import { createLocalDefs, createNpcDefs } from '../entities/npc/npcDefs.js';
 import { despawnWildlife, spawnWildlife } from '../entities/wildlife/wildlife.js';
+import { Rematch } from './Rematch.js';
 import { audio } from '../systems/AudioSystem.js';
 import { snapCamera } from '../systems/CameraSystem.js';
 import { releaseAllKeys } from '../systems/InputSystem.js';
@@ -170,6 +171,7 @@ export class PlanetProgression {
     const arriving = this.state === 'fadeOut' && this.#authorizedDestination === PLANETS[index].id;
     if (!restoring && !arriving && !this.canTravelTo(PLANETS[index].id)) throw new Error('The secret planet is locked');
     this.#authorizedDestination = null;
+    Rematch.cancel();   // a rematch never travels with the hero (TODO 31a)
     Dungeons.reset();   // restore the surface actors before save hooks and world disposal
     this.beforeLoad?.(); BuildingUI.close(); Building.clear(); HomeUI.close(); Home.clear(); PortalUI.close(); Portals.clear();
     const P = ctx.player, world = this.world;

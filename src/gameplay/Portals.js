@@ -1,4 +1,5 @@
 import { ctx } from '../core/context.js';
+import { Rematch } from './Rematch.js';
 import { gameEvents } from '../core/events.js';
 import { arcDist } from '../utils/sphere.js';
 import { groundHeight } from '../world/terrain.js';
@@ -27,7 +28,7 @@ export const Portals = {
   clear() { this.gate?.dispose(); this.gate = null; },
   setup(world, avoid) { this.clear(); this.gate = buildPortal(world, avoid); this.update(); },
   destinations() { return portalDestinations(ctx.planetId, this.progression.defeated, this.stranded, this.keys,
-    { night: dayClock.phase === 'night', rareGifts: RareGifts.toJSON() }); },
+    { night: dayClock.phase === 'night', rareGifts: RareGifts.toJSON(), rematch: Rematch.waiting(this.progression.defeated) }); },
   canUse() {
     return !!this.gate && ctx.started && !ctx.paused && !ctx.inventoryOpen && !ctx.player.dead && !ctx.indoors && !ctx.transitioning && !ctx.cutscene
       && !this.progression.pendingClear && this.progression.state !== 'victory' && arcDist(ctx.player.up, this.gate.dir) < 3;

@@ -2,8 +2,10 @@ import { PLANET_CATALOG } from '../config/planets.js';
 import { releasedPlanets, secretUnlocked } from '../config/planetRules.js';
 import { mechanicAvailable } from '../world/mechanics/index.js';
 
-/** Boss wins open their world and its successor. A key opens only the next locked world or the route home. */
-export function portalDestinations(currentId, defeated, stranded, keys = 0, { catalog = PLANET_CATALOG, ...unlockState } = {}) {
+/** Boss wins open their world and its successor. A key opens only the next locked world or the route home.
+    `rematch` is the set of world ids whose beaten boss will fight again (TODO 31a): the gate marks them, so the
+    hero can see from the lantern gate where a rematch is waiting without walking every lair. */
+export function portalDestinations(currentId, defeated, stranded, keys = 0, { catalog = PLANET_CATALOG, rematch = null, ...unlockState } = {}) {
   const planets = releasedPlanets(catalog), main = catalog.filter(p => !p.secret);
   if (!planets.some(p => p.id === currentId)) return [];
   const cleared = new Set(defeated);
@@ -26,7 +28,9 @@ export function portalDestinations(currentId, defeated, stranded, keys = 0, { ca
       : free ? 'Open portal · free travel'
       : reachable ? `1 Wayfarer's Key · ${home ? 'open the way home' : 'one-way trip; another key or its boss opens the way home'}`
         : 'Defeat the earlier bosses to reach this world';
+    const again = !!rematch?.has?.(planet.id) && gateOpen;
     return { id: planet.id, name: gateOpen || current ? planet.name : '?', tagline: gateOpen || current ? planet.tagline : 'An undiscovered world',
-      current, free, home, cost, enabled, reason };
+      current, free, home, cost, enabled, rematch: again,
+      reason: again ? `${reason} · a rematch waits at the lair` : reason };
   });
 }
