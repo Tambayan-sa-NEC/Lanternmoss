@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 // Duskhollow's monsters (TODO 30e shadelings and mosslurks, 30f gloomweavers and snuffers, 30g Grandmother
-// Gloomweaver) as authored data and pure rules: no browser, no scene, no world.
+// Gloomweaver, 30h Umbra) as authored data and pure rules: no browser, no scene, no world.
 const duskhollow = (await import('../src/config/planets/duskhollow.js')).default;
 const { COMBAT } = await import('../src/config/combat.js');
 const { BESTIARY_ENTRIES } = await import('../src/config/bestiary.js');
@@ -111,6 +111,40 @@ test('she guards the moonstone vein, and leaves her own keepsake', async () => {
   assert.ok(MINI_BOSS_LOOT.extra.grandweaver.some(([item]) => item === 'moonstone'), 'including a moonstone of her own');
 });
 
+test('Umbra dives at the brightest light, and the bait is something every hero can light', async () => {
+  const d = COMBAT.enemies.umbra, L = d.lanterns, bait = COMBAT.enemies[L.type];
+  assert.equal(d.ai, 'boss'); assert.equal(d.behavior, 'umbra');
+  assert.ok(!d.miniBoss, 'she is the planet boss, not a mini boss');
+  assert.ok(d.hover > 2, `she fights from the air (${d.hover} m)`);
+  assert.ok(L.count >= 3, `enough bait to keep relighting (${L.count})`);
+  assert.ok(L.oil > 0, 'lighting one costs oil, so it is a decision');
+  assert.ok(L.relight > 0, 'and a snuffed one needs a moment');
+  assert.ok(bait?.object === true && bait.static === true, 'an arena lantern is an object, not a monster');
+  assert.ok(bait.light.radius > 0 && bait.light.intensity > 0, 'and it really is a light');
+  // the crash is the damage window, and it has to be worth it
+  assert.ok(d.crash.stun > 2, `she lies stunned long enough to punish (${d.crash.stun}s)`);
+  assert.ok(d.stunnedDamageBonus > 0, 'and takes extra damage while she is down');
+  // the wingbeat, and what it leaves behind
+  assert.ok(d.snuff.oil > 0 && d.snuff.shades > 0 && d.snuff.maxShades >= d.snuff.shades, 'the wingbeat is bounded');
+  assert.equal(COMBAT.enemies[d.snuff.type].ai, 'lightbound', 'and what comes out of the dark is a shadeling');
+  // drinking the light
+  assert.ok(d.feed.drains > 0 && d.feed.fog > 0 && d.feed.blind > 0 && d.feed.blind < 1, 'a feed drains a lantern and fogs the hero');
+  assert.deepEqual(d.phases.map(p => p.below), [1, 0.5], 'she starts drinking at half health');
+  assert.ok(!d.phases[0].attacks.includes('drink') && d.phases[1].attacks.includes('drink'));
+  for (const p of d.phases) assert.ok(p.attacks.every(id => d.attacks[id]), `${p.title} names real moves`);
+});
+
+test('her lair, her ring and her crown', async () => {
+  const { ARENA_WALLS } = await import('../src/config/bossSummon.js');
+  const boss = duskhollow.boss;
+  assert.equal(boss.type, 'umbra');
+  assert.deepEqual(boss.summon, { level: 11, quest: 'oldRoad' }, "the gate Wick's quest opens");
+  assert.ok(ARENA_WALLS[boss.arena.wall], `the ring is a real wall kind (${boss.arena.wall})`);
+  assert.equal(boss.arena.wall, 'moonfire', 'pale moonfire, as the design asks');
+  assert.equal(boss.trophy, 'duskCrown');
+  assert.ok(ITEMS.has('duskCrown'), 'and the Dusk Crown is a real item');
+});
+
 test('the beetle silhouette is one setting, shared by every spider on the world', async () => {
   const { SETTINGS_SCHEMA } = await import('../src/config/settings.js');
   const items = SETTINGS_SCHEMA.flatMap(g => g.items);
@@ -147,6 +181,11 @@ test('every monster has a journal page and leaves something of this world behind
   assert.match(granny.counters.join(' '), /burn/i, 'which says to burn the strands');
   assert.match(granny.counters.join(' '), /beetle/i, 'and names the accessibility setting too');
   assert.equal(BESTIARY_ENTRIES[COMBAT.enemies.grandweaver.anchors.type], undefined, 'a strand is an object, so it gets no page');
+  const moth = BESTIARY_ENTRIES.umbra;
+  assert.ok(moth?.lore && moth.blurb, 'the boss has her page and her story');
+  assert.match(moth.counters.join(' '), /arena lantern/i, 'which says to light the bait');
+  assert.match(moth.counters.join(' '), /crash/i, 'and names the damage window');
+  assert.equal(BESTIARY_ENTRIES[COMBAT.enemies.umbra.lanterns.type], undefined, 'an arena lantern is an object, so it gets no page');
   assert.equal(BESTIARY_ENTRIES[COMBAT.enemies.gloomweaver.web.type], undefined, 'a web is an object, so it gets no page');
 });
 

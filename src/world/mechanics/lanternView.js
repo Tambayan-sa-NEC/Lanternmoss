@@ -11,6 +11,7 @@ import { Glowmoss } from '../../fx/glowmoss.js';
 import { LocalLights } from '../../render/lighting.js';
 import { addTo, disposeTree, G, part } from '../../render/meshes.js';
 import { activeLantern } from './lantern.js';
+import { clamp } from '../../utils/math.js';
 
 /** The small lantern hanging from the hero's belt: a glass body around a flame that drops when the oil runs out. */
 function buildBeltLantern() {
@@ -33,7 +34,9 @@ export class LanternView {
     const s = lamp.status;
     LocalLights.setDarkness(s.darkness);
     const hero = LocalLights.heroLight;
-    if (hero) { hero.source.radius = s.radius; hero.source.intensity = s.intensity; }
+    // a fog of Umbra's scales (30h) presses the carried light in while it hangs on the hero; transient, never saved
+    const blind = clamp(player?.blindK ?? 1, 0.1, 1);
+    if (hero) { hero.source.radius = s.radius * blind; hero.source.intensity = s.intensity; }
     if (player) {                                                   // the lantern hangs clear of the witch's skirt and the knight's coat
       if (this.attached !== player.body) { player.body?.add(this.belt.group); this.belt.group.position.set(0.44, 0.62, 0.06); this.attached = player.body; }
       this.belt.flame.scale.setScalar(s.lit ? 1 : 0.45);

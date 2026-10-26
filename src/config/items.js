@@ -361,6 +361,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'crown', color: 0xff7a4a, art: 'crown' }, rarity: 'legendary', value: 0 },
   { id: 'tideCrown', name: 'The Tide Crown', description: "Proof that you put out the Lantern Angler's false lights and freed Tidewhisper.", category: 'quest',
     icon: { shape: 'crown', color: 0x6fe0d8, art: 'crown' }, rarity: 'legendary', value: 0 },
+  { id: 'duskCrown', name: 'The Dusk Crown', description: 'Proof that you brought down the Moth of the Last Light and gave Duskhollow back its lamps.', category: 'quest',
+    icon: { shape: 'crown', color: 0xe8e0ff, art: 'crown' }, rarity: 'legendary', value: 0 },
   { id: 'frostCrown', name: "Malgrath's Crown", description: 'Proof that you cast down the Winged Demon Lord and freed Frostveil, the last planet.', category: 'quest',
     icon: { shape: 'crown', color: 0x8fd8ff, art: 'crown' }, rarity: 'legendary', value: 0 },
 ];

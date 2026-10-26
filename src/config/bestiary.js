@@ -154,6 +154,21 @@ export const BESTIARY_ENTRIES = {
       'At 66% and 33% it crawls out to swap shells: that\'s your window, from any side.', 'At low tide, bait a charge across the wet sand: it gets stuck, soft and open. It only falls for it once per shell.'],
     drops: 'Two black pearls, and the pearl beds it guards are yours to gather.',
   },
+  umbra: {
+    lore: 'Wick keeps the Old Road lit because of her. She came the night the last moonwell went out, and every lamp in the '
+      + 'hollows has been a bargain with her since: light enough to walk by, never so much that she comes to drink it.',
+    blurb: "Duskhollow's boss: a vast pale-eyed moth that dives at the brightest light there is. On this world, that is usually the one on your belt.",
+    attacks: [['Dive', 'Marks a lane and falls along it at whatever is burning brightest - a lit arena lantern, or you.'],
+      ['Wingbeat', 'A ring of wind that puts every arena lantern out and takes the oil from your lantern. Shadelings come out of the dark it leaves.'],
+      ['Blinding scales', 'A fan of thrown scales that hurt.'],
+      ['Drinking the light', 'From half health: she drains an arena lantern for good and sheds a fog of scales that hangs on you and presses your own light in.']],
+    counters: ['Light an arena lantern in the ring: she dives at that instead of at you, and crashes into it.',
+      'A crashed moth is stunned and takes extra damage: that is the whole damage window.',
+      'Lighting one costs a little oil, so come with a full tank and something to refill it.',
+      'After a wingbeat everything is dark: relight a lantern before she picks you.',
+      'She drinks one lantern dry each time she feeds, so the ring gets darker: do not waste the ones you have left.'],
+    drops: 'The Dusk Crown.',
+  },
   mirelure: {
     lore: "Ships once steered by the lighthouse at Tidewhisper. Then a second light began to glow in the lagoon, softer and nearer, "
       + "and the ships turned toward it. Mirelure has hidden in the deep ever since Marlo's lamp went dark, and she does not like it lit again.",
