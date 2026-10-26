@@ -1660,11 +1660,33 @@ reset/preservation lifecycle distinct from encounter retries.
 | --- | --- | --- | --- |
 | [x] **31a. Rematch lifecycle and rewards** | 24, 26d | 3-4.5 h | Add beaten-lair portal selection, repeatable encounter state, difficulty/loot tables and saved retry/finish state. Keep original campaign defeat and first-win rewards separate; test interruption, travel and Continue without duplicated trophies/keys/achievements. Only expose encounters whose rematch kit is complete. |
 | [x] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
-| [ ] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
+| [x] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
 | [ ] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
 | [ ] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
 | [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
 | [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
+
+**31c implemented (2026-10-27):** Emberfall's two encounters wear a second shared move, the **dragonfire
+signature** (`src/entities/enemies/behaviors/boss/signatures.js`, beside the thorn one). A line of ground is marked
+right through the fight and then it burns: unlike the thorns it does not strike once and let go but keeps the
+ground for several seconds, so it is area denial rather than a hit and the answer is to move *through* it. It is
+never a cage -- **one segment of every wall is left unlit**, marked like the rest of the lane for the whole
+wind-up, and never one of the ends.
+**Pyrrhax** wears it twice: `firewall`, a long wall thrown across the arena, and `scorch`, a short line laid under
+the hero's feet once he is below half health; he keeps every move from the first fight and opens with "The wyrm
+remembers". **The Basilisk** wears it once as `cinders`, a line of burning venom spat across the hero's path, so
+turning away from the gaze is no longer free. Neither appears in any campaign phase. The keepsakes are themed and
+repeatable rather than trophies: a Fire Opal pair from the wyrm, Cinderquartz from the Stone-Gazer.
+Checked by `tests/rematch.test.mjs` (a new pure test that every authored wall has at least three segments and a
+spacing wider than a segment's own radius, so the gap is a place a hero can really stand, but narrower than two, so
+the lit segments still join up) and `tests/sim/emberRematch.sim.mjs`, which tests the signature independently of
+the kits: it reads the line the move chose during its wind-up, stands the hero in the gap for the wall's whole burn
+and takes nothing, stands in the fire and does, repeats that for all three heroes, and draws sixty lines straight
+from the signature for both encounters to confirm the one-gap rule. One stale assertion in `tests/sim/rematch.sim.mjs`
+("the worlds whose stages have not run") now names Malgrath instead of Pyrrhax. Full suites passed: 284 unit tests
+and 65 simulations, and `node scripts/rematch-smoke.mjs` with zero page and shader errors. See
+[the Ember rematches](docs/wiki/world/monsters-and-bosses.md#the-ember-rematches-todo-31c). Not done here: the
+Frost, Tide and Dusk kits (31d-31f) and New Game+ (31g).
 
 **31b implemented (2026-10-26):** Lanternmoss is the first world whose rematch kits are written, and both of its
 encounters wear the same new **thorn signature** (`src/entities/enemies/behaviors/boss/signatures.js`): patches of

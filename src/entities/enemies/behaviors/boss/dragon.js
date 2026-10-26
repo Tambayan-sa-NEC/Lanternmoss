@@ -25,6 +25,7 @@ import { mpick, rng } from '../../../../utils/random.js';
 import { dirAlong, projectTangent, slerpDir, turnToward } from '../../../../utils/sphere.js';
 import { groundHeight } from '../../../../world/terrain.js';
 import { bossDecal, defineBoss, facing, finish, inWedge, keepInArena, phaseOf, predictHero, roar, shortName } from './core.js';
+import { dragonfireSignature } from './signatures.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _mouth = new V3();
@@ -154,6 +155,10 @@ const moves = {
     },
     cancel(e) { e.hover = 0; },
   },
+  // TODO 31c, rematch only: the dragonfire signature worn twice -- a wall thrown across the arena, and a
+  // short line scorched under the hero's feet. Each leaves one segment unlit as the way through.
+  firewall: dragonfireSignature('firewall'),
+  scorch: dragonfireSignature('scorch'),
 };
 
 /** One lobbed fireball: the first goes where the hero is heading, the rest scatter around it. */

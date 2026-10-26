@@ -13,19 +13,32 @@
 
      def.attacks[id]: { windup, recover, cooldown, reuse?, count, radius, spread, damage, knockback, root,
                         lead? (seconds of the hero's run to aim ahead of), around? (patches ring the boss instead
-                        of following the hero) } */
+                        of following the hero) }
+
+   THE DRAGONFIRE SIGNATURE (TODO 31c). Emberfall's own threat: a line of ground is marked across the fight, and
+   then it burns. Unlike the thorns it does not strike once and let go - it **stays**, as a wall of fire that keeps
+   the ground for `duration` seconds - so it is area denial rather than a hit, and the answer is to move through it
+   rather than to stand somewhere else. It is never a cage: one segment of every wall is left unlit, and that gap
+   is marked like the rest of the lane for the whole wind-up, so there is always a way through in plain sight.
+   Worn by Pyrrhax's rematch twice (a long wall thrown across the arena, and a short one scorched under the hero)
+   and by the Basilisk's once (a line of burning venom), and exported for Nyxra with the rest.
+
+     def.attacks[id]: { windup, recover, cooldown, reuse?, segments (how many along the line), spacing (metres
+                        between them), radius, damage, tick, duration, lead? (aim ahead of the hero's run),
+                        across? (the line runs across the hero's path instead of along it) } */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
-import { addHazard, Blast } from '../../../../combat/hazards.js';
+import { addHazard, Blast, Zone } from '../../../../combat/hazards.js';
 import { sparkles } from '../../../../fx/sparkles.js';
 import { audio } from '../../../../systems/AudioSystem.js';
-import { arcDist, offsetDir, turnToward } from '../../../../utils/sphere.js';
+import { arcDist, dirAlong, offsetDir, tangentToward, turnToward } from '../../../../utils/sphere.js';
 import { damp } from '../../../../utils/math.js';
-import { rng } from '../../../../utils/random.js';
+import { mpick, rng } from '../../../../utils/random.js';
 import { dryGround } from '../../../../world/terrain.js';
 import { keepInArena, predictHero } from './core.js';
 
 const THORN = 0x6a8a3a, TIP = 0xb48cff;
+const _line = new THREE.Vector3();
 
 /** Where this volley's thorns will come up: a ring around the boss, or a spread around where the hero is running. */
 function thornSpots(e, a) {
@@ -79,3 +92,53 @@ export function thornSignature(id) {
     },
   };
 }
+
+const FIRE = 0xff6a2a, EMBER = 0xffb03d;
+
+/** Where this wall's segments will burn: a line through a point, with one segment left out as the way through. */
+export function firePath(e, a) {
+  const aim = predictHero(a.lead ?? 0.4);
+  const along = tangentToward(aim, e.up);                              // the line the hero and the boss share
+  const dir = _line.copy(along);
+  if (a.across) dir.applyAxisAngle(aim, Math.PI / 2);                  // ...or straight across it
+  const half = (a.segments - 1) / 2, gap = 1 + Math.floor(rng() * Math.max(1, a.segments - 2));
+  const out = [];
+  for (let i = 0; i < a.segments; i++) {
+    const spot = dirAlong(aim.clone(), dir, (i - half) * a.spacing);
+    out.push({ at: keepInArena(e, spot), lit: i !== gap });            // one segment is the gap: never a cage
+  }
+  return out;
+}
+
+/** Builds the dragonfire move. `id` is the key it lives under in the kit's moves and in def.attacks. */
+export function dragonfireSignature(id) {
+  return {
+    begin(e) {
+      const a = e.def.attacks[id];
+      e.firePath = firePath(e, a);
+      if (e.heard) audio.charge();
+    },
+    windup(e, dt, k) {
+      turnToward(e.fwd, e.toP, e.up, damp(4, dt));
+      if (k < 0.2 || (e.fireT = (e.fireT ?? 0) - dt) > 0) return;
+      e.fireT = 0.07;
+      // every segment is marked, the gap included: the way through is as plain as the wall
+      for (const seg of e.firePath ?? []) sparkles.emit(seg.at.clone().multiplyScalar(e.r + 0.2),
+        { count: 1, color: seg.lit ? mpick([FIRE, EMBER]) : 0xfff0c0, speed: 0.4, up: seg.at, upBias: 0.8, life: 0.45, size: seg.lit ? 0.3 : 0.2 });
+    },
+    fire(e) {
+      const a = e.def.attacks[id];
+      for (const seg of e.firePath ?? []) {
+        if (!seg.lit || !dryGround(seg.at, 0.6)) continue;
+        addHazard(new Zone({ owner: e, team: 'enemy', center: seg.at, radius: a.radius, duration: a.duration,
+          tick: a.tick, damage: a.damage, color: FIRE, rain: 'embers' }));
+      }
+      e.firePath = null;
+      if (e.heard) audio.explode();
+    },
+  };
+}
+
+/** The segments a wall would lay right now, for the checks: how many burn, and that one is always a way through. */
+export const firewallOf = (e, id) => firePath(e, e.def.attacks[id]);
+

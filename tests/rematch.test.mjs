@@ -36,7 +36,7 @@ test('only an encounter with a finished kit is ever offered', () => {
   assert.equal(rematchReady({ rematch: { kit: 'moss' } }), true);
   // The kits land world by world (31b-31f). Only the ones written so far are exposed.
   const ready = Object.entries(COMBAT.enemies).filter(([, def]) => rematchReady(def)).map(([type]) => type).sort();
-  assert.deepEqual(ready, ['gloomcap', 'hydra'], 'only the Moss encounters have kits so far (31b)');
+  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'hydra', 'pyrrhax'], 'the Moss (31b) and Ember (31c) encounters have kits so far');
 });
 
 // The kits as authored data. That each named move is implemented is checked where a scene exists, in the
@@ -71,6 +71,24 @@ test('every rematch kit is a complete, playable fight', () => {
       assert.notEqual(def.category, 'quest', `${type}: ${item} is a one-off keepsake and must not repeat`);
       assert.ok(!PLANET_CATALOG.some(p => p.boss?.trophy === item), `${type}: ${item} is a boss trophy`);
     }
+  }
+});
+
+// TODO 31c. The dragonfire signature lays a line of burning ground and leaves exactly one segment of it unlit, so
+// the wall is area denial rather than a cage. Whether the gap is really a way through is a matter of the numbers the
+// kit authors: if the segments were packed closer than their own radius the neighbours would simply cover it.
+// (That the move lays the line at all is checked in tests/sim/emberRematch.sim.mjs, where a scene exists.)
+test('every dragonfire wall leaves a gap a hero can actually stand in', () => {
+  const walls = Object.entries(COMBAT.enemies)
+    .flatMap(([type, def]) => Object.entries(def.rematch?.attacks ?? {})
+      .filter(([, a]) => a.segments != null).map(([id, a]) => [`${type}.${id}`, a]));
+  assert.ok(walls.length >= 3, `the signature is worn more than once (${walls.map(([n]) => n).join(', ')})`);
+  for (const [name, a] of walls) {
+    assert.ok(a.segments >= 3, `${name}: a wall with a gap needs at least three segments`);
+    assert.ok(a.spacing > a.radius, `${name}: the unlit segment is not covered by its neighbours (${a.spacing} > ${a.radius})`);
+    assert.ok(a.spacing < a.radius * 2, `${name}: the lit segments still join up into a wall (${a.spacing} < ${a.radius * 2})`);
+    assert.ok(a.duration > 0 && a.tick > 0, `${name}: it holds the ground for a while rather than striking once`);
+    assert.ok(a.duration > a.windup, `${name}: it burns for longer than it took to read`);
   }
 });
 

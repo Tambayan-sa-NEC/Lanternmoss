@@ -79,4 +79,21 @@ than being unavoidable, and it is the same answer for every hero: step off the m
 The signature itself lives in `src/entities/enemies/behaviors/boss/signatures.js`, written once and exported, so
 Nyxra can borrow it on the Lantern Moon (TODO 32) along with the other worlds' signatures.
 
+### The Ember rematches (TODO 31c)
+
+Emberfall's two encounters wear the **dragonfire signature**. A line of ground is marked right through the fight,
+and then it burns: unlike the thorns it does not strike once and let go, it keeps the ground for several seconds.
+It is area denial rather than a hit, so the answer is to move *through* it rather than to stand somewhere else.
+It is never a cage - **one segment of every wall is left unlit**, and that gap is marked like the rest of the lane
+for the whole wind-up, so there is always a way through in plain sight.
+
+| | What it learned |
+| --- | --- |
+| **Pyrrhax** | **Firewall**, a long wall of flame thrown right across the arena, and - once it is wildfire-angry below half health - **Scorch**, a short line laid under your feet. Keeps every move from the first fight, and opens with "The wyrm remembers" |
+| **The Basilisk** | **Cinders**, a line of burning venom spat across your path, so turning away from the gaze is no longer free: the ground you turn onto may be alight. Challenge it where it fell, on its own ladder |
+
+Both wear the same signature, tuned differently: Pyrrhax's firewall is seven segments three metres apart, his
+scorch four segments closer together, and the Basilisk's cinders five. Whichever is thrown, exactly one segment of
+it is a gap, and it is never one of the ends.
+
 ![The lantern gate marking a world with a rematch waiting](../../screenshots/huds/rematch-gate.jpg)
