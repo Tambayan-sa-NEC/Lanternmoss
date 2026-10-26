@@ -81,6 +81,8 @@ node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk
                                    # the glowmoss trail and burning oil, the safe ember; retakes its shot
 node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
                                    # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/dusk-umbra-smoke.mjs # Duskhollow (unreleased, 30h): Umbra diving at the brightest light, real E on an
+                                  # arena lantern, her wingbeat emptying the Oil bar and her blinding fog
 node scripts/dusk-boss-smoke.mjs  # Duskhollow (unreleased, 30g): Grandmother Gloomweaver hanging out of reach,
                                   # and real W walking up with a lit lantern to burn a strand through
 node scripts/dusk-weavers-smoke.mjs # Duskhollow (unreleased, 30f): webs that slow and are cut or burnt, oil
@@ -179,6 +181,16 @@ threshold; and the beetle toggle really swaps her and her grandchildren together
 `bosses/duskhollow-grandweaver.jpg`.
 `node tests/sim/duskBoss.sim.mjs` covers the same fight headlessly and adds all three rounds, the dazed window, the
 loot, the vein she frees, and a defeat that survives Continue and travel.
+
+`node scripts/dusk-umbra-smoke.mjs` owns port 8136 and checks 30h in the browser, through the boss fixture
+`tests/sim/lib/duskUmbraFixture.mjs`: she wakes in the air inside a ring of moonfire with her arena lanterns dark,
+a real `E` with a lit belt lantern really lights one and really costs oil, a lit one really takes the dive and she
+really crashes into it, her wingbeat really empties the Oil bar and puts every lantern out, and her fog really
+presses the hero's carried light in. It captures `bosses/duskhollow-umbra.jpg` and
+`bosses/duskhollow-umbra-crash.jpg`.
+`node tests/sim/duskUmbra.sim.mjs` covers the same fight headlessly and adds the gate, the dive at the hero when
+nothing is lit, the shadelings the wingbeat calls, a drained lantern that never lights again, all three heroes
+lighting the bait, an empty lantern never walling the fight off, and a faint and a Continue both putting it back.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
