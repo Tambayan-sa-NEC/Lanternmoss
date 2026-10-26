@@ -64,6 +64,7 @@ node scripts/structures-smoke.mjs  # structure controls, support/pickup, door mo
 node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
+node scripts/rematch-smoke.mjs     # rematches: real E at a beaten lair, its own chest and no second trophy, the gate badge
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
@@ -97,6 +98,15 @@ authored fourth-world release flag. It rejects candidate-module loading, checks 
 720p/1080p, saves a partial coastal quest/node state, reloads Continue, returns and revisits, completes Mirelure,
 reloads the single Tide Crown, then opens an old v1 save. It asserts zero page/shader errors and captures the
 reviewed `huds/tidewhisper-portal.jpg`. Run it only on a branch where Tidewhisper is intentionally released.
+
+`node scripts/rematch-smoke.mjs` owns port 8144 and checks TODO 31a in a real browser: after the campaign win the
+beaten lair really offers the fight again, a real `E` really starts it and the boss really returns at the tier's
+health, winning it really leaves its own chest with no second trophy and no change to the recorded worlds, and the
+lantern gate really shows the Rematch badge at 720p and 1080p. The one finished kit it needs comes from the
+test-only `tests/sim/lib/rematchFixture.mjs`, because no world ships one until its own stage. It captures
+`huds/rematch-gate.jpg`.
+`node tests/sim/rematch.sim.mjs` covers the same lifecycle headlessly and adds the tier ladder and its top, travel,
+a faint and Continue all putting the lair back, and the gate marking only beaten worlds.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and

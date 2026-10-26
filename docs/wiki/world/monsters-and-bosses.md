@@ -44,3 +44,22 @@ The [release gate](../technical/content-release.md) runs against actual registri
 **Quick test from the console** (after starting a game): `LANTERNMOSS.wakeBoss()`, then `LANTERNMOSS.boss.hp = 1` and hit it once to watch the
 victory, open the treasure chest that falls, and choose a destination at the village lantern gate; or `LANTERNMOSS.goToPlanet(2)` to jump straight to
 Frostveil. `LANTERNMOSS.Pets.unlock('whelp')`, `LANTERNMOSS.spawnItem('emberAxe')` and friends help try features out.
+
+## Rematches (TODO 31a)
+
+A boss you have already beaten can be challenged again, harder, for loot of its own. Walk back to its lair and the
+prompt reads **"E Challenge <boss> again"**; the lantern gate marks the worlds where one is waiting, so you can see
+from the village square where to go.
+
+**The campaign never moves.** A rematch win pays its own coins, XP and chest, and nothing else: no trophy, no
+Wayfarer's Key, no portal opening, no achievement and no first-win banner. Those belong to the one win that
+mattered, and the progression refuses a second win on a world it has already recorded.
+
+| | |
+| --- | --- |
+| **The ladder** | Three tiers of health, damage and speed, each worth more coins, XP and a better chest table. The last tier repeats for ever, so the fight tops out rather than running away |
+| **What is saved** | Only how many rematches of each encounter are won, per adventure. A fight **in progress** is never saved |
+| **What ends one** | Travelling, fainting or reloading puts the lair straight back to beaten-and-offered. A save cannot inject a half-woken fight |
+| **Which bosses** | Only an encounter whose rematch kit is finished (`COMBAT.enemies[type].rematch`). The lifecycle landed first; each world's kit follows in 31b-31f, so until then a beaten lair stays quiet |
+
+![The lantern gate marking a world with a rematch waiting](../../screenshots/huds/rematch-gate.jpg)

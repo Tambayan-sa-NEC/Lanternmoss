@@ -26,7 +26,7 @@ export const SHOT_FOLDERS = {
     'tidewhisper-campaign-720', 'tidewhisper-campaign-1080', 'cave', 'cave-combat', 'cave-rewards', 'cave-guardian'],
   activities: ['fishing', 'gathering', 'chest', 'photo-mode', 'photo-storybook'],
   huds: ['title', 'continue', 'save-menu', 'controls', 'keys', 'help', 'tutorial', 'fainted', 'bag', 'journal', 'bestiary',
-    'achievement', 'crafting', 'enchanting', 'bounty-window', 'portal-destinations', 'portal-one-way', 'tidewhisper-portal', 'balance-shop',
+    'achievement', 'crafting', 'enchanting', 'bounty-window', 'portal-destinations', 'portal-one-way', 'rematch-gate', 'tidewhisper-portal', 'balance-shop',
     'performance', 'performance-settings', 'gear-sets', 'talents', 'witch-talents-1080', 'warrior-talents', 'warrior-talents-1080', 'ranger-talents', 'ranger-talents-1080'],
 };
 

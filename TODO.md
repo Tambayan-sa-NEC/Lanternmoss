@@ -1658,13 +1658,36 @@ reset/preservation lifecycle distinct from encounter retries.
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **31a. Rematch lifecycle and rewards** | 24, 26d | 3-4.5 h | Add beaten-lair portal selection, repeatable encounter state, difficulty/loot tables and saved retry/finish state. Keep original campaign defeat and first-win rewards separate; test interruption, travel and Continue without duplicated trophies/keys/achievements. Only expose encounters whose rematch kit is complete. |
+| [x] **31a. Rematch lifecycle and rewards** | 24, 26d | 3-4.5 h | Add beaten-lair portal selection, repeatable encounter state, difficulty/loot tables and saved retry/finish state. Keep original campaign defeat and first-win rewards separate; test interruption, travel and Continue without duplicated trophies/keys/achievements. Only expose encounters whose rematch kit is complete. |
 | [ ] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
 | [ ] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
 | [ ] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
 | [ ] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
 | [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
 | [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
+
+**31a implemented (2026-10-26):** a boss you have already beaten can be challenged again, harder, for loot of its
+own, and the campaign never moves. `src/config/rematch.js` authors the ladder: three tiers of health, damage and
+speed, each worth more coins, XP and a better chest table, with the last repeating so the fight tops out rather
+than running away. `src/gameplay/Rematch.js` is the lifecycle: a beaten lair whose kit is finished offers an
+**"E Challenge <boss> again"** prompt, puts the boss back on its feet at that tier's numbers and wakes it through
+the ordinary gate, and a win pays its own coins, XP and chest.
+**Nothing of the first win repeats.** `PlanetProgression.onBossDefeated` already refuses a second win on a world it
+has recorded, so no trophy, Wayfarer's Key, portal opening, achievement or first-win banner can fire twice; the
+rematch adds its own reward beside that rather than touching it. The ladder is saved per adventure
+(`systems.rematch: { wins }`); a fight **in progress** deliberately is not, so travelling, fainting or reloading
+always finds the lair simply beaten and offering again, and a crafted save cannot inject a half-woken boss.
+The lantern gate marks the worlds where a rematch is waiting (a **Rematch** badge and a line in the reason), which
+changes no destination's reachability or cost.
+**Only a finished kit is ever offered** (`COMBAT.enemies[type].rematch`), and none is written yet -- those are
+31b-31f -- so nothing half-made can be reached. The checks mark one ready through
+`tests/sim/lib/rematchFixture.mjs`, the same way the unreleased worlds use their own fixtures.
+Checked by `tests/rematch.test.mjs`, `tests/sim/rematch.sim.mjs` and `node scripts/rematch-smoke.mjs` (port 8144;
+real `E` at a beaten lair, the boss back at 1.35x health, its own chest with no second trophy, and the gate badge
+at 720p/1080p), plus a reviewed shot. Full suites passed: 282 unit tests and 63 simulations. The v1 save fixture
+test gained the new system's default, the way it already carries defaults for portals, tutorial and crafting.
+See [rematches](docs/wiki/world/monsters-and-bosses.md#rematches-todo-31a). Not done here: every world's rematch
+kit and its new attacks (31b-31f), and New Game+ (31g).
 
 - [ ] **Rematches:** harder versions of the planet bosses and mini bosses, with new attacks and better loot.
   - Reached through the portals (24): a beaten boss's lair offers a rematch (this replaces 14's open "harder

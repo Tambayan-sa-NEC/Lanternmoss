@@ -20,6 +20,10 @@ independent of lifetime achievement rewards. Saving and continuing a fight prese
 hit, so reloading cannot turn a damaged fight into a no-hit key reward. Mini boss loot sharing the rare loot table
 does not roll travel keys. Ordinary Lantern Keys still only open locked chests.
 
+A world whose beaten boss will fight again is marked **Rematch** in the destination list, and its reason line says
+a rematch waits at the lair. The marking changes nothing about who can travel or what it costs; it is a signpost.
+See [rematches](../world/monsters-and-bosses.md#rematches-todo-31a).
+
 ## State between visits
 
 | State | Return visit |
