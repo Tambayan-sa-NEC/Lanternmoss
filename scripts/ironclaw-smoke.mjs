@@ -25,8 +25,9 @@ try{
   const frames=n=>page.evaluate(async n=>{const {ctx}=await import('/src/core/context.js');ctx.paused=false;for(let i=0;i<n;i++)window.LANTERNMOSS.update(1/60);ctx.paused=true;},n);
   await page.evaluate(async()=>{
     const L=window.LANTERNMOSS,{dayClock}=await import('/src/gameplay/dayClock.js'),{DAY}=await import('/src/config/day.js'),{encounterEvents}=await import('/src/combat/events.js');
+    (await import('/src/utils/random.js')).seedPlay(1); // seed before Ironclaw's initial facing is chosen
     L.CharacterSelect.pick('witch');L.begin();L.Tutorial.skip();L.player.invuln=10000;L.Pets.command('passive');
-    (await import('/src/utils/random.js')).seedPlay(1);(await import('/src/core/context.js')).ctx.paused=true;
+    (await import('/src/core/context.js')).ctx.paused=true;
     dayClock.skip((.4*DAY.length-dayClock.t+DAY.length)%DAY.length,'test');   // afternoon low tide
     const ic=window.ic=L.enemies.find(e=>e.type==='ironclaw');for(const e of L.enemies)if(e!==ic&&e.alive&&e!==L.boss)e.vanish();
     window.hurts=[];encounterEvents.addEventListener('playerhurt',e=>window.hurts.push(e.detail.source));
@@ -37,6 +38,9 @@ try{
     // Hold the target still and start each shot with casting resources after the earlier bell wave.
     ic.state='recover';ic.timer=99;ic.cool=99;ic.speed=0;const at=dirAlong(ic.up,side==='face'?ic.fwd:ic.fwd.clone().negate(),5);
     L.player.placeAt(at);L.player.mana=L.player.stats.maxMana;L.player.fwd.copy(tangentToward(at,ic.up));L.cam.fwd.copy(L.player.fwd);L.player.invuln=0;window.before={hp:ic.hp,hurts:window.hurts.length};
+    // A cast precedes the frame's auto-aim refresh, so reset the lock after moving across Ironclaw.
+    const {targeting,updateAim}=await import('/src/combat/targeting.js');updateAim();
+    if(targeting.aim!==ic)throw new Error(`Ironclaw aim lost from ${side}`);
   },side);
   const bolt=async()=>{await page.keyboard.down('KeyZ');await frames(2);await page.keyboard.up('KeyZ');await frames(40);};
   await stand('bell');await bolt();
@@ -44,7 +48,11 @@ try{
   await page.evaluate(()=>{window.ic.state='recover';window.ic.timer=99;});await frames(90);
   assert.ok(await page.evaluate(()=>window.hurts.slice(window.before.hurts).some(s=>/Ironclaw/.test(s))),'the ring hurts the hero');
   await page.evaluate(()=>{window.LANTERNMOSS.player.petrifyT=0;});
-  await stand('face');await bolt();assert.ok(await page.evaluate(()=>window.ic.hp<window.before.hp),'a bolt into its face lands');
+  await stand('face');await bolt();
+  const faceShot=await page.evaluate(async()=>{
+    const {ctx}=await import('/src/core/context.js'),{spellState}=await import('/src/combat/casting.js'),{hitZone}=await import('/src/entities/enemies/behaviors/boss/ironclaw.js');
+    return {hit:window.ic.hp<window.before.hp,zone:hitZone(window.ic,ctx.player.pos),cooldown:spellState.cd.bolt,projectiles:ctx.projectiles.length,petrify:ctx.player.petrifyT,ringAt:window.ic.ringAt};
+  });assert.ok(faceShot.hit,`a bolt into its face lands: ${JSON.stringify(faceShot)}`);
   console.log('PASS keyboard Arcane Bolt: the bell refuses and rings a shockwave that hurts; its face takes the hit');
   // a low-tide charge across the pearl flat's wet sand wedges it
   const wedged=await page.evaluate(async()=>{
