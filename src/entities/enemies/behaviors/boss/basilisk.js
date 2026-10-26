@@ -20,6 +20,7 @@ import { damp } from '../../../../utils/math.js';
 import { arcDist, projectTangent, tangentToward, turnToward } from '../../../../utils/sphere.js';
 import { Projectile } from '../../../Projectile.js';
 import { hideDots, layLane, makeDots } from '../telegraphs.js';
+import { dragonfireSignature } from './signatures.js';
 import { bossDecal, defineBoss, facing, finish } from './core.js';
 import { rng } from '../../../../utils/random.js';
 
@@ -105,6 +106,8 @@ const moves = {
       audio.wispShot();
     },
   },
+  // TODO 31c, rematch only: a line of burning venom spat across the hero's path (the dragonfire signature).
+  cinders: dragonfireSignature('cinders'),
 };
 
 export const basilisk = defineBoss({

@@ -117,7 +117,19 @@ export const COMBAT = {
                  phases: [
                    { below: 1.0, attacks: ['gaze', 'whip', 'lunge'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Enraged', attacks: ['gaze', 'whip', 'lunge', 'spit'], speedMul: 1.2, cooldownMul: 0.8 },
-                 ] },
+                 ],
+                 // TODO 31c: the Stone-Gazer wears the dragonfire signature once, as `cinders`: a line of burning
+                 // venom spat along the ground. Turning away from the gaze is no longer free, because the ground
+                 // you turn onto may be alight -- but the lane always has its unlit gap to stand in.
+                 rematch: { extra: [['cinderquartz', 2]],
+                   attacks: {
+                     cinders: { windup: 1.1, recover: 0.8, cooldown: 1.1, reuse: 6, segments: 5, spacing: 2.8,
+                                radius: 1.7, damage: 7, tick: 0.5, duration: 4.0, lead: 0.6, across: true },
+                   },
+                   phases: [
+                     { below: 1.0, title: 'Stone and cinder', attacks: ['gaze', 'whip', 'lunge', 'cinders'], speedMul: 1.1, cooldownMul: 0.85 },
+                     { below: 0.5, title: 'Enraged', enraged: true, attacks: ['gaze', 'whip', 'lunge', 'spit', 'cinders'], speedMul: 1.25, cooldownMul: 0.7 },
+                   ] } },
     // Tidewhisper (TODO 27f). faceArc = half-angle (degrees) of the front that can be hurt; everywhere else is the bell,
     // which only rings (bellRing: a shockwave after `delay`, at most once per `cooldown`; stun = seconds dazed).
     // guarded = damage share while tucked in its shell; openBonus = extra while out of it (swap) or wedged in the sand
@@ -219,7 +231,21 @@ export const COMBAT = {
                  phases: [
                    { below: 1.0, attacks: ['bite', 'tail', 'breath', 'fireballs', 'leap'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Inferno', enraged: true, attacks: ['bite', 'tail', 'breath', 'fireballs', 'leap'], speedMul: 1.15, cooldownMul: 0.75 },
-                 ] },
+                 ],
+                 // TODO 31c: what the wyrm learned. The dragonfire signature (behaviors/boss/signatures.js) worn
+                 // twice: `firewall` thrown right across the arena, and `scorch` laid under the hero's feet. Each
+                 // wall leaves one segment unlit, marked like the rest, so there is always a way through.
+                 rematch: { extra: [['fireOpal', 2]],
+                   attacks: {
+                     firewall: { windup: 1.4, recover: 1.0, cooldown: 1.2, reuse: 8, segments: 7, spacing: 3.0,
+                                 radius: 1.9, damage: 9, tick: 0.5, duration: 5.5, lead: 0.5, across: true },
+                     scorch:   { windup: 1.0, recover: 0.8, cooldown: 1.0, reuse: 5, segments: 4, spacing: 2.6,
+                                 radius: 1.7, damage: 8, tick: 0.5, duration: 3.5, lead: 0.7 },
+                   },
+                   phases: [
+                     { below: 1.0, title: 'The wyrm remembers', attacks: ['bite', 'tail', 'breath', 'fireballs', 'leap', 'firewall'], speedMul: 1.1, cooldownMul: 0.85 },
+                     { below: 0.5, title: 'Wildfire', enraged: true, attacks: ['bite', 'tail', 'breath', 'fireballs', 'leap', 'firewall', 'scorch'], speedMul: 1.25, cooldownMul: 0.65 },
+                   ] } },
     malgrath:  { ai: 'boss', behavior: 'demonLord', name: 'Malgrath, the Winged Demon Lord', color: 0xd0305a, capColor: 0xff3a5a,   // planet 3: the finale
                  look: { skin: 0x3a2030, armor: 0x1e1420, cape: 0x2a0e18, horn: 0x2a1a22, trim: 0xd8a040, eye: 0xff4040,
                          motif: 'infernal', weapon: 'greatsword', wings: 0x3a1420, scale: 3.4 },                                         // src/models/bosses.js

@@ -25,7 +25,8 @@ try {
 
   // ---- nothing is offered until a kit exists, and never before the win ------------------------------------------
   assert.ok(rematchReady(COMBAT.enemies.gloomcap), 'the Moss King has his kit (31b)');
-  assert.ok(!rematchReady(COMBAT.enemies.pyrrhax), 'and the worlds whose stages have not run do not');
+  assert.ok(rematchReady(COMBAT.enemies.pyrrhax), 'and the wyrm has his (31c)');
+  assert.ok(!rematchReady(COMBAT.enemies.malgrath), 'but the worlds whose stages have not run do not (31d)');
   atLair();
   assert.equal(Rematch.offered, false, 'an unbeaten lair offers no rematch');
   assert.equal(Rematch.target(), null);

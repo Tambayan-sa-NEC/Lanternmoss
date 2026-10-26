@@ -66,6 +66,7 @@ node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and m
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
 node scripts/rematch-smoke.mjs     # rematches: real E at a beaten lair, its own chest and no second trophy, the gate badge
 npm run sim -- mossRematch         # the Moss kits: the thorn signature, the mini boss's own ladder, repeat rewards
+npm run sim -- emberRematch        # the Ember kits: the dragonfire signature and the gap every wall leaves
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
@@ -113,6 +114,11 @@ fight, that the whole kit is swapped in rather than just bigger numbers, that th
 before it erupts and holds a hero who stands still, that every hero is untouched standing clear of the marks, that
 the Hydra can be challenged where it fell with four heads and its own ladder, and that the keepsake repeats while
 the trophy never does.
+`node tests/sim/emberRematch.sim.mjs` covers the Ember kits (31c) and the dragonfire signature on its own terms:
+that each wall is chosen in plain sight during the wind-up and then burns the ground for its whole duration, that a
+hero standing in the unlit gap takes nothing from it while one standing in the fire does, that this is true for
+every hero, that Pyrrhax wears the signature twice and the Basilisk once, and that across sixty lines drawn for
+both encounters exactly one segment is always a gap and never an end of the wall.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
