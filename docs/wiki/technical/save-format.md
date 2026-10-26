@@ -51,6 +51,12 @@ Potion/pet timers and the one meal timer save independently. Old v1 files defaul
 and favourites; their existing buff timers remain intact. Unknown runes and enchantments on vanity or materials
 are discarded. The original v1 fixture remains unchanged.
 
+TODO 31a adds an adventure-owned `systems.rematch: { wins }`: how many rematches of each encounter the hero has
+won, keyed by enemy type. Counts for unknown encounters are dropped and the numbers are clamped. A rematch **in
+progress** is deliberately absent from the format: the active fight and each lair's cooldown live only in memory,
+so a reload, a journey or a faint always finds a lair simply beaten and offering again, and a crafted save cannot
+inject a half-woken boss. Old v1 files default to none won.
+
 TODO 26b adds optional per-planet `mechanics: { id, state, at } | null`. The module validates its state, and `at`
 records adventure-calendar seconds rather than wall-clock time. Missing old-v1 state uses defaults; unknown or
 mismatched modules are discarded. Continue loads this state and applies away time before mechanic entry and

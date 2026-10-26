@@ -86,6 +86,16 @@ export const Chests = {
     return this.bossChest;
   },
 
+  /** The chest a rematch leaves (TODO 31a): the tier's own table, and never the trophy the first win dropped.
+      Its id carries the tier, so each rematch leaves its own chest and none of them can be opened twice. */
+  spawnRematchChest(dir, kind, id) {
+    if (this.opened.has(id)) return null;
+    const at = spawnSpot(dir, 0, 2.5, 1.1), fwd = tangentToward(at, ctx.player.up);
+    const chest = new Chest(kind, at, fwd, { id, fall: true });
+    this.list.push(chest);
+    return chest;
+  },
+
   /** Removes every chest (the planet is being replaced). The opened set stays. */
   clear() { for (const c of this.list) c.dispose(); this.list.length = 0; this.bossChest = null; },
   /** A fresh adventure: every chest full again. */

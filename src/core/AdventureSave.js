@@ -21,6 +21,7 @@ import { Houses, houseDef } from '../gameplay/Houses.js';
 import { Pets } from '../gameplay/Pets.js';
 import { Pickups } from '../gameplay/pickups.js';
 import { Quests } from '../gameplay/quests/Quests.js';
+import { Rematch } from '../gameplay/Rematch.js';
 import { StoryMemory } from '../gameplay/storyState.js';
 import { Tutorial } from '../gameplay/Tutorial.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
@@ -65,6 +66,7 @@ export class AdventureSave {
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook, talents: Talents,
       home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, caves: CaveRewards, cavePuzzles: CavePuzzles, bossGate: BossGate, pickups: Pickups, building: Building,
+      rematch: Rematch,
       mechanics: game.world.mechanics })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.world.mechanics.snapshotForPlanet = id => this.registry.planets[id]?.mechanics;

@@ -29,7 +29,7 @@ export const PortalUI = {
     this.root.innerHTML = `<div class="portal-panel"><header><h2 id="portal-title">Lantern gate</h2><button type="button" data-portal-close aria-label="Close destinations">×</button></header>
       <p>Choose where to travel. Wayfarer's Keys: <b>${this.portals.keys}</b></p>
       ${this.portals.stranded ? '<p class="portal-warning">The gate home is dark. Defeat this world’s boss or spend another key to return.</p>' : ''}
-      <div class="portal-destinations">${choices.map(d => `<button type="button" data-destination="${d.id}" ${d.enabled ? '' : 'disabled'}><strong>${d.name}</strong><span>${d.tagline}</span><small>${d.reason}</small></button>`).join('')}</div>
+      <div class="portal-destinations">${choices.map(d => `<button type="button" data-destination="${d.id}" ${d.enabled ? '' : 'disabled'}${d.rematch ? ' data-rematch' : ''}><strong>${d.name}${d.rematch ? ' <i class="portal-rematch">Rematch</i>' : ''}</strong><span>${d.tagline}</span><small>${d.reason}</small></button>`).join('')}</div>
       <p class="portal-foot">Boss wins open onward travel. Early travel costs one key each way until the destination’s boss falls. Esc closes this menu.</p></div>`;
     this.root.classList.add('show'); this.root.querySelector('[data-portal-close]').focus();
   },
