@@ -45,4 +45,4 @@ export default { id: 'duskhollow', name: 'Duskhollow', act: 2, released: false, 
     rare: [['moonstoneVein', 2]] },
   tagline: 'an endless dusk under glowing caps',
   arrival: 'Duskhollow. The caps hold back the sky here, so the day never quite arrives. Keep the lantern on your belt fed, and the moss will light your way home.',
-  boss: { type: 'umbra', summon: { level: 11, quest: 'oldRoad' } } };
+  boss: { type: 'umbra', trophy: 'duskCrown', summon: { level: 11, quest: 'oldRoad' }, arena: { wall: 'moonfire' } } };

@@ -221,6 +221,37 @@ export const COMBAT = {
                    { below: 1.0, title: 'Lantern lights', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Beached', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1.15, cooldownMul: 0.85 },
                  ] },
+    // ---- Duskhollow's boss (TODO 30h). Umbra dives at the brightest light there is, which is your own belt lantern
+    // unless something brighter is burning: `lanterns` are the tall arena lanterns you light as bait (`count` of
+    // them, `at` metres from the lair, `oil` oil it costs to light one, `relight` seconds before a snuffed one can
+    // be lit again). A dive into a lit lantern crashes her: `crash.stun` seconds on the ground, open to everything.
+    // A dive at the hero only hurts. `snuff` is the wingbeat that puts the lights out (`oil` taken from the belt
+    // lantern, `shades` shadelings that come out of the dark, up to `maxShades`). From 50% she drinks light:
+    // each `feed` drains one arena lantern for good and sheds scales that blind the hero (`fog`).
+    umbra:     { ai: 'boss', behavior: 'umbra', name: 'Umbra, the Moth of the Last Light', color: 0x2f2746, capColor: 0xe8e0ff,
+                 hp: 3400, speed: 3.4, radius: 2.2, height: 3.0, hover: 5.5, aggro: 20, leash: 32, turnRate: 2.0,
+                 knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.4,
+                 telegraph: true, respawn: 0, xp: 240, cooldown: 1.3,
+                 lanterns: { count: 4, at: 11, oil: 12, relight: 4, type: 'arenaLantern' },
+                 crash: { stun: 4.5, radius: 3.2, damage: 10, knockback: 8 },
+                 snuff: { oil: 35, shades: 2, maxShades: 4, type: 'shadeling' },
+                 feed: { fog: 7, blind: 0.45, drains: 1 },
+                 attacks: {
+                   dive:   { windup: 1.3, speed: 22, width: 2.6, damage: 22, knockback: 11, recover: 0.9, cooldown: 1.2 },
+                   gust:   { windup: 1.0, radius: 9, damage: 9, knockback: 7, recover: 0.8, cooldown: 1.2, reuse: 6 },   // the wingbeat that snuffs
+                   scales: { windup: 0.9, count: 4, spread: 60, speed: 11, homing: 0.5, damage: 11, recover: 0.6, cooldown: 1.0, reuse: 3 },
+                   drink:  { windup: 1.4, recover: 1.2, cooldown: 1.4, reuse: 9 },                                      // only from 50%
+                 },
+                 phases: [
+                   { below: 1.0, title: 'Wings in the dark', attacks: ['dive', 'gust', 'scales'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Drinking the light', attacks: ['dive', 'gust', 'scales', 'drink'], speedMul: 1.15, cooldownMul: 0.85 },
+                 ] },
+    // An arena lantern: bait, not a monster. Press E beside one with a lit belt lantern and it burns until she
+    // snuffs it. `drained` ones she has drunk never light again.
+    arenaLantern:{ ai: 'arenaLamp', object: true, static: true, name: 'Arena lantern', color: 0x6a608f, capColor: 0xffd36b,
+                 hp: 1, speed: 0, radius: 0.7, height: 3.4, aggro: 0, leash: 99, respawn: 0, xp: 0,
+                 knockResist: 1, slowResist: 1, staggerImmune: true, reach: 2.6,
+                 light: { radius: 13, intensity: 1.3 } },
     gloomcap:  { ai: 'boss', behavior: 'gloomcap', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6,   // planet 1: the introduction
                  look: { skin: 0x6a4a7a, armor: 0x2e2638, cape: 0x2a1838, horn: 0xe8dcc4, trim: 0xffd36b, eye: 0xffe066, motif: 'moss' },   // src/models/bosses.js
                  hp: 6700, speed: 2.6, radius: 1.3, height: 4.6,

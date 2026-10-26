@@ -1605,8 +1605,31 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [x] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
 | [x] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
 | [x] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
-| [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
+| [x] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30h implemented (2026-10-26):** Duskhollow has its boss, and she is the world's rule taken to its conclusion:
+**she dives at the brightest light there is**, which on this world is usually the one on the hero's own belt.
+`src/entities/enemies/behaviors/boss/umbra.js` (on the shared boss framework) puts **Umbra** in the air over her
+lair inside a ring of pale **moonfire** (`ARENA_WALLS.moonfire`), behind the level-11 and Old Road gate 30d
+installed. Four **arena lanterns** (`behaviors/arenaLamp.js`) ring the lair, dark: press `E` at one with a lit belt
+lantern and it catches for a little oil, and a burning arena lantern is brighter than the hero, so it takes the
+dive. A dive into a lit lantern **crashes her into the ground**, stunned for `crash.stun` seconds and taking
+`stunnedDamageBonus` extra -- the whole damage window. A dive with nothing lit comes at the hero and only hurts.
+Her **wingbeat** puts every arena lantern out, takes `snuff.oil` from the tank and calls shadelings (30e) out of the
+dark it leaves, bounded by `snuff.maxShades`; a snuffed lantern waits `lanterns.relight` seconds. From **50%** she
+**drinks the light**: each feed drains one lantern for good, so the ring genuinely dims as the fight runs, and the
+scales she sheds hang on the hero as a fog that presses their carried light in through a new transient
+`Player.blindK` read by `lanternView`. Her trophy is the new **Dusk Crown**.
+Nothing walls the fight off: an empty lantern lights no bait, but she stays hittable, a crashed moth is crashed
+either way, and all three heroes light the bait with the lantern they all carry rather than a spell.
+Checked by `tests/duskMonsters.test.mjs`, `tests/sim/duskUmbra.sim.mjs` and `node scripts/dusk-umbra-smoke.mjs`
+(port 8136; real `E` lighting a lantern for real oil, the crash and its window, the wingbeat really emptying the Oil
+bar, and the fog really shrinking the carried light from 7.1 m to 3.2 m), plus two reviewed shots. The sim drives
+her moves through a new exported `startMove`, the kit's own path, rather than poking the state machine, so what the
+checks exercise is what plays. Full suites passed: 314 unit tests and 70 simulations.
+Duskhollow is now complete except for its release: it still stays `released: false` until 30i's acceptance.
+See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: the campaign release (30i).
 
 **30g implemented (2026-10-22):** Duskhollow has its mini boss, and her fight is the world's own rule once more.
 **Grandmother Gloomweaver** (`src/entities/enemies/behaviors/boss/grandweaver.js`, on the shared boss framework)
@@ -1795,7 +1818,7 @@ music, Wick's waylamps, every monster and the release (30b-30i).
   - [x] **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
 - [x] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
       her down, where she fights and spins new anchors. She guards the moonstone vein.
-- [ ] **Boss: Umbra, the Moth of the Last Light.**
+- [x] **Boss: Umbra, the Moth of the Last Light.**
   - Wakes when: level 11, and the three moonwell lanterns on the Old Road are relit for Wick's quest by carrying the
     village flame (run dry on the way and you start again from the last lit waylamp).
   - She dives at the brightest light. Light an arena lantern and she crashes into it, stunned and open to hits.

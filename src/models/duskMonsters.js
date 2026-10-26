@@ -181,3 +181,46 @@ export function buildGloomAnchor(def = {}) {
   ember.visible = false;
   return { root, body, strand, ember };
 }
+
+/** Umbra, the Moth of the Last Light: a huge pale-eyed moth, four wings dusted with the scales she sheds, with a
+    furred body and two feathered antennae. Parts: body, wings[4], antennae[2], eyes[2]. */
+export function buildUmbra(def = {}) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  const fur = def.color ?? 0x2f2746, dust = def.capColor ?? 0xe8e0ff;
+  addTo(body, part(G.ico(0.62, 1), fur), [0, 0.2, 0], [0, 0, 0], [1, 1.15, 1.9]);          // the furred thorax
+  addTo(body, part(G.ico(0.4, 1), fur), [0, 0.42, 0.72], [0, 0, 0], [1, 0.9, 0.9]);        // the head
+  const eyes = [];
+  for (const sx of [-1, 1]) eyes.push(addTo(body, part(G.ico(0.15, 1), dust, { glow: true, intensity: 2.4 }), [sx * 0.24, 0.48, 0.96]));
+  const antennae = [];
+  for (const sx of [-1, 1]) {
+    const a = group(body, sx * 0.16, 0.66, 0.84);
+    addTo(a, part(G.cyl(0.035, 0.02, 0.9, 4), dust), [sx * 0.2, 0.34, 0], [0, 0, -sx * 0.5]);
+    for (let i = 0; i < 5; i++) addTo(a, part(G.box(0.16, 0.02, 0.03), dust, { outline: false }), [sx * (0.1 + i * 0.07), 0.14 + i * 0.16, 0], [0, 0, -sx * 0.5]);
+    antennae.push(a);
+  }
+  const wings = [];
+  for (const sx of [-1, 1]) for (const [z, scale, tint] of [[0.3, 1, dust], [-0.5, 0.75, fur]]) {
+    const w = group(body, sx * 0.4, 0.3, z);
+    addTo(w, part(G.ico(1.5 * scale, 1), tint, { glow: tint === dust, intensity: 0.7 }), [sx * 1.3 * scale, 0, -0.2 * scale], [0, 0, 0], [1.25, 0.1, 0.85]);
+    addTo(w, part(G.ico(0.4 * scale, 0), 0x6a608f, { glow: true, intensity: 1.2 }), [sx * 1.5 * scale, 0.04, -0.2 * scale], [0, 0, 0], [1, 0.12, 1]);   // the eye-spot
+    wings.push(w);
+  }
+  return { root, body, wings, antennae, eyes };
+}
+
+/** An arena lantern: a tall stone post under a glass case, dark until the hero lights it.
+    Parts: body, post, glass, flame. */
+export function buildArenaLantern(def = {}) {
+  const root = new THREE.Group(), body = group(root, 0, 0, 0);
+  const stone = def.color ?? 0x6a608f, fire = def.capColor ?? 0xffd36b, h = def.height ?? 3.4;
+  const post = group(body, 0, 0, 0);
+  addTo(post, part(G.cyl(0.26, 0.42, h, 6), stone), [0, h / 2, 0]);
+  for (let i = 0; i < 6; i++) addTo(post, part(G.box(0.5, 0.12, 0.16), stone), [Math.cos(i * 1.05) * 0.4, 0.3, Math.sin(i * 1.05) * 0.4], [0, -i * 1.05, 0]);
+  const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.8, 7, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0xfff3d6, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }));
+  glass.position.y = h + 0.3; body.add(glass);
+  addTo(body, part(G.cone(0.58, 0.5, 7), stone), [0, h + 0.95, 0]);
+  const flame = addTo(body, part(G.ico(0.3, 1), fire, { glow: true, intensity: 3.4 }), [0, h + 0.3, 0]);
+  flame.visible = false;
+  return { root, body, post, glass, flame };
+}

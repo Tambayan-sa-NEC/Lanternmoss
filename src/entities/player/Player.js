@@ -46,6 +46,7 @@ export class Player extends Walker {
     this.energy = NEEDS.start; this.regenK = 1; this.sprintK = 1;                      // gameplay/Needs.js
     this.mireK = 1;                      // 1 = free; a sticky web presses it down (behaviors/web.js), transient, never saved
     this.silkT = 0; this.silkK = 1;      // a hit of thrown silk (30g): the same slow on its own timer, also transient
+    this.blindK = 1;                     // 1 = clear sight; Umbra's fog of scales (30h) presses the carried light in
     // the hero's items: slots 0-8 are the hotbar, the rest the bag (kept across planets and fainting; emptied on a new adventure)
     this.inventory = new Inventory(HOTBAR.size + INVENTORY.slots, itemRegistry,
       { fillOrder: hotbarFirst(HOTBAR.size, HOTBAR.size + INVENTORY.slots, HOTBAR.holdCategories) });

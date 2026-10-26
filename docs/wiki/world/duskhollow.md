@@ -1,6 +1,6 @@
 # Duskhollow: twilight terrain and the lantern
 
-## In brief (stages 30a-30g, unreleased)
+## In brief (stages 30a-30h, unreleased)
 
 Duskhollow is the fifth world: deep valleys under a canopy of giant lumen caps, where your lantern decides what you
 can see. Stage 30a builds its terrain, its endless dusk, the belt lantern with its Oil bar, and the glowmoss that
@@ -15,8 +15,8 @@ Road's waylamps and the three moonwells his quest asks you to relight, and the g
 exactly like the glowcaps they are sitting among. Stage 30f adds the other two: gloomweavers, round fuzzy spiders
 that fence the ground with sticky webs, and snuffers, little thieves who want what is in your lantern. Stage 30g
 hangs Grandmother Gloomweaver over the moonstone vein, where the only way to reach her is to burn the three strands
-holding her up. The rest of the planned checklist - Umbra herself (30h) and campaign release (30i) - is **not built
-yet**.
+holding her up. Stage 30h puts Umbra in the sky over her lair: the Moth of the Last Light, who dives at the
+brightest thing burning. Only the **campaign release (30i)** is left.
 
 Duskhollow stays `released: false`: it cannot be selected, generated or travelled to in normal play. The checks run
 it through a development fixture (`tests/sim/lib/duskhollowFixture.mjs`) that copies this world's content into the
@@ -317,6 +317,43 @@ does not come back: a beaten grandmother stays beaten across Continue and travel
 She wears the same spider silhouette her grandchildren do, so the **"Draw spiders as beetles"** setting takes her
 off the screen with them, in the same frame.
 
+## Umbra, the Moth of the Last Light (30h)
+
+Duskhollow's boss, and the reason Wick keeps the Old Road lit. She wakes when the hero is **level 11** and the
+**three moonwells** are burning (the gate 30d put in), and she fights from the air inside a ring of pale
+**moonfire**.
+
+One rule drives the whole encounter: **she dives at the brightest light there is.** On this world, that is usually
+the one on your own belt.
+
+![Umbra in the air over a burning arena lantern](../../screenshots/bosses/duskhollow-umbra.jpg)
+
+### The bait
+
+Four tall **arena lanterns** ring the lair, dark. Stand at one with a lit belt lantern and press `E`: it catches,
+for a little of your oil. A burning arena lantern is brighter than yours, so it is what she comes for - and a dive
+into a lantern ends with her **in the ground**, stunned for several seconds and taking extra damage. That is the
+whole damage window. With nothing lit, the dive comes at you instead, and only hurts.
+
+![The window: Umbra crashed beside the lantern she dived into](../../screenshots/bosses/duskhollow-umbra-crash.jpg)
+
+### What she does about it
+
+| | |
+| --- | --- |
+| **Wingbeat** | A ring of wind that puts **every** arena lantern out, takes oil out of your tank, and calls shadelings out of the dark it leaves. A snuffed lantern needs a moment before it lights again |
+| **Blinding scales** | A fan of thrown scales, homing and painful |
+| **Drinking the light** | From half health: she drains one arena lantern **for good**, so the ring really does get darker as the fight goes on, and the scales she sheds hang on you as a fog that presses your own light in until it clears |
+
+So the fight is a running argument about light: you spend oil to keep something brighter than yourself burning, and
+she spends her wings putting it out.
+
+**Nothing here walls the fight off.** An empty lantern lights no bait, but she is still perfectly hittable, a
+crashed moth is crashed whether or not you can see her, and the ring keeps her in there with you. Every hero lights
+the bait the same way, with the lantern they all carry - no spell required.
+
+Her trophy is the **Dusk Crown**.
+
 ## What is checked
 
 | Check | What it proves |
@@ -340,9 +377,12 @@ off the screen with them, in the same frame.
 | `node scripts/dusk-weavers-smoke.mjs` | In a real browser: real `W` walking into a web really slows the hero, a blade really frees them and leaves silk, one touch of fire really burns a web away, a snuffer really drains the Oil bar and really pays it back, and the beetle toggle really swaps every spider on screen |
 | `npm run sim -- duskBoss` | She hangs over the vein and refuses every blow, a strand refuses a blade and ignores an empty lantern but burns to a lit one, fire takes one in a touch, the last drop leaves her dazed and open, she re-anchors at 60% and 30%, the beetle toggle covers her, and a beaten grandmother leaves her loot, frees the vein and stays beaten |
 | `node scripts/dusk-boss-smoke.mjs` | In a real browser: she really hangs out of reach, real `W` walking up with a lit lantern really burns a strand through, an empty one does not, and the beetle toggle really swaps her and her grandchildren together |
+| `npm run sim -- duskUmbra` | The level-11 and quest gate, her lanterns standing dark, the dive at the hero when nothing is lit and into the lantern when something is, the crash window, the wingbeat's oil and shadelings, a drained lantern that never lights again, the fog and its clearing, all three heroes lighting the bait, an empty lantern never walling the fight off, and a faint and a Continue both putting the fight back |
+| `node scripts/dusk-umbra-smoke.mjs` | In a real browser: she wakes in the air inside her moonfire ring, real `E` lights an arena lantern for real oil, she really crashes into it, her wingbeat really empties the Oil bar, and her fog really presses the carried light in |
 
 ## Not built yet
 
-Umbra herself and the campaign release. The world has all four regular monsters and its mini boss now, but its boss
-is still only a name in the catalogue, so Duskhollow fails the content gate by design and nothing yet answers the
-gate Wick's quest opens.
+The campaign release (30i): the content gate, three-hero pacing, the end-to-end browser run, the lowest-preset and
+accessibility checks, performance and the affected tour screenshots. Duskhollow has its world, its people, its
+economy, all four regular monsters, its mini boss and its boss now - but it is still `released: false`, so it
+cannot be selected, generated or travelled to in normal play until that stage passes.

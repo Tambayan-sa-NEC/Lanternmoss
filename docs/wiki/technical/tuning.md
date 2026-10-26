@@ -84,6 +84,10 @@
 | Grandmother Gloomweaver's strands: how many, how high she hangs, how long she falls and lies dazed | `src/config/combat.js` → `COMBAT.enemies.grandweaver.anchors` |
 | How long a lit lantern takes to burn through a strand, and from how far | `src/config/combat.js` → `COMBAT.enemies.gloomAnchor` (`burnTime`, `reach`) |
 | What she leaves behind | `src/config/chests.js` → `MINI_BOSS_LOOT.extra.grandweaver` |
+| Umbra's arena lanterns: how many, how far out, the oil one costs and how long a snuffed one waits | `src/config/combat.js` → `COMBAT.enemies.umbra.lanterns` |
+| How long her crash leaves her stunned, and how much her wingbeat takes | `src/config/combat.js` → `COMBAT.enemies.umbra` (`crash`, `snuff`) |
+| How much each feed drains and how long her fog blinds | `src/config/combat.js` → `COMBAT.enemies.umbra.feed` |
+| The look of her arena ring | `src/config/bossSummon.js` → `ARENA_WALLS.moonfire` |
 | Its veins and patches, the shade crop's growth, and which worlds water their own plots | `src/config/resources.js` → `NODE_KINDS`, `CROPS`, `FARM` |
 | Spore drift and deep dark | `src/config/weather.js` → `WEATHER_KINDS` (`spores`, `deepDark`) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
