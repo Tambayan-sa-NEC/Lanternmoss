@@ -93,7 +93,18 @@ export const COMBAT = {
                    { below: 1.0, heads: 3, attacks: ['bite', 'spit'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.66, heads: 4, title: 'Four heads', attacks: ['bite', 'spit', 'sweep'], speedMul: 1.1, cooldownMul: 0.9 },
                    { below: 0.33, heads: 5, title: 'Five heads', attacks: ['bite', 'spit', 'sweep'], speedMul: 1.2, cooldownMul: 0.75 },
-                 ] },
+                 ],
+                 // TODO 31b: the lake has grown into the briars. It starts with every head it ever grew, and drags
+                 // thorns out of the shore (the shared signature) between its old moves.
+                 rematch: { extra: [['lanternKey', 1]],
+                   attacks: {
+                     briars: { windup: 1.1, recover: 0.8, cooldown: 1.1, reuse: 6, count: 5, radius: 2.0, spread: 4.0,
+                               damage: 16, knockback: 6, root: 0.6, lead: 0.7 },
+                   },
+                   phases: [
+                     { below: 1.0, heads: 4, title: 'Thorn-crowned', attacks: ['bite', 'spit', 'sweep', 'briars'], speedMul: 1.1, cooldownMul: 0.85 },
+                     { below: 0.5, heads: 5, title: 'Five heads again', attacks: ['bite', 'spit', 'sweep', 'briars'], speedMul: 1.25, cooldownMul: 0.7 },
+                   ] } },
     basilisk:  { ai: 'boss', behavior: 'basilisk', miniBoss: true, name: 'The Basilisk, Stone-Gazer', color: 0x5a7a3a, capColor: 0xfff066,
                  hp: 2640, speed: 3.4, radius: 1.1, height: 2.0, aggro: 15, leash: 22, turnRate: 3.5,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3, telegraph: true, respawn: 0, xp: 170, cooldown: 1.1,
@@ -171,7 +182,26 @@ export const COMBAT = {
                    { below: 1.0,  attacks: ['slam', 'charge', 'volley'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.6,  attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon'], speedMul: 1.15, cooldownMul: 0.85 },
                    { below: 0.25, attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon'], speedMul: 1.35, cooldownMul: 0.6 },   // enraged
-                 ] },
+                 ],
+                 // TODO 31b: what it has learned since you beat it. `rematch` turns the encounter on (31a) and its
+                 // attacks and phases replace the campaign ones for that fight only; the kit keeps every old move.
+                 //   thorns  the reusable thorn signature (behaviors/boss/signatures.js), worn as a crown around
+                 //           itself: a ring of marked ground that bursts into briars and holds you in them
+                 //   spores  the old volley, now sown as a creeping cloud it walks behind
+                 //   extra   what the win hands over on top of the tier's chest. Never a trophy or a one-off
+                 //           keepsake: those belong to the win that mattered, and a rematch is repeatable
+                 rematch: { extra: [['lanternKey', 2]],
+                   attacks: {
+                     thorns: { windup: 1.2, recover: 0.9, cooldown: 1.2, reuse: 7, count: 7, radius: 2.2, spread: 5.5,
+                               damage: 18, knockback: 6, root: 0.7, around: true },
+                     bloom:  { windup: 1.0, recover: 0.8, cooldown: 1.0, reuse: 5, count: 4, radius: 2.4, spread: 3.2,
+                               damage: 15, knockback: 5, root: 0.5, lead: 0.6 },
+                   },
+                   phases: [
+                     { below: 1.0,  title: 'The Moss King remembers', attacks: ['slam', 'charge', 'volley', 'thorns'], speedMul: 1.1, cooldownMul: 0.9 },
+                     { below: 0.6,  title: 'Briars', attacks: ['slam', 'charge', 'volley', 'shockwave', 'summon', 'thorns', 'bloom'], speedMul: 1.25, cooldownMul: 0.75 },
+                     { below: 0.25, title: 'Overgrown', attacks: ['slam', 'charge', 'shockwave', 'summon', 'thorns', 'bloom'], speedMul: 1.45, cooldownMul: 0.55 },
+                   ] } },
     pyrrhax:   { ai: 'boss', behavior: 'dragon', name: 'Pyrrhax, the Red Wyrm', color: 0xe0482a, capColor: 0xff8a3a,                 // planet 2
                  look: { scale: 1.25, body: 0xc0392b, belly: 0xf0b060, dark: 0x7a1f1a, horn: 0xf3e6c8, membrane: 0x8a2420, eye: 0xffe066 },   // src/models/dragon.js
                  hp: 5000, speed: 3.2, radius: 1.9, height: 3.6, tallHitbox: true,

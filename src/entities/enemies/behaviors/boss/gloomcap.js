@@ -6,7 +6,11 @@
      volley     a fan of slow homing spores (also its fallback when nothing else fits)
      shockwave  an expanding ring along the ground: jump over it
      summon     calls a few temporary minions
-   Below each health threshold it roars and gets faster and more aggressive. */
+   Below each health threshold it roars and gets faster and more aggressive.
+   A rematch (TODO 31b, COMBAT.enemies.gloomcap.rematch) keeps every one of those and adds two thorn moves built
+   from the shared signature (./signatures.js): `thorns`, a crown of briars that bursts up around itself, and
+   `bloom`, the same thing sown ahead of where the hero is running. Both only exist in a rematch, because only a
+   rematch's phases name them. */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
 import { hurtPlayer } from '../../../../combat/damage.js';
@@ -22,6 +26,7 @@ import { arcDist, dirAlong, projectTangent, turnToward } from '../../../../utils
 import { groundHeight } from '../../../../world/terrain.js';
 import { hideDots, layLane, layRing, makeDots, showDisc } from '../telegraphs.js';
 import { defineBoss, finish, glowOf } from './core.js';
+import { thornSignature } from './signatures.js';
 import { rng } from '../../../../utils/random.js';
 
 const V3 = THREE.Vector3;
@@ -104,6 +109,9 @@ const moves = {
       ringFX(e.pos, 3, glowOf(e), 0.4); shakeCamera(0.3); audio.slam(); audio.nova();
     },
   },
+  // TODO 31b, rematch only: the same signature worn two ways (a crown around itself, and sown where you are going)
+  thorns: thornSignature('thorns'),
+  bloom: thornSignature('bloom'),
   summon: {
     ready: e => minionCount(e) < e.def.attacks.summon.max,
     begin() { audio.charge(); },

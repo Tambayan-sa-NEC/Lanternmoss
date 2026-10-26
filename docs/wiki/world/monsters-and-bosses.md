@@ -61,5 +61,22 @@ mattered, and the progression refuses a second win on a world it has already rec
 | **What is saved** | Only how many rematches of each encounter are won, per adventure. A fight **in progress** is never saved |
 | **What ends one** | Travelling, fainting or reloading puts the lair straight back to beaten-and-offered. A save cannot inject a half-woken fight |
 | **Which bosses** | Only an encounter whose rematch kit is finished (`COMBAT.enemies[type].rematch`). The lifecycle landed first; each world's kit follows in 31b-31f, so until then a beaten lair stays quiet |
+| **Your treasure first** | A chest still lying where the encounter fell is yours to open before anything else is offered, so "open the chest" and "challenge it again" never fight over the same prompt |
+| **What comes back** | A fresh challenger spawns where the encounter stood. It is never the lair's own boss, which is what keeps the campaign's single win untouchable; the sealed lair, the waking sequence and the arena ring stay the campaign's ceremony |
+
+### The Moss rematches (TODO 31b)
+
+Lanternmoss is the first world whose kits are written. Both of its encounters wear the same **thorn signature** -
+patches of ground are marked, and a moment later thorns burst out of them, hurting whoever is standing there and
+holding them in the briars. The marks are on the ground for the whole wind-up, so it punishes standing still rather
+than being unavoidable, and it is the same answer for every hero: step off the marks.
+
+| | What it learned |
+| --- | --- |
+| **Gloomcap** | **Thorns**, a crown of briars that bursts up in a ring around him - walk out of it - and **Bloom**, the same thing sown ahead of where you are running. Keeps every move from the first fight, and opens with "The Moss King remembers" |
+| **The Hydra** | **Briars** dragged out of the lake shore, and it starts with four heads instead of three. Challenge it where it fell, on its own ladder: beating the King again does not count towards the Hydra's |
+
+The signature itself lives in `src/entities/enemies/behaviors/boss/signatures.js`, written once and exported, so
+Nyxra can borrow it on the Lantern Moon (TODO 32) along with the other worlds' signatures.
 
 ![The lantern gate marking a world with a rematch waiting](../../screenshots/huds/rematch-gate.jpg)

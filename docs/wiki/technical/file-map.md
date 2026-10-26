@@ -165,6 +165,7 @@ src/
 │   ├── Dungeons.js        caves: mouth, entry/exit, combat frame and safe surface encounter restoration
 │   ├── Talents.js         the hero's learned talents: their kit for casting, saves, Old Bramble's free reset
 │   ├── Rematch.js         challenging a beaten boss again: the tier ladder, its own loot, and the campaign left alone
+│   │                      (the fights' own kits are in the boss modules; signatures.js holds the shared moves)
 │   ├── bountyRules.js     the day's jobs generated from a planet's config, progress and the saved shape (pure)
 │   ├── resourceRules.js   drops, tool tiers, catches, the needle, crop stages, what a planet supplies (pure)
 │   ├── heldTool.js        the tool in the hero's hand while working

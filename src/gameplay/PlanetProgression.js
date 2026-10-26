@@ -75,6 +75,8 @@ export class PlanetProgression {
     spawnForage(this.planet.forage);
     Chests.spawnFor(ctx.planet, boss.home);
     this.spawnResources();
+    const minis = ctx.enemies.filter(e => e.def.miniBoss);
+    Rematch.register(boss, minis);                                      // where this world's encounters stand (31a)
     for (const e of ctx.enemies) if (this.miniDefeated.has(e.portalId)) e.vanish();
     const village = [Farm.center && [Farm.center, 8], Stations.center && [Stations.center, 5]].filter(Boolean);
     Portals.setup(this.world, village);

@@ -3,7 +3,9 @@
      bite   one head rears back over a wedge in front, then snaps
      spit   every head spits an acid glob that curves after you (one more glob per head grown)
      sweep  (four heads and up) all the heads rear and sweep a wide arc in front: get behind it
-   Fallback: spit. It keeps to its lake (a short leash). */
+   Fallback: spit. It keeps to its lake (a short leash).
+   A rematch (TODO 31b, COMBAT.enemies.hydra.rematch) starts with four heads and drags `briars` out of the shore
+   between its old moves: the shared thorn signature (./signatures.js), sown where the hero is running. */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
 import { hurtPlayer } from '../../../../combat/damage.js';
@@ -16,6 +18,7 @@ import { mpick, rng } from '../../../../utils/random.js';
 import { turnToward } from '../../../../utils/sphere.js';
 import { Projectile } from '../../../Projectile.js';
 import { bossDecal, defineBoss, facing, glowOf, inWedge, phaseOf, roar } from './core.js';
+import { thornSignature } from './signatures.js';
 
 const WARN = 0xff4d6d, ACID = 0xb8ff6a;
 const A = (e, id) => e.def.attacks[id];
@@ -51,6 +54,7 @@ const moves = {
       e.snapT = 0.25; audio.wispShot();
     },
   },
+  briars: thornSignature('briars'),   // TODO 31b, rematch only
   sweep: {
     ready: (e, dist) => dist <= A(e, 'sweep').radius,
     weight: e => (facing(e) > 0.2 ? 2 : 0.5),

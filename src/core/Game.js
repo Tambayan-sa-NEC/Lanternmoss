@@ -126,7 +126,7 @@ export class Game {
     const chat = npc => npc.reaction() || Quests.offerFor(npc) || BossGate.lineFor(npc) || Challenges.lineFor(npc);
     Dialog.lineProvider = npc => Quests.stepLineFor(npc) || (Challenges.run?.npc === npc ? Challenges.lineFor(npc) : null)
       || shopLineFor(npc, n => chat(n) || n.nextLine()) || Talents.wizardLine(npc, n => chat(n) || n.nextLine()) || chat(npc);
-    Quests.init(); Rematch.init(); ShopUI.init();
+    Quests.init(); Rematch.init(this.planets); ShopUI.init();
     Houses.world = this.world; Houses.onLeave = () => { if (ctx.companion) resetCompanion(); };   // the companion meets you at the door
     Home.callbacks = { inside: () => Houses.inside, refresh: () => Houses.refreshHome(), save: () => this.saves?.save({ quiet: true }) };
     Building.callbacks = { open: entry => BuildingUI.open(entry), preview: active => BuildingUI.showPreview(active), gate: () => Portals.gate?.dir, save: () => this.saves?.save({ quiet: true }) };

@@ -65,6 +65,7 @@ node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p lay
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
 node scripts/rematch-smoke.mjs     # rematches: real E at a beaten lair, its own chest and no second trophy, the gate badge
+npm run sim -- mossRematch         # the Moss kits: the thorn signature, the mini boss's own ladder, repeat rewards
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
@@ -107,6 +108,11 @@ test-only `tests/sim/lib/rematchFixture.mjs`, because no world ships one until i
 `huds/rematch-gate.jpg`.
 `node tests/sim/rematch.sim.mjs` covers the same lifecycle headlessly and adds the tier ladder and its top, travel,
 a faint and Continue all putting the lair back, and the gate marking only beaten worlds.
+`node tests/sim/mossRematch.sim.mjs` covers the Moss kits (31b): that the new moves exist nowhere in the campaign
+fight, that the whole kit is swapped in rather than just bigger numbers, that the thorn signature marks the ground
+before it erupts and holds a hero who stands still, that every hero is untouched standing clear of the marks, that
+the Hydra can be challenged where it fell with four heads and its own ladder, and that the keepsake repeats while
+the trophy never does.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
