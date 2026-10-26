@@ -17,9 +17,6 @@ try {
   await page.click('[data-act="play"]');
   await page.evaluate(async () => {
     const L = window.LANTERNMOSS;
-    // the one finished kit the checks are allowed to see
-    const { installRematchFixture } = await import('/tests/sim/lib/rematchFixture.mjs');
-    window.__fixture = installRematchFixture('gloomcap');
     L.CharacterSelect.pick('witch'); L.begin(); L.Tutorial.skip(); L.Pets.command('passive');
     L.player.invuln = 1e9;
     document.getElementById('hint').classList.add('collapsed');
@@ -40,12 +37,21 @@ try {
   assert.equal(won.beaten, 'beaten'); assert.ok(won.recorded, 'the campaign records the first win');
   console.log('PASS  the campaign win lands as it always did');
 
-  // ---- the beaten lair offers the fight again, and a real E starts it -------------------------------------------------
-  await page.evaluate(async () => {
-    const L = window.LANTERNMOSS;
+  // ---- your treasure first, then the fight again -------------------------------------------------------------------
+  const waiting = await page.evaluate(async () => {
+    const L = window.LANTERNMOSS, { Chests } = await import('/src/gameplay/Chests.js');
+    const { Rematch } = await import('/src/gameplay/Rematch.js');
     L.player.placeAt(L.BossGate.lair); L.player.vel.set(0, 0, 0); L.companion?.snapToHero?.();
+    for (let i = 0; i < 400; i++) L.update(1 / 60);                    // the chest falls and lands
+    const held = Rematch.offered;
+    for (const c of Chests.list) if (!c.opened) { L.player.placeAt(c.up); for (let i = 0; i < 12; i++) L.update(1 / 60); c.open(); }
+    for (let i = 0; i < 30; i++) L.update(1 / 60);
+    L.player.placeAt(L.BossGate.lair); L.player.vel.set(0, 0, 0);
     for (let i = 0; i < 20; i++) L.update(1 / 60);
+    return { held, nowOffered: Rematch.offered };
   });
+  assert.equal(waiting.held, false, 'the treasure lying at the lair comes first');
+  assert.ok(waiting.nowOffered, 'and once it is collected the lair offers the fight again');
   const prompt = await page.evaluate(() => document.getElementById('prompt').textContent);
   assert.match(prompt, /Challenge .* again/, `the lair offers it (${prompt})`);
   assert.match(prompt, /rematch 1/);
@@ -53,11 +59,12 @@ try {
   const started = await page.evaluate(async () => {
     const L = window.LANTERNMOSS, { Rematch } = await import('/src/gameplay/Rematch.js');
     const { rematchTier } = await import('/src/config/rematch.js');
-    return { active: Rematch.active, state: L.BossGate.state, alive: L.boss.alive,
-      hp: L.boss.def.hp, campaignHp: window.__campaignHp ?? null, tier: rematchTier(0).hp };
+    const e = Rematch.fighting;   // a fresh challenger, never the lair's own beaten boss
+    return { active: Rematch.active, fresh: !!e && e !== L.boss, alive: !!e?.alive,
+      hp: e?.def.hp ?? 0, tier: rematchTier(0).hp };
   });
   assert.equal(started.active, 'lanternmoss', `real E starts the rematch: ${JSON.stringify(started)}`);
-  assert.ok(started.alive, 'and the boss is back on its feet');
+  assert.ok(started.alive && started.fresh, 'and a fresh challenger is on its feet, not the beaten lair boss');
   assert.ok(Math.abs(started.hp - Math.round(won.hp * started.tier)) <= 1, `at tier one's health (${started.hp} vs ${won.hp})`);
   console.log(`PASS  real E at the beaten lair brings the boss back at ${started.tier}x health`);
 
@@ -66,11 +73,12 @@ try {
     const L = window.LANTERNMOSS, { damageEnemy } = await import('/src/combat/damage.js');
     const { Rematch } = await import('/src/gameplay/Rematch.js'), { Chests } = await import('/src/gameplay/Chests.js');
     const coins = L.player.coins, crowns = L.inventory.count('mossCrown'), defeated = L.planets.defeated.size;
-    damageEnemy(L.boss, L.boss.def.hp * 3);
+    damageEnemy(Rematch.fighting, Rematch.fighting.def.hp * 3);
     for (let i = 0; i < 140; i++) L.update(1 / 60);
     return { wins: Rematch.won('gloomcap'), active: Rematch.active, coins, nowCoins: L.player.coins,
       crowns, nowCrowns: L.inventory.count('mossCrown'), defeated, nowDefeated: L.planets.defeated.size,
-      chest: !!Chests.list.find(c => c.id === 'lanternmoss:rematch:1') };
+      chest: !!Chests.list.find(c => c.id === 'lanternmoss:rematch:gloomcap:1'),
+      keys: L.inventory.count('lanternKey') };
   });
   assert.equal(paid.wins, 1, 'the rematch is counted');
   assert.equal(paid.active, null);
@@ -109,7 +117,7 @@ try {
     await page.evaluate(() => window.LANTERNMOSS.PortalUI.close());
     await frames(4);
   }
-  await page.evaluate(() => { clearInterval(window.__heal); window.__fixture?.restore(); });
+  await page.evaluate(() => clearInterval(window.__heal));
   assert.deepEqual(errors, [], 'no page or shader errors');
   console.log('PASS  720p and 1080p overflow nothing, the gate shot is saved, and there are zero page and shader errors');
 } finally { await close(); }

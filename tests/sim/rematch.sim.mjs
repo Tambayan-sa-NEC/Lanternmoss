@@ -2,9 +2,7 @@
 // the campaign never moves. No trophy, no key, no portal opening, no achievement and no first-win banner may
 // repeat; the ladder is saved, a fight in progress is not, and travel, a faint or a reload put the lair back.
 import assert from 'node:assert/strict';
-import { installRematchFixture } from './lib/rematchFixture.mjs';
 import { boot, imp } from './lib/boot.mjs';
-const fixture = installRematchFixture('gloomcap');
 const { game, H, step } = await boot('witch', { wake: false });
 const { ctx } = await imp('core/context.js');
 const { COMBAT } = await imp('config/combat.js');
@@ -26,8 +24,8 @@ try {
   H.Tutorial.skip(); P.invuln = 1e4; live(0.5);
 
   // ---- nothing is offered until a kit exists, and never before the win ------------------------------------------
-  assert.ok(rematchReady(COMBAT.enemies.gloomcap), 'the fixture marks one kit finished');
-  assert.ok(!rematchReady(COMBAT.enemies.pyrrhax), 'and leaves the rest alone, as the stages intend');
+  assert.ok(rematchReady(COMBAT.enemies.gloomcap), 'the Moss King has his kit (31b)');
+  assert.ok(!rematchReady(COMBAT.enemies.pyrrhax), 'and the worlds whose stages have not run do not');
   atLair();
   assert.equal(Rematch.offered, false, 'an unbeaten lair offers no rematch');
   assert.equal(Rematch.target(), null);
@@ -42,9 +40,15 @@ try {
   const firstWins = game.planets.defeated.size;
   pass('the first win is the campaign win: the world is recorded and its trophy chest falls');
 
-  // ---- the beaten lair offers the fight again --------------------------------------------------------------------
-  live(0.5); atLair();
-  assert.ok(Rematch.offered, 'a beaten lair with a finished kit offers a rematch');
+  // ---- your treasure first, then the fight again --------------------------------------------------------------------
+  live(6); atLair();
+  assert.equal(Rematch.offered, false, 'while the trophy chest is still lying there, nothing else is offered');
+  const open = currentInteraction();
+  assert.match(open?.label ?? '', /Treasure chest/, `the chest is what the lair offers first (${open?.label})`);
+  open.run(); live(0.4);
+  assert.ok(trophyChest.opened, 'the treasure is collected');
+  live(0.3); atLair();
+  assert.ok(Rematch.offered, 'and then a beaten lair with a finished kit offers a rematch');
   const prompt = currentInteraction();
   assert.match(prompt?.label ?? '', /Challenge .* again/, `and says so at the lair (${prompt?.label})`);
   assert.match(prompt.label, /rematch 1/);
@@ -55,9 +59,11 @@ try {
   // ---- it is harder, and it is the same fight ----------------------------------------------------------------------
   const base = COMBAT.enemies.gloomcap, campaignHp = ctx.boss.def.hp;
   prompt.run(); live(0.6);
-  const again = ctx.boss;
+  // the challenger is a fresh encounter, never the lair's own boss: that is what keeps the campaign's win unique
+  const again = Rematch.fighting;
   const t = rematchTier(0);
   assert.equal(Rematch.active, 'lanternmoss', 'the rematch is running');
+  assert.ok(again && again !== ctx.boss, 'it is a new challenger, not the beaten lair boss');
   assert.ok(again.alive && again.hp > campaignHp, `it is tougher than the campaign fight (${again.hp} vs ${campaignHp})`);
   assert.ok(Math.abs(again.def.hp - Math.round(campaignHp * t.hp)) <= 1, `exactly tier 1's ${t.hp}x health`);
   assert.equal(again.def.behavior ?? again.def.ai, base.behavior ?? base.ai, 'and it is the same kit, not a new monster');
@@ -74,7 +80,7 @@ try {
   assert.equal(game.planets.defeated.size, firstWins);
   assert.equal(H.inventory.count('mossCrown'), trophies, 'no second trophy');
   assert.ok(P.coins > coins, 'it pays coins of its own');
-  const chest = Chests.list.find(c => c.id === 'lanternmoss:rematch:1');
+  const chest = Chests.list.find(c => c.id === 'lanternmoss:rematch:gloomcap:1');
   assert.ok(chest, 'and leaves its own chest');
   assert.notEqual(chest.kind, 'boss', 'which is not the first win\'s trophy chest');
   assert.equal(Chests.bossChest, trophyChest, 'the trophy chest it already dropped is untouched');
@@ -82,7 +88,8 @@ try {
 
   // ---- the ladder climbs, and tops out --------------------------------------------------------------------------
   Rematch.cool = {};
-  atLair();
+  for (const c of Chests.list) if (!c.opened) { P.placeAt(c.up); live(0.2); c.open(); }   // its chest first, again
+  live(0.3); atLair();
   assert.match(currentInteraction()?.label ?? '', /rematch 2/, 'the next one is offered');
   assert.equal(Rematch.tier('gloomcap').hp, REMATCH.tiers[1].hp, 'at the second tier');
   Rematch.wins.gloomcap = 99;
@@ -98,6 +105,7 @@ try {
   assert.equal(Rematch.active, null, 'travelling calls it off');
   H.goToPlanet('lanternmoss'); live(0.5);
   assert.equal(H.BossGate.state, 'beaten', 'and the lair is simply beaten again');
+  assert.ok(Rematch.offered, 'offering again on the next visit');
   assert.equal(Rematch.won('gloomcap'), 1, 'with the ladder where it was');
 
   Rematch.cool = {}; atLair(); currentInteraction().run(); live(0.5);
@@ -124,4 +132,4 @@ try {
     'only beaten worlds are ever marked');
   pass('the lantern gate marks the worlds whose lairs will fight again');
   console.log('all passed');
-} finally { fixture.restore(); }
+} finally { /* nothing to restore: the Moss kits are authored (31b) */ }

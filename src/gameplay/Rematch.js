@@ -1,14 +1,21 @@
-/* REMATCHES (TODO 31a, config/rematch.js): challenging a boss you have already beaten, harder, for its own loot.
-   The lifecycle, and nothing else: the fights themselves keep their own kits, and each world's rematch kit lands in
-   its own stage (31b-31f). Until a kit exists (`COMBAT.enemies[type].rematch`), a beaten lair stays quiet.
-     offered    the boss of this world is beaten, its kit is ready, and its cooldown has run out
-     target()   the "E Challenge <boss> again" prompt at the lair (gameplay/Houses.js currentInteraction)
-     begin()    the boss is put back on its feet at this tier's numbers and woken; the arena ring closes as usual
-     a win      rolls this tier's chest where it falls, and counts one more rematch for that encounter
-   **The campaign never moves.** PlanetProgression.onBossDefeated already refuses a second win on a world it has
-   recorded, so no trophy, no portal opening, no key, no achievement and no first-win banner can repeat; this module
-   adds its own reward instead and touches none of that state. A rematch in progress is not saved as "in progress":
-   a reload, a journey or a faint puts the lair back to beaten-and-offered, so nothing can be left half-woken.
+/* REMATCHES (TODO 31a, config/rematch.js): challenging an encounter you have already beaten, harder, for its own
+   loot. The lifecycle lives here; each world's rematch kit is written in its own stage (31b-31f).
+     spots      where this world's encounters stand, recorded when the planet is populated. A beaten boss is
+                disposed and gone from the world within a second of falling, so a rematch cannot re-arm the old
+                body: it needs to know where to put a new one
+     offers()   the beaten encounters here whose kit is ready, whose cooldown has run out, and whose treasure has
+                been collected: a chest still lying where it fell is yours to open before anything else
+     target()   the "E Challenge <boss> again" prompt where one waits (Houses.js currentInteraction)
+     begin()    spawns it afresh at that spot with this tier's numbers and its rematch kit, and sets it on the hero
+     the kit    `def.rematch.attacks` and `.phases` replace the campaign ones **for that fight only** (31b-31f), so
+                a rematch is a different fight rather than the same one with bigger numbers. The encounter's own
+                module carries the moves; campaign phases that never name them keep them out of the first fight
+     a win      rolls this tier's chest where it falls, plus that encounter's own `rematch.extra`, and counts one
+   **The campaign never moves.** The rematch is a fresh encounter, not the lair's own boss, so
+   PlanetProgression.onBossDefeated (which only answers for `ctx.boss`, and only once per world) cannot fire for
+   it: no trophy, portal opening, key, achievement or first-win banner can repeat. The sealed lair, the waking
+   sequence and the arena ring stay the campaign's ceremony; a rematch simply comes for you.
+   A rematch in progress is not saved: a reload, a journey or a faint ends it and leaves the spot offering again.
    Saved per adventure: how many rematches of each encounter are won. */
 import { COMBAT } from '../config/combat.js';
 import { PLANETS } from '../config/planets.js';
@@ -16,8 +23,10 @@ import { REMATCH, rematchReady, rematchTier } from '../config/rematch.js';
 import { ctx } from '../core/context.js';
 import { emit } from '../core/events.js';
 import { encounterEvents } from '../combat/events.js';
-import { BossGate } from './BossGate.js';
+import { addEnemy } from '../combat/spawning.js';
+import { enemyDef } from '../combat/enemyDefs.js';
 import { Chests } from './Chests.js';
+import { grantItem } from './pickups.js';
 import { gainXp } from '../progression/experience.js';
 import { gainCoins } from './wallet.js';
 import { audio } from '../systems/AudioSystem.js';
@@ -30,15 +39,27 @@ const shortName = def => def.name.split(',')[0];
 
 export const Rematch = {
   wins: {},            // encounter type -> rematches already won, this adventure
+  spots: [],           // { type, at, mini, portalId } for this world's encounters (rebuilt on every visit)
   active: null,        // the planet id of a rematch being fought right now (never saved)
-  cool: {},            // planet id -> seconds before that lair offers another (never saved)
+  fighting: null,      // the encounter itself (never saved)
+  cool: {},            // planet id -> seconds before that world offers another (never saved)
+  progression: null,   // PlanetProgression, for the worlds and mini bosses it remembers
 
   toJSON() { return { wins: { ...this.wins } }; },
-  load(data) { this.wins = { ...(data?.wins ?? {}) }; this.active = null; this.cool = {}; },
-  reset() { this.wins = {}; this.active = null; this.cool = {}; },
+  load(data) { this.wins = { ...(data?.wins ?? {}) }; this.clear(); },
+  reset() { this.wins = {}; this.clear(); },
+  clear() { this.active = null; this.fighting = null; this.spots = []; this.cool = {}; },
 
-  init() {
-    encounterEvents.addEventListener('bossdefeated', e => this.onBossDefeated(e.detail.boss));
+  init(progression = null) {
+    if (progression) this.progression = progression;
+    encounterEvents.addEventListener('enemydefeated', e => this.onDefeated(e.detail.enemy));
+  },
+
+  /** Called once a planet is populated: where its boss and mini bosses stand, whether or not they are still up. */
+  register(boss, miniBosses = []) {
+    this.spots = [];
+    if (boss?.type) this.spots.push({ type: boss.type, at: boss.home.clone(), mini: false, portalId: null });
+    for (const m of miniBosses) if (m?.type) this.spots.push({ type: m.type, at: m.home.clone(), mini: true, portalId: m.portalId });
   },
 
   /** How many rematches of this encounter the hero has already won. */
@@ -46,80 +67,106 @@ export const Rematch = {
   /** What the next one is worth. */
   tier(type) { return rematchTier(this.won(type)); },
 
-  /** Is this world's boss beaten, with a rematch kit, and ready to be challenged again? */
-  get offered() {
-    const boss = ctx.boss;
-    if (!boss || this.active || BossGate.state !== 'beaten') return false;
-    if (!rematchReady(COMBAT.enemies[boss.type])) return false;        // 31b-31f: no kit, no rematch
-    return !(this.cool[ctx.planetId] > 0);
+  /** Has the hero beaten this spot's encounter? */
+  beaten(spot) {
+    return spot.mini ? !!this.progression?.miniDefeated?.has(spot.portalId)
+      : !!this.progression?.defeated?.has(ctx.planetId);
   },
 
-  /** The "E Challenge ... again" prompt at a beaten lair. */
+  /** Treasure still lying unopened where this encounter fell. Collect it before asking for another fight: it also
+      keeps the "challenge again" prompt from standing on top of the "open the chest" one. */
+  treasureAt(spot) {
+    return Chests.list.some(c => !c.opened && arcDist(c.up ?? spot.at, spot.at) <= REMATCH.reach + 2);
+  },
+
+  /** Every beaten encounter here that will fight again right now. */
+  offers() {
+    if (this.active || this.cool[ctx.planetId] > 0 || !ctx.started) return [];
+    return this.spots.filter(s => rematchReady(COMBAT.enemies[s.type]) && this.beaten(s) && !this.treasureAt(s));
+  },
+  /** Is anything offered on this world at all? */
+  get offered() { return this.offers().length > 0; },
+
+  /** The "E Challenge ... again" prompt where a beaten encounter waits. */
   target() {
-    if (!this.offered || ctx.indoors || ctx.player.dead || !ctx.started) return null;
-    const lair = BossGate.lair, dist = arcDist(ctx.player.up, lair);
-    if (dist > REMATCH.reach) return null;
-    const boss = ctx.boss, next = this.won(boss.type) + 1;
-    return { dist, label: `Challenge ${shortName(boss.def)} again <span class="ctag">(rematch ${next})</span>`,
-      at: lair.clone().multiplyScalar(groundHeight(lair) + 3.2), run: () => this.begin() };
+    if (ctx.indoors || ctx.player.dead) return null;
+    let best = null;
+    for (const spot of this.offers()) {
+      const dist = arcDist(ctx.player.up, spot.at);
+      if (dist > REMATCH.reach || (best && dist >= best.dist)) continue;
+      const def = enemyDef(spot.type), next = this.won(spot.type) + 1;
+      best = { dist, label: `Challenge ${shortName(def)} again <span class="ctag">(rematch ${next})</span>`,
+        at: spot.at.clone().multiplyScalar(groundHeight(spot.at) + 3.2), run: () => this.begin(spot) };
+    }
+    return best;
   },
 
-  /** Puts the boss back on its feet at this tier's numbers and wakes it. */
-  begin() {
-    if (!this.offered) return false;
-    const boss = ctx.boss, type = boss.type, t = this.tier(type), base = COMBAT.enemies[type];
-    this.active = ctx.planetId;
-    // Its own scaled stats, raised for this tier. The def is this encounter's copy, so the authored table is safe.
-    boss.def = { ...boss.def, hp: Math.round(boss.def.hp * t.hp), rematchTier: t,
-      damage: boss.def.damage == null ? boss.def.damage : boss.def.damage * t.damage,
-      speed: boss.def.speed * t.speed, xp: Math.round(base.xp * t.xp) };
-    boss.spawn(BossGate.lair);
-    boss.dormant = true; boss.hidden = true; boss.selfCollider.active = false;
-    BossGate.state = 'ready'; BossGate.styleBeacon();
-    boss.root.visible = boss.shadow.visible = false;
-    showBanner(`${shortName(boss.def)} stirs again`, `Rematch ${this.won(type) + 1}: it is stronger than you remember.`);
-    audio.roar();
-    emit('rematchbegun', { planet: ctx.planetId, type, tier: this.won(type) + 1 });
-    BossGate.wake();
+  /** This encounter's def for a rematch at tier `t`: this world's numbers raised, and its rematch kit in place of
+      the campaign one. Built from a fresh scaled def, so the authored table is never touched. */
+  armedDef(type, t) {
+    const base = COMBAT.enemies[type], here = enemyDef(type), kit = base.rematch ?? {};
+    return { ...here, hp: Math.round(here.hp * t.hp), rematchTier: t,
+      damage: here.damage == null ? here.damage : here.damage * t.damage,
+      speed: here.speed * t.speed, xp: Math.round(here.xp * t.xp),
+      respawn: 0, miniBoss: here.miniBoss,
+      attacks: { ...here.attacks, ...(kit.attacks ?? {}) },            // its new moves, for this fight only
+      phases: kit.phases ? kit.phases.map(p => ({ ...p })) : here.phases };
+  },
+
+  /** Spawns the encounter afresh at its spot and sets it on the hero. */
+  begin(spot = this.offers()[0]) {
+    if (!spot || !this.offers().includes(spot)) return false;
+    const type = spot.type, t = this.tier(type), tier = this.won(type) + 1;
+    const e = addEnemy(type, spot.at, this.armedDef(type, t));
+    e.rematch = true;                                                  // never the campaign's boss, whatever it is
+    this.active = ctx.planetId; this.fighting = e;
+    showBanner(`${shortName(e.def)} stirs again`, `Rematch ${tier}: it has not been idle.`);
+    audio.roar(); e.aggro();
+    emit('rematchbegun', { planet: ctx.planetId, type, tier });
     return true;
   },
 
-  /** A boss has fallen. Only a rematch win is ours; the first win belongs to the campaign. */
-  onBossDefeated(boss) {
-    if (!boss || this.active !== ctx.planetId || boss !== ctx.boss) return;
-    const type = boss.type, t = this.tier(type), tier = this.won(type) + 1;
+  /** An encounter has fallen. Only the rematch this module started is ours. */
+  onDefeated(e) {
+    if (!e || e !== this.fighting) return;
+    const type = e.type, t = this.tier(type), tier = this.won(type) + 1;
     this.wins[type] = tier;
-    this.active = null; this.cool[ctx.planetId] = REMATCH.cooldown;
+    this.active = null; this.fighting = null; this.cool[ctx.planetId] = REMATCH.cooldown;
     const kill = COMBAT.enemies[type];
-    if (t.coins) gainCoins(Math.round((kill.xp ?? 0) * t.coins), boss.center());
+    if (t.coins) gainCoins(Math.round((kill.xp ?? 0) * t.coins), e.center());
     if (t.xp) gainXp(Math.round((kill.xp ?? 0) * t.xp));
-    Chests.spawnRematchChest(boss.up, t.loot, `${ctx.planetId}:rematch:${tier}`);
-    showBanner(`${shortName(boss.def)} falls again`, `Rematch ${tier} won. Its treasure is waiting.`);
+    Chests.spawnRematchChest(e.up, t.loot, `${ctx.planetId}:rematch:${type}:${tier}`);
+    for (const [item, qty] of kill.rematch?.extra ?? []) grantItem(item, qty);   // what this encounter alone gives
+    showBanner(`${shortName(e.def)} falls again`, `Rematch ${tier} won. Its treasure is waiting.`);
     audio.melody();
     emit('rematchwon', { planet: ctx.planetId, type, tier });
   },
 
-  /** A rematch never survives a journey, a reload or a faint: the lair simply goes back to beaten. */
+  /** A rematch never survives a journey, a reload or a faint: the challenger simply leaves. */
   cancel() {
     if (!this.active) return;
-    this.active = null;
-    const boss = ctx.boss;
-    if (boss?.alive) { boss.vanish(); }
-    if (BossGate.state !== 'beaten') { BossGate.state = 'beaten'; BossGate.styleBeacon(); }
+    const e = this.fighting;
+    this.active = null; this.fighting = null;
+    if (e?.alive) e.vanish();
     toast('The rematch is called off.');
   },
 
   update(dt) {
     for (const id of Object.keys(this.cool)) { this.cool[id] -= dt; if (this.cool[id] <= 0) delete this.cool[id]; }
-    if (this.active && (this.active !== ctx.planetId || ctx.player.dead)) this.cancel();
+    if (!this.active) return;
+    if (this.active !== ctx.planetId || ctx.player.dead || !this.fighting?.alive) this.cancel();
   },
 
-  /** Which released worlds have a rematch waiting, for the lantern gate's destination list. */
-  waiting(defeated) {
+  /** Which released worlds have a rematch waiting, for the lantern gate's destination list: a beaten boss, or a
+      beaten mini boss of that world. */
+  waiting(defeated, miniDefeated = this.progression?.miniDefeated) {
     const out = new Set();
     for (const p of PLANETS) {
-      if (!defeated?.has?.(p.id) || !p.boss?.type) continue;
-      if (rematchReady(COMBAT.enemies[p.boss.type])) out.add(p.id);
+      if (defeated?.has?.(p.id) && p.boss?.type && rematchReady(COMBAT.enemies[p.boss.type])) { out.add(p.id); continue; }
+      for (const m of p.miniBosses ?? []) {
+        if (!rematchReady(COMBAT.enemies[m.type])) continue;
+        for (const id of miniDefeated ?? []) if (typeof id === 'string' && id.startsWith(`${p.id}:mini:`)) { out.add(p.id); break; }
+      }
     }
     return out;
   },

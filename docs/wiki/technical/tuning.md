@@ -41,6 +41,7 @@
 | Mini bosses (the Hydra, the Basilisk): stats, attacks, phases; their loot | `src/config/combat.js` → `hydra`, `basilisk`; `src/config/chests.js` → `MINI_BOSS_LOOT` |
 | How much harder each rematch of a beaten boss is, and what it pays | `src/config/rematch.js` → `REMATCH.tiers` ([docs](../world/monsters-and-bosses.md#rematches-todo-31a)) |
 | How long a lair waits before offering another rematch, and from how far its prompt shows | `src/config/rematch.js` → `REMATCH.cooldown`, `REMATCH.reach` |
+| What each boss learned for its rematch: its new attacks, phases and keepsake | `src/config/combat.js` → `enemies.<type>.rematch` |
 | Giving up a chase: healing on the way home, the mini boss's delay before it heals | `src/config/combat.js` → `leashReturn` |
 | Monsters fighting each other: how hard they hit, how long a grudge lasts, how wide a swipe catches | `src/config/combat.js` → `mobFeud` |
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |

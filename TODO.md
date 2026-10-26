@@ -1659,12 +1659,34 @@ reset/preservation lifecycle distinct from encounter retries.
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
 | [x] **31a. Rematch lifecycle and rewards** | 24, 26d | 3-4.5 h | Add beaten-lair portal selection, repeatable encounter state, difficulty/loot tables and saved retry/finish state. Keep original campaign defeat and first-win rewards separate; test interruption, travel and Continue without duplicated trophies/keys/achievements. Only expose encounters whose rematch kit is complete. |
-| [ ] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
+| [x] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
 | [ ] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
 | [ ] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
 | [ ] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
 | [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
 | [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
+
+**31b implemented (2026-10-26):** Lanternmoss is the first world whose rematch kits are written, and both of its
+encounters wear the same new **thorn signature** (`src/entities/enemies/behaviors/boss/signatures.js`): patches of
+ground are marked, and a moment later thorns burst out of them, hurting whoever stands there and holding them in
+the briars (the "cannot act" timer Old Ironclaw's bell already uses). The marks are visible for the whole wind-up,
+so it punishes standing still rather than being unavoidable, and the answer is the same for every hero. The
+signature is written once and exported for **Nyxra** to borrow on the Lantern Moon (32).
+**Gloomcap** gains `thorns` (a crown of briars in a ring around him) and `bloom` (the same, sown ahead of where the
+hero is running), keeping every move from the first fight; **the Hydra** gains `briars` and starts with four heads
+instead of three, on its own ladder. Neither new move appears in any campaign phase, so the first fight is exactly
+what it always was.
+Two things had to change in the 31a lifecycle for this to work, and both were defects the new checks found:
+a beaten encounter is **disposed and removed from the world** within a second of falling, so re-arming the old body
+never updated anything -- a rematch now spawns a **fresh challenger** at a spot recorded when the planet is
+populated, which also means the campaign's `onBossDefeated` (it only answers for `ctx.boss`) can never fire for it.
+And the "challenge again" prompt stood on top of the boss chest's own prompt, so **a rematch is not offered while
+treasure is still lying where the encounter fell**.
+Checked by `tests/rematch.test.mjs` (every kit's phases, new moves and keepsake, and that a keepsake is never a
+trophy or any one-off quest item), `tests/sim/mossRematch.sim.mjs` and the updated `tests/sim/rematch.sim.mjs` and
+`node scripts/rematch-smoke.mjs`. Full suites passed: 283 unit tests and 64 simulations. See
+[the Moss rematches](docs/wiki/world/monsters-and-bosses.md#the-moss-rematches-todo-31b). Not done here: the Ember,
+Frost, Tide and Dusk kits (31c-31f) and New Game+ (31g).
 
 **31a implemented (2026-10-26):** a boss you have already beaten can be challenged again, harder, for loot of its
 own, and the campaign never moves. `src/config/rematch.js` authors the ladder: three tiers of health, damage and
