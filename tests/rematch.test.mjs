@@ -36,7 +36,8 @@ test('only an encounter with a finished kit is ever offered', () => {
   assert.equal(rematchReady({ rematch: { kit: 'moss' } }), true);
   // The kits land world by world (31b-31f). Only the ones written so far are exposed.
   const ready = Object.entries(COMBAT.enemies).filter(([, def]) => rematchReady(def)).map(([type]) => type).sort();
-  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'hydra', 'pyrrhax'], 'the Moss (31b) and Ember (31c) encounters have kits so far');
+  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'hydra', 'malgrath', 'pyrrhax'],
+    'the Moss (31b), Ember (31c) and Frost (31d) encounters have kits so far');
 });
 
 // The kits as authored data. That each named move is implemented is checked where a scene exists, in the
@@ -112,10 +113,15 @@ test('the lantern gate marks a waiting rematch without changing who can travel',
 test('a rematch save keeps the ladder and nothing else', () => {
   assert.equal(SAVE_SYSTEMS.rematch, 'adventure', 'the ladder belongs to the adventure, not to one planet');
   assert.deepEqual(cleanState('rematch', null), { wins: {} }, 'an older save simply has none won');
-  assert.deepEqual(cleanState('rematch', { wins: { gloomcap: 3 } }), { wins: { gloomcap: 3 } });
-  assert.deepEqual(cleanState('rematch', { wins: { notAMonster: 4 } }), { wins: {} }, 'an unknown encounter is dropped');
-  assert.deepEqual(cleanState('rematch', { wins: { gloomcap: -5 } }), { wins: { gloomcap: 0 } });
-  assert.deepEqual(cleanState('rematch', { wins: { gloomcap: 'many' } }), { wins: { gloomcap: 0 } });
-  const injected = cleanState('rematch', { wins: { gloomcap: 2 }, active: 'lanternmoss', cool: { lanternmoss: 99 } });
-  assert.deepEqual(injected, { wins: { gloomcap: 2 } }, 'a fight in progress can never be injected through a save');
+  // the key is the encounter, `<planet>:<type>` (31d): two worlds may field the same species on separate ladders
+  assert.deepEqual(cleanState('rematch', { wins: { 'lanternmoss:gloomcap': 3 } }), { wins: { 'lanternmoss:gloomcap': 3 } });
+  assert.deepEqual(cleanState('rematch', { wins: { 'lanternmoss:hydra': 2, 'frostveil:hydra': 1 } }),
+    { wins: { 'lanternmoss:hydra': 2, 'frostveil:hydra': 1 } }, 'the same species on two worlds keeps two ladders');
+  assert.deepEqual(cleanState('rematch', { wins: { 'lanternmoss:notAMonster': 4 } }), { wins: {} }, 'an unknown encounter is dropped');
+  assert.deepEqual(cleanState('rematch', { wins: { 'nowhere:gloomcap': 4 } }), { wins: {} }, 'and so is an unknown world');
+  assert.deepEqual(cleanState('rematch', { wins: { gloomcap: 4 } }), { wins: {} }, 'a bare type names no encounter');
+  assert.deepEqual(cleanState('rematch', { wins: { 'lanternmoss:gloomcap': -5 } }), { wins: { 'lanternmoss:gloomcap': 0 } });
+  assert.deepEqual(cleanState('rematch', { wins: { 'lanternmoss:gloomcap': 'many' } }), { wins: { 'lanternmoss:gloomcap': 0 } });
+  const injected = cleanState('rematch', { wins: { 'lanternmoss:gloomcap': 2 }, active: 'lanternmoss', cool: { lanternmoss: 99 } });
+  assert.deepEqual(injected, { wins: { 'lanternmoss:gloomcap': 2 } }, 'a fight in progress can never be injected through a save');
 });

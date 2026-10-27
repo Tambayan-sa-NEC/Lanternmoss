@@ -26,7 +26,8 @@ try {
   // ---- nothing is offered until a kit exists, and never before the win ------------------------------------------
   assert.ok(rematchReady(COMBAT.enemies.gloomcap), 'the Moss King has his kit (31b)');
   assert.ok(rematchReady(COMBAT.enemies.pyrrhax), 'and the wyrm has his (31c)');
-  assert.ok(!rematchReady(COMBAT.enemies.malgrath), 'but the worlds whose stages have not run do not (31d)');
+  assert.ok(rematchReady(COMBAT.enemies.malgrath), 'and the Demon Lord his (31d)');
+  assert.ok(!rematchReady(COMBAT.enemies.mirelure), 'but the worlds whose stages have not run do not (31e)');
   atLair();
   assert.equal(Rematch.offered, false, 'an unbeaten lair offers no rematch');
   assert.equal(Rematch.target(), null);
@@ -93,9 +94,9 @@ try {
   live(0.3); atLair();
   assert.match(currentInteraction()?.label ?? '', /rematch 2/, 'the next one is offered');
   assert.equal(Rematch.tier('gloomcap').hp, REMATCH.tiers[1].hp, 'at the second tier');
-  Rematch.wins.gloomcap = 99;
+  Rematch.wins['lanternmoss:gloomcap'] = 99;                           // the ladder is keyed per encounter (31d)
   assert.deepEqual(Rematch.tier('gloomcap'), REMATCH.tiers.at(-1), 'and the ladder has a top rather than running away');
-  Rematch.wins.gloomcap = 1;
+  Rematch.wins['lanternmoss:gloomcap'] = 1;
   pass(`the ladder climbs through ${REMATCH.tiers.length} tiers and then holds`);
 
   // ---- a rematch never survives a journey, a faint or a reload ----------------------------------------------------

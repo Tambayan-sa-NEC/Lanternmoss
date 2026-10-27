@@ -1661,10 +1661,35 @@ reset/preservation lifecycle distinct from encounter retries.
 | [x] **31a. Rematch lifecycle and rewards** | 24, 26d | 3-4.5 h | Add beaten-lair portal selection, repeatable encounter state, difficulty/loot tables and saved retry/finish state. Keep original campaign defeat and first-win rewards separate; test interruption, travel and Continue without duplicated trophies/keys/achievements. Only expose encounters whose rematch kit is complete. |
 | [x] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
 | [x] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
-| [ ] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
+| [x] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
 | [ ] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
 | [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
 | [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
+
+**31d implemented (2026-10-27):** Frostveil's two encounters go opposite ways, and both are what the stage asked
+for. **Malgrath** gets a third wearing of the **Doom Blade signature**: the killing blow he has always carried is
+now written once in `src/entities/enemies/behaviors/boss/signatures.js` and worn three times -- the campaign's
+`doom` in front of him (unchanged: the `bosses` sim still shows the same 2.0 s wind-up and the same deaths), plus
+his rematch's `reckoning`, whose circle *hunts* the hero while it aims instead of being planted, and `eclipse`,
+the first killing blow his ascended phase has ever had, dropped out of the air. The signature makes and owns its
+own decals the first time it runs, so Nyxra (32) can wear it without declaring anything. Keepsake: two Frost
+Diamonds. **The Frost Hydra** gets nothing new, which is the point: it reuses the Hydra kit proven in 31b.
+Two real defects in the 31a lifecycle came out of building on it, both confirmed with a throwaway probe first:
+a rematch was built from `enemyDef(type)` and so **threw away the planet's variant** -- challenging the Frost
+Hydra spawned "The Hydra, Terror of the Lake" in green at a different health, and even the prompt said so. The
+lifecycle now records the def each encounter actually spawned with and puts *that* encounter back. And the ladder
+was keyed by bare monster type, so **beating Frostveil's Hydra put Lanternmoss's straight onto tier 2**; it is now
+keyed per encounter, `<planet>:<type>`, with the save cleaner validating both halves and `won()`/`tier()` still
+accepting a bare type as "this world's".
+Checked by `tests/sim/frostRematch.sim.mjs`, which drives the hero with real `KeyW` input rather than teleporting:
+the circle is on the ground for the whole wind-up, stops moving once the blade commits, and a hero who simply
+turns and runs -- no sprint, no dodge -- clears it by about 5 m on all three heroes; standing in it kills outright
+even through armor; the buried blade leaves a 2.6 s punish window; the rematch still carries him into the air on
+its own phases; a lost rematch can be taken again with the ladder unmoved; the Frost Hydra comes back ice-fanged;
+and the two worlds' Hydras keep separate ladders across a save and a Continue. Full suites passed: 284 unit tests
+and 66 simulations, and `node scripts/rematch-smoke.mjs` with zero page and shader errors. See
+[the Frost rematches](docs/wiki/world/monsters-and-bosses.md#the-frost-rematches-todo-31d). Not done here: the
+Tide and Dusk kits (31e-31f) and New Game+ (31g).
 
 **31c implemented (2026-10-27):** Emberfall's two encounters wear a second shared move, the **dragonfire
 signature** (`src/entities/enemies/behaviors/boss/signatures.js`, beside the thorn one). A line of ground is marked

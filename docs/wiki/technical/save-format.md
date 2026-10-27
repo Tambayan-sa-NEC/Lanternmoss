@@ -52,7 +52,8 @@ and favourites; their existing buff timers remain intact. Unknown runes and ench
 are discarded. The original v1 fixture remains unchanged.
 
 TODO 31a adds an adventure-owned `systems.rematch: { wins }`: how many rematches of each encounter the hero has
-won, keyed by enemy type. Counts for unknown encounters are dropped and the numbers are clamped. A rematch **in
+won, keyed `<planet>:<type>` (`frostveil:hydra`, since 31d: two worlds may field the same species and each keeps
+its own ladder). Counts for an unknown world or monster are dropped and the numbers are clamped. A rematch **in
 progress** is deliberately absent from the format: the active fight and each lair's cooldown live only in memory,
 so a reload, a journey or a faint always finds a lair simply beaten and offering again, and a crafted save cannot
 inject a half-woken boss. Old v1 files default to none won.

@@ -25,17 +25,39 @@
 
      def.attacks[id]: { windup, recover, cooldown, reuse?, segments (how many along the line), spacing (metres
                         between them), radius, damage, tick, duration, lead? (aim ahead of the hero's run),
-                        across? (the line runs across the hero's path instead of along it) } */
+                        across? (the line runs across the hero's path instead of along it) }
+
+   THE DOOM BLADE SIGNATURE (TODO 31d). Frostveil's own threat, and the one Malgrath has always carried: the killing
+   blow. A huge circle is marked and pulses while the blade is raised, filling up as the blow nears; anyone still
+   inside when it falls **dies outright** (armor and Guard do not help, only leaving the circle or a dodge's
+   i-frames). The whole of it is the wind-up, which is why it is fair: the circle is on the ground from the first
+   frame, the blow lands where the circle is, and the blade stays buried afterwards for a long punish window.
+   `commit` is the fraction of the wind-up it keeps aiming for; after that the circle is fixed and running out of
+   it is the only answer. `onHero` moves the circle onto the hero instead of planting it in front of the boss, so
+   it hunts you while it aims rather than being sidestepped.
+   Worn by Malgrath three times - the campaign's `doom` in front of him, and his rematch's `reckoning` (grounded,
+   hunting) and `eclipse` (dropped from the air in the ascended phase) - and exported for Nyxra with the rest.
+   The wearer needs nothing of its own: the signature makes and owns its decals the first time it runs.
+
+     def.attacks[id]: { windup, recover, cooldown, reuse?, maxRange (how far off it can start), radius, damage,
+                        lethal, reach? (how far in front of the boss the circle is planted), commit? (0..1 of the
+                        wind-up spent aiming, default 0.45), onHero? (the circle sits on the hero while it aims) } */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
+import { playerInArea } from '../../../../combat/area.js';
+import { hurtPlayer } from '../../../../combat/damage.js';
 import { addHazard, Blast, Zone } from '../../../../combat/hazards.js';
+import { groundPoint, hitStop, ringFX } from '../../../../fx/combatFx.js';
+import { emote } from '../../../../fx/emotes.js';
 import { sparkles } from '../../../../fx/sparkles.js';
 import { audio } from '../../../../systems/AudioSystem.js';
+import { shakeCamera } from '../../../../systems/CameraSystem.js';
+import { toast } from '../../../../ui/toast.js';
 import { arcDist, dirAlong, offsetDir, tangentToward, turnToward } from '../../../../utils/sphere.js';
 import { damp } from '../../../../utils/math.js';
 import { mpick, rng } from '../../../../utils/random.js';
 import { dryGround } from '../../../../world/terrain.js';
-import { keepInArena, predictHero } from './core.js';
+import { bossDecal, keepInArena, predictHero, shortName } from './core.js';
 
 const THORN = 0x6a8a3a, TIP = 0xb48cff;
 const _line = new THREE.Vector3();
@@ -142,3 +164,53 @@ export function dragonfireSignature(id) {
 /** The segments a wall would lay right now, for the checks: how many burn, and that one is always a way through. */
 export const firewallOf = (e, id) => firePath(e, e.def.attacks[id]);
 
+
+const WARN = 0xff4d6d, DOOM = 0xff1a3a;
+
+/** The circle this move owns: made the first time it runs, so any boss can wear the signature as it is. */
+function doomTele(e, id) {
+  return (e.doomTele ??= {})[id] ??= {
+    disc: bossDecal(e, 'disc', WARN, { k: 0.9 }),
+    edge: bossDecal(e, 'ring', DOOM, { k: 1.9, lift: 0.14 }),
+    fill: bossDecal(e, 'disc', DOOM, { k: 1.1, lift: 0.16 }),
+    at: new THREE.Vector3(),
+  };
+}
+
+/** Builds the Doom Blade move. `id` is the key it lives under in the kit's moves and in def.attacks. */
+export function doomSignature(id) {
+  return {
+    ready: (e, dist) => dist <= e.def.attacks[id].maxRange,
+    weight: e => (e.hp / e.def.hp < 0.9 ? 2 : 0.4),
+    begin(e) {
+      const t = doomTele(e, id);
+      t.at.copy(e.def.attacks[id].onHero && !ctx.player.dead ? ctx.player.up : dirAlong(e.up, e.fwd, e.def.attacks[id].reach ?? 2.5));
+      audio.doomCharge(); emote(e, '!', '#ff1a3a');
+      if (!e.doomWarned) { e.doomWarned = true; toast(`${shortName(e)} raises the Doom Blade! Get out of the circle!`); }
+    },
+    windup(e, dt, k) {
+      const a = e.def.attacks[id], t = doomTele(e, id);
+      if (k < (a.commit ?? 0.45)) {                                    // aims, then commits: after this it is fixed
+        turnToward(e.fwd, e.toP, e.up, damp(3, dt));
+        t.at.copy(a.onHero && !ctx.player.dead ? ctx.player.up : dirAlong(e.up, e.fwd, a.reach ?? 2.5));
+      }
+      const pulse = Math.abs(Math.sin(ctx.time * (5 + 12 * k)));
+      t.disc.place(t.at, e.fwd, a.radius).opacity = 0.16 + 0.3 * k;
+      t.edge.place(t.at, e.fwd, a.radius).opacity = 0.5 + 0.5 * pulse;
+      t.fill.place(t.at, e.fwd, Math.max(0.1, a.radius * k)).opacity = 0.2 + 0.25 * k;   // fills up as the blow nears
+      if (e.sword && rng() < dt * 40) sparkles.emit(e.sword.getWorldPosition(_line), { count: 2, color: DOOM, speed: 1.5, up: e.up, upBias: 1, life: 0.5, size: 0.55 });
+      if (k > 0.5 && playerInArea(t.at, a.radius)) shakeCamera(0.06 + 0.1 * k);          // the ground trembles under you
+    },
+    fire(e) {
+      const a = e.def.attacks[id], t = doomTele(e, id), c = groundPoint(t.at, 0);
+      ringFX(c, a.radius, DOOM, 0.7); ringFX(c, a.radius * 0.6, 0xffffff, 0.45); ringFX(c, a.radius * 1.4, 0x3a0a14, 0.9);
+      sparkles.emit(groundPoint(t.at, 0.5), { count: 80, color: DOOM, speed: 6, up: t.at, upBias: 0.8, life: 1.1, size: 0.6 });
+      sparkles.emit(groundPoint(t.at, 0.5), { count: 40, color: 0xffe0e8, speed: 4, up: t.at, upBias: 1.2, life: 0.8, size: 0.5 });
+      shakeCamera(0.9); hitStop(0.12); audio.doomSlam();
+      if (playerInArea(t.at, a.radius)) hurtPlayer(a.damage, c, 16, { lethal: a.lethal !== false, source: e });
+    },
+  };
+}
+
+/** Where a Doom Blade circle is right now, for the checks: the ground that kills, while it is still only marked. */
+export const doomCircleOf = (e, id) => (e.doomTele?.[id] ? { at: e.doomTele[id].at.clone(), radius: e.def.attacks[id].radius } : null);
