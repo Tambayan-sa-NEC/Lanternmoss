@@ -5,7 +5,10 @@
      hellfire  at range: marks circles where you stand and around you; crimson bolts strike each one in turn
      doom      DOOM BLADE, the killing blow: raises the sword for 2 s while a huge circle pulses in front of him and the
                blade gathers light. Anyone still inside when it falls dies outright (armor and Guard don't help;
-               only leaving the circle or the i-frames of a dodge do). Then the sword stays buried: punish him
+               only leaving the circle or the i-frames of a dodge do). Then the sword stays buried: punish him.
+               The blow itself is the shared DOOM BLADE signature (boss/signatures.js), which he also wears twice
+               more in his rematch (TODO 31d): `reckoning`, grounded, whose circle hunts you while it aims, and
+               `eclipse`, dropped from the air in the ascended phase. Neither is reachable in the campaign fight
    TRANSITION (at 50%): immune while he kneels, then a shock burst throws you back and he rises on his wings.
    PHASE 2, ASCENDED: hovers and circles at range (still low enough to reach), with an aerial moveset:
      dive      climbs high, marks where you stand, then plummets onto it; grounded and open for a moment after
@@ -31,6 +34,7 @@ import { arcDist, dirAlong, projectTangent, slerpDir, tangentTo, tangentToward, 
 import { groundHeight } from '../../../../world/terrain.js';
 import { bossDecal, defineBoss, finish, glowOf, inWedge, keepInArena, phaseOf, predictHero, roar, shortName } from './core.js';
 import { rng } from '../../../../utils/random.js';
+import { doomSignature } from './signatures.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3(), _aim = new V3();
@@ -125,32 +129,12 @@ const moves = {
     },
   },
 
-  doom: {
-    ready: (e, dist) => dist <= A(e, 'doom').maxRange,
-    weight: e => (e.hp / e.def.hp < 0.9 ? 2 : 0.4),
-    begin(e) {
-      audio.doomCharge(); emote(e, '!', '#ff1a3a');
-      if (!e.doomWarned) { e.doomWarned = true; toast(`${shortName(e)} raises the Doom Blade! Get out of the circle!`); }
-    },
-    windup(e, dt, k) {
-      const a = A(e, 'doom');
-      if (k < 0.45) { turnToward(e.fwd, e.toP, e.up, damp(3, dt)); e.doomAt.copy(dirAlong(e.up, e.fwd, a.reach)); }   // aims, then commits
-      const pulse = Math.abs(Math.sin(ctx.time * (5 + 12 * k)));
-      e.disc.place(e.doomAt, e.fwd, a.radius).opacity = 0.16 + 0.3 * k;
-      e.edge.place(e.doomAt, e.fwd, a.radius).opacity = 0.5 + 0.5 * pulse;
-      e.fill.place(e.doomAt, e.fwd, Math.max(0.1, a.radius * k)).opacity = 0.2 + 0.25 * k;      // fills up as the blow nears
-      if (rng() < dt * 40) sparkles.emit(e.sword.getWorldPosition(_tv), { count: 2, color: DOOM, speed: 1.5, up: e.up, upBias: 1, life: 0.5, size: 0.55 });
-      if (k > 0.5 && playerInArea(e.doomAt, a.radius)) shakeCamera(0.06 + 0.1 * k);           // the ground trembles under you
-    },
-    fire(e) {
-      const a = A(e, 'doom'), c = groundPoint(e.doomAt, 0);
-      ringFX(c, a.radius, DOOM, 0.7); ringFX(c, a.radius * 0.6, 0xffffff, 0.45); ringFX(c, a.radius * 1.4, 0x3a0a14, 0.9);
-      sparkles.emit(groundPoint(e.doomAt, 0.5), { count: 80, color: DOOM, speed: 6, up: e.doomAt, upBias: 0.8, life: 1.1, size: 0.6 });
-      sparkles.emit(groundPoint(e.doomAt, 0.5), { count: 40, color: 0xffe0e8, speed: 4, up: e.doomAt, upBias: 1.2, life: 0.8, size: 0.5 });
-      shakeCamera(0.9); hitStop(0.12); audio.doomSlam();
-      if (playerInArea(e.doomAt, a.radius)) hurtPlayer(a.damage, c, 16, { lethal: true, source: e });
-    },
-  },
+  // TODO 31d: the Doom Blade is a shared signature now (boss/signatures.js), written once and worn three times --
+  // here in front of him, and twice more in his rematch. The campaign blow is unchanged: same circle, same aim,
+  // same killing landing, same buried-sword punish window.
+  doom: doomSignature('doom'),
+  reckoning: doomSignature('reckoning'),
+  eclipse: doomSignature('eclipse'),
 
   // ======================= PHASE 2: ASCENDED (flying) =======================
   dive: {
@@ -281,9 +265,8 @@ export const demonLord = defineBoss({
     const a = e.def.attacks;
     e.wedge = bossDecal(e, 'sector', WARN, { arc: rad(a.combo.arc) });
     e.disc = bossDecal(e, 'disc', WARN, { k: 0.9 }); e.edge = bossDecal(e, 'ring', DOOM, { k: 1.9, lift: 0.14 });
-    e.fill = bossDecal(e, 'disc', DOOM, { k: 1.1, lift: 0.16 });
     e.lane = bossDecal(e, 'lane', WARN, { k: 1.2 });
-    e.laneDir = new V3(); e.laneFrom = new V3(); e.doomAt = new V3(); e.diveTo = new V3(); e.diveFrom = new V3();
+    e.laneDir = new V3(); e.laneFrom = new V3(); e.diveTo = new V3(); e.diveFrom = new V3();
     e.side = 1; e.swingT = 0; e.slamT = 0; e.orbit = 1; e.yaw = 0;
     foldWings(e);
   },

@@ -67,6 +67,7 @@ node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/108
 node scripts/rematch-smoke.mjs     # rematches: real E at a beaten lair, its own chest and no second trophy, the gate badge
 npm run sim -- mossRematch         # the Moss kits: the thorn signature, the mini boss's own ladder, repeat rewards
 npm run sim -- emberRematch        # the Ember kits: the dragonfire signature and the gap every wall leaves
+npm run sim -- frostRematch        # the Frost kits: the Doom Blade signature, retries, and one ladder per encounter
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
@@ -119,6 +120,13 @@ that each wall is chosen in plain sight during the wind-up and then burns the gr
 hero standing in the unlit gap takes nothing from it while one standing in the fire does, that this is true for
 every hero, that Pyrrhax wears the signature twice and the Basilisk once, and that across sixty lines drawn for
 both encounters exactly one segment is always a gap and never an end of the wall.
+`node tests/sim/frostRematch.sim.mjs` covers the Frost kits (31d) and the Doom Blade signature: that the killing
+circle is on the ground for the whole wind-up and stops moving once the blade commits, that a hero who simply
+turns and runs - no sprint, no dodge - clears it with metres to spare on all three heroes, that standing in it
+kills outright, that the buried blade leaves a punish window, that the rematch still carries Malgrath into the air
+on its own phases, that a lost rematch can be taken again with the ladder unmoved, that Frostveil's Frost Hydra
+comes back as itself rather than as a plain Hydra, and that the two worlds' Hydras keep separate ladders across a
+save and a Continue.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and

@@ -43,6 +43,7 @@
 | How long a lair waits before offering another rematch, and from how far its prompt shows | `src/config/rematch.js` → `REMATCH.cooldown`, `REMATCH.reach` |
 | What each boss learned for its rematch: its new attacks, phases and keepsake | `src/config/combat.js` → `enemies.<type>.rematch` |
 | How far a thorn volley or a dragonfire wall reaches, and how long each holds the ground | `src/config/combat.js` → `enemies.<type>.rematch.attacks` (the shared moves are in `behaviors/boss/signatures.js`) |
+| How long a Doom Blade circle is readable before it commits, and how wide it is | `src/config/combat.js` → `enemies.malgrath.attacks.doom` and `.rematch.attacks` (`windup`, `commit`, `radius`, `recover`) |
 | Giving up a chase: healing on the way home, the mini boss's delay before it heals | `src/config/combat.js` → `leashReturn` |
 | Monsters fighting each other: how hard they hit, how long a grudge lasts, how wide a swipe catches | `src/config/combat.js` → `mobFeud` |
 | The waking sequence, elites, the arena ring, villager hints | `src/config/bossSummon.js` |

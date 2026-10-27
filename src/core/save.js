@@ -103,6 +103,13 @@ export function cleanStack(v) {
   return { itemId: def.id, quantity: integer(s.quantity, 0, 0, def.maxStack), props: cleanProps(s.props, def) };
 }
 const stringIds = (v, allowed) => [...new Set(list(v).filter(id => allowed(id)))];
+/** A rematch ladder key: a known world and a known monster, `frostveil:hydra`. */
+const encounterId = key => {
+  if (typeof key !== 'string') return false;
+  const cut = key.indexOf(':');
+  return cut > 0 && ids.has(key.slice(0, cut)) && Object.hasOwn(COMBAT.enemies, key.slice(cut + 1));
+};
+
 const chestId = id => typeof id === 'string' && PLANETS.some(p => {
   const prefix = `${p.id}:`; if (!id.startsWith(prefix)) return false;
   const suffix = id.slice(prefix.length);
@@ -119,8 +126,9 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
   switch (key) {
     case 'mechanics': return cleanMechanicSnapshot(value);
     // Only the count of rematches won per encounter is kept: a fight in progress is never saved (TODO 31a).
+    // the ladder is per encounter, `<planet>:<type>` (31d): two worlds may field the same species on separate ladders
     case 'rematch': return { wins: Object.fromEntries(Object.entries(record(s.wins))
-      .filter(([type]) => Object.hasOwn(COMBAT.enemies, type)).map(([type, n]) => [type, integer(n, 0, 0, 9999)])) };
+      .filter(([key]) => encounterId(key)).map(([key, n]) => [key, integer(n, 0, 0, 9999)])) };
     case 'building': return cleanBuildings(value, cleanStack);
     case 'home': return cleanHomeState(value);
     case 'crafting': {

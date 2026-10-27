@@ -59,6 +59,8 @@ mattered, and the progression refuses a second win on a world it has already rec
 | --- | --- |
 | **The ladder** | Three tiers of health, damage and speed, each worth more coins, XP and a better chest table. The last tier repeats for ever, so the fight tops out rather than running away |
 | **What is saved** | Only how many rematches of each encounter are won, per adventure. A fight **in progress** is never saved |
+| **One ladder per encounter** | The count is kept against the world *and* the monster (`frostveil:hydra`), not the species. Two worlds may field the same creature - Frostveil's Frost Hydra is a Hydra - and beating one is not practice for the other (31d) |
+| **The encounter you beat** | The challenger is spawned from the def that world's encounter actually stood up with, so a planet's variant comes back as itself: the Frost Hydra returns ice-fanged and at its own health, not as a Hydra borrowed from Lanternmoss (31d) |
 | **What ends one** | Travelling, fainting or reloading puts the lair straight back to beaten-and-offered. A save cannot inject a half-woken fight |
 | **Which bosses** | Only an encounter whose rematch kit is finished (`COMBAT.enemies[type].rematch`). The lifecycle landed first; each world's kit follows in 31b-31f, so until then a beaten lair stays quiet |
 | **Your treasure first** | A chest still lying where the encounter fell is yours to open before anything else is offered, so "open the chest" and "challenge it again" never fight over the same prompt |
@@ -95,5 +97,21 @@ for the whole wind-up, so there is always a way through in plain sight.
 Both wear the same signature, tuned differently: Pyrrhax's firewall is seven segments three metres apart, his
 scorch four segments closer together, and the Basilisk's cinders five. Whichever is thrown, exactly one segment of
 it is a gap, and it is never one of the ends.
+
+### The Frost rematches (TODO 31d)
+
+Frostveil's two encounters go opposite ways. Malgrath gets a third wearing of the **Doom Blade signature** - the
+killing blow he has always carried, now written once in `signatures.js` and worn three times - while the Frost
+Hydra simply gets to fight again *as itself*, on the kit the Hydra already proved in 31b.
+
+The Doom Blade is the one move in the game that ignores armor and Guard: anyone still inside the circle when the
+blade falls dies outright. It is fair because the whole of it is the wind-up. The circle is on the ground from the
+first frame, it keeps aiming only until it **commits**, and after that it does not move, so turning and running is
+enough - no sprint, no dodge, no hero's own trick. Then the blade stays buried for a long punish window.
+
+| | What it learned |
+| --- | --- |
+| **Malgrath** | **Reckoning**, a killing circle that *hunts you* while it aims instead of being planted in front of him, and **Eclipse**, the first killing blow his ascended phase has ever had, dropped out of the air onto where you stand. He keeps every move from the first fight, including the original Doom Blade, and opens with "The Lord remembers" |
+| **The Frost Hydra** | Nothing new - and that is the point. It reuses the Hydra's own rematch kit (briars and every head it ever grew), but as the cold variant Frostveil fields, at its own health and in its own colours, on a ladder entirely separate from Lanternmoss's Hydra |
 
 ![The lantern gate marking a world with a rematch waiting](../../screenshots/huds/rematch-gate.jpg)

@@ -270,6 +270,21 @@ export const COMBAT = {
                  phases: [
                    { below: 1.0, title: 'Grounded', attacks: ['combo', 'fissure', 'hellfire', 'doom'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Ascended', flying: true, enraged: true, attacks: ['dive', 'barrage', 'rain', 'strafe'], speedMul: 1.2, cooldownMul: 0.8 },
-                 ] },
+                 ],
+                 // TODO 31d: what the Demon Lord learned. The Doom Blade signature (behaviors/boss/signatures.js)
+                 // worn twice more: `reckoning`, whose circle hunts you while it aims instead of being planted in
+                 // front of him, and `eclipse`, the first killing blow his ascended phase has ever had, dropped
+                 // from the air onto where you stand. Both commit early and leave the blade buried a long while.
+                 rematch: { extra: [['frostDiamond', 2]],
+                   attacks: {
+                     reckoning: { windup: 2.2, commit: 0.4, onHero: true, maxRange: 12, radius: 5.0, damage: 999, lethal: true,
+                                  recover: 2.4, cooldown: 1.2, reuse: 16 },
+                     eclipse:   { windup: 2.4, commit: 0.4, onHero: true, maxRange: 16, radius: 6.0, damage: 999, lethal: true,
+                                  recover: 2.0, cooldown: 1.2, reuse: 20 },
+                   },
+                   phases: [
+                     { below: 1.0, title: 'The Lord remembers', attacks: ['combo', 'fissure', 'hellfire', 'doom', 'reckoning'], speedMul: 1.1, cooldownMul: 0.85 },
+                     { below: 0.5, title: 'Ascended, unbound', flying: true, enraged: true, attacks: ['dive', 'barrage', 'rain', 'strafe', 'eclipse'], speedMul: 1.3, cooldownMul: 0.65 },
+                   ] } },
   },
 };
