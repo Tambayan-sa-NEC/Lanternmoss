@@ -224,6 +224,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xff9a5a, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
   { id: 'rimequartz', name: 'Rimequartz', description: 'Pale quartz from the grotto under Frostveil, so cold it frosts over in the hand.', category: 'material',
     icon: { shape: 'gem', color: 0xbfe8ff, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
+  { id: 'tidequartz', name: 'Tidequartz', description: 'Sea-green quartz from Tideglass Cavern. Its light seems to turn like the tide.', category: 'material',
+    icon: { shape: 'gem', color: 0x70dfd7, art: 'gemstone' }, maxStack: 20, rarity: 'uncommon', value: 12 },
   // ---- smelted at the forge (config/crafting.js: ore + fuel -> ingots); fuel burns in the forge (FUEL)
   { id: 'copperIngot', name: 'Copper Ingot', description: 'Copper ore, smelted bright at the forge. Watering cans, copper picks, rings and staves.', category: 'material',
     icon: { shape: 'gem', color: 0xe08a4a, art: 'ingot' }, maxStack: 20, value: 10 },

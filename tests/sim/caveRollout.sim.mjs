@@ -13,6 +13,7 @@ const { caveEnding, caveMonsters, generateCave, roomAt } = await imp('world/cave
 const { currentInteraction } = await imp('gameplay/Houses.js');
 const { damageEnemy } = await imp('combat/damage.js');
 const { arcDist } = await imp('utils/sphere.js');
+const { dryGround } = await imp('world/terrain.js');
 const { H, game, step } = await boot('witch', { wake: false });
 const P = H.player, D = H.Dungeons, R = H.CaveRewards, Q = H.CavePuzzles;
 const pass = m => console.log(`PASS  ${m}`);
@@ -42,13 +43,15 @@ const clearRoom = room => {
 };
 
 const report = [];
-for (const [index, key] of ['lanternmoss', 'emberfall', 'frostveil'].entries()) {
+for (const [index, key] of ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper'].entries()) {
   const cave = CAVES[key], planet = PLANETS[index];
   if (index) H.goToPlanet(index); step(0.6);
   P.invuln = 1e9;
 
   // ---- the mouth stands in the world, and E goes in ------------------------------------------------------------
   assert.ok(D.mouth?.parts, `${key}: the cave mouth stands in the world`);
+  if (key === 'tidewhisper') assert.ok(dryGround(D.mouth.dir, CAVE.entrance.clearance, { high: true }),
+    'the Tideglass mouth and its clearance stay dry at high tide');
   P.placeAt(D.mouth.dir); step(0.2);
   assert.equal(prompt(), `Enter ${cave.name}`, `${key}: E offers the way in`);
   currentInteraction().run(); step(1.2);
@@ -77,7 +80,7 @@ for (const [index, key] of ['lanternmoss', 'emberfall', 'frostveil'].entries()) 
   put(...beside(L, vein, 1.4));
   assert.ok(new RegExp(`Mine the ${CAVE_VEINS[cave.ore].name.toLowerCase()}`).test(prompt() ?? ''),
     `${key}: E offers its own vein (got ${prompt()})`);
-  const ores = ['gloomquartz', 'cinderquartz', 'rimequartz'];
+  const ores = ['gloomquartz', 'cinderquartz', 'rimequartz', 'tidequartz'];
   const oreBefore = Object.fromEntries(ores.map(id => [id, H.inventory.count(id)]));
   currentInteraction().run();
   for (let i = 0; i < 600 && R.job; i++) step(1 / 60);
@@ -160,7 +163,7 @@ for (const [index, key] of ['lanternmoss', 'emberfall', 'frostveil'].entries()) 
 // ---- each world kept its own cave ----------------------------------------------------------------------------------
 // `planets` holds each world's state as it was left; the one being stood on has to be captured first.
 game.saves.registry.capturePlanet(ctx.planetId);
-for (const key of ['lanternmoss', 'emberfall', 'frostveil']) {
+for (const key of ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper']) {
   const snap = game.saves.registry.planets[key];
   assert.ok(snap, `${key} has a captured record`);
   assert.equal(snap.caves.cave, CAVES[key].id, `${key}'s rewards record is its own cave`);
@@ -168,6 +171,6 @@ for (const key of ['lanternmoss', 'emberfall', 'frostveil']) {
   assert.ok(snap.cavePuzzles.beaten.length, `${key}: its warden stays beaten`);
   assert.ok(snap.caves.mined.every(id => id.startsWith(`${CAVES[key].id}:`)), 'with no other cave in its rows');
 }
-pass('all three worlds kept their own cave, their own ore and their own warden');
+pass('all four worlds kept their own cave, their own ore and their own warden');
 console.log(report.join('\n'));
 console.log('all passed');

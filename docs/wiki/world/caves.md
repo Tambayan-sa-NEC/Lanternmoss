@@ -1,9 +1,9 @@
 # Caves (TODO 29)
 
 Each main planet will have a cave entered from the surface: a few rooms with monsters, chests and ore found nowhere
-else, ending in a guardian (the plan is in [TODO.md](../../../TODO.md), stages 29b-29g). **Status: layout, traversal
-and combat context (29b/29c) are built; the caves are unreleased.** No cave mouth appears until 29f. Encounters use
-test fixtures; normal cave rosters, rewards, saved room progress, puzzles and guardians are later stages.
+else, ending in a guardian (the plan is in [TODO.md](../../../TODO.md), stages 29b-29g). **Status:** the original
+three worlds' caves are released (29f). Tidewhisper's cave is configured on the 29g stage branch; Duskhollow awaits
+30i. Layout, combat, rewards, saved progress, puzzles and guardians use the shared kit below.
 
 ## Layout (29b)
 
@@ -21,6 +21,7 @@ against these ids.
 | Lanternmoss | Mossroot Hollow | 5-7 |
 | Emberfall | Cinder Warren | 6-8 |
 | Frostveil | Rimeglass Grotto | 6-8 |
+| Tidewhisper | Tideglass Cavern | 6-8 |
 
 Each cave has its own floor, wall and lantern colours. The pure rules (layout, walkable floor, which room a point is
 in) are `src/world/caveLayout.js`; the 3D rooms are `src/world/caves.js`.
@@ -100,6 +101,7 @@ builds them in the room frame, hands out their loot and keeps the progress.
 ![A shut chest and lit gloomquartz veins in a lantern-lit cave room](../../screenshots/world/cave-rewards.jpg)
 
 Since 29f all three original worlds' caves are released and reachable in normal play; see the rollout below.
+Tidewhisper's cave is configured in 29g; Duskhollow's cave awaits its 30i release gate.
 
 ## Puzzles, the warden and the way home (29e)
 
@@ -158,6 +160,16 @@ Each original world has a cave of its own, open to players. Everything that diff
 - **Its own warden.** Made elite by the same helper a planet's elites use — but it is **not** one of them: a warden
   carries no boss-summon sigil, so a cave is never a way around a lair's own conditions.
 - **Its own look.** Floor, wall and accent colours, and a lantern light colour of its own.
+
+### Tideglass Cavern (29g checkpoint)
+
+Tidewhisper's cave uses the shared room kit: 6-8 rooms, push stones and pressure plates, a shellback warden,
+shellbacks and wisps in ordinary rooms, teal lanterns, and Tidequartz veins. Tidequartz is cave-only and brews the
+existing Starwater potion with sweetleaf and sea salt. The entrance placement uses the existing high-tide dry-ground
+check, so its mouth remains usable at the tide crest. The complete route, Continue in the middle, distinct saved
+progress, and a real high-tide entrance are checked on the stage branch. Duskhollow's cave remains pending 30i.
+
+![Tideglass Cavern's teal lanterns and readable entrance room](../../screenshots/world/tidewhisper-cave.jpg)
 
 ### Adding a cave to a later world
 
@@ -220,13 +232,16 @@ target device, which remains pending — see [performance](../technical/performa
   lantern puzzle is played at 720p on Lanternmoss and a real stone push at 1080p on Emberfall; **E** opens the chest
   and turns the key; the guardian wakes, is beaten, and real **E** takes the way back. Nothing overflows, zero
   page/shader errors; it retakes the guardian shot above.
-- `node --test tests/caveRollout.test.mjs`: every original world has a released cave; each cave's ore is its own,
+- `node --test tests/caveRollout.test.mjs`: every released world has a released cave; each cave's ore is its own,
   mined nowhere else and used by a recipe; each palette, lantern colour, warden keepsake and roster is its own; a
   roster only uses kinds that already roam that world (so the released enemy set is unchanged) and fits the smallest
   cave its room range can generate; and no monster stands in the entrance, the puzzle room, the warden's room or on
   top of a chest or vein.
-- `node tests/sim/caveRollout.sim.mjs`: the whole of each of the three caves as a player walks it, mouth to warden to
+- `node tests/sim/caveRollout.sim.mjs`: the whole of each of the four caves as a player walks it, mouth to warden to
   the way home - the real "Enter" prompt, the room's own monsters fought and the room cleared, the world's own ore
   mined, a save and Continue in the middle, the world's own puzzle solved, the key through the ward, the warden
   beaten for its purse (and carrying no boss sigil), the way home, and out by the mouth; then that each world kept
-  its own cave record.
+  its own cave record. Tidewhisper's mouth also passes the high-tide dry-ground clearance check.
+- `node scripts/tide-cave-smoke.mjs` (Edge, port 8148): at high tide, the Tideglass mouth remains dry and real **E**
+  enters; at 720p and 1080p Low, lanterns keep the room readable within the cave draw budget and nothing overflows;
+  zero page/shader errors. It retakes the Tideglass screenshot above.

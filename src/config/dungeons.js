@@ -26,11 +26,11 @@
      CAVE_VEINS  the ore veins that only grow in caves (the mining fields of config/resources.js NODE_KINDS:
                  verb, tool, tier, hits, drops). Cave ore is found nowhere on the surface.
      CAVES     per planet: id (stable: room ids derive from it), name, released (the surface mouth only appears for
-               a released cave; 29f releases the original worlds' caves), seed salt, rooms [min, max] and colours,
+               a released cave), seed salt, rooms [min, max] and colours,
                its rewards: `ore` (a CAVE_VEINS kind), `veins` [min, max] per room, `chest` (a CHEST_KINDS kind
                for an ordinary room) and `endChest` (the end room's); and its way in to the end (29e): `puzzle`
                ('lanterns' or 'stones'), `guardian` (a COMBAT.enemies type, made into the cave's keeper) and
-               `guardianLoot` (a LOOT_TABLES id). 29f gives each world its own ore and roster.
+               `guardianLoot` (a LOOT_TABLES id). Each released world gets its own ore and roster.
    Room ids are `${cave.id}:r${n}`, numbered in generation order, so the same planet always builds the same cave. */
 export const CAVE = {
   cell: 16, corridor: 2.6, wallHeight: 3.4, darkness: 1,
@@ -45,7 +45,7 @@ export const CAVE = {
 };
 
 /* Cave ore: mined with a pickaxe, like a surface vein, but these kinds are never placed on a planet's surface
-   (config/resources.js owns those), so gloomquartz can only come out of a cave. */
+   (config/resources.js owns those), so each cave gem only comes from its cave. */
 export const CAVE_VEINS = {
   gloomVein: { name: 'Gloomquartz vein', verb: 'Mine', tool: 'pick', tier: 1, hits: 4, color: 0x9f8cff, glow: true,
     drops: [['gloomquartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
@@ -53,6 +53,8 @@ export const CAVE_VEINS = {
     drops: [['cinderquartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
   rimeVein: { name: 'Rimequartz vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, color: 0xbfe8ff, glow: true,
     drops: [['rimequartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
+  tideVein: { name: 'Tidequartz vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, color: 0x70dfd7, glow: true,
+    drops: [['tidequartz', [1, 2]], ['stone', [0, 1]]], r: 1.0 },
 };
 
 export const ROOM_KIT = {
@@ -81,4 +83,10 @@ export const CAVES = {
     puzzle: 'lanterns', guardian: 'hexlantern', guardianLoot: 'caveGuardian', guardianExtra: [['rimequartz', 3]],
     lantern: 0xbfe0ff,
     roster: [{ type: 'thornmole', count: 3 }, { type: 'hexlantern', count: 2 }, { type: 'goblin', count: 3 }] },
+  tidewhisper: { id: 'tidewhisper-cave', name: 'Tideglass Cavern', released: true, salt: 0x74de, rooms: [6, 8],
+    colors: { floor: 0x477c80, wall: 0x305868, accent: 0x70dfd7 },
+    ore: 'tideVein', veins: [1, 2], chest: 'common', endChest: 'rare',
+    puzzle: 'stones', guardian: 'shellback', guardianLoot: 'caveGuardian', guardianExtra: [['tidequartz', 3]],
+    lantern: 0x7ce6d9,
+    roster: [{ type: 'shellback', count: 4 }, { type: 'wisp', count: 3 }] },
 };

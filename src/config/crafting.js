@@ -94,6 +94,7 @@ export const RECIPES = [
   { id: 'gloomElixir', group: 'Potions', station: 'brew', result: 'restorativeElixir', needs: [['sweetleaf', 3], ['springWater', 2], ['gloomquartz', 1]] },
   { id: 'cinderElixir', group: 'Potions', station: 'brew', result: 'emberTonic', needs: [['sweetleaf', 3], ['springWater', 1], ['emberShard', 2], ['cinderquartz', 1]] },
   { id: 'rimeElixir', group: 'Potions', station: 'brew', result: 'glacialTonic', needs: [['sweetleaf', 3], ['springWater', 1], ['frostPetal', 2], ['rimequartz', 1]] },
+  { id: 'tideStarwater', group: 'Potions', station: 'brew', result: 'starwater', needs: [['sweetleaf', 1], ['seaSalt', 1], ['tidequartz', 1]] },
   { id: 'amethystBand', group: 'Trinkets', station: 'forge', result: 'amethystBand', needs: [['amethyst', 1], ['copperIngot', 1]], coins: 20, rarity: 'rare' },
   { id: 'emberRing', group: 'Trinkets', station: 'forge', result: 'emberRing', needs: [['emberShard', 5]], coins: 30, rarity: 'uncommon' },
   { id: 'opalBrooch', group: 'Trinkets', station: 'forge', result: 'opalBrooch', needs: [['fireOpal', 1], ['ironIngot', 1]], coins: 30, rarity: 'rare' },

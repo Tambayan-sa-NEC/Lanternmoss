@@ -6,6 +6,7 @@ styles/main.css            all styling
 scripts/serve.mjs          zero-dependency dev server
 scripts/screenshots.mjs    retakes the README screenshots (headless Chrome)
 scripts/shots.mjs          which folder of docs/screenshots/ each screenshot belongs in
+scripts/tide-cave-smoke.mjs  high-tide Tidewhisper cave entry, Low render budget, 720p/1080p and feature shot
 scripts/save-smoke.mjs     checks real browser save/reload/export/import; retakes save-menu screenshots
 docs/screenshots/          the README screenshots, one folder per subject (characters, mobs, huds...)
 docs/logs/                 timestamped decisions, tasks, actions and verification
@@ -52,7 +53,7 @@ src/
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
 │   ├── talents.js         talent points, the reset wizard and each hero's tree (Witch, Warrior and Ranger)
-│   ├── dungeons.js        caves: the room kit, cave rules and each planet's (unreleased) cave
+│   ├── dungeons.js        caves: the room kit, cave rules and each planet's release-gated cave
 │   └── critters.js        ambient animal looks
 ├── core/
 │   ├── Game.js            startup order, per-frame update order, run lifecycle (begin / reset)

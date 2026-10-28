@@ -1,0 +1,9 @@
+# TODO 29g: expansion cave rollout
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 00:43 | PLAN | TODO 29g | Started the expansion cave stage | feat/todo-29g | Fetched remotes; `develop` was clean and up to date. Created a fresh `feat/todo-29` parent from `develop` and this stage branch. Tidewhisper is released, while 30i remains an incomplete checkpoint on `feat/todo-30i`; Duskhollow stays unreleased. | 0h 02m |
+| 2026-10-29 01:01 | DECISION | TODO 29g | Keep 29g open for Duskhollow | feat/todo-29g | Configure the released Tidewhisper world now and checkpoint this branch. Rejected enabling Duskhollow early or building its cave on the incomplete 30i checkpoint: its release gate and content are absent from `develop`. No stage merge to the TODO parent yet. | 0h 18m |
+| 2026-10-29 01:01 | FEATURE | TODO 29g | Added Tideglass Cavern | feat/todo-29g | Added Tidequartz vein and an existing Starwater potion recipe, coastal roster, shellback warden, teal lanterns and screenshot. Reused high-water-safe mouth placement and shared puzzle/guardian/reward kit. Reviewed the screenshot and hid HUD clutter on the retake. | 0h 18m |
+| 2026-10-29 01:01 | TEST | TODO 29g | Checked Tideglass and the full project | feat/todo-29g | `npm test`: 282 passed; `npm run sim`: 63 passed including all four cave routes and Continue; Tide cave smoke: high-tide E entry, readable Low 720p/1080p, draw budget and zero errors. Initial 180k-triangle smoke failure read a stale surface frame; fixed by capturing a fresh cave frame. Screenshot tour: `errors: none` with Edge after default Chrome was unavailable. Unrelated retakes restored. | 0h 12m |
+| 2026-10-29 01:01 | DOCS | TODO 29g | Updated cave roadmap and wiki | feat/todo-29g | Recorded the Tidewhisper checkpoint, pending Duskhollow dependency, feature tour image, check instructions and file map. TODO 29g remains unchecked. | 0h 01m |

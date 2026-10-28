@@ -13,18 +13,18 @@ import { PLANET_CATALOG, PLANETS } from '../src/config/planets.js';
 import { releasedEnemyTypes } from '../src/config/releasedEnemies.js';
 import { caveEnding, caveFixtures, caveMonsters, generateCave } from '../src/world/caveLayout.js';
 
-const ORIGINALS = ['lanternmoss', 'emberfall', 'frostveil'];
+const ROLLOUT = ['lanternmoss', 'emberfall', 'frostveil', 'tidewhisper'];
 const item = id => ITEM_DEFINITIONS.find(d => d.id === id);
 const planetOf = key => PLANET_CATALOG.find(p => p.id === key);
-const entries = () => ORIGINALS.map(key => ({ key, cave: CAVES[key], planet: planetOf(key) }));
+const entries = () => ROLLOUT.map(key => ({ key, cave: CAVES[key], planet: planetOf(key) }));
 
-test('every original world has a released cave, and only those worlds do', () => {
+test('the four released worlds have caves, while unreleased Duskhollow does not', () => {
   for (const { key, cave, planet } of entries()) {
     assert.ok(cave, `${key} has a cave`);
     assert.equal(cave.released, true, `${cave.id} is released`);
     assert.equal(planet.released, true, `${key} itself is a released world`);
   }
-  assert.deepEqual(Object.keys(CAVES).sort(), [...ORIGINALS].sort(), 'no cave is configured for an unreleased world yet');
+  assert.deepEqual(Object.keys(CAVES).sort(), [...ROLLOUT].sort(), 'no cave is configured for an unreleased world yet');
 });
 
 test('each cave has an ore of its own, mined nowhere else, and worth carrying home', () => {
@@ -44,7 +44,7 @@ test('each cave has an ore of its own, mined nowhere else, and worth carrying ho
       assert.ok(RECIPES.some(r => r.needs.some(([i]) => i === id)), `${id} is used by a recipe`);
     }
   }
-  assert.equal(drops.size, ORIGINALS.length, 'one distinct gem per cave');
+  assert.equal(drops.size, ROLLOUT.length, 'one distinct gem per cave');
 });
 
 test('each cave looks like its own place', () => {

@@ -1486,6 +1486,11 @@ dependency for 29g; the failing Tidewhisper hardware timing matrix remains a pub
 `develop`, 29g still waits on 30i, which is not built. The cave-specific Tidewhisper/Duskhollow rollout does not
 change either world's release flag by itself.
 
+**29g checkpoint (2026-10-29):** Tidewhisper's Tideglass Cavern is configured on the stage branch with its own
+Tidequartz ore, Starwater recipe, shellback warden, coastal roster, teal lanterns and a high-tide-safe mouth. The
+complete path and saved progress pass the cave rollout simulation; the 720p/1080p low-quality browser check passes.
+The stage remains open: 30i has not passed its release gate, so Duskhollow is still unavailable for its cave rollout.
+
 **29a implemented (2026-10-16):** `src/render/lighting.js` (`RENDER.localLight`): light radii in every toon shader
 (patched on the material prototype, grass and kelp chained), up to 8 spots for the nearest sources, toon-banded and
 scaled by a place's darkness, so the surface (darkness 0) is unchanged; a minimum ambient keeps the dark readable; a

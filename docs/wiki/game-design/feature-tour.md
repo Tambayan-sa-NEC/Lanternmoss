@@ -291,6 +291,12 @@ Duskhollow and the secret Moon remain unavailable. See [Tidewhisper](../world/ti
 
 ![The portal offers Tidewhisper after Frostveil](../../screenshots/huds/tidewhisper-portal.jpg)
 
+**A cave under the tide.** Tideglass Cavern opens from a dry spot even at high tide. Teal lanterns lead through
+stone plates and Tidequartz veins to a shellback warden. The ore brews Starwater; cave progress survives Continue.
+See [caves](../world/caves.md#tideglass-cavern-29g-checkpoint).
+
+![Tideglass Cavern's lantern-lit entrance](../../screenshots/world/tidewhisper-cave.jpg)
+
 **A companion for the coast.** Completing The Dark Lighthouse unlocks an
 otter. When a clam bed lies below the tide, Pearl Dive brings back one pearl, up to twice a day. The otter joins the
 other pets in the menu and follows the same commands. See [Tidewhisper](../world/tidewhisper.md#pearl-diving-otter-27i).
