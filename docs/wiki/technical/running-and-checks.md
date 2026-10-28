@@ -198,6 +198,14 @@ presses the hero's carried light in. It captures `bosses/duskhollow-umbra.jpg` a
 nothing is lit, the shadelings the wingbeat calls, a drained lantern that never lights again, all three heroes
 lighting the bait, an empty lantern never walling the fight off, and a faint and a Continue both putting it back.
 
+`node scripts/duskhollow-campaign-smoke.mjs` owns port 8147 and exercises the candidate's real fifth-world portal,
+the Old Road moonwells through real `E` input, Wick's oil reward and Umbra gate, and Continue. It runs at Low with
+the beetle accessibility setting on, checks 720p and 1080p bounds, and requires zero page/shader errors.
+`node scripts/duskhollow-performance.mjs --output <path>` owns port 8145. It records the three heroes, seeds 1/7 and
+village/night/spore-drift scenes at 1080p High on the Acer RTX 4050. The default is diagnostic; `--release` requires
+a clean committed released catalog and passing reference frame/count budgets before writing
+`docs/releases/duskhollow.json`. Run it alone, without suites or screenshot work competing for the GPU.
+
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High
 on the owner's Acer RTX 4050 reference (the collector requests the high-performance GPU).

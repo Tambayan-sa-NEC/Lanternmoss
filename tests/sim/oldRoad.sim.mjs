@@ -131,7 +131,7 @@ try {
   const coins = P.coins;
   Quests.stepLineFor(wick()); step(0.1);
   assert.equal(Quests.st('oldRoad').status, 'done');
-  assert.equal(P.coins, coins + 140);
+  assert.equal(P.coins, coins + 75);
   assert.equal(H.inventory.count('lumenOil'), 2);
 
   assert.deepEqual(conditions(), { level: false, quest: true }, 'the quest alone is not enough');

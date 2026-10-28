@@ -25,7 +25,7 @@ export const QUESTS = {
       {kind:'light',count:3,text:'Relight the three moonwells on the Old Road'},
       {kind:'talk',to:'Wick',text:'Tell Wick the moonwells are lit',say:'Three wells burning and a road you can walk at any hour. That is the hollow put right.'},
     ],
-    reward:{coins:140,xp:200,items:[['lumenOil',2]]},
+    reward:{coins:75,xp:200,items:[['lumenOil',2]]},
     text:{offer:'The Old Road runs out to three moonwells and every lamp on it is dark. Carry the village flame out and light them for me?',
       accept:'Take fire at the brazier. Keep ahead of it: a flame that gutters out means walking back to the last lamp you lit.',
       decline:'The dark has waited this long. It can wait for you.',

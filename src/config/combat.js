@@ -92,7 +92,7 @@ export const COMBAT = {
     // A Mosslurk is scenery until something reaches for it: triggerRange = walking this close springs it anyway;
     // pickReach = how close the "Pick the glowcap patch" prompt appears. The wind-up and its warning circle are what
     // keep the ambush fair.
-    mosslurk:  { ai: 'mimic', color: 0x6a4a7a, capColor: 0x9ff0ff, hp: 105, speed: 2.6, radius: 0.5, height: 1.1,
+    mosslurk:  { ai: 'mimic', color: 0x6a4a7a, capColor: 0x9ff0ff, hp: 80, speed: 2.6, radius: 0.5, height: 1.1,
                  aggro: 7, leash: 14, turnRate: 5, range: 1.8, damage: 13, windup: 0.6, windupTurn: 5, recover: 0.7,
                  cooldown: 1.8, knockback: 6, triggerRange: 1.2, pickReach: 2.2, knockResist: 0.4, telegraph: true,
                  respawn: 55, xp: 24 },
@@ -152,7 +152,7 @@ export const COMBAT = {
     // is three rounds of burn-the-anchors and fight-her-down. She wears the same spider/beetle pair as her
     // grandchildren (config/settings.js roundBeetles), and she guards the moonstone vein (config/resources.js).
     grandweaver:{ ai: 'boss', behavior: 'grandweaver', miniBoss: true, name: 'Grandmother Gloomweaver, Keeper of the Moonstone',
-                 color: 0x4a3c68, capColor: 0xe8d0ff, hp: 760, speed: 2.4, radius: 1.4, height: 2.2, aggro: 15, leash: 22, turnRate: 2.4,
+                 color: 0x4a3c68, capColor: 0xe8d0ff, hp: 1300, speed: 2.4, radius: 1.4, height: 2.2, aggro: 15, leash: 22, turnRate: 2.4,
                  knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3,
                  telegraph: true, respawn: 0, xp: 175, cooldown: 1.2,
                  anchors: { count: 3, type: 'gloomAnchor', at: 6.5, hang: 6, drop: 1.1, dazed: 2.4 },
@@ -229,12 +229,12 @@ export const COMBAT = {
     // lantern, `shades` shadelings that come out of the dark, up to `maxShades`). From 50% she drinks light:
     // each `feed` drains one arena lantern for good and sheds scales that blind the hero (`fog`).
     umbra:     { ai: 'boss', behavior: 'umbra', name: 'Umbra, the Moth of the Last Light', color: 0x2f2746, capColor: 0xe8e0ff,
-                 hp: 3400, speed: 3.4, radius: 2.2, height: 3.0, hover: 5.5, aggro: 20, leash: 32, turnRate: 2.0,
+                 hp: 820, speed: 3.4, radius: 2.2, height: 3.0, hover: 5.5, aggro: 20, leash: 32, turnRate: 2.0,
                  knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.4,
                  telegraph: true, respawn: 0, xp: 240, cooldown: 1.3,
-                 lanterns: { count: 4, at: 11, oil: 12, relight: 4, type: 'arenaLantern' },
+                 lanterns: { count: 4, at: 11, oil: 8, relight: 4, type: 'arenaLantern' },
                  crash: { stun: 4.5, radius: 3.2, damage: 10, knockback: 8 },
-                 snuff: { oil: 35, shades: 2, maxShades: 4, type: 'shadeling' },
+                 snuff: { oil: 10, shades: 2, maxShades: 4, type: 'shadeling' },
                  feed: { fog: 7, blind: 0.45, drains: 1 },
                  attacks: {
                    dive:   { windup: 1.3, speed: 22, width: 2.6, damage: 22, knockback: 11, recover: 0.9, cooldown: 1.2 },

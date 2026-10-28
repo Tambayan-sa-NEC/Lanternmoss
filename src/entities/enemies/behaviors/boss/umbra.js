@@ -10,8 +10,8 @@
      the snuff  her wingbeat (gust) puts every arena lantern out and takes `snuff.oil` from your tank. In the dark
                 that leaves, shadelings come out of the hollows (up to `snuff.maxShades`), and a snuffed lantern
                 needs a moment before it can be lit again.
-     drinking   from 50% she drinks light: each feed drains one arena lantern **for good**, so the arena really does
-                get darker, and the scales she sheds hang on the hero as a fog that presses their own light in
+     drinking   from 50% she drinks light: each feed drains one arena lantern **for good**, leaving one usable bait
+                lantern so the crash counter remains possible. The scales she sheds press the hero's light in
                 (`feed.fog` seconds at `feed.blind`).
    Arena ring: pale moonfire (ARENA_WALLS.moonfire). Trophy: the Dusk Crown.
    Nothing here can leave the hero unable to act: an empty lantern still lights nothing, but she is still beatable -
@@ -98,6 +98,7 @@ const MOVES = {
   /** The dive: at the nearest burning arena lantern, or at the hero when nothing is lit. */
     dive: {
       ready: e => !isCrashed(e),
+      weight: e => litLamps(e).length ? 3 : 1,
       begin(e) {
         const target = brightest(e);
         e.diveAt = target.lamp ?? null;
@@ -165,7 +166,7 @@ const MOVES = {
     /** From 50%: she drinks a lantern dry and sheds the scales that blind you. */
     drink: {
       ready: e => !isCrashed(e) && e.bossPhase >= 1,
-      weight: e => (litLamps(e).length ? 3 : 1),
+      weight: e => (litLamps(e).length ? 1.5 : 1),
       windup(e, dt, k) {
         e.body.scale.setScalar(1 + 0.12 * k);
         if (k > 0.5 && (e.drinkT = (e.drinkT ?? 0) - dt) <= 0) {
@@ -176,7 +177,9 @@ const MOVES = {
       fire(e) {
         const F = e.def.feed;
         e.body.scale.setScalar(1);
-        const lit = litLamps(e), victim = lit[0] ?? lampsOf(e).find(l => !l.drained);
+        // Preserve one bait lantern: the fight's crash window must remain reachable after repeated feeds.
+        const available = lampsOf(e).filter(l => !l.drained);
+        const lit = litLamps(e), victim = available.length > 1 ? (lit[0] ?? available[0]) : null;
         for (let i = 0; i < F.drains && victim; i++) { drain(victim); e.drank++; break; }
         e.fogT = F.fog;
         toast(victim ? 'Umbra drinks a lantern dry: the ring is darker now.' : 'Umbra drinks the dark itself.');

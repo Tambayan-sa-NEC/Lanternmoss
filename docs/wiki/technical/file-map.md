@@ -236,6 +236,15 @@ Continue. `scripts/otter-smoke.mjs` checks the real pet menu and ability keys at
 The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` reports remain separate from new runs.
 The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.
 
+## Duskhollow release validation (30i in progress)
+
+`tests/sim/lib/duskhollowCandidate.mjs` substitutes the authored fifth world into the test catalog without changing
+its release flag. `tests/sim/pacing.sim.mjs` audits its XP, coin and minimum material route, while
+`tests/sim/balance.sim.mjs` drives all three heroes through its regular enemies and two bosses on seeds 1 and 7.
+`scripts/duskhollow-campaign-smoke.mjs` checks the candidate portal, Wick's Old Road quest and oil reward, Continue,
+Low quality and the beetle accessibility setting. `scripts/duskhollow-performance.mjs` collects the 18-row Acer
+matrix and only writes release evidence after all hardware budgets pass on clean, released source.
+
 `docs/tidewhisper-balance-20261017.json` is the clean-commit synchronization audit; the earlier balance JSON remains historical.
 `docs/tidewhisper-performance-acer-20261017.json` records the separate 18-case Acer Intel UHD diagnostic, not certification.
 `docs/tidewhisper-performance-acer-rtx4050-before-20261017.json` records the first 1080p High RTX 4050 reference

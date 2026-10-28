@@ -61,7 +61,7 @@
 | How many chests each planet has, its loot material | `src/config/planets/<id>.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
-| Frame-time target and per-world count ceilings (including Tidewhisper's 550 calls / 230,000 triangles) | `src/config/render.js` → `PERFORMANCE_BUDGET`; calibrated frame limit: `src/config/contentGate.js` → `frameLimitMs` |
+| Frame-time target and per-world count ceilings (Tidewhisper and Duskhollow: 550 calls / 230,000 triangles each) | `src/config/render.js` → `PERFORMANCE_BUDGET`; calibrated frame limit: `src/config/contentGate.js` → `frameLimitMs` |
 | Default desktop validation machine, GPU, viewport, quality and hero/seed/scene matrix | `src/config/render.js` → `PERFORMANCE_REFERENCE`; actual GPU/profile helpers are shared by the collector and content gate |
 | Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](lighting.md)) |
 | Duskhollow's endless dusk, canopy cover, lantern oil and light, and the glowmoss trail | `src/config/lantern.js` → `LANTERN` ([docs](../world/duskhollow.md)) |

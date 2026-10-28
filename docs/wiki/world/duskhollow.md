@@ -343,7 +343,7 @@ whole damage window. With nothing lit, the dive comes at you instead, and only h
 | --- | --- |
 | **Wingbeat** | A ring of wind that puts **every** arena lantern out, takes oil out of your tank, and calls shadelings out of the dark it leaves. A snuffed lantern needs a moment before it lights again |
 | **Blinding scales** | A fan of thrown scales, homing and painful |
-| **Drinking the light** | From half health: she drains one arena lantern **for good**, so the ring really does get darker as the fight goes on, and the scales she sheds hang on you as a fog that presses your own light in until it clears |
+| **Drinking the light** | From half health: she drains one arena lantern **for good**, leaving one usable bait lantern so the crash counter remains available. The scales she sheds hang on you as a fog that presses your own light in until it clears |
 
 So the fight is a running argument about light: you spend oil to keep something brighter than yourself burning, and
 she spends her wings putting it out.
@@ -379,10 +379,13 @@ Her trophy is the **Dusk Crown**.
 | `node scripts/dusk-boss-smoke.mjs` | In a real browser: she really hangs out of reach, real `W` walking up with a lit lantern really burns a strand through, an empty one does not, and the beetle toggle really swaps her and her grandchildren together |
 | `npm run sim -- duskUmbra` | The level-11 and quest gate, her lanterns standing dark, the dive at the hero when nothing is lit and into the lantern when something is, the crash window, the wingbeat's oil and shadelings, a drained lantern that never lights again, the fog and its clearing, all three heroes lighting the bait, an empty lantern never walling the fight off, and a faint and a Continue both putting the fight back |
 | `node scripts/dusk-umbra-smoke.mjs` | In a real browser: she wakes in the air inside her moonfire ring, real `E` lights an arena lantern for real oil, she really crashes into it, her wingbeat really empties the Oil bar, and her fog really presses the carried light in |
+| `node scripts/duskhollow-campaign-smoke.mjs` | On the candidate catalog at Low and 720p/1080p: portal travel, three moonwells lit with real `E`, Wick's oil reward and gate, Continue, and zero page/shader errors |
+| `node scripts/duskhollow-performance.mjs --output <path>` | Diagnostic 18-row Acer matrix at 1080p High; `--release` requires the actual released catalog, a clean commit and every timing/count budget before saving release evidence |
 
 ## Not built yet
 
-The campaign release (30i): the content gate, three-hero pacing, the end-to-end browser run, the lowest-preset and
-accessibility checks, performance and the affected tour screenshots. Duskhollow has its world, its people, its
-economy, all four regular monsters, its mini boss and its boss now - but it is still `released: false`, so it
-cannot be selected, generated or travelled to in normal play until that stage passes.
+The campaign release (30i) is in progress. The candidate portal, Old Road quest, oil reward and Continue pass a
+Low-preset browser run at both resolutions, and the minimum-yield XP, coin and material routes pass. The two-seed
+three-hero Umbra pacing and the Acer frame-time matrix still miss acceptance; the affected tour screenshots also
+remain to be retaken. Duskhollow stays `released: false` until those checks pass, so it cannot be selected,
+generated or travelled to in normal play.

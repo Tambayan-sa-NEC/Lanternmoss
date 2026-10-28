@@ -19,14 +19,16 @@ import { rollLoot } from '../../src/gameplay/loot.js';
 import { mulberry32 } from '../../src/utils/random.js';
 import { MINI_BOSS_LOOT } from '../../src/config/chests.js';
 import { installTidewhisperCandidate } from './lib/tidewhisperCandidate.mjs';
+import { installDuskhollowCandidate } from './lib/duskhollowCandidate.mjs';
 const items = new Map(ITEM_DEFINITIONS.map(d => [d.id, d]));
 const recipe = id => RECIPES.find(r => r.id === id);
 const sell = id => Math.max(1, Math.floor(items.get(id).value * SHOP.sellRate));
 const check = (ok, message) => { assert.ok(ok, message); console.log(`PASS  ${message}`); };
 const mean = v => Array.isArray(v) ? (v[0] + v[1]) / 2 : v;
 
-// The audit continues through the unreleased fourth world (TODO 27h) with its real id, index and scaling.
-const candidate = installTidewhisperCandidate();
+// The audit includes the fifth-world candidate with its real id, index and scaling before release.
+const tideCandidate = installTidewhisperCandidate();
+const duskCandidate = installDuskhollowCandidate();
 for (const hero of ['witch', 'knight', 'ranger']) {
   let state = { level: 1, xp: 0 };
   for (const [p, planet] of PLANETS.entries()) {
@@ -69,7 +71,8 @@ for (const hero of ['witch', 'knight', 'ranger']) {
   }
 }
 const tide = PLANETS.find(p => p.id === 'tidewhisper');
-candidate.restore();
+const dusk = PLANETS.find(p => p.id === 'duskhollow');
+duskCandidate.restore(); tideCandidate.restore();
 
 // Tidewhisper materials: washups return once per day (300 s), low-tide nodes are reachable once per day, the black
 // pearl bed regrows slower than a visit. Minimum yields only: the lens fits the first day, lens + Tide set two days.
@@ -87,6 +90,35 @@ candidate.restore();
   const yieldOf = (item, days) => (daily.get(item) ?? 0) * days + (once.get(item) ?? 0);
   for (const [item, n] of lens) check(yieldOf(item, 1) >= n, `Tidewhisper lens: ${n} ${item} within one day's minimum yield (${yieldOf(item, 1)})`);
   for (const [item, n] of need) check(yieldOf(item, 2) >= n, `Tidewhisper lens + Tide set: ${n} ${item} within two days' minimum yield (${yieldOf(item, 2)})`);
+}
+
+// Duskhollow's full Dusk set: ordinary veins regrow within a day, the guarded moonstone is a first-visit reward,
+// and the silk comes from placed forage, Grandmother's fixed drop and two cut webs (minimum one each).
+{
+  const gear = BALANCE.budgets[4].map(id => recipe(id));
+  const need = new Map(), add = (id, n) => need.set(id, (need.get(id) ?? 0) + n);
+  for (const r of gear) for (const [id, n] of r.needs) add(id, n);
+  const ingots = need.get('lumenIngot');
+  add('lumenOre', ingots * recipe('lumenIngot').needs.find(([id]) => id === 'lumenOre')[1]);
+  const fuel = ingots * recipe('lumenIngot').fuel + gear.reduce((n, r) => n + (r.fuel ?? 0), 0);
+  const charcoal = recipe('charcoal');
+  add('wood', Math.ceil(fuel / (FUEL.charcoal * charcoal.qty)) * charcoal.needs.find(([id]) => id === 'wood')[1]);
+  const low = qty => Array.isArray(qty) ? qty[0] : qty;
+  const nodes = new Map();
+  for (const [kind, count] of [...dusk.resources.nodes, ...dusk.resources.rare])
+    for (const [id, qty] of NODE_KINDS[kind].drops) nodes.set(id, (nodes.get(id) ?? 0) + low(qty) * count);
+  const forage = new Map(dusk.forage.map(({ item, count }) => [item, count]));
+  const fixed = new Map(MINI_BOSS_LOOT.extra.grandweaver);
+  check((nodes.get('lumenOre') ?? 0) * 3 >= need.get('lumenOre'),
+    `Duskhollow: ${need.get('lumenOre')} lumen ore within three minimum-yield vein cycles`);
+  check((nodes.get('lumenDust') ?? 0) >= need.get('lumenDust') + recipe('lumenOil').needs.find(([id]) => id === 'lumenDust')[1],
+    `Duskhollow: ${need.get('lumenDust')} dust for the set and one refill on the first visit`);
+  check((forage.get('spiderSilk') ?? 0) + (fixed.get('spiderSilk') ?? 0) + 2 * low(COMBAT.enemies.gloomweb.silk[1]) >= need.get('spiderSilk'),
+    `Duskhollow: ${need.get('spiderSilk')} silk from forage, Grandmother and two cut webs`);
+  check((nodes.get('moonstone') ?? 0) + (fixed.get('moonstone') ?? 0) >= need.get('moonstone'),
+    'Duskhollow: a guarded moonstone is available on the first visit');
+  check((nodes.get('wood') ?? 0) >= need.get('wood'),
+    `Duskhollow: ${need.get('wood')} wood fuels the smelting and forging through charcoal`);
 }
 
 for (const stock of SHOP.stock) {

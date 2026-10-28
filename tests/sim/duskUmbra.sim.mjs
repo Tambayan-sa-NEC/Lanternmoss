@@ -137,6 +137,16 @@ try {
   assert.ok(lit > 0);
   pass(`from half health she drinks a lantern dry for good and fogs the hero for ${U.feed.fog}s`);
 
+  // Repeated feeds must leave a usable bait lantern for the crash counter.
+  while (lampsOf(b).filter(l => !isDrained(l)).length > 1) { cast(b, 'drink'); live(0.2); }
+  const lastBait = lampsOf(b).find(l => !isDrained(l));
+  cast(b, 'drink'); live(0.2);
+  assert.equal(lampsOf(b).filter(l => !isDrained(l)).length, 1, 'repeated feeds leave one bait lantern');
+  lastBait.relightT = 0; lamp().refill(1e6);
+  assert.ok(lightLampAt(lastBait), 'the final lantern can still be lit after repeated feeds');
+  lastBait.lit = false;
+  pass('repeated feeds leave one usable bait lantern for the crash counter');
+
   // ---- the fight is still winnable in the dark, for every hero -------------------------------------------------------
   lamp().burn(1e6);
   for (const l of lamps()) if (isLit(l)) l.lit = false;

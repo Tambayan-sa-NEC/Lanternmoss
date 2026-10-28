@@ -29,6 +29,7 @@ export const PERFORMANCE_BUDGET = {
     emberfall: { calls: 900, triangles: 280000 },
     frostveil: { calls: 850, triangles: 280000 },
     tidewhisper: { calls: 550, triangles: 230000 }, // Retained through the owner-approved Acer reference change; 27h must fit them.
+    duskhollow: { calls: 550, triangles: 230000 }, // Diagnostic peaks: 506 calls / 196,486 triangles across all 18 scenes.
   },
   // A cave room is a far smaller scene than a planet's surface (measured 196-240 calls and 4.9k-6.2k triangles at
   // high across the three caves, TODO 29f). This is a regression guard with room to spare, not a target: it catches
