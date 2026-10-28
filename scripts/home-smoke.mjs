@@ -47,7 +47,7 @@ try {
   await enter(); await menu(); await page.screenshot({ path: shotPath('home-claim'), type: 'jpeg', quality: 85 });
   await page.keyboard.press('Tab'); await page.keyboard.press('Space');
   assert.ok(await page.evaluate(() => window.LANTERNMOSS.Home.state.claimed));
-  assert.equal(await page.$$eval('[data-home-action="place"]:disabled', buttons => buttons.length), 5);
+  assert.equal(await page.$$eval('[data-home-action="place"]:disabled', buttons => buttons.length), 6);   // every furnishing, the pet basket (TODO 35) included
   await page.keyboard.press('Escape');
   // Leave using the actual door interaction (do not press Escape again and open the pause menu).
   await page.evaluate(async () => { const { Houses } = await import('/src/gameplay/Houses.js'); const s = Houses.inside;

@@ -7,9 +7,9 @@ export const BUILDING = { limit: 256, reach: 2.6, range: 8, grid: 1, storageSlot
 export const PLACEABLES = {
   ...STRUCTURE_ITEMS,
   ...Object.fromEntries(Object.entries(FURNISHINGS).map(([id, f]) => [id, { ...f,
-    radius: { bed: 1.25, table: 1.35, rug: 1.6, lamp: 0.35, plant: 0.48 }[f.kind],
-    solid: { bed: 1.05, table: 1.15, rug: 0, lamp: 0.3, plant: 0.45 }[f.kind],
-    height: { bed: 0.9, table: 1.05, rug: 0.1, lamp: 1.9, plant: 1 }[f.kind], furniture: f.kind }])),
+    radius: { bed: 1.25, table: 1.35, rug: 1.6, lamp: 0.35, plant: 0.48, petBed: 0.7 }[f.kind],
+    solid: { bed: 1.05, table: 1.15, rug: 0, lamp: 0.3, plant: 0.45, petBed: 0.6 }[f.kind],
+    height: { bed: 0.9, table: 1.05, rug: 0.1, lamp: 1.9, plant: 1, petBed: 0.45 }[f.kind], furniture: f.kind }])),   // (a pet basket outdoors is only decoration: pets rest in the cottage)
   gardenFence: { name: 'Garden Fence', description: 'A wooden rail fence. Rotate it before placing.', art: 'fence', color: 0xb0703a,
     needs: [['wood', 3]], station: 'workbench', radius: 0.95, solid: 0.2, height: 0.85, fence: true },
   stonePath: { name: 'Stepping Stone', description: 'A walk-through path tile for your garden.', art: 'path', color: 0xe2cfbd,

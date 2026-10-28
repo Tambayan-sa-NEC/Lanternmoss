@@ -5,9 +5,13 @@
    It also remembers which pet each hero last took (./petPicks.js: localStorage, kept across adventures): picking a hero
    brings that pet back if it's unlocked in this adventure, otherwise the hero's own.
    The body asks Pets what to do (mode, stay spot, damage); Pets tells the body to show / hide and to celebrate.
-   Unlocks come from game events: a quest finished, a chest opened (core/events.js). */
+   Unlocks come from game events: a quest finished, a chest opened (core/events.js).
+   Care (TODO 35, config/pets.js PET_FOOD / PET_FINDS / PET_BED): feeding from the pet menu (a favourite makes it Happy:
+   more damage for a while), a pet fed today sometimes brings back a find, an outfit per pet (worn on its head,
+   models/vanity.js dressPet; the item leaves the bag while worn), and the cottage pet basket where it rests and heals
+   (`resting`, set by the cottage while you are home). */
 import { CHARACTERS } from '../config/characters.js';
-import { PET_CARE, PET_COMMANDS, PET_LEVELS, PET_SWAP, PETS, petAvailable, availablePetIds } from '../config/pets.js';
+import { PET_BED, PET_CARE, PET_COMMANDS, PET_FAVOURITES, PET_FINDS, PET_FOOD, PET_LEVELS, PET_SWAP, PETS, petAvailable, availablePetIds, petEdible } from '../config/pets.js';
 import { ctx } from '../core/context.js';
 import { peaceful, pointOf, distance } from '../combat/space.js';
 import { emit, gameEvents } from '../core/events.js';
@@ -17,15 +21,20 @@ import { WalkingPet } from '../entities/companions/WalkingPet.js';
 import { floatText } from '../fx/combatFx.js';
 import { emote } from '../fx/emotes.js';
 import { sparkles } from '../fx/sparkles.js';
-import { levelEvents } from '../progression/experience.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
+import { dressPet } from '../models/vanity.js';
+import { gainXp, levelEvents } from '../progression/experience.js';
 import { encounterEvents } from '../combat/events.js';
 import { audio } from '../systems/AudioSystem.js';
 import { showBanner } from '../ui/banner.js';
 import { toast } from '../ui/toast.js';
-import { mpick } from '../utils/random.js';
+import { mpick, rng } from '../utils/random.js';
 
 import { PET_ABILITIES, petEffects, resetPetAbilities, updatePetAbilities } from './petAbilities.js';
+import { dayClock } from './dayClock.js';
 import { loadPicks, savePicks } from './petPicks.js';
+import { grantItem } from './pickups.js';
+import { gainCoins } from './wallet.js';
 
 const STARTERS = Object.keys(PETS).filter(id => !PETS[id].unlock);
 const MODES = Object.keys(PET_COMMANDS);
@@ -36,6 +45,9 @@ export const Pets = {
   unlocked: new Set(STARTERS), active: null, names: {}, mode: 'follow', stayDir: null, picks: loadPicks(),
   hp: null, hpFor: null, faintT: 0, hurtAt: -99, abilityCd: 0, petCool: 0, swapCool: 0,
   diveDay: 0, divesToday: 0,
+  // care (TODO 35): meals eaten today per pet, the Happy timer of the pet that's out, today's finds, outfits worn
+  fedDay: 0, fed: {}, happyT: 0, findDay: 0, findsToday: 0, findT: PET_FINDS.interval, outfits: {},
+  resting: false,        // in the cottage pet basket right now (the cottage sets it; never saved)
   presenting: false,     // a menu is showing the pet off: it comes round in front of the hero (PET_SHOWCASE)
 
   toJSON() {
@@ -43,11 +55,14 @@ export const Pets = {
     return { unlocked: [...this.unlocked], active: this.id, names: { ...this.names }, mode: this.mode,
       stayDir: this.mode === 'stay' ? stay?.toArray() ?? null : null, hp: this.hp, faintT: this.faintT, hurtAt: this.hurtAt,
       abilityCd: this.abilityCd, petCool: this.petCool, swapCool: this.swapCool, diveDay: this.diveDay,
-      divesToday: this.divesToday, mend: petEffects.mend ? { ...petEffects.mend } : null };
+      divesToday: this.divesToday, mend: petEffects.mend ? { ...petEffects.mend } : null,
+      fedDay: this.fedDay, fed: { ...this.fed }, happyT: this.happyT, findDay: this.findDay, findsToday: this.findsToday,
+      findT: this.findT, outfits: { ...this.outfits } };
   },
   load(data) {
-    const { unlocked, stayDir, mend, ...state } = data;
+    const { unlocked, stayDir, mend, fed, outfits, ...state } = data;
     Object.assign(this, state); this.unlocked = new Set(unlocked); this.hpFor = this.id;
+    this.fed = { ...(fed ?? {}) }; this.outfits = { ...(outfits ?? {}) }; this.resting = false;
     this.hp = Math.min(this.maxHp(), this.hp); this.presenting = false;
     resetPetAbilities(); petEffects.mend = mend;
     this.spawn();
@@ -66,7 +81,10 @@ export const Pets = {
     return own ? own.companionName.split(' ')[0] : PETS[id].defaultName;
   },
   maxHp(id = this.id) { return PETS[id].hp + PET_LEVELS.hpPerLevel * (this.level - 1); },
-  damage(id = this.id) { return Math.round(PETS[id].attack.damage * (1 + PET_LEVELS.damagePerLevel * (this.level - 1))); },
+  damage(id = this.id) {
+    const happy = id === this.id && this.happyT > 0 ? 1 + PET_FOOD.happyDamage : 1;   // a favourite meal (TODO 35)
+    return Math.round(PETS[id].attack.damage * (1 + PET_LEVELS.damagePerLevel * (this.level - 1)) * happy);
+  },
   /** Scales an ability's numbers with the pet's level too. */
   power() { return 1 + PET_LEVELS.damagePerLevel * (this.level - 1); },
 
@@ -79,6 +97,7 @@ export const Pets = {
     const Body = this.def.body === 'fly' ? FlyingPet : WalkingPet;
     ctx.companion = new Body(this.id);
     ctx.companion.setVisible(!this.fainted && !peaceful());
+    this.dress();
     if (this.mode === 'stay') this.stayDir = pointOf(ctx.companion).clone();   // a new place: wait here instead
     return ctx.companion;
   },
@@ -174,6 +193,75 @@ export const Pets = {
     toast(mpick(PET_LINES).replace('{name}', this.nameOf()));
   },
 
+  // ---------------------------------------------------------------- care (TODO 35)
+  /** Meals pet `id` has eaten today. */
+  meals(id = this.id) { return this.fedDay === dayClock.day ? this.fed[id] ?? 0 : 0; },
+  isFavourite(itemId, id = this.id) { return (PET_FAVOURITES[id] ?? []).includes(itemId); },
+  /** Why the pet that's out can't eat `itemId` right now, or null. */
+  feedProblem(itemId) {
+    const def = itemRegistry.get(itemId);
+    if (!ctx.companion || ctx.player.dead) return 'Your pet is not with you.';
+    if (this.fainted) return `${this.nameOf()} is resting.`;
+    if (!petEdible(def)) return `${this.nameOf()} won't eat that.`;
+    if (!ctx.player.inventory.count(itemId)) return `You have no ${def.name}.`;
+    if (this.meals() >= PET_FOOD.perDay) return `${this.nameOf()} is full. Try again tomorrow.`;
+    return null;
+  },
+  /** Feeds the pet that's out one `itemId` from the bag: a little XP, some health, and a favourite makes it Happy. */
+  feed(itemId) {
+    const problem = this.feedProblem(itemId);
+    if (problem) { toast(problem); audio.fizzle(); return { ok: false, message: problem }; }
+    ctx.player.inventory.remove(itemId, 1);
+    const fav = this.isFavourite(itemId), pet = ctx.companion, name = itemRegistry.get(itemId).name;
+    if (this.fedDay !== dayClock.day) { this.fedDay = dayClock.day; this.fed = {}; }
+    this.fed[this.id] = (this.fed[this.id] ?? 0) + 1;
+    this.heal(this.maxHp() * PET_FOOD.heal);
+    gainXp(fav ? PET_FOOD.favouriteXp : PET_FOOD.likedXp);
+    if (fav) this.happyT = PET_FOOD.happySeconds;
+    emote(pet, 'heart', fav ? '#ff6b9a' : undefined); pet.celebrate?.(); (pet.voice ?? audio.chirp).call(audio);
+    const message = fav ? `${this.nameOf()} loves ${name}! Happy: +${Math.round(PET_FOOD.happyDamage * 100)}% damage for ${PET_FOOD.happySeconds}s.`
+      : `${this.nameOf()} munches the ${name} happily.`;
+    toast(message);
+    return { ok: true, favourite: fav, message };
+  },
+  /** Fed today: a well-fed pet goes looking for things while you explore. */
+  get wellFed() { return this.meals() > 0; },
+  /** One try at a find: something off the table, at most PET_FINDS.perDay a day. Returns what it found, or null. */
+  tryFind() {
+    if (this.findDay !== dayClock.day) { this.findDay = dayClock.day; this.findsToday = 0; }
+    if (!this.wellFed || this.findsToday >= PET_FINDS.perDay || rng() >= PET_FINDS.chance) return null;
+    const total = PET_FINDS.table.reduce((n, [, w]) => n + w, 0);
+    let r = rng() * total, pick = PET_FINDS.table[0];
+    for (const row of PET_FINDS.table) if ((r -= row[1]) <= 0) { pick = row; break; }
+    const [what, , [lo, hi]] = pick, qty = lo + Math.floor(rng() * (hi - lo + 1)), pet = ctx.companion;
+    this.findsToday++;
+    if (what === 'coins') gainCoins(qty, pet?.pos ?? null);
+    else grantItem(what, qty);
+    if (pet) { emote(pet, '!', '#ffd36b'); pet.celebrate?.(); }
+    audio.sparkle();
+    toast(`${this.nameOf()} found ${what === 'coins' ? `${qty} coins` : `${qty > 1 ? `${qty}x ` : ''}${itemRegistry.get(what).name}`}!`);
+    return { what, qty };
+  },
+  /** The outfit pet `id` has on (an item definition), or null. */
+  outfitOf(id = this.id) { return this.outfits[id] ? itemRegistry.get(this.outfits[id]) ?? null : null; },
+  /** Puts outfit `itemId` on pet `id` from the bag (whatever it wore goes back), or takes it off with null. */
+  wear(itemId, id = this.id) {
+    const inv = ctx.player.inventory, old = this.outfits[id] ?? null;
+    if (itemId === old) return { ok: true };
+    if (!this.unlocked.has(id)) return { ok: false, message: 'Find that pet first.' };
+    if (itemId && !itemRegistry.get(itemId)?.props?.petOutfit) return { ok: false, message: 'That is not a pet outfit.' };
+    if (itemId && !inv.count(itemId)) return { ok: false, message: 'Craft that outfit first.' };
+    if (old && !itemId && inv.spaceFor(old) < 1) return { ok: false, message: 'Make room in the bag first.' };
+    if (itemId) inv.remove(itemId, 1);
+    if (old) inv.add(old, 1);
+    if (itemId) this.outfits[id] = itemId; else delete this.outfits[id];
+    if (id === this.id) { this.dress(); if (ctx.companion) { emote(ctx.companion, 'heart'); ctx.companion.celebrate?.(); } }
+    audio.blip();
+    return { ok: true };
+  },
+  /** Draws the outfit of the pet that's out on its body. */
+  dress() { if (ctx.companion) dressPet(ctx.companion, this.id, this.outfitOf()); },
+
   // ---------------------------------------------------------------- unlocking
   unlock(id) {
     if (!petAvailable(id) || this.unlocked.has(id)) return false;
@@ -185,8 +273,16 @@ export const Pets = {
 
   update(dt) {
     this.abilityCd = Math.max(0, this.abilityCd - dt); this.petCool = Math.max(0, this.petCool - dt); this.swapCool = Math.max(0, this.swapCool - dt);
-    if (this.fainted) { if ((this.faintT -= dt) <= 0) { if (peaceful()) this.faintT = 0.01; else this.revive(); } }   // (back outside, not in a room)
+    this.happyT = Math.max(0, this.happyT - dt);
+    const rest = this.resting ? PET_BED.faintRate : 1;                 // the cottage pet basket: a quicker rest
+    if (this.fainted) { if ((this.faintT -= dt * rest) <= 0) { if (peaceful()) this.faintT = 0.01; else this.revive(); } }   // (back outside, not in a room)
+    else if (this.resting && this.hp !== null) this.heal(this.maxHp() * PET_BED.heal * dt);
     else if (this.hp !== null && ctx.time - this.hurtAt > PET_CARE.regenDelay) this.heal(PET_CARE.regen * dt);
+    // a well-fed pet out exploring with you, between fights, sometimes brings something back
+    const pet = ctx.companion;
+    if (this.wellFed && pet?.visible && !this.fainted && !peaceful() && !ctx.player.dead && this.mode !== 'stay' && !pet.busy && (this.findT -= dt) <= 0) {
+      this.findT = PET_FINDS.interval; this.tryFind();
+    }
     updatePetAbilities(dt);
   },
   /** A fresh adventure: back to the starter pets, default names, full health (which pet each hero likes is kept). */
@@ -194,6 +290,8 @@ export const Pets = {
     this.unlocked = new Set(STARTERS); this.active = null; this.names = {}; this.mode = 'follow'; this.stayDir = null;
     this.hp = null; this.hpFor = null; this.faintT = 0; this.hurtAt = -99; this.abilityCd = 0; this.petCool = 0;
     this.diveDay = 0; this.divesToday = 0;
+    this.fedDay = 0; this.fed = {}; this.happyT = 0; this.findDay = 0; this.findsToday = 0; this.findT = PET_FINDS.interval;
+    this.outfits = {}; this.resting = false;
     resetPetAbilities();
   },
 };
