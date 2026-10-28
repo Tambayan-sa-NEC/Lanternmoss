@@ -104,6 +104,9 @@ export const RECIPES = [
   // ---- vanity: only the look
   { id: 'flowerCrown', group: 'Vanity', result: 'flowerCrown', needs: [['sweetleaf', 3], ['moonberry', 2]] },
   { id: 'leafCape', group: 'Vanity', result: 'leafCape', needs: [['sweetleaf', 6], ['wood', 2]] },
+  { id: 'petBow', group: 'Vanity', result: 'petBow', needs: [['sweetleaf', 2], ['moonberry', 1]] },
+  { id: 'petScarf', group: 'Vanity', result: 'petScarf', needs: [['sweetleaf', 4], ['glowcap', 1]] },
+  { id: 'petHat', group: 'Vanity', result: 'petHat', needs: [['sweetleaf', 2], ['wood', 1], ['moonberry', 1]] },
   // ---- other
   { id: 'lanternKey', group: 'Other', result: 'lanternKey', needs: [['glowcap', 4], ['emberShard', 2]], coins: 15 },
   // The stand supplies clean water; a wooden flask is included in the ingredient cost.

@@ -110,7 +110,7 @@ src/
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── resources.js       resource nodes (bushes, herbs, branches, veins), the farm (fence, plots, scarecrow), crops, the float
 │   ├── stations.js        the four crafting stations (glowing coals, a bubbling pot, flasks on a stand)
-│   ├── vanity.js          hats and capes drawn on the hero
+│   ├── vanity.js          hats and capes drawn on the hero; pet outfits (bow, scarf, party hat) on a pet's head
 │   ├── bosses.js          demon lords (Gloomcap; Malgrath with greatsword + wings) and the shared bat wing
 │   └── dragon.js          Pyrrhax, the red dragon
 ├── items/                 ItemRegistry (validated item catalogue), itemActions (what each category does),
@@ -122,7 +122,8 @@ src/
 │   ├── enemies/           Enemy (melee / ranged / hopper AI), shared AI states, and behaviors/ for the newer AIs:
 │   │                      bomber, charger, burrower, support, and boss/: the boss framework (core.js) with one kit
 │   │                      per boss (gloomcap.js, dragon.js, demonLord.js)
-│   ├── companions/        pet bodies: FlyingPet (owl, wisp, dragon whelp), WalkingPet (wolf, fox, otter), petBrain (targets, hits)
+│   ├── companions/        pet bodies: FlyingPet (owl, wisp, dragon whelp), WalkingPet (wolf, fox, otter), petBrain (targets, hits),
+│   │                      petLook (a pet's body as a still model: asleep in the cottage basket)
 │   ├── npc/               NPC behaviour (schedules, sleep, lines, outfits) and the villager definitions
 │   │                      (places, schedules, story-aware dialogue, a local villager per later planet)
 │   ├── wildlife/          critters (village pets, wild animals, rare creatures to befriend), birds and flocks, pond

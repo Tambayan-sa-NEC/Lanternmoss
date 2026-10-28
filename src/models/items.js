@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { addTo, G, part } from '../render/meshes.js';
 import { buildFurniture } from '../world/interiors.js';
+import { PET_OUTFITS } from './vanity.js';
 import { FURNISHINGS } from '../config/home.js';
 import { buildPlaceable } from '../world/placeables.js';
 
@@ -50,6 +51,7 @@ const ART = {
   homeTable: (g) => { const m = buildFurniture(FURNISHINGS.homeTable.kind); m.scale.setScalar(0.25); g.add(m); },
   homeRug: (g) => { const m = buildFurniture(FURNISHINGS.homeRug.kind); m.scale.setScalar(0.18); g.add(m); },
   homeLamp: (g) => { const m = buildFurniture(FURNISHINGS.homeLamp.kind); m.scale.setScalar(0.25); g.add(m); },
+  petBed: (g) => { const m = buildFurniture(FURNISHINGS.petBed.kind); m.scale.setScalar(0.32); g.add(m); },
   homePlant: (g) => { const m = buildFurniture(FURNISHINGS.homePlant.kind); m.scale.setScalar(0.4); g.add(m); },
   scroll: (g, c) => { addTo(g, part(G.box(0.27, 0.34, 0.025), c), [0, 0, 0]); for (const y of [-0.17, 0.17]) addTo(g, part(G.cyl(0.045, 0.045, 0.34, 8), CREAM), [0, y, 0], [0, 0, Math.PI / 2]); addTo(g, part(G.box(0.16, 0.02, 0.01), WOOD), [0, 0.03, 0.02]); },
   bun: (g, c) => { addTo(g, part(G.hemi(0.22, 8, 3), c), [0, -0.04, 0], [0, 0, 0], [1, 0.8, 1]); addTo(g, part(G.cyl(0.22, 0.2, 0.08, 8), CREAM), [0, -0.06, 0]); },
@@ -124,6 +126,9 @@ const ART = {
   hood: (g, c) => { addTo(g, part(G.cone(0.2, 0.36, 8), c), [0, 0, 0]); addTo(g, part(G.ico(0.1, 1), 0xffe2cc, { outline: false }), [0, -0.05, 0.1], [0, 0, 0], [1, 1, 0.5]); },
   strawHat: (g, c) => { addTo(g, part(G.cyl(0.24, 0.24, 0.03, 12), c), [0, -0.05, 0]); addTo(g, part(G.cyl(0.11, 0.13, 0.12, 10), c), [0, 0.02, 0]); addTo(g, part(G.cyl(0.135, 0.135, 0.035, 10), 0xe0605a), [0, -0.01, 0]); },
   flowerCrown: (g, c) => { addTo(g, part(torus(0.17, 0.025), 0x5fae5a), [0, 0, 0], [Math.PI / 2, 0, 0]); for (let i = 0; i < 6; i++) addTo(g, part(G.ico(0.045, 0), i % 2 ? c : 0xffffff), [Math.cos(i * 1.05) * 0.17, 0.03, Math.sin(i * 1.05) * 0.17]); },
+  petBow: (g, c) => { const m = new THREE.Group(); PET_OUTFITS.petBow(m, c); m.scale.setScalar(1.6); g.add(m); },
+  petScarf: (g, c) => { const m = new THREE.Group(); PET_OUTFITS.petScarf(m, c); m.scale.setScalar(1.3); g.add(m); },
+  petHat: (g, c) => { const m = new THREE.Group(); PET_OUTFITS.petHat(m, c); m.scale.setScalar(1.3); m.position.y = -0.12; g.add(m); },
   frogHat: (g, c) => { addTo(g, part(G.hemi(0.19, 9, 3), c), [0, -0.06, 0]); for (const sx of [-1, 1]) { addTo(g, part(G.ico(0.06, 1), c), [sx * 0.09, 0.11, 0.04]); addTo(g, part(G.ico(0.035, 0), 0xffffff), [sx * 0.09, 0.12, 0.08]); } },
   ingot: (g, c) => { for (const [y, z] of [[-0.06, -0.08], [-0.06, 0.08], [0.07, 0]]) addTo(g, part(G.box(0.32, 0.12, 0.14), c), [0, y, z], [0, 0, 0], [1, 1, 1]); },
   coal: (g, c) => { for (const [x, y, z] of [[-0.08, -0.04, 0], [0.09, -0.05, 0.05], [0.01, 0.07, -0.03]]) addTo(g, part(G.dodec(0.1), c), [x, y, z]); addTo(g, part(G.ico(0.035), 0xff8a3a, { glow: true, intensity: 2.2 }), [0.06, 0.02, 0.1]); },

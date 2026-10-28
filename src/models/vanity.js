@@ -1,7 +1,10 @@
 /* Vanity pieces drawn on the hero (src/gameplay/equipment.js applyVanity): a hat on the head (it replaces the witch's
    own hat) and a cape (it replaces the hero's own cape, keeping its swing: the run animation moves `cape`).
-   One builder per item art kind (config/items.js icon.art), tinted with the item's colour. */
+   One builder per item art kind (config/items.js icon.art), tinted with the item's colour.
+   Pet outfits (TODO 35): dressPet puts a bow, a scarf or a little hat on a pet's head group, placed by
+   config/pets.js PET_OUTFIT_FIT so it sits right on every body. */
 import * as THREE from 'three';
+import { PET_OUTFIT_FIT } from '../config/pets.js';
 import { addTo, disposeTree, G, part } from '../render/meshes.js';
 
 const torus = (r, t, arc = Math.PI * 2) => new THREE.TorusGeometry(r, t, 5, 16, arc);
@@ -70,3 +73,33 @@ export function dressHero(P, hatDef, backDef) {
   for (const k of P.capeKids) k.visible = !cape;
 }
 
+/** Pet outfits, built round their own origin at the size of a small critter's head (radius ~0.22). */
+export const PET_OUTFITS = {
+  petBow: (g, c) => {
+    const dark = new THREE.Color(c).multiplyScalar(0.75).getHex();
+    for (const sx of [-1, 1]) addTo(g, part(G.cone(0.09, 0.16, 4), c), [sx * 0.08, 0.03, 0], [0, 0, sx * Math.PI / 2], [1, 1, 0.55]);
+    addTo(g, part(G.ico(0.045, 0), dark), [0, 0.03, 0]);
+  },
+  petScarf: (g, c) => {
+    const dark = new THREE.Color(c).multiplyScalar(0.7).getHex();
+    addTo(g, part(new THREE.TorusGeometry(0.17, 0.05, 5, 14), c), [0, 0, 0], [Math.PI / 2, 0, 0]);
+    addTo(g, part(G.box(0.08, 0.16, 0.04), dark), [0.08, -0.08, 0.15], [0.2, 0, 0.25]);
+  },
+  petHat: (g, c) => {
+    addTo(g, part(G.cone(0.1, 0.24, 8), c), [0, 0.12, 0]);
+    for (let i = 0; i < 3; i++) addTo(g, part(G.cyl(0.075 - i * 0.022, 0.08 - i * 0.022, 0.025, 8), 0xff6b9a, { outline: false }), [0, 0.04 + i * 0.07, 0]);
+    addTo(g, part(G.ico(0.04, 1), 0xffffff), [0, 0.25, 0]);
+  },
+};
+
+/** Puts `def` (a pet outfit item, or nothing) on `body` (a pet body or look with a `head` group), replacing what was
+    there. Where it sits comes from the outfit (props.petOutfit: 'top' or 'neck') and the pet (PET_OUTFIT_FIT). */
+export function dressPet(body, petId, def) {
+  if (!body?.head) return;
+  if (body.outfit) { body.head.remove(body.outfit); disposeTree(body.outfit); body.outfit = null; }
+  const build = def && PET_OUTFITS[def.icon?.art], fit = PET_OUTFIT_FIT[petId];
+  if (!build || !fit) return;
+  const g = new THREE.Group(), at = def.props?.petOutfit === 'neck' ? fit.neck : fit.top;
+  build(g, def.icon.color ?? 0xffffff); g.position.set(...at); g.scale.setScalar(fit.s);
+  body.head.add(g); body.outfit = g;
+}

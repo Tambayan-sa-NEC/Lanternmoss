@@ -668,6 +668,19 @@ body.bossfight #toast { top:120px; }
 .pet-cmds button.on { background:var(--ink); color:#fff; }
 .pet-cmds small { flex-basis:100%; font-size:11px; opacity:.65; }
 .sel-detail .pet-status { margin-top:10px; font-weight:800; color:#3f9a5a; }
+/* pet care (TODO 35, src/ui/petViews.js petCareHtml) */
+.pet-care { margin-top:10px; font-size:12px; display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; }
+.pet-care > small { flex-basis:100%; font-size:11px; opacity:.7; }
+.pet-care .happy, .pet-care .fed, .pet-care .hungry { padding:0 8px; border-radius:999px; font-size:11px; font-weight:800; border:2px solid var(--ink); }
+.pet-care .happy { background:#ffd6e6; } .pet-care .fed { background:#e2f5dc; } .pet-care .hungry { background:#fff1cc; }
+.pet-care .feed, .pet-care .dress { flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+.pet-care .feed button, .pet-care .dress button { display:inline-flex; align-items:center; gap:3px; font:inherit; font-weight:800; font-size:11.5px;
+  padding:1px 9px 1px 4px; border:2px solid var(--ink); border-radius:999px; background:#fff8ee; color:var(--ink); cursor:pointer; }
+.pet-care .feed button.fav { background:#ffe2ee; } .pet-care .feed button.fav::after { content:'\2665'; color:#e0306a; margin-left:2px; }
+.pet-care .feed button:disabled { opacity:.45; cursor:default; }
+.pet-care .feed button em { font-style:normal; opacity:.6; }
+.pet-care .dress button.on { background:var(--ink); color:#fff; }
+.pet-care button svg { width:18px; height:18px; }
 .sel-detail .take { margin-top:10px; font:inherit; font-weight:800; font-size:14px; padding:5px 16px; border:3px solid var(--ink); border-radius:999px;
   background:var(--pink); color:#fff; cursor:pointer; box-shadow:0 3px 0 var(--ink); }
 .sel-detail .take:hover { transform:translateY(-1px); }
@@ -833,6 +846,7 @@ body.paused #tutorial, body.menu #tutorial, body.menu #faint-screen, body.cutsce
 .home-panel { box-sizing: border-box; width: min(760px, 100%); padding: 18px; }
 .home-panel p { margin: 8px 0; }
 .home-furniture { display: grid; gap: 8px; margin-bottom: 12px; }
+@media (min-width: 700px) { .home-furniture { grid-template-columns: 1fr 1fr; } }   /* (six furnishings since TODO 35: two columns keep 720p unscrolled) */
 .home-row { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid #c7b3cd; border-radius: 12px; background: #fffbf2; }
 .home-row .item-art { width: 36px; height: 36px; }
 .home-row strong, .home-row small { display: block; }

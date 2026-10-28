@@ -70,7 +70,8 @@ export function resolveHouse(index, planet) {
 /** What each interactive prop does when you press E next to it (Houses.js runs them). */
 export const INTERACTIONS = {
   homeSign: { label: 'Read the cottage sign' },
-  bed: { label: 'Rest in the bed' },           // at night: sleep till morning, full heal; by day: a nap (heals)
+  bed: { label: 'Rest in the bed' },
+  petBed: { label: 'Check on your pet' },     // TODO 35: the cottage pet basket (pet it, see how it is)           // at night: sleep till morning, full heal; by day: a nap (heals)
   chest: { label: 'Open the storage chest' },  // the house's gift, once per adventure
   bookshelf: { label: 'Read' },                // the house's lore, in order
   kettle: { label: 'Have some tea' },          // heals a little and a Feather-Step

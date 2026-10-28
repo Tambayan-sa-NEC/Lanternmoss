@@ -2,7 +2,8 @@
    Outside, a door within reach shows "E Enter ..."; the screen fades, the room is built far from the planet and the
    hero walks its flat floor (Player.motion = the indoor controller) under a dollhouse camera (CameraSystem room view).
    Inside: no combat (abilities are off and monsters lose interest), furniture to use, the resident or the sleeping
-   owner to talk to, a note when nobody's home. Step back onto the doormat (or press E at the door) to leave.
+   owner to talk to, a note when nobody's home. In your own cottage, with the pet basket placed, the pet that's out
+   naps in it and heals (TODO 35: Pets.resting, config/pets.js PET_BED). Step back onto the doormat (or press E at the door) to leave.
    currentInteraction() is the single "what does E do here" answer the prompt and the E key share. */
 import * as THREE from 'three';
 import { resolveHouse, INTERACTIONS, REST } from '../config/houses.js';
@@ -14,6 +15,8 @@ import { held } from '../core/keybinds.js';
 import { emote } from '../fx/emotes.js';
 import { sparkles } from '../fx/sparkles.js';
 import { buildGranny, buildLibrarian } from '../models/villagers.js';
+import { dressPet } from '../models/vanity.js';
+import { buildPetLook } from '../entities/companions/petLook.js';
 import { audio } from '../systems/AudioSystem.js';
 import { setRoomView, snapCamera } from '../systems/CameraSystem.js';
 import { keys } from '../systems/InputSystem.js';
@@ -47,6 +50,7 @@ import { nearestNPC } from '../entities/npc/NPC.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { Portals } from './Portals.js';
 import { HOME, FURNISHINGS } from '../config/home.js';
+import { PET_BED } from '../config/pets.js';
 import { NEEDS } from '../config/survival.js';
 import { Home } from './Home.js';
 import { Needs } from './Needs.js';
@@ -113,19 +117,29 @@ export const Houses = {
     const chest = room.spots.find(p => p.kind === 'chest');            // emptied earlier this adventure: lid's still up
     if (chest && this.opened.has(`${ctx.planetId}:${index}`)) chest.obj.userData.lid.rotation.x = -1.9;
     if (ctx.companion) { ctx.companion.root.visible = false; if (ctx.companion.shadow) ctx.companion.shadow.visible = false; }
+    if (def.playerHome && room.petBedAt) this.tuckInPet();
     setRoomView({ up: ROOM_UP, back: BACK });
     if (def.playerHome && !Home.state.claimed) toast('An empty cottage! Use the little sign by the door to claim it.');
+  },
+  /** Your pet curls up in the cottage pet basket: a still copy of it (outfit and all) asleep there, and it rests. */
+  tuckInPet() {
+    const s = this.inside, b = s.room.petBedAt, look = buildPetLook(Pets.id);
+    look.root.position.set(b.x, 0.36, b.z); look.root.rotation.y = b.ry + 0.6; look.root.scale.setScalar(0.85);
+    if (look.head) { look.head.rotation.x = 0.45; look.head.rotation.y = 0.5; }    // head down, turned in: asleep
+    for (const leg of look.legs ?? []) leg.visible = false;          // tucked under
+    dressPet(look, Pets.id, Pets.outfitOf());
+    s.room.root.add(look.root); s.petLook = look; Pets.resting = true;
   },
   /** Rebuild only the player cottage's room, preserving the hero's spot and facing. */
   refreshHome() {
     if (this.inside?.index !== HOME.houseIndex) return;
     const { x, z, armed, room } = this.inside, fwd = ctx.player.fwd.clone();
-    room.dispose(); this.inside = null; this.goInside(HOME.houseIndex, houseDef(HOME.houseIndex));
+    room.dispose(); this.inside = null; Pets.resting = false; this.goInside(HOME.houseIndex, houseDef(HOME.houseIndex));
     Object.assign(this.inside, { x, z, armed }); ctx.player.fwd.copy(fwd); this.placeHero();
   },
   goOutside() {
     const P = ctx.player, { index, room } = this.inside, house = this.world.houses[index];
-    room.dispose(); this.inside = null; ctx.indoors = null;
+    room.dispose(); this.inside = null; ctx.indoors = null; Pets.resting = false;
     P.motion = null; P.motionHs = 0; P.selfCollider.active = true;
     P.placeAt(house.door);
     _fwd.copy(house.fwd); projectTangent(_fwd, P.up).normalize(); P.fwd.copy(_fwd);   // step out facing away from the door
@@ -136,7 +150,7 @@ export const Houses = {
   /** Leaves at once without a fade (restarting the adventure, changing planets). */
   reset() {
     if (this.inside) { this.inside.room.dispose(); this.inside = null; }
-    ctx.indoors = null; this.fade = null; setRoomView(null);
+    ctx.indoors = null; this.fade = null; setRoomView(null); Pets.resting = false;
     const P = ctx.player; if (P) { P.motion = null; P.motionHs = 0; P.selfCollider.active = true; }
   },
   /** A fresh adventure: chests full again, lore from the start. */
@@ -236,6 +250,14 @@ export const Houses = {
       case 'bed': {
         if (def.playerHome && (P.dead || !Home.state.claimed || !Home.state.furniture.includes('homeBed'))) { toast('Craft and place your bed, then rest here when you are standing.'); return; }
         this.rest(!!def.playerHome);
+        return;
+      }
+      case 'petBed': {                                               // TODO 35: a scratch for the sleepy pet, and how it is
+        const name = Pets.nameOf();
+        sparkles.emit(s.room.toWorld(spot.x, spot.z, 0.8), { count: 14, color: 0xff8fb1, speed: 1.4, up: ROOM_UP, upBias: 1, life: 0.8, size: 0.3 });
+        if (Pets.fainted) { this.read('Pet basket', `${name} is curled up tight, getting better. Back on their feet in ${Math.ceil(Pets.faintT / PET_BED.faintRate)}s.`); return; }
+        Pets.heal(Pets.maxHp() * 0.1); audio.chirp();
+        this.read('Pet basket', `${name} stretches, yawns and goes back to sleep. (${Math.ceil(Pets.hp)} / ${Pets.maxHp()} health, healing while you're home.)`);
         return;
       }
       case 'chest': {

@@ -108,7 +108,7 @@ export const ITEM_ICON_SHAPES = ['orb', 'bun', 'cap', 'gem', 'petal', 'charm', '
 export const ITEM_ART_KINDS = ['scroll', 'bun', 'tart', 'berry', 'bottle', 'bowl', 'flask', 'moonCharm', 'leafCharm', 'mushroom', 'shard', 'petal',
   'staff', 'axe', 'bow', 'cloak', 'mail', 'mantle', 'pendant', 'ring', 'locket', 'key', 'crown',
   'log', 'stone', 'ore', 'gemstone', 'herb', 'pepper', 'plum', 'carrot', 'wheat', 'pumpkin', 'seeds', 'fish', 'bread', 'skewer',
-  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'ingot', 'coal', ...Object.keys(FURNISHINGS), 'fence', 'path', 'storage', 'workbench', 'forge', 'pot', 'brew', 'plot', 'floor', 'wall', 'doorway', 'windowWall', 'roof'];
+  'pickaxe', 'rod', 'hoe', 'can', 'helm', 'boots', 'hood', 'strawHat', 'flowerCrown', 'frogHat', 'cape', 'petBow', 'petScarf', 'petHat', 'ingot', 'coal', ...Object.keys(FURNISHINGS), 'fence', 'path', 'storage', 'workbench', 'forge', 'pot', 'brew', 'plot', 'floor', 'wall', 'doorway', 'windowWall', 'roof'];
 
 export const INVENTORY = {
   slots: 24, columns: 6,          // bag size and grid width
@@ -328,6 +328,14 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0x6fcf6a, art: 'cape' }, value: 12, equip: { slot: 'back', tier: 1, stats: {} } },
   { id: 'starryCape', name: 'Starry Cape', description: 'Midnight blue, sprinkled with stars that glow. Found only in Lantern chests.', category: 'equipment', rarity: 'rare',
     icon: { shape: 'gem', color: 0x4a4aa8, art: 'cape' }, value: 40, equip: { slot: 'back', tier: 1, stats: {} } },
+  // ---- pet outfits (TODO 35): worn by a pet from the pet menu, drawn on its head (src/models/vanity.js dressPet).
+  //      props.petOutfit = where it sits: 'top' (hats, bows) or 'neck' (scarves); config/pets.js PET_OUTFIT_FIT
+  { id: 'petBow', name: 'Ribbon Bow', description: 'A big satin bow for your pet. Wear it from the pet menu.', category: 'misc', rarity: 'uncommon',
+    icon: { shape: 'gem', color: 0xff6b9a, art: 'petBow' }, maxStack: 1, value: 8, props: { petOutfit: 'top' } },
+  { id: 'petScarf', name: 'Knitted Scarf', description: 'A snug little scarf for your pet. Wear it from the pet menu.', category: 'misc', rarity: 'uncommon',
+    icon: { shape: 'gem', color: 0x6fa8ff, art: 'petScarf' }, maxStack: 1, value: 8, props: { petOutfit: 'neck' } },
+  { id: 'petHat', name: 'Tiny Party Hat', description: 'A pointed paper hat with a pompom, just pet-sized. Wear it from the pet menu.', category: 'misc', rarity: 'uncommon',
+    icon: { shape: 'gem', color: 0xffd36b, art: 'petHat' }, maxStack: 1, value: 8, props: { petOutfit: 'top' } },
   // ---- gifts from rare creatures (config/critters.js): befriend one to get its charm ----
   { id:'pearlOfDeep',name:'Pearl of the Deep',description:'A luminous pearl from a befriended Pearl Turtle. Steadies your guard and restores your magic.',category:'equipment',
     icon:{shape:'charm',color:0xbafff1,art:'pendant'},value:130,props:{giftOnly:true},equip:{slot:'charm',tier:3,stats:{armor:.03,manaRegen:.8}} },
