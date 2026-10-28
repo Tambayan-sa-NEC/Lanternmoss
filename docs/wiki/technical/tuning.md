@@ -57,6 +57,7 @@
 | Talents: points per level, the reset wizard, each hero's tree and its release flag | `src/config/talents.js` → `TALENTS` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys; otter Pearl Dive radius, cooldown, daily cap and yield | `src/config/pets.js` |
 | How the menus frame a pet (where it shows off, camera distance and angle) | `src/config/pets.js` → `PET_SHOWCASE` |
+| Pet care: favourite foods, meals a day, XP and the Happy bonus, finds (how often, what, how many a day), where outfits sit on each pet, the pet basket's healing | `src/config/pets.js` → `PET_FAVOURITES`, `PET_FOOD`, `PET_FINDS`, `PET_OUTFIT_FIT`, `PET_BED` |
 | How the menus frame the hero | `src/ui/showcase.js` → `HERO_VIEW` |
 | Photo mode: camera range, filters, frames, poses, emotes | `src/config/photo.js` → `PHOTO` (filter / frame looks: `RenderSystem` paper pass) |
 | Achievements: goals, rewards, boss challenge levels, banner timing, when a monster counts as met | `src/config/achievements.js` |

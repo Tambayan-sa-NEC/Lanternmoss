@@ -2,7 +2,7 @@
    it), so they never mix with the world. Local frame: x right, y up, z toward the camera / the door. The walls nearest
    the camera stay low (a dollhouse cut-away) so the room is always visible.
    buildRoom(def, layout) -> { root, shape, obstacles [{ x, z, r }], spots [{ kind, x, z }], entrance { x, z }, residentAt,
-   bedAt, tableAt, dispose() }. Furniture kinds: see ANCHORS; config/houses.js lists which a house has. */
+   bedAt, tableAt, petBedAt (the cottage pet basket, when placed), dispose() }. Furniture kinds: see ANCHORS; config/houses.js lists which a house has. */
 import * as THREE from 'three';
 import { addTo, disposeTree, G, part } from '../render/meshes.js';
 import { scene } from '../render/scene.js';
@@ -27,13 +27,14 @@ const ANCHORS = {
     oven: [-3.0, -2.5, 0], counter: [-0.7, -1.3, 0], bed: [3.0, -2.2, 0], table: [2.1, 0.7, 0], rug: [0, 0.9, 0], chest: [-3.4, 1.1, 1.57],
     shelf: [1.1, -3.05, 0], bookshelf: [[-1.4, -3.05, 0], [1.3, -3.05, 0]], lamp: [3.5, 1.7, 0], plant: [-3.5, -0.3, 0],
     window: [-2.2, -3.35, 0], fireplace: [0.1, -3.05, 0], anvil: [-2.0, -0.9, 0], kettle: [-3.0, -2.5, 0], telescope: [2.8, 2.8, -0.6],
+    petBed: [HOME.petBed.x, HOME.petBed.z, 0.35],
   },
 };
 /** Collision radius of solid furniture (rugs, windows and yarn are walk-through). */
 const SOLID = { bed: 1.0, table: 0.85, chest: 0.55, lamp: 0.3, plant: 0.4, bookshelf: 0.75, telescope: 0.45, instruments: 0.55, kettle: 0.5,
-  fireplace: 0.8, anvil: 0.55, oven: 1.0, counter: 1.1, shelf: 0.5 };
+  fireplace: 0.8, anvil: 0.55, oven: 1.0, counter: 1.1, shelf: 0.5, petBed: 0.55 };
 /** Furniture you can use (an "E ..." prompt within reach). */
-const INTERACTIVE = new Set(['bed', 'chest', 'bookshelf', 'kettle', 'oven', 'instruments', 'telescope', 'fireplace', 'anvil', 'homeSign']);
+const INTERACTIVE = new Set(['bed', 'chest', 'bookshelf', 'kettle', 'oven', 'instruments', 'telescope', 'fireplace', 'anvil', 'homeSign', 'petBed']);
 
 // ---------------------------------------------------------------- furniture
 const F = {
@@ -128,6 +129,12 @@ const F = {
     addTo(g, part(G.box(2.7, 0.08, 0.9), 0xfff6ee), [0, 0.98, 0]);
     for (let i = 0; i < 4; i++) addTo(g, part(G.cyl(0.08, 0.09, 0.5, 6), 0xe0a050), [-0.9 + i * 0.55, 1.1, 0], [1.4, 0, 0.2]);
   },
+  petBed(g) {                                                      // TODO 35: a woven basket with a cushion (the pet sleeps on it)
+    addTo(g, part(G.cyl(0.62, 0.52, 0.32, 12), 0xc98a4a), [0, 0.16, 0]);
+    addTo(g, part(new THREE.TorusGeometry(0.58, 0.08, 5, 16), 0xa86a34), [0, 0.32, 0], [Math.PI / 2, 0, 0]);
+    addTo(g, part(G.cyl(0.5, 0.5, 0.1, 12), 0xff8fb1), [0, 0.33, 0]);
+    addTo(g, part(G.ico(0.07, 0), 0xffffff), [0.28, 0.4, 0.2]);
+  },
   shelf(g) {
     addTo(g, part(G.box(1.4, 0.1, 0.4), WOOD), [0, 1.5, 0]);
     for (let i = 0; i < 3; i++) addTo(g, part(G.ico(0.17, 1), 0xe0a050), [-0.4 + i * 0.4, 1.7, 0], [0, 0, 0], [1.2, 0.8, 1]);
@@ -196,9 +203,10 @@ export function buildRoom(def, layout) {
     if (SOLID[kind]) obstacles.push({ x: at[0], z: at[1], r: SOLID[kind] });
     if (INTERACTIVE.has(kind)) spots.push({ kind, x: at[0], z: at[1], index: k, obj: g });
   }
-  const tableAt = A.table, bedAt = A.bed;
+  const tableAt = A.table, bedAt = A.bed, petBed = def.props.includes('petBed') && A.petBed;
   return {
     root, shape, obstacles, spots, entrance, tableAt: { x: tableAt[0], z: tableAt[1] }, bedAt: { x: bedAt[0], z: bedAt[1], ry: bedAt[2] },
+    petBedAt: petBed ? { x: petBed[0], z: petBed[1], ry: petBed[2] } : null,
     residentAt: { x: tableAt[0] - 1.3, z: tableAt[1] - 0.6 }, light, baseLight, fires,
     /** Local room coordinates -> world point (y = height over the floor). */
     toWorld(x, z, y = 0, out = new V3()) { return out.set(x, y, z).add(ROOM_ORIGIN); },

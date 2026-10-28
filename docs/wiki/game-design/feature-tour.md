@@ -37,6 +37,17 @@ to show your pet: swap, rename and command them there. Each hero remembers the p
 still view on these screens instead of circling.
 
 <p>
+  <img src="../../screenshots/pets/pet-care.jpg" width="32%" alt="Feeding and dressing a pet in the pet menu">
+  <img src="../../screenshots/pets/pet-outfits.jpg" width="32%" alt="The fox in a party hat">
+  <img src="../../screenshots/pets/pet-bed.jpg" width="32%" alt="The fox asleep in its basket">
+</p>
+
+**Looking after them.** The pet menu's Care section feeds your pet from the bag: every pet has favourite foods from the
+farm, the ponds and the wilds, and a favourite makes it Happy (it hits harder for a while). A pet fed today sometimes
+brings back something it found. Craft it a ribbon bow, a scarf or a party hat to wear, and a basket for your cottage,
+where it naps and heals while you are home. See [pet care](../systems/pets.md#pet-care-todo-35).
+
+<p>
   <img src="../../screenshots/npcs/dialogue.jpg" width="49%" alt="Talking to Fern">
   <img src="../../screenshots/village/night.jpg" width="49%" alt="The village at night">
 </p>

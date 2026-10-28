@@ -11,7 +11,7 @@ import { buildingFootprint, footprintsOverlap, snapBuildingDir } from '../src/ga
 import { dirAlong, tangentFrame } from '../src/utils/sphere.js';
 
 test('every 25b placeable remains craftable, with all four stations alongside the new structures', () => {
-  const garden=Object.entries(PLACEABLES).filter(([,d])=>!d.structure); assert.equal(garden.length,13);
+  const garden=Object.entries(PLACEABLES).filter(([,d])=>!d.structure); assert.equal(garden.length,14);   // 13 of 25b and the pet basket (TODO 35)
   for (const [id, def] of Object.entries(PLACEABLES)) {
     assert.ok(itemRegistry.has(id)); const recipe = RECIPES.find(r => r.result === id);
     assert.ok(recipe && !recipe.discovery && !recipe.hero); assert.ok(def.radius > 0 && def.height > 0);

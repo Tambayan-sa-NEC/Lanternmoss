@@ -139,6 +139,11 @@ calling off or travelling away while she is beached leaves the lagoon full and t
 asks nothing of the low-tide gate and leaves Marlo's quest untouched; and that a win pays pearls, never the Tide Crown,
 on a ladder of its own that survives a save and a Continue. `tests/rematch.test.mjs` adds the pure check that every
 lamp ring leaves a gap a hero fits through and a clear middle.
+`node scripts/pet-care-smoke.mjs` owns port 8146 and checks pet care (TODO 35): a real `B` opens the pet menu, real
+clicks feed a favourite (the pet turns Happy and the panel updates at once) and put outfits on the owl and the fox,
+the Care section fits at 720p and 1080p with nothing overflowing, and in the claimed cottage the pet sleeps in its
+basket in its outfit, heals, and a real `E` checks on it, with zero page and shader errors. It retakes
+`pets/pet-care`, `pets/pet-outfits` and `pets/pet-bed`. `npm run sim -- petCare` runs the matching simulation.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and

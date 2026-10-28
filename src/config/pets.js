@@ -102,6 +102,56 @@ export const PET_CARE = {
   nameLength: 14,
 };
 
+/* ---------------------------------------------------------------------
+   PET CARE (TODO 35): feeding, outfits, finds and the pet bed. Runtime: src/gameplay/Pets.js (care state, saved with
+   the pets), the pet menu's Care panel (src/ui/petViews.js), src/models/vanity.js (dressPet) and the cottage
+   (src/gameplay/Houses.js, a `petBed` furnishing in config/home.js).
+     PET_FAVOURITES  each pet's favourite foods (item ids), from the farm, the ponds and the wilds. Any other food a pet
+                     eats (petEdible: anything that fills your energy) is merely liked.
+     PET_FOOD        feeding from the pet menu, the pet that is out with you only:
+                       perDay        meals a pet will eat in one adventure day (then it is full until tomorrow)
+                       favouriteXp / likedXp   hero XP for a favourite or any other food (pet level = hero level)
+                       happySeconds  a favourite makes the pet Happy this long: happyDamage more pet damage
+                       heal          share of the pet's health a meal restores
+     PET_FINDS       a pet fed today sometimes brings back something it found while you explore outdoors:
+                       interval      seconds between tries (only while it follows you, outside a fight)
+                       chance        of a find on each try; perDay = at most this many finds a day
+                       table         [itemId | 'coins', weight, [min, max]]
+     PET_OUTFIT_FIT  where an outfit sits on each pet's head group (models/creatures.js): top = hats and bows,
+                     neck = scarves, both [x, y, z] in the head's frame, and s = a size for that head
+     PET_BED         the cottage pet bed: a pet resting in it (you indoors with it placed) heals `heal` of its health
+                     a second, and a fainted pet's rest runs `faintRate` times faster
+   --------------------------------------------------------------------- */
+export const PET_FAVOURITES = {
+  owl:        ['pondPerch', 'moonberry'],
+  wolf:       ['iceTrout', 'moonCarrot', 'honeyBun'],
+  fox:        ['moonberry', 'pondPerch', 'moonCarrot'],
+  wisp:       ['honeyBun', 'moonberryTart', 'moonberry'],
+  dragontoad: ['pondPerch', 'firePepper'],
+  whelp:      ['firePepper', 'cinderEel', 'pumpkin'],
+  otter:      ['silverSprat', 'pondPerch', 'clam'],
+};
+export const PET_FOOD = { perDay: 3, favouriteXp: 15, likedXp: 5, happySeconds: 120, happyDamage: 0.2, heal: 0.3 };
+/** Food a pet will eat: any food you could eat yourself (it fills energy, so potions and elixirs are not food), plus
+    the raw crops, fish and forage it might fancy. */
+export const petEdible = def => !!def && (def.use?.some(u => u.effect === 'energy')
+  || Object.values(PET_FAVOURITES).some(list => list.includes(def.id)));
+export const PET_FINDS = {
+  interval: 75, chance: 0.4, perDay: 3,
+  table: [['sweetleaf', 5, [1, 2]], ['moonberry', 4, [1, 2]], ['glowcap', 2, [1, 1]], ['carrotSeeds', 2, [1, 1]],
+    ['wheatSeeds', 2, [1, 1]], ['pumpkinSeeds', 1, [1, 1]], ['coins', 2, [3, 8]]],
+};
+export const PET_OUTFIT_FIT = {
+  owl:        { top: [0, 0.25, -0.02], neck: [0, -0.2, 0], s: 0.9 },
+  wolf:       { top: [0, 0.2, -0.04], neck: [0, -0.17, -0.06], s: 1 },
+  fox:        { top: [0, 0.2, -0.04], neck: [0, -0.17, -0.06], s: 1 },
+  wisp:       { top: [0, 0.26, 0], neck: [0, -0.2, 0], s: 0.9 },
+  dragontoad: { top: [0, 0.2, -0.06], neck: [0, -0.18, -0.06], s: 1.1 },
+  whelp:      { top: [0, 0.22, -0.04], neck: [0, -0.16, -0.06], s: 0.9 },
+  otter:      { top: [0, 0.2, -0.04], neck: [0, -0.17, -0.05], s: 1 },
+};
+export const PET_BED = { heal: 0.25, faintRate: 6 };
+
 /** Swapping pets in play with its key (N): a short wait between swaps. */
 export const PET_SWAP = { cooldown: 1.2 };
 
