@@ -36,12 +36,12 @@ for (const f of Object.values(FURNISHINGS)) for (const [id, n] of f.needs) inv.a
 for (const id of Object.keys(FURNISHINGS)) { assert.ok(H.InventoryUI.commands.craft(RECIPES.find(r => r.id === id), 1).ok, id); assert.equal(inv.count(id), 1); }
 enter(); inv.move(inv.find('homeBed'), 0); H.Hotbar.selected = 0; assert.ok(H.Hotbar.use().ok);
 for (const id of Object.keys(FURNISHINGS).filter(id => id !== 'homeBed')) { assert.ok(home.place(id).ok); assert.equal(inv.count(id), 0); }
-assert.equal(home.state.furniture.length, 5); assert.equal(Houses.inside.room.obstacles.length, 4);
+assert.equal(home.state.furniture.length, 6); assert.equal(Houses.inside.room.obstacles.length, 5);   // (TODO 35: the pet basket is the sixth, and solid)
 inv.add('homeTable', 1); assert.equal(home.place('homeTable').ok, false); assert.equal(inv.count('homeTable'), 1);
 const x = Houses.inside.x, z = Houses.inside.z; assert.ok(H.saves.save().ok); assert.ok(H.saves.continue());
-assert.equal(home.state.furniture.length, 5); assert.equal(Houses.inside.x, x); assert.equal(Houses.inside.z, z);
-assert.equal(Houses.inside.room.obstacles.length, 4);
-console.log('PASS  all five actual recipes craft at the workbench; bag/hotbar placement consumes exactly one, rejects duplicates and restores geometry/collisions');
+assert.equal(home.state.furniture.length, 6); assert.equal(Houses.inside.x, x); assert.equal(Houses.inside.z, z);
+assert.equal(Houses.inside.room.obstacles.length, 5);
+console.log('PASS  every furnishing recipe crafts at the workbench; bag/hotbar placement consumes exactly one, rejects duplicates and restores geometry/collisions');
 
 inv.clear(); inv.add('glowStaff', inv.size); assert.equal(inv.freeSlots(), 0);
 assert.equal(home.remove('homeBed').ok, false); assert.ok(home.state.furniture.includes('homeBed'));
@@ -70,7 +70,7 @@ const original = home.toJSON(); leave(); H.planets.defeated.add('lanternmoss'); 
 assert.deepEqual(home.toJSON(), { claimed: false, furniture: [] }); enter(); assert.ok(home.claim().ok);
 inv.add('homePlant', 1); assert.ok(home.place('homePlant').ok); assert.ok(H.saves.save().ok); assert.ok(H.saves.continue());
 assert.deepEqual(home.state.furniture, ['homePlant']); assert.equal(Houses.inside.index, 6);
-leave(); travel('lanternmoss'); assert.deepEqual(home.toJSON(), original); enter(); assert.equal(Houses.inside.room.obstacles.length, 4);
+leave(); travel('lanternmoss'); assert.deepEqual(home.toJSON(), original); enter(); assert.equal(Houses.inside.room.obstacles.length, 5);
 leave(); travel('emberfall'); assert.deepEqual(home.state.furniture, ['homePlant']);
 assert.ok(H.npcs.some(n => n.name === 'Cinder')); assert.equal(game.world.houses.length, 7);
 console.log('PASS  portal round trips and indoor Continue retain separate planet homes; pre-existing house chest/lore/oven state survives');

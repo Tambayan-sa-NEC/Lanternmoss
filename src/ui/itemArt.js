@@ -33,6 +33,7 @@ const ART = {
   homeBed: (c) => `<path ${S} fill="${WOOD}" d="M4 12h24v12H4z"/><path ${S} fill="${c}" d="M5 12h22v8H5z"/><path ${S} fill="#fff6ee" d="M6 9h7v6H6z"/><path ${S} fill="none" d="M4 8v20M28 12v16"/>`,
   homeTable: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="12" rx="12" ry="5"/><path ${S} fill="${WOOD}" d="M13 17h6v11h-6z"/><path ${S} fill="none" d="M7 17v9M25 17v9"/>`,
   homeRug: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="17" rx="13" ry="8"/><ellipse fill="${GOLD}" cx="16" cy="17" rx="8" ry="4"/><path ${S} fill="none" d="M3 14l-1 2M3 20l-1 2M29 14l1 2M29 20l1 2"/>`,
+  petBed: (c) => `<path ${S} fill="${c}" d="M3 17h26l-3 10H6z"/><ellipse ${S} fill="#ff8fb1" cx="16" cy="17" rx="13" ry="4.5"/><path ${S} fill="none" d="M9 21v5M16 21v6M23 21v5"/>`,
   homeLamp: (c) => `<path ${S} fill="${WOOD}" d="M14 13h4v15h-4z"/><path ${S} fill="${c}" d="M7 14l5-10h8l5 10z"/><path ${S} fill="none" d="M11 28h10"/>`,
   homePlant: (c) => `<path ${S} fill="#d27a5a" d="M9 18h14l-2 11H11z"/><path ${S} fill="${c}" d="M16 19C4 19 3 6 12 8c6 2 4 7 4 11zM16 19c0-12 12-16 12-7 0 5-7 7-12 7zM16 14c-6-6-1-13 3-10 4 3 0 8-3 10z"/>`,
   scroll: () => `<path ${S} fill="#efdc9f" d="M8 5h17v21H8z"/><path ${S} fill="#fff1c5" d="M6 5h20v5H6zM6 23h20v5H6z"/><path ${S} fill="none" d="M11 14h10M11 18h7"/>`,
@@ -120,6 +121,9 @@ const ART = {
   strawHat: (c) => `<ellipse ${S} fill="${c}" cx="16" cy="21" rx="14" ry="5"/><path ${S} fill="${c}" d="M9 20c0-7 3-11 7-11s7 4 7 11z"/><path ${S} fill="#e0605a" d="M9 16.5h14V20H9z"/>`,
   flowerCrown: (c) => `<ellipse fill="none" stroke="${INK}" stroke-width="4.4" cx="16" cy="19" rx="12" ry="6"/><ellipse fill="none" stroke="#5fae5a" stroke-width="2.4" cx="16" cy="19" rx="12" ry="6"/>` +
     [[4, 19, c], [9, 14, '#fff'], [16, 13, '#ffd36b'], [23, 14, c], [28, 19, '#fff'], [10, 24, '#ffd36b'], [22, 24, c]].map(([x, y, col]) => `<circle ${S} stroke-width="1.6" fill="${col}" cx="${x}" cy="${y}" r="2.8"/>`).join(''),
+  petBow: (c, l) => `<path ${S} fill="${c}" d="M16 16L4 8v16zM16 16l12-8v16z"/><circle ${S} fill="${l}" cx="16" cy="16" r="4"/>`,
+  petScarf: (c, l) => `<path ${S} fill="${c}" d="M4 12c4 4 20 4 24 0v6c-4 4-20 4-24 0z"/><path ${S} fill="${l}" d="M18 18l2 11h5l-2-12z"/>`,
+  petHat: (c) => `<path ${S} fill="${c}" d="M16 3L7 27h18z"/><path ${S} fill="#ff6b9a" d="M10 19h12l1.5 4h-15z"/><circle ${S} fill="#fff" cx="16" cy="4" r="3"/>`,
   frogHat: (c, l) => `<path ${S} fill="${c}" d="M4 25c0-9 5-14 12-14s12 5 12 14z"/><circle ${S} fill="${c}" cx="10" cy="11" r="4.2"/><circle ${S} fill="${c}" cx="22" cy="11" r="4.2"/>
     <circle fill="#fff" cx="10" cy="11" r="2.4"/><circle fill="#fff" cx="22" cy="11" r="2.4"/><circle fill="${INK}" cx="10.4" cy="11.4" r="1.1"/><circle fill="${INK}" cx="22.4" cy="11.4" r="1.1"/><path fill="none" stroke="${l}" stroke-width="1.6" stroke-linecap="round" d="M9 21q7 3 14 0"/>`,
   ingot: (c, l, d) => `<path ${S} fill="${c}" d="M4 22l5-8h14l5 8z"/><path ${S} fill="${l}" d="M9 14l2-4h10l2 4z"/><path fill="${d}" d="M23 14l5 8H4" opacity=".35"/>

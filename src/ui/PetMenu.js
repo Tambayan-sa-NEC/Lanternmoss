@@ -2,7 +2,7 @@
    The world pauses (like the pause menu) while the camera holds a still framing of the pet out with you, who idles on
    the menu's own clock (pet bodies' pose()). Left: every pet (locked ones say how to find them). Right: the pet's
    detail panel (src/ui/petViews.js): rename it, see its stats and ability, give it a command, take another along
-   (it swaps in right there). The one place for all of that; the HUD pet card keeps quick command / ability buttons. */
+   (it swaps in right there), and care for it: feed it from the bag and dress it in an outfit (TODO 35). The one place for all of that; the HUD pet card keeps quick command / ability buttons. */
 import * as THREE from 'three';
 import { petAvailable, availablePetIds } from '../config/pets.js';
 import { cancelAim } from '../combat/aiming.js';
@@ -21,6 +21,7 @@ import { InventoryUI } from './InventoryUI.js';
 import { petCardsHtml, petDetailHtml } from './petViews.js';
 import { clearStage, petShowcase } from './showcase.js';
 import { ShopUI } from './ShopUI.js';
+import { toast } from './toast.js';
 
 
 export const PetMenu = {
@@ -36,6 +37,8 @@ export const PetMenu = {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.mode) { Pets.command(b.dataset.mode); ctx.companion?.celebrate?.(); }
       if (b.dataset.take) this.pick(b.dataset.take);
+      if (b.dataset.feed) Pets.feed(b.dataset.feed);                                   // TODO 35: care
+      if (b.dataset.outfit) { const r = Pets.wear(b.dataset.outfit === 'none' ? null : b.dataset.outfit, this.view); if (!r.ok) toast(r.message); }
       this.render(false);
     });
     this.detailEl.addEventListener('change', e => { const id = e.target.dataset?.rename; if (id) { e.target.value = Pets.rename(id, e.target.value); this.render(false); } });
@@ -73,7 +76,8 @@ export const PetMenu = {
   render(swap = true) {
     if (!this.isOpen) return;
     this.cardsEl.innerHTML = petCardsHtml(this.view);
-    if (!this.detailEl.contains(document.activeElement)) { this.detailEl.innerHTML = petDetailHtml(this.view, { play: true }); if (swap) flashEl(this.detailEl, 'swap'); }
+    const typing = document.activeElement?.tagName === 'INPUT' && this.detailEl.contains(document.activeElement);   // (renaming: keep the field)
+    if (!typing) { this.detailEl.innerHTML = petDetailHtml(this.view, { play: true }); if (swap) flashEl(this.detailEl, 'swap'); }
     this.keysEl.innerHTML = `↑ ↓ or click to choose · ${bindKbd('petMenu')} or <kbd>Esc</kbd> to close`;
   },
   /** Keys while the menu is open (play input is ignored). */

@@ -15,11 +15,16 @@ outdoor placement and rotation are available through [building previews](buildin
 | Rosewoven Rug | 6 Sweetleaf + 2 Moonberry | By hand |
 | Cottage Lantern | 3 Wood + 1 Copper Ingot + 2 Glowcap | Workbench |
 | Potted Sweetleaf | 3 Sweetleaf + 2 Stone | By hand |
+| Pet Basket | 4 Wood + 4 Sweetleaf | Workbench |
 
 The recipes are known from the start for all three heroes and have no coin cost. Placing consumes one crafted
 item. **Take to bag** returns it; if there is no room, the furniture stays put. An occupied slot, an unclaimed
 cottage, another villager’s house, a hero standing in the solid piece’s spot cannot consume
-an item. Beds, tables, lamps and plants block indoor movement; rugs are walk-through.
+an item. Beds, tables, lamps, plants and the pet basket block indoor movement; rugs are walk-through.
+With six pieces the furnishing menu lists them in two columns, so it still fits a 720p screen without scrolling.
+
+The **Pet Basket** (TODO 35) is where your pet naps while you are home: it heals there, and a fainted pet recovers six
+times faster. **E** by it checks on your pet. See [pet care](pets.md#pet-care-todo-35).
 
 Press **E** by your placed bed to rest. A night’s sleep reaches the next morning and fills health, mana/stamina/focus
 and energy. A daytime nap advances the clock by 20 seconds and recovers 40% of each maximum, capped at full.

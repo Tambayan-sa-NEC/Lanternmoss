@@ -14,13 +14,13 @@ test('a separate empty cottage preserves the six existing houses and their villa
   const home = HOUSES[HOME.houseIndex]; assert.equal(home.layout, 'cottage'); assert.equal(home.playerHome, true);
   assert.equal(home.owner, undefined); assert.equal(home.resident, undefined); assert.deepEqual(home.props, ['homeSign']);
 });
-test('all five furnishings are craftable, with a bed available from first-world materials', () => {
-  assert.equal(Object.keys(FURNISHINGS).length, 5);
+test('every furnishing is craftable, with a bed available from first-world materials', () => {
+  assert.equal(Object.keys(FURNISHINGS).length, 6, 'the five of 25a and the pet basket of TODO 35');
   for (const [id, f] of Object.entries(FURNISHINGS)) {
     const item = itemRegistry.get(id), recipe = RECIPES.find(r => r.result === id);
     assert.equal(item.category, 'furniture'); assert.ok(recipe); assert.equal(recipe.discovery, undefined);
     assert.ok(recipe.needs.every(([material, count]) => itemRegistry.has(material) && Number.isInteger(count) && count > 0));
-    assert.ok(['bed', 'table', 'rug', 'lamp', 'plant'].includes(f.kind));
+    assert.ok(['bed', 'table', 'rug', 'lamp', 'plant', 'petBed'].includes(f.kind));
   }
   assert.deepEqual(RECIPES.find(r => r.result === 'homeBed').needs, [['wood', 8], ['sweetleaf', 4]]);
 });

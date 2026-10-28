@@ -1772,18 +1772,46 @@ fixed: the journal now keeps its fish, harvest and gathering counters across rel
 Angler, Harvest Festival and Forager progress reset). Checked by `tests/bounties.test.mjs`,
 `tests/sim/bounties.sim.mjs` and `scripts/bounty-smoke.mjs`.
 
-## 35. Pet care **(suggested)**
+## 35. Pet care **(suggested)** ✓
 
 **Goal:** pets feel looked after, and the food you grow matters to them too.
 Code: `src/gameplay/Pets.js`, `src/ui/PetMenu.js`, `src/config/pets.js`, `src/models/vanity.js`. **Size:** S–M.
 **Needs:** 22 (cooking); the pet bed needs 25a.
 
-- [ ] **Feeding:** pets have favourite foods from the farm, the ponds and the wilds; feeding them gives a short buff
+- [x] **Feeding:** pets have favourite foods from the farm, the ponds and the wilds; feeding them gives a short buff
       or a little XP, and a happy emote.
-- [ ] **Pet outfits:** small hats, bows and scarves for pets, using the same vanity idea as the hero's hat and cape.
-- [ ] **Pet finds:** a well-fed pet sometimes brings back something it found (a forage item, a seed, now and then a
+- [x] **Pet outfits:** small hats, bows and scarves for pets, using the same vanity idea as the hero's hat and cape.
+- [x] **Pet finds:** a well-fed pet sometimes brings back something it found (a forage item, a seed, now and then a
       coin).
-- [ ] A pet bed in your home (25) where resting pets heal.
+- [x] A pet bed in your home (25) where resting pets heal.
+
+**35 implemented (2026-10-28):** the pet menu (`B`) gained a **Care** section for the pet out with you, and the cottage
+a **Pet Basket**. Numbers in `src/config/pets.js` (`PET_FAVOURITES`, `PET_FOOD`, `PET_FINDS`, `PET_OUTFIT_FIT`,
+`PET_BED`), runtime in `src/gameplay/Pets.js`.
+**Feeding:** each pet loves two or three foods from the farm, the ponds and the wilds; it eats any food that fills
+energy (not potions) plus those raw favourites. A meal takes one food, restores 30% of the pet's health and gives a
+little hero XP (5, or 15 for a favourite); a favourite makes it **Happy** for 120 s (+20% pet damage), with a heart
+emote. Three meals a day, then it is full until tomorrow. **Finds:** a pet fed today, following you outdoors and
+between fights, tries every 75 s (40%) for sweetleaf, moonberries, a glowcap, seeds or a few coins, at most three a day;
+an unfed pet finds nothing. **Outfits:** a Ribbon Bow, Knitted Scarf and Tiny Party Hat, crafted by hand in Vanity
+like the flower crown, worn from the Care section by any found pet (`models/vanity.js` `dressPet`, fitted to each body
+by `PET_OUTFIT_FIT`); the item leaves the bag while worn, stays with that pet through a swap and comes back when taken
+off. **Pet basket:** cottage furniture (4 Wood + 4 Sweetleaf); while you are home your pet is shown asleep in it, outfit
+and all (`entities/companions/petLook.js`), heals 25% a second, and a fainted pet recovers 6x faster. **E** checks on
+it. Outdoors it is a decorative garden piece (25b turns every furnishing into one). Care state is saved with the pets
+and cleaned to its daily limits.
+Two defects found on the way, both by reviewing screenshots: the pet menu did not re-render after a click inside its
+detail panel (a guard meant only for the rename field), so feeding and dressing looked like they had done nothing until
+the menu was reopened; and with a sixth furnishing the cottage menu no longer fitted 720p without scrolling, so its
+list is two columns on wide screens. Potions were briefly offered as pet food; food is now what fills energy.
+Checked by `tests/petCare.test.mjs`, `tests/sim/petCare.sim.mjs` and `node scripts/pet-care-smoke.mjs` (port 8146:
+real `B`, clicks that feed and dress, the panel updating at once, 720p/1080p, the basket and a real `E`, zero page and
+shader errors), with reviewed shots `pets/pet-care`, `pets/pet-outfits` and `pets/pet-bed`. Existing counts of
+furnishings and garden pieces in `tests/home.test.mjs`, `tests/building.test.mjs`, `tests/sim/home.sim.mjs`,
+`tests/sim/building.sim.mjs` and `scripts/home-smoke.mjs` were raised by one for the basket. Full suites: 282 unit
+tests and 63 simulations; the screenshot tour finished with `errors: none`. See
+[pet care](docs/wiki/systems/pets.md#pet-care-todo-35). Limit: a basket placed outdoors is only decoration; pets rest in
+the cottage one.
 
 ## 36. A living village **(suggested)**
 

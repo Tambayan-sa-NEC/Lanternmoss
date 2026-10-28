@@ -98,6 +98,12 @@ authored fourth-world release flag. It rejects candidate-module loading, checks 
 reloads the single Tide Crown, then opens an old v1 save. It asserts zero page/shader errors and captures the
 reviewed `huds/tidewhisper-portal.jpg`. Run it only on a branch where Tidewhisper is intentionally released.
 
+`node scripts/pet-care-smoke.mjs` owns port 8146 and checks pet care (TODO 35): a real `B` opens the pet menu, real
+clicks feed a favourite (the pet turns Happy and the panel updates at once) and put outfits on the owl and the fox,
+the Care section fits at 720p and 1080p with nothing overflowing, and in the claimed cottage the pet sleeps in its
+basket in its outfit, heals, and a real `E` checks on it, with zero page and shader errors. It retakes
+`pets/pet-care`, `pets/pet-outfits` and `pets/pet-bed`. `npm run sim -- petCare` runs the matching simulation.
+
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
 zero page/shader errors. It captures `pets/otter.jpg` through `shots.mjs`.

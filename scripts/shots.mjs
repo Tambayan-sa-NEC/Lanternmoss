@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 export const SHOT_FOLDERS = {
   characters: ['select', 'swim'],
-  pets: ['pets', 'pet-field', 'select-pet', 'dragontoad', 'otter'],
+  pets: ['pets', 'pet-field', 'select-pet', 'dragontoad', 'otter', 'pet-care', 'pet-outfits', 'pet-bed'],
   critters: ['meadow', 'rare', 'tidewhisper-pearl-turtle'],
   mobs: ['combat', 'basilisk', 'hydra', 'tidewhisper-enemies', 'mob-brawl'],
   bosses: ['boss-demon', 'boss-dragon', 'lair', 'summon', 'arena', 'balance-flight', 'tidewhisper-ironclaw',

@@ -6,7 +6,7 @@ import { storyKeyAllowed } from '../config/npcs.js';
 import { cleanMechanicSnapshot } from '../world/mechanics/index.js';
 import { LEVELING } from '../config/leveling.js';
 import { EQUIP_SLOTS, HOTBAR, INVENTORY, RARITIES } from '../config/items.js';
-import { PETS, PET_COMMANDS, PET_CARE, petAvailable } from '../config/pets.js';
+import { PETS, PET_COMMANDS, PET_CARE, PET_FINDS, PET_FOOD, petAvailable } from '../config/pets.js';
 import { QUESTS } from '../config/quests.js';
 import { CHALLENGES } from '../config/challenges.js';
 import { CROPS, FARM, NODE_KINDS, SCENERY } from '../config/resources.js';
@@ -159,7 +159,14 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
         faintT: number(s.faintT, 0, 0, PET_CARE.faintTime), hurtAt: number(s.hurtAt, -99, -99),
         abilityCd: number(s.abilityCd, 0, 0, PETS[active].ability.cooldown), petCool: number(s.petCool, 0, 0, 2), swapCool: number(s.swapCool, 0, 0, 60),
         diveDay: integer(s.diveDay, 0, 0), divesToday: integer(s.divesToday, 0, 0, PETS.otter.ability.perDay),
-        mend: s.mend ? { left: number(s.mend.left, 0, 0, 120), perSec: number(s.mend.perSec, 0, 0, 100) } : null };
+        mend: s.mend ? { left: number(s.mend.left, 0, 0, 120), perSec: number(s.mend.perSec, 0, 0, 100) } : null,
+        // care (TODO 35): today's meals per pet, the Happy timer, today's finds, and an outfit per pet (a real pet outfit)
+        fedDay: integer(s.fedDay, 0, 0), fed: Object.fromEntries(Object.entries(record(s.fed)).filter(([id]) => Object.hasOwn(PETS, id))
+          .map(([id, n]) => [id, integer(n, 0, 0, PET_FOOD.perDay)])),
+        happyT: number(s.happyT, 0, 0, PET_FOOD.happySeconds), findDay: integer(s.findDay, 0, 0),
+        findsToday: integer(s.findsToday, 0, 0, PET_FINDS.perDay), findT: number(s.findT, PET_FINDS.interval, 0, PET_FINDS.interval),
+        outfits: Object.fromEntries(Object.entries(record(s.outfits)).filter(([id, item]) => Object.hasOwn(PETS, id)
+          && typeof item === 'string' && !!itemRegistry.get(item)?.props?.petOutfit)) };
     }
     case 'dayClock': return { t: number(s.t, DAY.startAt * DAY.length, 0, DAY.length - 1e-6), day: integer(s.day, 1, 1) };
     case 'buffs': return { timers: Object.fromEntries(buffKeys.map(k => [k, number(record(s.timers)[k], 0, 0, 3600)])),
