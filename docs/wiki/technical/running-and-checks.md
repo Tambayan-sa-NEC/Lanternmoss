@@ -68,6 +68,8 @@ node scripts/rematch-smoke.mjs     # rematches: real E at a beaten lair, its own
 npm run sim -- mossRematch         # the Moss kits: the thorn signature, the mini boss's own ladder, repeat rewards
 npm run sim -- emberRematch        # the Ember kits: the dragonfire signature and the gap every wall leaves
 npm run sim -- frostRematch        # the Frost kits: the Doom Blade signature, retries, and one ladder per encounter
+npm run sim -- tideRematch         # the Tide kits: the false lure signature, the carillon, and the lagoon put back when a rematch ends
+node scripts/tide-rematch-smoke.mjs # Tide rematches in a browser (port 8145): real E at Mirelure's lair, the decoy ring lit and marked, the carillon; retakes bosses/tidewhisper-mirelure-decoys
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots
@@ -127,6 +129,16 @@ kills outright, that the buried blade leaves a punish window, that the rematch s
 on its own phases, that a lost rematch can be taken again with the ladder unmoved, that Frostveil's Frost Hydra
 comes back as itself rather than as a plain Hydra, and that the two worlds' Hydras keep separate ladders across a
 save and a Continue.
+`node tests/sim/tideRematch.sim.mjs` covers the Tide kits (31e) in the borrowed development slot (Tidewhisper stays
+unreleased): that Mirelure's decoy lamps are lit in a ring, marked for the whole wind-up, burst on their own and leave a
+hero in the middle (or between two circles) untouched while one standing on a lamp is stung; that a lamp popped from
+outside its circle costs nothing and one popped beside you stings; that decoys are a deep-water move and glare a
+surfaced one; that a rematch called off leaves no lamp lit; that Old Ironclaw's carillon rings three waves in a row,
+which a hero standing still takes all of and one who jumps on the beat takes none of (real jump input); that fainting,
+calling off or travelling away while she is beached leaves the lagoon full and the sluice mended; that the rematch
+asks nothing of the low-tide gate and leaves Marlo's quest untouched; and that a win pays pearls, never the Tide Crown,
+on a ladder of its own that survives a save and a Continue. `tests/rematch.test.mjs` adds the pure check that every
+lamp ring leaves a gap a hero fits through and a clear middle.
 
 `node scripts/otter-smoke.mjs` owns port 8142 and checks the candidate-only otter unlock and pet selection, real
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and

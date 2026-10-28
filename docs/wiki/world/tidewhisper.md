@@ -326,6 +326,9 @@ arena ring is crashing surf (`ARENA_WALLS.surf`). Her kit is `src/entities/enemi
   is mended, so a saved drain never outlives its fight. The win drops her treasure chest with the **Tide Crown**, once;
   Continue keeps her beaten without a second chest or crown.
 
+**Rematches (31e).** Once beaten, Mirelure and Old Ironclaw can be challenged again for their own keepsakes, wearing new
+attacks (decoy lamps, and a row of bell waves). See [the Tide rematches](monsters-and-bosses.md#the-tide-rematches-todo-31e).
+
 The tide mechanic gained an optional gradual reflood and `activeTides()` (the live instance, for encounters). The
 original drain behaviour is unchanged when no reflood is given, and the saved state only adds a bounded `reflood`
 field while one is in progress.

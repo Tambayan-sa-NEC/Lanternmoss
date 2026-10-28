@@ -10,7 +10,9 @@
                       tide) ploughs it into the sand for def.wedge seconds. Once per shell: afterwards it is wary and
                       skids to a stop at the wet sand until it climbs into its next shell.
    Moves: pinch (a claw snap over a marked wedge in front), charge (a marked lane; the wedge chance), toll (from the
-   second shell: it rears and slams the bell down, a shockwave to jump). Fallback: pinch up close, else charge. */
+   second shell: it rears and slams the bell down, a shockwave to jump). Fallback: pinch up close, else charge.
+   Rematch (TODO 31e): toll is there from the first shell, and from the second it rings carillon, a row of those waves
+   (def.attacks.carillon.rings, gap seconds apart). */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
 import { hurtPlayer } from '../../../../combat/damage.js';
@@ -113,6 +115,20 @@ const moves = {
     fire(e) { e.rear = 0; e.bellGlow.visible = false; launchWave(e, A(e, 'toll')); },
     cancel(e) { e.rear = 0; },
   },
+  /** TODO 31e: the same bell wave, rung `rings` times in a row. The wind-up is the toll's, so it reads the same. */
+  carillon: {
+    begin(e) { audio.doomCharge(); emote(e, '!', '#ffd36b'); },
+    windup(e, dt, k) { showDisc(e, e.pos, e.radius + 3 * k, k); e.rear = k; e.bellGlow.visible = k > 0.5; },
+    fire(e) { e.bellGlow.visible = false; e.ringsLeft = A(e, 'carillon').rings; e.ringT = 0; return 'active'; },
+    active(e, dt) {
+      const a = A(e, 'carillon');
+      if (e.ringsLeft > 0 && (e.ringT -= dt) <= 0) { launchWave(e, a); e.ringsLeft--; e.ringT = a.gap; e.rear = 0.8; }
+      e.rear = Math.max(0, e.rear - dt * 3);
+      if (e.ringsLeft <= 0) { e.rear = 0; finish(e); }
+      return 0;
+    },
+    cancel(e) { e.rear = 0; e.ringsLeft = 0; e.bellGlow.visible = false; },
+  },
 };
 
 /** Driven into the wet sand by its own charge: stuck and soft for def.wedge seconds. */
@@ -146,7 +162,7 @@ export const ironclaw = defineBoss({
   init(e) {
     e.pinchMark = bossDecal(e, 'sector', WARN, { arc: THREE.MathUtils.degToRad(e.def.attacks.pinch.arc) });
     e.lane = makeDots(e, 14, WARN); e.laneFrom = new THREE.Vector3(); e.chargeDir = new THREE.Vector3();
-    e.waveSlots = [makeDots(e, 40, BRONZE, 1.6), makeDots(e, 40, BRONZE, 1.6)]; e.waves = [];
+    e.waveSlots = [makeDots(e, 40, BRONZE, 1.6), makeDots(e, 40, BRONZE, 1.6), makeDots(e, 40, BRONZE, 1.6)]; e.waves = [];   // a carillon has two in the air, the bell a third
     e.swapFrom = new THREE.Vector3();
   },
   reset(e) {
@@ -162,7 +178,7 @@ export const ironclaw = defineBoss({
   damageScale: e => (isOpen(e) ? 1 + e.def.openBonus : e.def.guarded),
   /** 66% and 33%: out of the shell, a scuttle about, then into a new one. */
   onPhase(e) {
-    e.state = 'transition'; e.swapT = e.def.swap; e.hideTele(); e.ringAt = 0; e.bellGlow.visible = false;
+    e.state = 'transition'; e.swapT = e.def.swap; e.hideTele(); e.ringAt = 0; e.bellGlow.visible = false; e.rear = 0; e.ringsLeft = 0;
     emote(e, '!', '#ffd24a'); audio.roar(); toast('Old Ironclaw crawls out of its shell: hit it while it\'s soft!');
     return true;
   },

@@ -61,7 +61,7 @@ mattered, and the progression refuses a second win on a world it has already rec
 | **What is saved** | Only how many rematches of each encounter are won, per adventure. A fight **in progress** is never saved |
 | **One ladder per encounter** | The count is kept against the world *and* the monster (`frostveil:hydra`), not the species. Two worlds may field the same creature - Frostveil's Frost Hydra is a Hydra - and beating one is not practice for the other (31d) |
 | **The encounter you beat** | The challenger is spawned from the def that world's encounter actually stood up with, so a planet's variant comes back as itself: the Frost Hydra returns ice-fanged and at its own health, not as a Hydra borrowed from Lanternmoss (31d) |
-| **What ends one** | Travelling, fainting or reloading puts the lair straight back to beaten-and-offered. A save cannot inject a half-woken fight |
+| **What ends one** | Travelling, fainting or reloading puts the lair straight back to beaten-and-offered. A save cannot inject a half-woken fight, and the challenger is reset on its way out so what it changed in the world (Mirelure's drained lagoon, hazards it left) goes back too (31e) |
 | **Which bosses** | Only an encounter whose rematch kit is finished (`COMBAT.enemies[type].rematch`). The lifecycle landed first; each world's kit follows in 31b-31f, so until then a beaten lair stays quiet |
 | **Your treasure first** | A chest still lying where the encounter fell is yours to open before anything else is offered, so "open the chest" and "challenge it again" never fight over the same prompt |
 | **What comes back** | A fresh challenger spawns where the encounter stood. It is never the lair's own boss, which is what keeps the campaign's single win untouchable; the sealed lair, the waking sequence and the arena ring stay the campaign's ceremony |
@@ -113,5 +113,32 @@ enough - no sprint, no dodge, no hero's own trick. Then the blade stays buried f
 | --- | --- |
 | **Malgrath** | **Reckoning**, a killing circle that *hunts you* while it aims instead of being planted in front of him, and **Eclipse**, the first killing blow his ascended phase has ever had, dropped out of the air onto where you stand. He keeps every move from the first fight, including the original Doom Blade, and opens with "The Lord remembers" |
 | **The Frost Hydra** | Nothing new - and that is the point. It reuses the Hydra's own rematch kit (briars and every head it ever grew), but as the cold variant Frostveil fields, at its own health and in its own colours, on a ladder entirely separate from Lanternmoss's Hydra |
+
+### The Tide rematches (TODO 31e)
+
+Tidewhisper's two encounters are the first to need the lagoon and the tide to behave, so they come with a rule about
+that as well as new attacks. Mirelure wears the **false lure signature** - the Lantern Angler's own trick, a light that
+is not what it seems. A ring of decoy lanterns is lit at once and **every one of them is false**: each is marked on the
+ground with the circle it will burst over, for the whole wind-up, and when the wind-up ends they all go off and sting
+whoever is inside.
+
+It is fair because the ring is built around the way out. The lamps are spaced wider apart than two of their own circles,
+so a hero always fits between two of them, and the middle of a ring laid round the hero is clear of every lamp - the
+move punishes running blindly rather than standing still. And a lamp is a real object: **a blow pops it early**, so a
+ranged hero can pop one from outside its circle for nothing, while popping one you are standing beside stings at once.
+
+| | What it learned |
+| --- | --- |
+| **Mirelure** | **Decoys**, five false lamps round the hero while she is under the water, and **Glare**, six thrown round herself once she is up (so a melee hero close in under her chin is safe, and one who backs off into the ring is not). Both are *new*: her campaign lures - one real, the rest false, dimming on her breath - are untouched and still come first. Keeps every move from the first fight, and opens with "The false lights return". Keepsake: three Pearls |
+| **Old Ironclaw** | **Carillon**, from the second shell on: the bell wave of its toll rung three times in a row, 1.1 s apart, each ring one to jump. It also rings the toll from its first shell now. Wedging in the wet sand and the shell swaps work exactly as they did. Keepsake: a Black Pearl, on a ladder of its own |
+
+**The tide and the sluice stay honest.** A rematch called off while she is beached - by fainting, by walking away or by
+leaving the world - refills the lagoon and mends the sluice at once, rather than leaving a drained lagoon behind a boss
+that is no longer there (the challenger is reset on its way out; this also clears any hazard it had laid). The rematch
+asks nothing of the campaign's gate: it does not need low tide, level 8 or Marlo's lighthouse, it never touches the
+lighthouse quest, and it never pays the Tide Crown again.
+
+Tidewhisper itself is still **unreleased**, so none of this can be met in normal play yet; it is exercised through the
+development fixtures, as the rematch lifecycle always is for unreleased worlds.
 
 ![The lantern gate marking a world with a rematch waiting](../../screenshots/huds/rematch-gate.jpg)

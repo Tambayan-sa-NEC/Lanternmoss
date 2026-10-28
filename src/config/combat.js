@@ -147,10 +147,27 @@ export const COMBAT = {
                    { below: 1.0, attacks: ['pinch', 'charge'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.66, title: 'Second shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.1, cooldownMul: 0.9 },
                    { below: 0.33, title: 'Last shell', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.2, cooldownMul: 0.8 },
-                 ] },
+                 ],
+                 // TODO 31e: the old crab has stopped waiting for its second shell to ring the bell. `toll` is there from
+                 // the start, and from the second shell on it rings `carillon`: `rings` bell waves in a row, `gap` seconds
+                 // apart, each one a wave to jump (the same wave as the toll, the same numbers per ring). Wedging in the wet
+                 // sand and the shell swaps work exactly as they did.
+                 rematch: { extra: [['blackPearl', 1]],
+                   attacks: {
+                     carillon: { windup: 1.3, rings: 3, gap: 1.1, speed: 8, maxRadius: 13, width: 1.2, damage: 9, knockback: 5, stun: 0.8,
+                                 recover: 1.3, cooldown: 1.2, reuse: 8 },
+                   },
+                   phases: [
+                     { below: 1.0, title: 'The bell remembers', attacks: ['pinch', 'charge', 'toll'], speedMul: 1.1, cooldownMul: 0.85 },
+                     { below: 0.66, title: 'Second shell, louder', attacks: ['pinch', 'charge', 'toll', 'carillon'], speedMul: 1.2, cooldownMul: 0.75 },
+                     { below: 0.33, title: 'Last shell, loudest', attacks: ['pinch', 'charge', 'toll', 'carillon'], speedMul: 1.3, cooldownMul: 0.65 },
+                   ] } },
     // ---- lair seals and lures: objects, not monsters (object: true = no bestiary page, drops, coins or kill counts; static = never moves)
     mireLure:  { ai: 'mireLure', object: true, static: true, name: 'Lantern lure', color: 0xffd36b, hp: 1, speed: 0, radius: 0.45, height: 1.5,
                  aggro: 0, leash: 99, respawn: 0, xp: 0, knockResist: 1, slowResist: 1, staggerImmune: true },   // Mirelure's: one real, the rest false
+    // TODO 31e: the decoy lantern the false lure signature lights (behaviors/boss/signatures.js). Struck, it bursts early
+    falseLure: { ai: 'falseLure', object: true, static: true, name: 'Decoy lantern', color: 0xffd36b, hp: 1, speed: 0, radius: 0.45, height: 1.5,
+                 aggro: 0, leash: 99, respawn: 0, xp: 0, knockResist: 1, slowResist: 1, staggerImmune: true },
     thornSeal: { ai: 'seal', object: true, static: true, name: 'Thorn Seal', color: 0xb48cff, hp: 90, speed: 0, radius: 0.75, height: 2.6,
                  aggro: 0, leash: 99, respawn: 0, xp: 12, knockResist: 1, slowResist: 1, staggerImmune: true },
     // ---- planet bosses: ai 'boss' + behavior = their own AI kit (src/entities/enemies/behaviors/boss/) ----
@@ -177,7 +194,23 @@ export const COMBAT = {
                  phases: [   // the moves themselves check her mode (deep / surfaced / beached)
                    { below: 1.0, title: 'Lantern lights', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Beached', attacks: ['geyser', 'bite', 'thrash', 'roll'], speedMul: 1.15, cooldownMul: 0.85 },
-                 ] },
+                 ],
+                 // TODO 31e: the Angler has learned to lie with more than one light. The false lure signature
+                 // (behaviors/boss/signatures.js) worn twice: `decoys`, a ring of false lanterns lit round the hero while
+                 // she is under the water, and `glare`, the same ring thrown round herself once she is up. Every lamp is
+                 // marked with the circle it bursts over; the way between two of them is always wider than a hero.
+                 //   count, spread  how many lamps, and how far each is from the centre of the ring (metres)
+                 //   radius         its burst (the marked circle)        around  ring the boss rather than the hero
+                 // The campaign's own lures (one real, the rest false) are untouched and still dim on her breath.
+                 rematch: { extra: [['pearl', 3]],
+                   attacks: {
+                     decoys: { windup: 1.5, recover: 0.9, cooldown: 1.2, reuse: 8, count: 5, spread: 5.5, radius: 1.8, damage: 14, knockback: 7 },
+                     glare:  { windup: 1.4, recover: 0.8, cooldown: 1.0, reuse: 7, count: 6, spread: 6.5, radius: 1.8, damage: 13, knockback: 8, around: true },
+                   },
+                   phases: [   // her moves check her mode, so one list serves both
+                     { below: 1.0, title: 'The false lights return', attacks: ['geyser', 'bite', 'thrash', 'roll', 'decoys', 'glare'], speedMul: 1.1, cooldownMul: 0.85 },
+                     { below: 0.5, title: 'Beached, and bitter', attacks: ['geyser', 'bite', 'thrash', 'roll', 'decoys', 'glare'], speedMul: 1.25, cooldownMul: 0.7 },
+                   ] } },
     gloomcap:  { ai: 'boss', behavior: 'gloomcap', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6,   // planet 1: the introduction
                  look: { skin: 0x6a4a7a, armor: 0x2e2638, cape: 0x2a1838, horn: 0xe8dcc4, trim: 0xffd36b, eye: 0xffe066, motif: 'moss' },   // src/models/bosses.js
                  hp: 6700, speed: 2.6, radius: 1.3, height: 4.6,

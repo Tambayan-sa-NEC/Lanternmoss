@@ -134,4 +134,4 @@ export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buil
   puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern,
   gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord, thornSeal: buildThornSeal,
   hydra: buildHydra, basilisk: buildBasilisk, shellback: buildShellback, jellybell: buildJellybell, surfSkipper: buildSurfSkipper,
-  ironclaw: buildIronclaw, mirelure: buildMirelure, mireLure: buildMireLure };
+  ironclaw: buildIronclaw, mirelure: buildMirelure, mireLure: buildMireLure, falseLure: buildMireLure };
