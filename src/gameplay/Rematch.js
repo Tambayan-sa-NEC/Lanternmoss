@@ -19,7 +19,8 @@
    PlanetProgression.onBossDefeated (which only answers for `ctx.boss`, and only once per world) cannot fire for
    it: no trophy, portal opening, key, achievement or first-win banner can repeat. The sealed lair, the waking
    sequence and the arena ring stay the campaign's ceremony; a rematch simply comes for you.
-   A rematch in progress is not saved: a reload, a journey or a faint ends it and leaves the spot offering again.
+   A rematch in progress is not saved: a reload, a journey or a faint ends it and leaves the spot offering again, and
+   the challenger is reset on its way out so the world it changed goes back too (a drained lagoon, hazards it left).
    Saved per adventure: how many rematches of each encounter are won. */
 import { COMBAT } from '../config/combat.js';
 import { PLANETS } from '../config/planets.js';
@@ -161,7 +162,7 @@ export const Rematch = {
     if (!this.active) return;
     const e = this.fighting;
     this.active = null; this.fighting = null; this.fightingSpot = null;
-    if (e?.alive) e.vanish();
+    if (e?.alive) { e.behavior?.reset?.(e); e.vanish(); }   // reset first: whatever the fight changed in the world (Mirelure's drained lagoon, hazards it left) goes back with it (31e)
     toast('The rematch is called off.');
   },
 

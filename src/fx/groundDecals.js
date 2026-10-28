@@ -10,6 +10,7 @@ import { tangentFrame } from '../utils/sphere.js';
 
 import { fxMaterial } from './combatFx.js';
 import { advance, ground, upAt } from '../combat/space.js';
+import { waterAt } from '../world/terrain.js';
 
 const V3 = THREE.Vector3;
 const _right = new V3(), _off = new V3(), _fwd = new V3();
@@ -23,10 +24,12 @@ const TEMPLATES = {
 };
 
 export class GroundDecal {
-  /** o: arc (sector only, radians), k (glow strength), lift (height over the ground), order (render order). */
+  /** o: arc (sector only, radians), k (glow strength), lift (height over the ground), order (render order),
+      surface (draw over standing water at the water's surface instead of on the floor under it: a warning a swimmer
+      or a hero on the shore must be able to read, TODO 31e). */
   constructor(shape, color, o = {}) {
     this.template = TEMPLATES[shape](o.arc ?? Math.PI / 3);
-    this.geo = this.template.clone(); this.lift = o.lift ?? 0.12;
+    this.geo = this.template.clone(); this.lift = o.lift ?? 0.12; this.surface = !!o.surface;
     this.mesh = new THREE.Mesh(this.geo, fxMaterial(color, o.k ?? 1.2));
     this.mesh.frustumCulled = false; this.mesh.renderOrder = o.order ?? 3; this.mesh.visible = false; scene.add(this.mesh);
   }
@@ -43,7 +46,7 @@ export class GroundDecal {
     for (let i = 0; i < src.count; i++) {
       _off.copy(_right).multiplyScalar(src.getX(i) * sx).addScaledVector(_fwd, src.getY(i) * sy);
       const arc = _off.length(), d = arc > 1e-5 ? advance(center, _off.divideScalar(arc), arc) : center;
-      const p = ground(d, this.lift); dst.setXYZ(i, p.x, p.y, p.z);
+      const p = ground(d, this.surface ? this.lift + (waterAt(d)?.depth ?? 0) : this.lift); dst.setXYZ(i, p.x, p.y, p.z);   // water depth lifts it to the surface only where there is water
     }
     dst.needsUpdate = true; this.mesh.visible = true;
     return this;

@@ -1662,9 +1662,41 @@ reset/preservation lifecycle distinct from encounter retries.
 | [x] **31b. Moss rematches** | 31a | 2-4 h | Add genuinely new telegraphed attacks and better loot to Gloomcap and Hydra. Export the reusable thorn signature for Nyxra; simulate original and rematch kits, each hero's damage windows and repeat rewards. |
 | [x] **31c. Ember rematches** | 31a | 2-4 h | Add Pyrrhax and Basilisk rematch attacks/rewards and a reusable dragonfire signature. Test original kits, harder encounters and the shared signature independently. |
 | [x] **31d. Frost rematches** | 31a, 31b | 2-4 h | Add Malgrath's new attacks/rewards and reusable Doom Blade signature; configure the Frost Hydra rematch using the proven Hydra kit with its cold variant. Verify both lairs, telegraphs, fair melee/ranged windows, retry and reward persistence. |
-| [ ] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
+| [x] **31e. Tide rematches** | 31a, 27h | 2-4 h | Add Mirelure/Old Ironclaw rematch attacks and loot; export the false-lure signature. Test tide/sluice resets, fight-state restoration and separation from Marlo's original unlock. |
 | [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
 | [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
+
+**31e implemented (2026-10-28):** Tidewhisper's two encounters get new attacks and, because they are the first to
+change the world around them, a rule about putting it back. **Mirelure** wears the new **false lure signature**
+(`src/entities/enemies/behaviors/boss/signatures.js`, beside the thorn, dragonfire and Doom Blade ones): a ring of
+decoy lanterns is lit at once, every one false, each marked on the ground with the circle it bursts over for the
+whole wind-up. It is fair by construction -- neighbouring circles leave a gap wider than a hero, the middle of a ring
+laid round the hero is clear of every lamp, so it punishes running blindly rather than standing still -- and a lamp is
+a real object (`COMBAT.enemies.falseLure`), so a blow pops it early: free from outside its circle, a sting if you
+stand beside it. She wears it twice, `decoys` round the hero while she is under the water and `glare` round herself
+once she is up, keeps every move and lure from the first fight, and pays three Pearls. **Old Ironclaw** gains the
+**carillon**, the toll's bell wave rung three times in a row (jump each), from its second shell, rings the toll from
+its first, and pays a Black Pearl on a ladder of its own.
+Two defects came out of building on the lifecycle, both confirmed with a throwaway probe first. A rematch called off
+while she was **beached** (a direct cancel, which travelling also takes) vanished the challenger and left the lagoon
+drained behind a boss that no longer existed: `Rematch.cancel` now resets the challenger on its way out, which refills
+the lagoon, mends the sluice and clears any hazard it had laid. And the circles of a lamp over **water** were drawn on
+the lagoon floor, under the surface, so the danger zone could not be seen from the shore: `GroundDecal` gained an
+opt-in `surface` flag that lifts it per vertex to the water only where there is water, and a first screenshot is what
+caught it. The rematch asks nothing of the campaign's gate (not low tide, not level 8, not Marlo's lighthouse), never
+touches that quest, and never pays the Tide Crown again.
+Checked by `tests/rematch.test.mjs` (every ring leaves a gap and a clear middle; the kit list), `tests/sim/tideRematch.sim.mjs`
+(real jump input for the carillon: standing still takes all three rings, jumping on the beat takes none; the ring is
+marked for the whole wind-up, safe in the middle and between circles; popping; the move gating; cancel, faint and
+travel while beached all leave the lagoon full -- the first fails without the `Rematch.cancel` fix; a win pays pearls,
+never the crown, on its own ladder across a Continue) and `node scripts/tide-rematch-smoke.mjs` (port 8145; a real
+`E` at her lair, the ring lit and marked at 720p/1080p, the carillon, zero page and shader errors), plus a reviewed
+shot (`docs/screenshots/bosses/tidewhisper-mirelure-decoys.jpg`; the first take showed an achievement toast and
+missing water circles, both fixed). Full suites passed: 285 unit tests and 67 simulations. See
+[the Tide rematches](docs/wiki/world/monsters-and-bosses.md#the-tide-rematches-todo-31e). Limits: Tidewhisper is
+still unreleased, so none of this is reachable in normal play, and its economy was never audited -- the rematch
+keepsakes (three Pearls, one Black Pearl, repeatable) should be looked at in the 27h pacing pass before release.
+Not done here: the Dusk kits (31f, waits behind 30i) and New Game+ (31g).
 
 **31d implemented (2026-10-27):** Frostveil's two encounters go opposite ways, and both are what the stage asked
 for. **Malgrath** gets a third wearing of the **Doom Blade signature**: the killing blow he has always carried is

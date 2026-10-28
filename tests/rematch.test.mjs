@@ -36,8 +36,8 @@ test('only an encounter with a finished kit is ever offered', () => {
   assert.equal(rematchReady({ rematch: { kit: 'moss' } }), true);
   // The kits land world by world (31b-31f). Only the ones written so far are exposed.
   const ready = Object.entries(COMBAT.enemies).filter(([, def]) => rematchReady(def)).map(([type]) => type).sort();
-  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'hydra', 'malgrath', 'pyrrhax'],
-    'the Moss (31b), Ember (31c) and Frost (31d) encounters have kits so far');
+  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'hydra', 'ironclaw', 'malgrath', 'mirelure', 'pyrrhax'],
+    'the Moss (31b), Ember (31c), Frost (31d) and Tide (31e) encounters have kits so far');
 });
 
 // The kits as authored data. That each named move is implemented is checked where a scene exists, in the
@@ -90,6 +90,27 @@ test('every dragonfire wall leaves a gap a hero can actually stand in', () => {
     assert.ok(a.spacing < a.radius * 2, `${name}: the lit segments still join up into a wall (${a.spacing} < ${a.radius * 2})`);
     assert.ok(a.duration > 0 && a.tick > 0, `${name}: it holds the ground for a while rather than striking once`);
     assert.ok(a.duration > a.windup, `${name}: it burns for longer than it took to read`);
+  }
+});
+
+// TODO 31e. The false lure signature rings lamps round the hero (or the boss) and every lamp bursts over its own marked
+// circle. Whether there is always a way out is a matter of the numbers the kit authors: the neighbours must leave a
+// hero-wide gap between their circles, and the middle of a ring round the hero must be clear of every lamp.
+// (That the move lights the lamps at all is checked in tests/sim/tideRematch.sim.mjs, where a scene exists.)
+test('every false lure ring leaves a way out and a safe middle', () => {
+  const HERO = 0.5;                                                    // the widest hero's radius, rounded up
+  const rings = Object.entries(COMBAT.enemies)
+    .flatMap(([type, def]) => Object.entries(def.rematch?.attacks ?? {})
+      .filter(([, a]) => a.count != null && a.spread != null && a.radius != null && a.segments == null && a.damage != null && a.root == null)
+      .map(([id, a]) => [`${type}.${id}`, a]));
+  assert.ok(rings.length >= 2, `the signature is worn more than once (${rings.map(([n]) => n).join(', ')})`);
+  for (const [name, a] of rings) {
+    assert.ok(a.count >= 3, `${name}: a ring needs at least three lamps`);
+    const chord = 2 * a.spread * Math.sin(Math.PI / a.count);          // centre to centre of two neighbours
+    assert.ok(chord - 2 * a.radius > 2 * HERO + 0.5, `${name}: a hero fits between two circles (${(chord - 2 * a.radius).toFixed(2)} m of gap)`);
+    assert.ok(a.spread - a.radius > 2, `${name}: the middle of the ring is clear of every burst (${(a.spread - a.radius).toFixed(2)} m)`);
+    assert.ok(a.windup >= 1.2, `${name}: it is on the ground long enough to read`);
+    assert.ok(a.damage > 0 && a.knockback >= 0, `${name}: it is a sting, not nothing`);
   }
 });
 

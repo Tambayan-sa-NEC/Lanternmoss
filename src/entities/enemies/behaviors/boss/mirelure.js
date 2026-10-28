@@ -11,7 +11,9 @@
                Stranded on the floor she thrashes, rolls and bites, open to everything, until the water is deep enough
                over her again; then she dives and the lures return.
    Arena ring: crashing surf (ARENA_WALLS.surf). A faint, leaving or a reload resets everything: lures out, lagoon
-   refilled, sluice mended. */
+   refilled, sluice mended.
+   Rematch (TODO 31e): she also wears the false lure signature twice, `decoys` while she is deep and `glare` once she is
+   up (behaviors/boss/signatures.js); neither is in the campaign fight. */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
 import { clampRange } from '../../../../combat/area.js';
@@ -32,6 +34,7 @@ import { activeTides } from '../../../../world/mechanics/tides.js';
 import { SPAWN_DIR } from '../../../../world/World.js';
 import { hideDots, layLane, makeDots, showDisc } from '../telegraphs.js';
 import { bossDecal, defineBoss, finish, inWedge } from './core.js';
+import { falseLureSignature } from './signatures.js';
 
 const WARN = 0xff4d6d, FOAM = 0xe8fbff, LAMP = 0xffd36b;
 const A = (e, id) => e.def.attacks[id];
@@ -193,6 +196,10 @@ const moves = {
     cancel(e) { hideDots(e.lane); e.rolling = false; },
   },
 };
+
+// The signature is written once; she only says when it can be worn (her moves already check her own mode).
+moves.decoys = { ...falseLureSignature('decoys'), ready: e => e.mode === 'deep' };
+moves.glare = { ...falseLureSignature('glare'), ready: e => e.mode !== 'deep' };
 
 export const mirelure = defineBoss({
   moves,

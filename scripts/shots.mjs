@@ -17,7 +17,7 @@ export const SHOT_FOLDERS = {
   critters: ['meadow', 'rare', 'tidewhisper-pearl-turtle'],
   mobs: ['combat', 'basilisk', 'hydra', 'tidewhisper-enemies', 'mob-brawl'],
   bosses: ['boss-demon', 'boss-dragon', 'lair', 'summon', 'arena', 'balance-flight', 'tidewhisper-ironclaw',
-    'tidewhisper-mirelure-beached', 'tidewhisper-mirelure-lures'],
+    'tidewhisper-mirelure-beached', 'tidewhisper-mirelure-lures', 'tidewhisper-mirelure-decoys'],
   npcs: ['dialogue'],
   village: ['village', 'night', 'house', 'farm', 'stations', 'bounty-board', 'tidewhisper-village'],
   building: ['home-claim', 'home-furnishings', 'home-interior', 'building-preview', 'building-storage',

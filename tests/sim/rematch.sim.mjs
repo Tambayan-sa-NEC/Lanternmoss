@@ -27,7 +27,8 @@ try {
   assert.ok(rematchReady(COMBAT.enemies.gloomcap), 'the Moss King has his kit (31b)');
   assert.ok(rematchReady(COMBAT.enemies.pyrrhax), 'and the wyrm has his (31c)');
   assert.ok(rematchReady(COMBAT.enemies.malgrath), 'and the Demon Lord his (31d)');
-  assert.ok(!rematchReady(COMBAT.enemies.mirelure), 'but the worlds whose stages have not run do not (31e)');
+  assert.ok(rematchReady(COMBAT.enemies.mirelure) && rematchReady(COMBAT.enemies.ironclaw), 'and the Tide pair theirs (31e)');
+  assert.ok(!COMBAT.enemies.umbra, 'but the worlds whose stages have not run do not exist to be offered (31f)');
   atLair();
   assert.equal(Rematch.offered, false, 'an unbeaten lair offers no rematch');
   assert.equal(Rematch.target(), null);

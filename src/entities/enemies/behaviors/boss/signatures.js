@@ -41,7 +41,22 @@
 
      def.attacks[id]: { windup, recover, cooldown, reuse?, maxRange (how far off it can start), radius, damage,
                         lethal, reach? (how far in front of the boss the circle is planted), commit? (0..1 of the
-                        wind-up spent aiming, default 0.45), onHero? (the circle sits on the hero while it aims) } */
+                        wind-up spent aiming, default 0.45), onHero? (the circle sits on the hero while it aims) }
+
+   THE FALSE LURE SIGNATURE (TODO 31e). Tidewhisper's own threat, and Mirelure's: a light that is not what it
+   seems. A ring of decoy lanterns is lit at once, every one of them false, each marked on the ground with the circle
+   it will burst over. Left alone they all burst when the wind-up ends and sting anyone inside; but they are real
+   objects, so a blow pops one early, which makes a ranged hero's answer different from a melee hero's (pop it from
+   outside the circle, or simply keep out of it). The ring is laid so the way out is always open: the lamps are
+   spaced further apart than two of their own circles are wide, and the middle of a ring around the hero is safe
+   ground, so it punishes running blindly rather than standing still. `around` rings the boss instead of the hero.
+   Worn by Mirelure's rematch twice (`decoys` around the hero while she is under, `glare` around herself once she is
+   up) and exported for Nyxra with the rest.
+   The lamps are the `falseLure` object (COMBAT.enemies.falseLure, behaviour below); the signature makes and owns the
+   ground marks the first time it runs, and puts out any lamp still lit if the fight is cancelled.
+
+     def.attacks[id]: { windup, recover, cooldown, reuse?, count, spread (metres from the centre to each lamp),
+                        radius (its burst), damage, knockback, around? (ring the boss, not the hero) } */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
 import { playerInArea } from '../../../../combat/area.js';
@@ -56,7 +71,7 @@ import { toast } from '../../../../ui/toast.js';
 import { arcDist, dirAlong, offsetDir, tangentToward, turnToward } from '../../../../utils/sphere.js';
 import { damp } from '../../../../utils/math.js';
 import { mpick, rng } from '../../../../utils/random.js';
-import { dryGround } from '../../../../world/terrain.js';
+import { dryGround, waterAt } from '../../../../world/terrain.js';
 import { bossDecal, keepInArena, predictHero, shortName } from './core.js';
 
 const THORN = 0x6a8a3a, TIP = 0xb48cff;
@@ -214,3 +229,81 @@ export function doomSignature(id) {
 
 /** Where a Doom Blade circle is right now, for the checks: the ground that kills, while it is still only marked. */
 export const doomCircleOf = (e, id) => (e.doomTele?.[id] ? { at: e.doomTele[id].at.clone(), radius: e.def.attacks[id].radius } : null);
+
+
+const LAMP = 0xffd36b, FOAM = 0xe8fbff;
+let lureHint = false;
+
+/** Where this ring's lamps will be lit: evenly round the hero (or the boss), turned to a random angle. */
+export function lureSpots(e, a) {
+  const centre = a.around || ctx.player.dead ? e.up : ctx.player.up, turn = rng() * Math.PI * 2, out = [];
+  for (let i = 0; i < a.count; i++) out.push(keepInArena(e, offsetDir(centre, turn + i / a.count * Math.PI * 2, a.spread)));
+  return out;
+}
+
+/** The ground marks this move owns, one disc and one rim per lamp: made the first time it runs. */
+function lureTele(e, id, count) {
+  const marks = (e.lureTele ??= {})[id] ??= [];
+  while (marks.length < count) marks.push({ disc: bossDecal(e, 'disc', LAMP, { k: 0.8, surface: true }), edge: bossDecal(e, 'ring', LAMP, { k: 1.7, lift: 0.14, surface: true }) });   // over water they sit on the water, so the whole circle can be read
+  return marks;
+}
+
+/** A lamp bursts: a stinging flash over the circle it was marked with, to whoever is still inside it. */
+function lampBurst(boss, lamp, a) {
+  const level = waterAt(lamp.up)?.level ?? null;
+  ringFX(lamp.pos, a.radius, LAMP, 0.5, level); ringFX(lamp.pos, a.radius * 0.55, FOAM, 0.35, level);
+  sparkles.emit(lamp.center(), { count: 36, color: LAMP, speed: 4, up: lamp.up, upBias: 0.8, life: 0.7, size: 0.42 });
+  audio.explode();
+  if (playerInArea(lamp.up, a.radius)) hurtPlayer(a.damage, lamp.pos, a.knockback, { source: boss });
+}
+
+/** The decoy lantern: bobs on the water, flickers faster the nearer it is to bursting, and bursts if it is struck. */
+export const falseLure = {
+  animate(e) {
+    if (e.alive && !e.owner?.alive) { e.vanish(); return; }          // its boss is gone (a rematch called off): so is the light
+    const w = waterAt(e.up); e.hover = (w ? w.level - e.r : 0) - 0.15 + Math.sin(ctx.time * 1.8 + e.seed) * 0.08;
+    const k = e.lureK ?? 0, beat = Math.abs(Math.sin(ctx.time * (5 + 14 * k)));
+    e.lamp.scale.setScalar(1.1 - 0.6 * beat * (0.4 + 0.6 * k) + e.hitPop * 0.3);
+    e.body.rotation.z = Math.sin(ctx.time * 1.3 + e.seed) * 0.12;
+  },
+  onDie(e) {
+    const boss = e.owner, a = boss?.def.attacks[e.lureId];
+    if (boss?.alive && a) lampBurst(boss, e, a);                    // popped early: it goes off where it floats
+  },
+};
+
+/** Builds the false lure move. `id` is the key it lives under in the kit's moves and in def.attacks. */
+export function falseLureSignature(id) {
+  const putOut = e => { for (const l of e.decoys ?? []) if (l.alive) l.vanish(); e.decoys = []; };
+  return {
+    begin(e) {
+      const a = e.def.attacks[id];
+      putOut(e);                                                       // never two rings at once, whatever interrupted the last
+      e.decoys = lureSpots(e, a).map((d, i) => { const l = e.spawnMinion('falseLure', d); l.lureId = id; l.lureSlot = i; l.lureK = 0; return l; });
+      for (const l of e.decoys) sparkles.emit(l.center(), { count: 12, color: LAMP, speed: 1.6, up: l.up, upBias: 1.2, life: 0.8, size: 0.34 });
+      audio.sparkle();
+      if (!lureHint) { lureHint = true; toast('More lantern lights... every one of these is false. Keep out of their circles, or pop them from afar.'); }
+    },
+    windup(e, dt, k) {
+      const a = e.def.attacks[id], lamps = (e.decoys ?? []).filter(l => l.alive), marks = lureTele(e, id, a.count);
+      turnToward(e.fwd, e.toP, e.up, damp(3, dt));
+      marks.forEach((m, i) => {
+        const l = lamps.find(x => x.lureSlot === i);
+        if (!l) { m.disc.hide(); m.edge.hide(); return; }             // a popped lamp takes its circle with it
+        l.lureK = k;
+        m.disc.place(l.up, null, a.radius).opacity = 0.14 + 0.26 * k;
+        m.edge.place(l.up, null, a.radius).opacity = 0.5 + 0.5 * Math.abs(Math.sin(ctx.time * (6 + 10 * k)));
+      });
+    },
+    fire(e) {
+      const a = e.def.attacks[id];
+      for (const l of (e.decoys ?? []).filter(x => x.alive)) { lampBurst(e, l, a); l.vanish(); }
+      e.decoys = [];
+      if (e.heard) audio.growl();
+    },
+    cancel: putOut,
+  };
+}
+
+/** The lamps lit right now, for the checks: where each is and how far its burst reaches. */
+export const lampsOf = (e, id) => (e.decoys ?? []).filter(l => l.alive).map(l => ({ lamp: l, at: l.up.clone(), radius: e.def.attacks[id].radius }));
