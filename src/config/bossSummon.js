@@ -33,6 +33,7 @@ export const ARENA_WALLS = {
   fire:     { color: 0xff6a2a, glow: 0xffb03d, height: 2.6, kind: 'flame' },
   hellfire: { color: 0xd0305a, glow: 0xff4d6d, height: 2.8, kind: 'flame' },
   surf:     { color: 0xbff4ff, glow: 0xe8fbff, height: 2.4, kind: 'surf' },     // Mirelure's lagoon: crashing surf
+  moonfire: { color: 0xbfa8ff, glow: 0xe8e0ff, height: 2.5, kind: 'flame' },    // Umbra's ring: pale, cold moonfire
 };
 
 /** What villagers say about a sealed lair: one hint per unmet condition ({boss} = its short name). */

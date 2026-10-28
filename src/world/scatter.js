@@ -15,6 +15,7 @@ import { propFlower, propRock, propSmallMushroom, propTree, TREE_KINDS } from '.
 import { dryGround, ponds, slopeAt, surfM } from './terrain.js';
 import { movingWater } from './physics.js';
 import { scatterCoastalFlora } from './coastalFlora.js';
+import { scatterDuskFlora } from './duskFlora.js';
 
 const n = base => Math.round(base * WORLD.scatter);
 /** A free spot (findSpot) that isn't on a steep slope. */
@@ -65,8 +66,9 @@ function bankSpot() {
 /** Trees (the planet's own kinds: flora.trees weights, an occasional giant), rocks, flower clusters and small mushrooms.
     Returns how many trees of each kind grew; every tree and rock is also listed in spots ({ trees, rocks }: { dir, kind,
     s, r }) so they can be chopped and mined (src/gameplay/Gathering.js). */
-export function scatterFlora(B, flora = {}, spots = { trees: [], rocks: [] }) {
+export function scatterFlora(B, flora = {}, spots = { trees: [], rocks: [] }, { canopy = null } = {}) {
   if(flora.coastal)return scatterCoastalFlora(B,flora,spots);
+  if (flora.canopy) return scatterDuskFlora(B, flora, spots, canopy);     // Duskhollow: the canopy decides what grows where (30b)
   const trees = flora.trees ?? { blossom: 4, pine: 3, shroom: 2 }, flowerColors = flora.flowers ?? FLOWER_COLORS, grown = {};
   for (let i = 0; i < n(flora.treeCount ?? 52); i++) {
     const kind = weighted(trees), d = kind === 'willow' ? bankSpot() ?? flatSpot(2.1) : flatSpot(2.1); if (!d) continue;

@@ -18,6 +18,13 @@ without dozens of real lights. `src/render/lighting.js` adds two layers, tuned i
 `LocalLights.setDarkness(d)` (0 surface, 1 a cave) dims the sun and sky light to `dimFloor` (12%) and draws the sky and
 fog at `skyFloor` (30%). While it is dark the hero carries a light (radius 5 m). Sources are added with
 `LocalLights.add({ at, radius, color, intensity, real, outdoor })` and removed with the returned handle's `remove()`.
+
+Two places ask for darkness today. A cave sets `CAVE.darkness` while the hero is inside one
+(`src/gameplay/Dungeons.js`). On the unreleased Duskhollow, `src/world/mechanics/lanternView.js` sets it every frame
+from the endless dusk and the canopy overhead, and overrides the hero's carried light with the belt lantern's radius
+and strength, so an empty lantern shrinks to a safe ember instead of going out
+(see [Duskhollow](../world/duskhollow.md)). Only one of them owns the darkness at a time: the view stands back while
+the hero is in a cave.
 `at` is a live position or a function. The nearest 8 sources to the hero get the shader spots. Home lamps
 (`gameplay/Building.js`) are the first real sources, at the same brightness as before.
 

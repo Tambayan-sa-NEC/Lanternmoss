@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { DAY } from '../config/day.js';
 import { PLANETS } from '../config/planets.js';
-import { CROPS, FARM } from '../config/resources.js';
+import { CROPS, FARM, SHADE_CROP_REFUSAL } from '../config/resources.js';
 import { ctx } from '../core/context.js';
 import { emit } from '../core/events.js';
 import { sparkles } from '../fx/sparkles.js';
@@ -132,9 +132,10 @@ export const Farm = {
     if (!dryGround(p.dir)) { toast('Wait for the water to recede.'); return; }
     if (!p.s.tilled || p.s.crop) return;
     if (!sd) { toast('You have no seeds. Pim sells them, and you sometimes find some picking sweetleaf.'); return; }
+    if (CROPS[sd.def.props.crop]?.shade && !this.shaded()) { toast(SHADE_CROP_REFUSAL); return; }
     ctx.player.inventory.removeFromSlot(sd.slot, 1);
     Object.assign(p.s, { crop: sd.def.props.crop, growth: 0 });
-    if (this.raining()) p.s.watered = true;
+    if (this.watering()) p.s.watered = true;
     this.look(p); audio.plip();
     sparkles.emit(p.dir.clone().multiplyScalar(groundHeight(p.dir) + 0.3), { count: 12, color: 0x7fd07a, speed: 1.2, up: p.dir, upBias: 1, life: 0.6, size: 0.26 });
     toast(p.s.watered ? `Planted ${sd.def.name}. The rain will water them.` : `Planted ${sd.def.name}. Now water them!`);
@@ -161,10 +162,16 @@ export const Farm = {
     for (const p of this.plots) if (dryGround(p.dir) && p.s.crop && p.s.watered) { p.s.growth = Math.min(1, p.s.growth + growthFor(p.s.crop, seconds, DAY.length)); this.look(p); }
   },
   raining() { const w = this.world?.weather; return !!w && FARM.rainWaters.includes(w.kind) && (w.k ?? 1) > 0.5; },
+  /** The live planet mechanic, for the two rules a world may own: watering its plots and lying in shade. */
+  mechanic() { return this.world?.mechanics?.active?.instance ?? null; },
+  /** Rain, or a world that waters its own plots (Duskhollow's dripping caps, 30c). */
+  watering() { return this.raining() || this.mechanic()?.watersFarm === true; },
+  /** Shade crops only take where the world's mechanic says it lies in shade. */
+  shaded() { return this.mechanic()?.shaded === true; },
   update(dt) {
     if (!ctx.started || !this.plots.length) return;
     if (dayClock.day !== this.day) { this.day = dayClock.day; for (const p of this.plots) { p.s.watered = false; this.look(p); } }   // a new day: the soil dries
-    const rain = this.raining();
+    const rain = this.watering();
     for (const p of this.plots) {
       const s = p.s; if (!s.crop || !dryGround(p.dir)) continue;
       if (rain && !s.watered && s.growth < 1) { s.watered = true; this.look(p); }

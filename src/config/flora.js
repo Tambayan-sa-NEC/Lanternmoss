@@ -16,4 +16,8 @@ export const TREE_KINDS = {
   crystal:  { name: 'crystal spire', r: 0.45, cam: { r: 1.2, base: 0.6, top: 3.6 }, wood: false },
   ember:    { name: 'ember tree', r: 0.45, cam: { r: 1.7, base: 2.0, top: 4.6 } },
   snowpine: { name: 'snowy pine', r: 0.42, cam: { r: 1.4, base: 0.9, top: 5.6 } },
+  // Duskhollow (30b): the canopy overhead and the small caps you walk under. The giant cap hangs far above the
+  // camera, so only its trunk is in the way; neither is wood an axe can chop.
+  lumenCap: { name: 'lumen cap', r: 1.15, cam: { r: 1.5, base: 0, top: 9 }, wood: false },
+  glowcap:  { name: 'glowcap', r: 0.34, cam: { r: 1.5, base: 1.4, top: 3.1 }, wood: false },
 };

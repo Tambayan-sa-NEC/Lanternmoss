@@ -187,6 +187,17 @@ export function buildRoom(def, layout) {
       for(let k=0;k<3;k++)addTo(root,part(G.ico(.12,0),0x9cdde3),[-.9+k*.16,1.17,-1.3],[0,0,.4],[1.5,.4,.5]);
     }
   }
+  if (def.dusk) {
+    // Inside a stalk (30d): lit gills overhead instead of a flat ceiling, a lantern vine, and the lamplighter's oil.
+    for (let i = 0; i < 14; i++) {
+      const a = i / 14 * Math.PI * 2;
+      addTo(root, part(G.box(0.16, 0.08, 3.1), 0xffd9a0, { glow: true, intensity: 1.5 }), [Math.sin(a) * 2.1, 3.05, Math.cos(a) * 2.1], [0, a, 0]);
+    }
+    addTo(root, part(G.cyl(0.05, 0.05, 1.1, 5), 0x6f8f7a), [1.9, 2.5, -1.4]);
+    addTo(root, part(G.cone(0.26, 0.4, 6), 0xbff4c8, { glow: true, intensity: 2 }), [1.9, 1.85, -1.4], [Math.PI, 0, 0]);
+    for (let k = 0; k < 3; k++) addTo(root, part(G.cyl(0.17, 0.2, 0.42, 7), 0xc8a85c), [-2.9 + k * 0.42, 0.21, 1.9]);
+    if (def.owner === 'Wick') addTo(root, part(G.box(0.3, 0.42, 0.3), 0xffb85c, { glow: true, intensity: 2.6 }), [2.9, 0.98, 1.1]);
+  }
   addTo(root, part(G.cyl(0.65, 0.75, 0.04, 8), 0xd9c7b8), [entrance.x, 0.06, entrance.z]);              // doormat
   const back = new THREE.Mesh(new THREE.SphereGeometry(46, 16, 10), new THREE.MeshBasicMaterial({ color: 0x2a1e2e, side: THREE.BackSide, fog: false }));
   back.renderOrder = -5; root.add(back);

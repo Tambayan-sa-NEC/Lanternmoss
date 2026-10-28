@@ -1598,32 +1598,234 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
-| [ ] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
-| [ ] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
-| [ ] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
-| [ ] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
-| [ ] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
-| [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
-| [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
+| [x] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
+| [x] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
+| [x] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
+| [x] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
+| [x] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
+| [x] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
+| [x] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
+| [x] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
+
+**30i checkpoint (2026-10-29):** The first-visit XP, coin and minimum-material routes pass, and a candidate browser
+run covers portal travel, the Old Road quest, its oil reward, Continue, Low quality and beetle accessibility at
+720p/1080p. Unit tests (318/318) and simulations (71/71) pass. Umbra's two-seed combat timing remains outside the
+180-300 second boss band for some heroes, and the idle Acer performance diagnostic has four of 18 rows over the
+16.67 ms frame limit (up to 21.3 ms). Retake the tour and get clean committed performance evidence only after these
+gates pass. Duskhollow remains unreleased; this stage has not merged into its parent.
+
+**30h implemented (2026-10-26):** Duskhollow has its boss, and she is the world's rule taken to its conclusion:
+**she dives at the brightest light there is**, which on this world is usually the one on the hero's own belt.
+`src/entities/enemies/behaviors/boss/umbra.js` (on the shared boss framework) puts **Umbra** in the air over her
+lair inside a ring of pale **moonfire** (`ARENA_WALLS.moonfire`), behind the level-11 and Old Road gate 30d
+installed. Four **arena lanterns** (`behaviors/arenaLamp.js`) ring the lair, dark: press `E` at one with a lit belt
+lantern and it catches for a little oil, and a burning arena lantern is brighter than the hero, so it takes the
+dive. A dive into a lit lantern **crashes her into the ground**, stunned for `crash.stun` seconds and taking
+`stunnedDamageBonus` extra -- the whole damage window. A dive with nothing lit comes at the hero and only hurts.
+Her **wingbeat** puts every arena lantern out, takes `snuff.oil` from the tank and calls shadelings (30e) out of the
+dark it leaves, bounded by `snuff.maxShades`; a snuffed lantern waits `lanterns.relight` seconds. From **50%** she
+**drinks the light**: each feed drains one lantern for good, so the ring genuinely dims as the fight runs, and the
+scales she sheds hang on the hero as a fog that presses their carried light in through a new transient
+`Player.blindK` read by `lanternView`. Her trophy is the new **Dusk Crown**.
+Nothing walls the fight off: an empty lantern lights no bait, but she stays hittable, a crashed moth is crashed
+either way, and all three heroes light the bait with the lantern they all carry rather than a spell.
+Checked by `tests/duskMonsters.test.mjs`, `tests/sim/duskUmbra.sim.mjs` and `node scripts/dusk-umbra-smoke.mjs`
+(port 8136; real `E` lighting a lantern for real oil, the crash and its window, the wingbeat really emptying the Oil
+bar, and the fog really shrinking the carried light from 7.1 m to 3.2 m), plus two reviewed shots. The sim drives
+her moves through a new exported `startMove`, the kit's own path, rather than poking the state machine, so what the
+checks exercise is what plays. Full suites passed: 314 unit tests and 70 simulations.
+Duskhollow is now complete except for its release: it still stays `released: false` until 30i's acceptance.
+See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: the campaign release (30i).
+
+**30g implemented (2026-10-22):** Duskhollow has its mini boss, and her fight is the world's own rule once more.
+**Grandmother Gloomweaver** (`src/entities/enemies/behaviors/boss/grandweaver.js`, on the shared boss framework)
+hangs in a canopy of her own web over the **moonstone vein** she guards, `anchors.hang` metres up on three anchor
+strands. Up there she **refuses every blow**, so hitting her is not the answer; she drops the same sticky webs her
+grandchildren spin (30f) and spits fans of slowing silk.
+An **anchor strand** (`behaviors/anchor.js`) is an object that **cannot be cut, only burnt**: a blade glances off,
+but a **lit belt lantern** held within `reach` chars one through over `burnTime` -- which every hero can do, and an
+empty lantern cannot -- and a hit carrying `fire` takes one in a single touch. The last strand parts and she crashes
+down, lying dazed and open for `anchors.dazed` seconds before she fights on the ground (bite, sweep, the same spit).
+At **60%** and **30%** she climbs back up and spins a fresh set, so the fight is three rounds of burn-the-strands
+and fight-her-down. She wears the same spider/beetle pair as the regular weavers, so one `roundBeetles` setting
+covers the grandmother and her grandchildren in the same frame. Beaten, she leaves spider silk and a moonstone, and
+`guardedBy` on the moonstone vein moved from the regular weaver to her, so the rare placement now puts it beside
+her and the "(guarded)" prompt clears when she falls.
+Her thrown silk slows the hero through the `mireK` added in 30f, on its own timer, so nothing new is saved.
+Checked by `tests/duskMonsters.test.mjs`, `tests/sim/duskBoss.sim.mjs` and `node scripts/dusk-boss-smoke.mjs`
+(port 8135; she really refuses every blow up there, a strand really refuses a blade and really ignores an empty
+lantern, real `W` walking up with a lit one really burns it through, and the beetle toggle really swaps her and her
+grandchildren together), plus a reviewed shot. Full suites passed: 312 unit tests and 69 simulations.
+This stage also merged the owner's **Tidewhisper release** from `develop` into the TODO 30 parent first: one
+conflict in `scripts/lib/tidewhisper-browser.mjs`, where their new `candidate: false` option and this branch's
+`bootstrap` option both had to survive, and all six Duskhollow browser checks were rerun against the merged tree.
+Duskhollow's boss is still only a name in the catalogue, so the world fails the content gate by design and stays
+`released: false`. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: Umbra and the release (30h-30i).
+
+**30f implemented (2026-10-22):** Duskhollow's other two monsters are in, and with them the silk the world has been
+asking for since 30c.
+**Gloomweavers** (`src/entities/enemies/behaviors/weaver.js`) are round, fuzzy spiders that bite like any other
+biter and, between bites, **spin**: every `web.every` seconds they lay a sticky web a couple of paces ahead, up to
+`web.max` of their own at a time, trying several bearings so one facing a rock still strings what it can. A **web**
+(`behaviors/web.js`) is an object, not a monster -- no page, no drops, no kill counted -- and it is walk-through,
+never solid: standing in one makes the hero wade at `mire` of walking speed, through a new transient `Player.mireK`
+that nothing saves. **A blade cuts it** (ordinary blows, a little health to work through) and **fire burns the whole
+thing away in one** (the `fire` option added in 30e). Either way it leaves **spider silk**, and an uncut web rots
+after `life` seconds so a hollow can never silt up.
+**Snuffers** (`behaviors/thief.js`) dart in, take `steal.oil` straight out of the tank through the lantern
+mechanic's own `burn()` -- so the Oil bar and the saved value move together -- and run off quicker than they came
+with the flask showing on their belt. **Catch one and the lantern gets it back with interest** (`steal.interest`).
+A theft is only ever as big as the tank still holds, so an empty lantern has nothing to steal and a snuffer can
+never leave the hero worse off than empty.
+**Accessibility:** a new `roundBeetles` setting (Settings -> Gameplay) draws every spider on this world as a round
+beetle. Both silhouettes are built into the model and one is hidden (`showSpiderLook` in
+`src/models/duskMonsters.js`), so the toggle lands the next frame, costs no rebuild, and the regular weaver and
+Grandmother Gloomweaver (30g) will share the one switch. Nothing about the fight changes.
+Checked by `tests/duskMonsters.test.mjs` (now the world's four monsters), `tests/sim/duskWeavers.sim.mjs` and
+`node scripts/dusk-weavers-smoke.mjs` (port 8134; real `W` walking into a web, a blade freeing the hero and leaving
+silk, one hit of fire burning a web away, the Oil bar really drained and really repaid, and the toggle swapping
+every spider on screen), plus three reviewed shots. Full suites passed: 310 unit tests and 68 simulations. One sim
+assertion had to be made honest on the way: the repayment check filled a nearly full tank, so the refill stopped at
+the brim and the interest could not be seen; it now leaves room first and asserts the exact multiple. All four
+regular monsters are in, but the world has no mini boss or boss fight, so it still fails the content gate by design
+and stays `released: false`. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: Grandmother
+Gloomweaver, Umbra and the release (30g-30i).
+
+**30e implemented (2026-10-22):** Duskhollow's first monsters take their rules from its light.
+**Shadelings** (`src/entities/enemies/behaviors/lightbound.js`) are only shadows where the ground is dark: a flat
+stain that follows you, untargetable like a burrowed thornmole - and, by the same rule, unable to strike, so an
+unreadable monster never lands a blow. Where there is light they stand up solid and fight. What counts as light is
+answered by the new `OldRoad.litAt(dir)`: the village gap, the belt lantern (full or down to its safe ember), the
+brazier, and every waylamp and moonwell relit in 30d, so **the road you lit is the road you can fight on**. A
+**burst** of light drives them off - light that was not there a moment ago, never light you merely walked closer to:
+OldRoad emits `lightflare` when a lamp or moonwell catches and when an empty lantern is refilled. Fire does the same;
+the witch's Fireball and Meteor now carry `fire` through to `damageEnemy`, read by a new behaviour hook `onHurt`
+beside the existing `refuses` and `damageScale`.
+**Mosslurks** (`behaviors/mimic.js`) are scenery until something reaches for them: a disguised one is untargetable,
+motionless and offers the real glowcap patch's prompt, *"Pick the glowcap patch"*. Picking it or walking over it
+springs the ambush, always with a warning circle on the ground for the whole wind-up first. They hold no saved state,
+so Continue and travel can never leave one sprung. A new roster placement `near: 'glowcaps'` plants them beside the
+world's real glowcaps.
+Models are in `src/models/duskMonsters.js` (a shadeling draws either its ground stain or its solid body; a mosslurk
+hides its mouth, eyes and legs under its caps), with bestiary pages and drops (lumen dust, glowcaps).
+Checked by `tests/duskMonsters.test.mjs`, `tests/sim/duskMonsters.sim.mjs` and `node scripts/dusk-monsters-smoke.mjs`
+(port 8133; both kinds render, a shadow really cannot be hit, the lantern really stands one up solid, a waylamp
+coming on really drives it off, and real `E` springs a mimic), plus two reviewed shots. Full suites passed: 307 unit
+tests and 67 simulations. Two gate tests had to be re-pointed: they used Duskhollow as "a draft with no generation
+data", which a roster makes untrue, so the Moon now plays that part and Duskhollow is asserted to be blocked by the
+content gate instead. The roster is two of four regular monsters with no mini boss, so Duskhollow still fails the
+content gate by design and stays `released: false`. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here:
+gloomweavers and snuffers, Grandmother Gloomweaver, Umbra and the release (30f-30i).
+
+**30d implemented (2026-10-22):** Duskhollow has people and a purpose. `src/config/duskVillage.js` adds **Wick the
+lamplighter** (the keeper look and swinging lantern Tidewhisper's Marlo already wears), the four travellers' arrival
+lines, and two **stalk houses** you can walk into: Wick's own and a traveller's. `src/world/interiors.js` grows the
+inside of a stalk for them on a new `dusk` flag -- lit gills overhead instead of a flat ceiling, a lantern vine and
+the lamplighter's oil jars -- the way `coastal` already flavours the keeper's chart room.
+**The Old Road** (`src/config/oldRoad.js`, `src/gameplay/OldRoad.js`) leaves the village in one branch for each of
+the first three authored gaps of starlight, so every **moonwell** stands under open sky, with **waylamps** along each
+branch and the **village brazier** burning in the village gap. Press `E` at the brazier to carry the village flame,
+`E` at a waylamp to light it, `E` at a moonwell to relight it. Lighting a waylamp is a relay: it stays lit for the
+rest of the adventure *and* fills the carried flame back up, so the road lights itself once you start. A flame burns
+by the belt lantern's own rule (never indoors, in a cave, in a menu, paused, or over skipped and away time) and
+**running dry costs only the walk back** to the last lit lamp, which hands out fire again. Which lamps and wells are
+alight, and the flame itself, are rules of the lantern mechanic, saved per planet beside the Oil bar, so Continue and
+portal travel restore a relit road. A lit lamp head glows on its own; only the brazier, the three moonwells and the
+nearest `OLD_ROAD.lamp.sources` waylamps hold a shared local light, so a road relit end to end stays inside the
+local-light budget (the duskWildlife budget check caught the first version, which held one light per lamp).
+Wick's quest **"Light the Old Road"** uses a new `light` quest step, and `boss.summon` now gates **Umbra** behind
+level 11 and that quest.
+Checked by `tests/oldRoad.test.mjs`, `tests/sim/oldRoad.sim.mjs` and `node scripts/old-road-smoke.mjs` (port 8132;
+real `E` carrying the flame and lighting lamps, a flame left to run dry costing no health, the village gap still
+reading as safe light, and a relit lamp's light reaching the shader), plus two reviewed shots. Full suites passed:
+300 unit tests and 66 simulations. Duskhollow stays `released: false` with no roster, so nothing yet answers the gate
+Wick's quest opens. See [Duskhollow](docs/wiki/world/duskhollow.md). Not done here: every monster, Grandmother
+Gloomweaver, Umbra herself and the release (30e-30i).
+
+**30c implemented (2026-10-21):** Duskhollow has an economy and a sky of its own. `src/config/duskResources.js`
+(shaped like the coast's) adds lumen ore, dust, ingots, spider silk, moonstone, **lumen oil** and the **shade
+mushroom** crop, with the recipes that join them: ore smelts at the forge, glowcaps and dust brew into oil, and the
+four-piece **Dusk set** is forged from ingots, silk and dust. Lumen veins need an iron pickaxe, the moonstone vein is
+a guarded rare vein, and a glowcap can be tipped straight into the lantern for 10 oil, so the world now has three
+refills. The set's bonuses are about the light: two pieces burn oil 40% slower, three burn 60% slower and reach 15%
+further, carried to the mechanic through the hero's ordinary set effects (`lanternOil`, `lanternRadius`).
+**Spore drift** and **deep dark** join the weather, and the acceptance line's rule holds: the weather only states a
+number, and the world's mechanic decides what it means. Deep dark thickens the dusk by `LANTERN.dusk.deepDark` of
+the light that is left and presses the lantern in by `LANTERN.light.deepDarkShrink`; no rain falls at all, so the
+**dripping caps** water the farm early in the day through the mechanic's `watersFarm`, and **shade spores** only
+take where its `shaded` rule says so. Its music is the procedural `musicBox` theme. BALANCE.budgets reserves the
+Dusk set the way Tidewhisper reserves the Tide set.
+Checked by `tests/duskEconomy.test.mjs`, `tests/sim/duskEconomy.sim.mjs` and `node scripts/dusk-economy-smoke.mjs`
+(port 8131; real `E` mining with an iron pickaxe, the Craft tab, a glowcap poured into the lantern, deep dark taking
+the hollow from 91/255 to 58/255 while the lit ground holds 64/255, and real `E` planting shade spores), plus a
+reviewed shot. Full suites passed: 293 unit tests and 65 simulations. Three sims had to be made deliberate rather
+than lucky, because new content moves the seeded bot stream: the pets sim now quiets the neighbours before checking
+that a passive pet does not bite, the coastal sim takes a surf skipper that is actually submerged, and the pacing
+audit accepts a crop whose seeds are foraged instead of sold. Duskhollow stays `released: false` with no roster. See
+[Duskhollow](docs/wiki/world/duskhollow.md). Not done here: Wick's Old Road, the interiors, every monster and the
+release (30d-30i); spider silk has no in-world source until the webs of 30f.
+
+**30b implemented (2026-10-21):** Duskhollow is planted and populated. `src/world/duskFlora.js` grows the canopy by
+one rule that ties it to the light: a giant **lumen cap** (a 19 m stalk under an 8 m cap with lit gills and hanging
+lantern vines) only grows where the dusk is at full strength, so the roof is solid over the hollows and genuinely
+open over every authored gap and the village. **Glowcaps**, **ghost ferns** and **pale moonflowers** fill in
+everywhere, gaps included; all four counts are authored in `flora.canopy` and capped in code.
+Its animals are **glow snails** (they pull into their lit shells), **lantern bats** (they hang in the air under the
+caps and flutter off), **dusk crickets** (heard before seen), pale blind fish in the pools, and the rare
+**Moonmoth**, built in `src/models/duskCreatures.js` with the hover and wingbeat fields added to `Critter`.
+**Firefly swarms** (`src/gameplay/Fireflies.js`) drift as a soft light and a trickle of particles rather than
+bodies; real `E` catches one for a **Firefly Jar** that pours 25 oil into the lantern, and the caught swarm's
+waiting time is saved per planet (new `fireflies` planet row) so Continue cannot relight it and reloading cannot
+farm jars. The Moonmoth's **Moonmoth Wing** charm widens a lit lantern 1.4x (7.5 m to 10.5 m) and never changes the
+safe ember; it is marked `props.giftOnly`, a new rule in `src/gameplay/loot.js` that keeps an unreleased world's
+gift out of every random chest.
+Checked by `tests/duskWildlife.test.mjs`, `tests/sim/duskWildlife.sim.mjs` and
+`node scripts/dusk-wildlife-smoke.mjs` (port 8130; the canopy and animals render, real `E` catches a swarm, the jar
+pours oil, the charm widens the carried light, 720p/1080p, zero page and shader errors), plus two reviewed shots.
+Full suites passed: 287 unit tests and 64 simulations. One real defect was found and fixed on the way: a comment
+appended to the wrong line had swallowed `this.fwd.applyAxisAngle(this.up, rng() * 6.28)` in `Critter`, which
+dropped one draw from the seeded world stream and moved every seeded layout (caves, pets and coastal sims failed
+until it was restored). Duskhollow stays `released: false` with no roster. See
+[Duskhollow](docs/wiki/world/duskhollow.md). Not done here: the lumen economy, weather, music, Wick's Old Road,
+every monster and the release (30c-30i).
+
+**30a implemented (2026-10-21):** Duskhollow now generates. `src/config/planets/duskhollow.js` seeds deep valleys
+(hills plus ridged noise, more than 12 m of relief) under an authored canopy: its height, the village gap and five
+gaps of starlight. The new `lantern` mechanic (`src/world/mechanics/lantern.js`, tuned in `src/config/lantern.js`)
+keeps the day clock turning as brighter and dimmer dusk and multiplies it by the canopy cover where the hero stands;
+that darkness goes to the 29a local light, which keeps its minimum ambient, so the world is dark but never a black
+screen. The belt lantern is the hero's carried light: its Oil bar sits beside Energy, it burns only while you play
+this world outdoors (never indoors, in a cave, in a menu, paused, or over skipped and away time), and an empty
+lantern shrinks from 7.5 m to a safe 2.8 m ember that costs no health. Oil is saved per planet. Walking lights the
+glowmoss (`src/fx/glowmoss.js`): one bounded, instanced additive trail of at most 24 prints that the scenery-density
+setting scales down. The mechanic stays pure, so its presentation lives in `src/world/mechanics/lanternView.js`,
+which the World owns exactly as it owns the tide's water.
+Checked by `tests/lantern.test.mjs` (6 unit tests, no browser stubs), `tests/sim/duskhollow.sim.mjs` and
+`node scripts/duskhollow-smoke.mjs` (port 8129, lowest preset: deep hollow 91/255 versus village gap 205/255 mean
+ground luminance, real WASD walking, the safe ember, 720p/1080p, zero page and shader errors). Full suites passed:
+283 unit tests and 63 simulations, plus the mechanics, tides and lighting browser checks for the shared registry,
+browser helper and light. Duskhollow stays `released: false` and has no roster, so it still fails the content gate
+by design; the checks use the test-only `tests/sim/lib/duskhollowFixture.mjs`. See
+[Duskhollow](docs/wiki/world/duskhollow.md). Not done here: the canopy models, flora, wildlife, economy, weather,
+music, Wick's waylamps, every monster and the release (30b-30i).
 
 - [ ] **Shape and look:** deep valleys under a canopy of giant lumen caps about 25 m up, with gaps of starlight. An
       endless dusk (the day clock still turns, as brighter and dimmer dusk). Glowmoss carpets light up in your
       footprints as you walk, the world's signature effect.
-- [ ] **Your lantern:** it hangs from the hero's belt and has an Oil bar beside Energy, refilled with glowcaps, firefly
+- [x] **Your lantern:** it hangs from the hero's belt and has an Oil bar beside Energy, refilled with glowcaps, firefly
       jars and lumen oil. An empty lantern shrinks to a small glow; it never hurts you. The village and its lamp posts
       are safe light. Relight **waylamps** along the roads and they stay lit (per-planet state, 24), making safe paths.
-- [ ] **Monsters (new):**
-  - **Shadelings:** only shadows outside your light, solid and hittable inside it. A burst of light (fire spells, a
+- [x] **Monsters (new):** (shadelings and mosslurks built in 30e; gloomweavers and snuffers in 30f)
+  - [x] **Shadelings:** only shadows outside your light, solid and hittable inside it. A burst of light (fire spells, a
     flare) sends them fleeing.
-  - **Gloomweavers:** round, fuzzy spiders that string sticky webs between the stalks. Webs slow you; fire or a blade
+  - [x] **Gloomweavers:** round, fuzzy spiders that string sticky webs between the stalks. Webs slow you; fire or a blade
     cuts them. (Accessibility: an option draws them as round beetles.)
-  - **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
-  - **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
-- [ ] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
+  - [x] **Mosslurks:** mimics that look like glowcap clusters and bite when you go to gather them.
+  - [x] **Snuffers:** little hooded thieves that dart in, steal oil and run; catch one to get it back with interest.
+- [x] **Mini boss: Grandmother Gloomweaver,** a huge spider in a canopy of webs. Burn her three anchor strands to bring
       her down, where she fights and spins new anchors. She guards the moonstone vein.
-- [ ] **Boss: Umbra, the Moth of the Last Light.**
+- [x] **Boss: Umbra, the Moth of the Last Light.**
   - Wakes when: level 11, and the three moonwell lanterns on the Old Road are relit for Wick's quest by carrying the
     village flame (run dry on the way and you start again from the last lit waylamp).
   - She dives at the brightest light. Light an arena lantern and she crashes into it, stunned and open to hits.
@@ -1631,19 +1833,19 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
   - At 50% she drinks light: the arena dims each time she feeds, and the scales she sheds blind you (a fog that
     follows you).
   - Arena ring: pale moonfire. Trophy: the Dusk Crown.
-- [ ] **Flora:** lumen caps (the canopy, and smaller ones you walk under), lantern vines hanging from them, ghost ferns,
+- [x] **Flora:** lumen caps (the canopy, and smaller ones you walk under), lantern vines hanging from them, ghost ferns,
       glowmoss and pale moonflowers.
-- [ ] **Wildlife:** firefly swarms (catch them in a jar with `E`, for light and oil), glow snails, lantern bats hanging
+- [x] **Wildlife:** firefly swarms (catch them in a jar with `E`, for light and oil), glow snails, lantern bats hanging
       under the caps, and crickets you hear before you see. Pale blind fish in glowing pools. Rare: the **Moonmoth**
       (gift: the Moonmoth Wing charm, a wider light).
-- [ ] **Weather:** no rain under the canopy (the dripping caps water the farm instead), plus two new kinds: **spore
+- [x] **Weather:** no rain under the canopy (the dripping caps water the farm instead), plus two new kinds: **spore
       drift** (glowing spores) and **deep dark** (the dusk thickens; the lantern mechanic shrinks your light a little).
-- [ ] **Resources and items:** lumen ore (needs an iron pickaxe) for lumen ingots, spider silk from cut webs (cloth for
+- [x] **Resources and items:** lumen ore (needs an iron pickaxe) for lumen ingots, spider silk from cut webs (cloth for
       light armour), firefly jars, and shade mushrooms (a crop that grows only in shade). Material: **lumen dust**. Rare
       vein: moonstone. Gear: the Dusk set (28).
-- [ ] **People:** Wick the lamplighter (lines, tips for Umbra, and the quest "Light the Old Road"); houses inside
+- [x] **People:** Wick the lamplighter (lines, tips for Umbra, and the quest "Light the Old Road"); houses inside
       mushroom stalks; the travellers' lines ("I can't see my own beard!").
-- [ ] **Music:** a music box over low strings, made in code.
+- [x] **Music:** a music box over low strings, made in code.
 
 ## 31. After the last boss **(suggested)**
 

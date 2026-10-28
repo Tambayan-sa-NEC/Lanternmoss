@@ -21,7 +21,9 @@ real projectile hits in flight and the transition immunity window.
 Reproduce with `npm run sim -- balance`; set `SIM_SEED` to change the gameplay seed and `BALANCE_JSON` to export the
 raw results. Set `BALANCE_CHECK=1` to make out-of-target profiles fail the report. `npm run sim -- pacing` audits the campaign XP, all chest-coin bounds, shop trade margins, farm/food timing
 and forge fuel budget from the actual configuration. `src/config/balance.js` holds targets and the reproducible route.
-Set `BALANCE_PLANET` to 0, 1 or 2 to rerun only the world being tuned; its JSON export contains only that world's rows.
+Set `BALANCE_PLANET` to 0 through 4 to rerun only the world being tuned; its JSON export contains only that world's rows.
+For Duskhollow, the bot springs mosslurks, burns Grandmother's anchors and lights Umbra's bait. It reserves damaging
+skills for Umbra's crash window. Duskhollow's two-seed boss timings are still being tuned and are not accepted yet.
 
 Bounty boards (TODO 34, `src/config/bounties.js`) are optional, repeatable income outside these budgets, like selling.
 Three jobs a day pay about 23 / 30 / 35 coins a day on average on Lanternmoss / Emberfall / Frostveil (200 sampled days,
@@ -125,7 +127,8 @@ Farming and gathering requirements still need play time; this is an XP route aud
 | Lanternmoss | 3 | 2 | 195–206 | 160 | 12 |
 | Emberfall | 5 | 4 | 226–237 | 220 | 46 |
 | Frostveil | 7 | 6 | 305–330 | 300, including two trinkets | 30 |
-| Tidewhisper (27h, unreleased) | 8 | 8 | 281–360 | 280, its own Tide set and pendant | 39 |
+| Tidewhisper | 8 | 8 | 281–360 | 280, its own Tide set and pendant | 39 |
+| Duskhollow (30i candidate) | 11 | 11 | 303–389 | 300, its own Dusk set and trinket | Audited separately |
 
 The bounds cover every possible chest coin roll, including each planet's boss chest. The pacing audit also samples 100 loot seeds for each hero/world.
 Selling **all** chest contents adds 101–207, 141–261 and 180–407 coins respectively in that sample, but sacrifices
@@ -139,13 +142,15 @@ Warm Hearts 90 and Songs 40 coins; the earlier villager rewards remain 95 total.
 planet scaling, avoiding the old early level jump while preserving the existing XP curve. Optional fights retain
 their rewards. Pim's seed prices are 3/3/5; every stocked item's buy price remains above its sell price.
 
-Tidewhisper is audited with its real id and planet index while it stays unreleased. Act I already ends at level 8,
+Tidewhisper is audited with its real id and planet index. Act I already ends at level 8,
 its summon level, so its route (The Dark Lighthouse and three Shellbacks crossing the beach) keeps the hero at 8
 without grinding. With no Act II gear beyond it yet, its coins reserve its own Tide set: the forge fees are 70/80/70
 and 60 for the pendant. Its materials are audited at minimum yields: washups return once per 300 s day and low-tide
 nodes are reachable once per day. The lens (6 seaglass, 6 wood) fits the first day, and the lens plus the whole set
-(28 seaglass, 14 wood including forge fuel, 4 pearls, 6 coral, 9 shells, 1 black pearl) fits two days. Revisit the
-budget when Duskhollow's gear exists.
+(28 seaglass, 14 wood including forge fuel, 4 pearls, 6 coral, 9 shells, 1 black pearl) fits two days. Duskhollow
+reserves its own row: the Dusk set costs 75/85/75 coins for armour and 65 for the trinket. Wick's Old Road reward
+is 75 coins. Three of each regular foe plus the quest reach level 11. The minimum-yield route supplies 22 ore,
+6 dust, 12 silk, one moonstone and 12 fuel wood within three vein cycles; these materials come from that world.
 
 ## Survival, gathering and crafting
 

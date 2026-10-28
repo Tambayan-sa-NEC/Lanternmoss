@@ -16,6 +16,7 @@ import { showBanner } from '../../ui/banner.js';
 import { toast } from '../../ui/toast.js';
 import { grantItem } from '../pickups.js';
 import { planetSources } from '../resourceRules.js';
+import { activeLantern } from '../../world/mechanics/lantern.js';
 import { gainCoins } from '../wallet.js';
 
 const DECLINE_WAIT = 45;                       // seconds before a declined quest is offered again
@@ -85,7 +86,8 @@ export const Quests = {
   check(id) {
     for (let guard = 0; guard < 10 && this.st(id).status === 'active'; guard++) {
       const st = this.step(id);
-      const ok = (st.kind === 'collect' && ctx.player.inventory.count(st.item) >= st.count) || (st.kind === 'reach' && ctx.planet >= st.planet);
+      const ok = (st.kind === 'collect' && ctx.player.inventory.count(st.item) >= st.count) || (st.kind === 'reach' && ctx.planet >= st.planet)
+        || (st.kind === 'light' && (activeLantern()?.wellsLit ?? 0) >= st.count);   // the Old Road's moonwells (30d)
       if (!ok || this.advance(id)) return;
     }
   },
@@ -114,7 +116,8 @@ export const Quests = {
     const id = this.tracked; if (!id) return null;
     const st = this.step(id), s = this.st(id);
     const progress = st.kind === 'collect' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}`
-      : st.kind === 'defeat' ? `${s.n}/${st.count}` : st.kind === 'deliver' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}` : '';
+      : st.kind === 'defeat' ? `${s.n}/${st.count}` : st.kind === 'light' ? `${Math.min(st.count, activeLantern()?.wellsLit ?? 0)}/${st.count}`
+      : st.kind === 'deliver' ? `${Math.min(st.count, ctx.player.inventory.count(st.item))}/${st.count}` : '';
     const person = st.to ?? QUESTS[id].giver, absent = !ctx.npcs.some(n => n.name === person);
     const home = PLANETS.find(p=>p.npcs?.locals?.some(n=>n.name===person))?.name ?? (person === 'Marlo' ? 'Tidewhisper' : 'their home world');
     return { title: QUESTS[id].title, text: absent ? `Return to ${home}: ${st.text}` : st.text, progress };

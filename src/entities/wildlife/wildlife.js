@@ -23,6 +23,7 @@ import { SeaShoal } from './SeaShoal.js';
 import { Bird, Flock } from './Bird.js';
 import { Critter } from './Critter.js';
 import { Fish } from './Fish.js';
+import { Fireflies } from '../../gameplay/Fireflies.js';
 
 /** A spot out in the wilds, at least `min` metres from the village. */
 function wildSpot(village, min = COMBAT.player.safeRadius + 6) {
@@ -39,13 +40,16 @@ export function spawnWildlife(world, planet = {}) {
   critter('catBlack', spawnDrySpot(null)); critter('dogShiba', spawnDrySpot(spawnDir, 4, 7));
   critter('dogGold', spawnDrySpot(null)); critter('fox', spawnDrySpot(stoneCenter, 8, 14)); critter('fox', spawnDrySpot(null));
   }
+  const caps = (world.spots?.trees ?? []).filter(t => t.kind === 'glowcap' || t.kind === 'lumenCap');
   for (const [key, count, where] of w.critters ?? []) for (let i = 0; i < count; i++) {
-    if(where==='rocks'&&world.spots?.rocks?.length)critter(key,world.spots.rocks[i%world.spots.rocks.length].dir);
+    if (where === 'caps' && caps.length) critter(key, caps[i % caps.length].dir);   // Duskhollow's bats hang under the caps (30b)
+    else if(where==='rocks'&&world.spots?.rocks?.length)critter(key,world.spots.rocks[i%world.spots.rocks.length].dir);
     else if(where==='beach'||where==='rocks')critter(key,coastalSpot());
     else if (where === 'ponds') { const p = ponds[i % Math.max(1, ponds.length)]; if (p) critter(key, spawnDrySpot(p.dir, p.r + 0.6, p.r + 2.6, 0.4)); }
     else critter(key, wildSpot(spawnDir, where === 'far' ? 40 : undefined));
   }
   if (w.rare) critter(w.rare, w.coastal?coastalSpot():wildSpot(spawnDir, 45));
+  if (w.fireflies) Fireflies.spawn(w.fireflies);                     // Duskhollow's catchable swarms (30b)
   const plumage = w.plumage ?? null;
   const bird = (dir,looks=plumage) => { if (dir) ctx.birds.push(new Bird(dir, looks)); };
   if(!w.coastal)for (let i = 0; i < 4; i++) bird(spawnDrySpot(spawnDir, 5, 16, 0.5));
@@ -64,6 +68,7 @@ export function spawnWildlife(world, planet = {}) {
 
 /** Removes every critter, bird and fish (the planet is being replaced). */
 export function despawnWildlife() {
+  Fireflies.clear();
   for (const c of ctx.critters) c.dispose(); ctx.critters.length = 0;
   for (const b of ctx.birds) b.dispose(); ctx.birds.length = 0;
   for (const p of ponds) { for (const f of p.fish) f.dispose(); p.fish.length = 0; }

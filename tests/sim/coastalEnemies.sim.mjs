@@ -31,7 +31,8 @@ try{
   console.log(`PASS  roster: ${before.length} respawning monsters on beaches, shallows and surf (deterministic through Continue); sea-green wisps`);
 
   // keep one of each to study; the rest leave quietly
-  const crab=of('shellback')[0],jelly=of('jellybell')[0],skip=of('surfSkipper')[0],skip2=of('surfSkipper')[1];
+  const crab=of('shellback')[0],jelly=of('jellybell')[0];
+  let skip=of('surfSkipper')[0],skip2=of('surfSkipper')[1];
   for(const e of ctx.enemies)if(![crab,jelly,skip,skip2,ctx.boss].includes(e))e.vanish();step(1);
 
   // ---- Shellback: the front plate refuses hits; flank it -------------------------------------------------------------
@@ -83,7 +84,11 @@ try{
   step(1);
 
   // ---- Surf skipper: hidden in the deep, ambush leap, exposed, back to the sea ----------------------------------------
-  park();phase(.4);step(.5);assert.ok(skip.hidden,'submerged in deep water');hp=skip.hp;damageEnemy(skip,30);assert.equal(skip.hp,hp,'nothing hits it under the surf');
+  // Which of the surf skippers is deep enough to hide at low water depends on the seed, so take one that is.
+  park();phase(.4);step(.5);
+  const sunk=of('surfSkipper').filter(e=>e.alive&&e.hidden);
+  if(sunk.length){skip=sunk[0];skip2=sunk[1]??of('surfSkipper').find(e=>e!==skip)??skip2;}
+  assert.ok(skip.hidden,'submerged in deep water');hp=skip.hp;damageEnemy(skip,30);assert.equal(skip.hp,hp,'nothing hits it under the surf');
   const beach=ringFind(skip.home,d=>dryGround(d,.6)),inland=dirAlong(beach,tangentToward(skip.home,beach),1.5);
   P.placeAt(inland);P.invuln=0;const seen=new Set();let h2=hurts.length,exposedHit=false;
   for(let i=0;i<60*8;i++){P.invuln=Math.min(P.invuln,.3);step(1/60);seen.add(skip.state);

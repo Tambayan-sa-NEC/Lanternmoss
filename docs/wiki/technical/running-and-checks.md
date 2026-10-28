@@ -83,6 +83,22 @@ node scripts/cave-puzzles-smoke.mjs # cave puzzles: the ward stops real keys, bo
 node scripts/photo-smoke.mjs       # photo mode input, filters/frames in a downloaded PNG, 720p/1080p; retakes its two shots
 node scripts/mob-combat-smoke.mjs  # monsters fighting each other (45b/45c): brawl damage, a ghost's orb, no damage numbers,
                                    # the hero reclaiming a monster, a boss harmless to them; retakes docs/screenshots/mobs/mob-brawl.jpg
+node scripts/duskhollow-smoke.mjs  # Duskhollow (unreleased, 30a): readable dusk on Low, the village gap, real WASD lighting
+                                   # the glowmoss trail and burning oil, the safe ember; retakes its shot
+node scripts/dusk-wildlife-smoke.mjs # Duskhollow (unreleased, 30b): the canopy and its animals, real E catching a firefly
+                                   # swarm, the jar pouring oil, the Moonmoth charm; retakes its two shots
+node scripts/dusk-umbra-smoke.mjs # Duskhollow (unreleased, 30h): Umbra diving at the brightest light, real E on an
+                                  # arena lantern, her wingbeat emptying the Oil bar and her blinding fog
+node scripts/dusk-boss-smoke.mjs  # Duskhollow (unreleased, 30g): Grandmother Gloomweaver hanging out of reach,
+                                  # and real W walking up with a lit lantern to burn a strand through
+node scripts/dusk-weavers-smoke.mjs # Duskhollow (unreleased, 30f): webs that slow and are cut or burnt, oil
+                                  # theft and its repayment, and the beetle accessibility toggle
+node scripts/dusk-monsters-smoke.mjs # Duskhollow (unreleased, 30e): shadows and mimics, the light that makes a
+                                  # shadeling solid, and real E springing a mosslurk
+node scripts/old-road-smoke.mjs   # Duskhollow (unreleased, 30d): Wick's quest, real E carrying the village flame and
+                                  # lighting waylamps, a flame that runs dry, and the lair's level-11 gate
+node scripts/dusk-economy-smoke.mjs # Duskhollow (unreleased, 30c): real E mining a lumen vein, the Craft tab, a glowcap
+                                   # poured into the lantern, deep dark, real E planting shade spores; retakes its shot
 ```
 
 `CHROME` points it at another browser, `PUPPETEER` at an existing puppeteer-core install. A new feature worth showing
@@ -149,6 +165,87 @@ basket in its outfit, heals, and a real `E` checks on it, with zero page and sha
 `B` and `V` input, one Pearl Dive reward, a spent bed and cooldown, Continue, 720p/1080p menu bounds, model cost and
 zero page/shader errors. It captures `pets/otter.jpg` through `shots.mjs`.
 `node tests/sim/otter.sim.mjs` covers all three heroes, the daily cap, bed state, travel and saved dive state.
+
+## Duskhollow checks (30a)
+
+Duskhollow is unreleased, so its checks run through the development fixture `tests/sim/lib/duskhollowFixture.mjs`,
+which borrows the first released world's save and travel slot. Nothing here enables the authored world.
+
+`node scripts/duskhollow-smoke.mjs` owns port 8129 and runs on the lowest quality preset: it measures that the
+deepest dusk is still readable and the village gap brighter, walks with real `W`/`D` to light the bounded glowmoss
+trail and burn oil, checks that an empty lantern keeps a safe ember and costs no health, and that 720p and 1080p
+overflow nothing with zero page and shader errors. It captures `world/duskhollow.jpg` through `shots.mjs`.
+`node tests/sim/duskhollow.sim.mjs` covers generation, the clock and canopy, the HUD, pause and sleep, saves,
+Continue and real portal travel; `node --test tests/lantern.test.mjs` covers the pure dusk, canopy and oil rules.
+
+`node scripts/dusk-wildlife-smoke.mjs` owns port 8130 and checks the 30b flora and wildlife in the browser: the
+canopy grows only where the dusk is closed, the animals and swarms render, a real `E` catches a swarm, really using
+the jar pours oil, and the Moonmoth Wing widens the lantern. It captures `world/duskhollow-canopy.jpg` and
+`critters/duskhollow-wildlife.jpg`. `node tests/sim/duskWildlife.sim.mjs` covers placement, the animals' reactions,
+catching and its save, the charm and the scenery, particle and light budgets;
+`node --test tests/duskWildlife.test.mjs` covers the pure canopy, content and charm rules.
+
+`node scripts/dusk-economy-smoke.mjs` owns port 8131 and checks 30c in the browser: a real `E` mines a lumen vein
+with the iron pickaxe, the Craft tab lists the lumen chain and the Dusk set, really using a glowcap pours oil into
+the lantern, the deep-dark weather visibly darkens the hollow while the lit ground stays readable, and a real `E`
+plants shade spores in the farm. It captures `activities/duskhollow-lumen.jpg`.
+`node tests/sim/duskEconomy.sim.mjs` and `node --test tests/duskEconomy.test.mjs` cover the same ground headlessly.
+
+`node scripts/old-road-smoke.mjs` owns port 8132 and checks 30d in the browser, through the village fixture
+`tests/sim/lib/duskVillageFixture.mjs`: the brazier, the waylamps and the three moonwells render dark, Wick really
+offers "Light the Old Road", a real `E` takes the village flame and lights a waylamp, a flame left to run dry costs
+no health and a lit waylamp hands out fire again, the village gap still reads as the world's safe light, and a
+relit lamp's light reaches the shader that draws the dark hollow. It captures `world/duskhollow-old-road.jpg` and
+`npcs/duskhollow-wick.jpg`.
+`node tests/sim/oldRoad.sim.mjs` covers the same route headlessly and adds Continue, portal travel, the quest
+completing, the local-light budget of a road relit end to end, and the level-11 gate sealing and unsealing the
+lair; `node --test tests/oldRoad.test.mjs` covers the pure flame, lamp and moonwell rules and the saved shape.
+
+`node scripts/dusk-monsters-smoke.mjs` owns port 8133 and checks 30e in the browser, through the roster fixture
+`tests/sim/lib/duskMonsterFixture.mjs`: both kinds render (shadelings as shadows, mosslurks as glowcap patches), a
+shadeling out in the dusk really cannot be hit and really stands up solid when the hero brings a lit lantern, a
+waylamp coming on beside one really drives it off, and a real `E` on a mosslurk's caps springs the ambush and puts
+its warning circle on the ground before the bite. It captures `mobs/duskhollow-shadeling.jpg` and
+`mobs/duskhollow-mosslurk.jpg`.
+`node tests/sim/duskMonsters.sim.mjs` covers the same ground headlessly and adds placement, fire, an empty lantern,
+and Continue/travel leaving no mimic sprung; `node --test tests/duskMonsters.test.mjs` covers the authored stats,
+pages, drops and the brightness arithmetic that makes every counter reachable (30e and 30f both).
+
+`node scripts/dusk-weavers-smoke.mjs` owns port 8134 and checks 30f in the browser: a weaver really spins up to its
+own cap of webs, real `W` walking into one really slows the hero, a blade really cuts it and frees them and leaves
+spider silk, one touch of fire really burns a whole web away, a snuffer really drains the Oil bar and really pays it
+back with interest, and the beetle toggle really swaps every spider on screen without touching the fight. It
+captures `mobs/duskhollow-gloomweaver.jpg`, `mobs/duskhollow-beetles.jpg` and `mobs/duskhollow-snuffer.jpg`.
+`node tests/sim/duskWeavers.sim.mjs` covers the same ground headlessly and adds the web cap and placement, repeated
+theft, an empty lantern having nothing to steal, and Continue/travel rebuilding them with no held oil and no
+standing webs.
+
+`node scripts/dusk-boss-smoke.mjs` owns port 8135 and checks 30g in the browser, through the mini-boss fixture
+`tests/sim/lib/duskBossFixture.mjs`: she really hangs out of reach over the vein she guards and really refuses every
+blow; a strand really refuses a blade and really ignores an empty lantern; really walking up to one with a lit
+lantern really burns it through; fire takes one in a touch; the last one drops her; she really re-anchors at a
+threshold; and the beetle toggle really swaps her and her grandchildren together. It captures
+`bosses/duskhollow-grandweaver.jpg`.
+`node tests/sim/duskBoss.sim.mjs` covers the same fight headlessly and adds all three rounds, the dazed window, the
+loot, the vein she frees, and a defeat that survives Continue and travel.
+
+`node scripts/dusk-umbra-smoke.mjs` owns port 8136 and checks 30h in the browser, through the boss fixture
+`tests/sim/lib/duskUmbraFixture.mjs`: she wakes in the air inside a ring of moonfire with her arena lanterns dark,
+a real `E` with a lit belt lantern really lights one and really costs oil, a lit one really takes the dive and she
+really crashes into it, her wingbeat really empties the Oil bar and puts every lantern out, and her fog really
+presses the hero's carried light in. It captures `bosses/duskhollow-umbra.jpg` and
+`bosses/duskhollow-umbra-crash.jpg`.
+`node tests/sim/duskUmbra.sim.mjs` covers the same fight headlessly and adds the gate, the dive at the hero when
+nothing is lit, the shadelings the wingbeat calls, a drained lantern that never lights again, all three heroes
+lighting the bait, an empty lantern never walling the fight off, and a faint and a Continue both putting it back.
+
+`node scripts/duskhollow-campaign-smoke.mjs` owns port 8147 and exercises the candidate's real fifth-world portal,
+the Old Road moonwells through real `E` input, Wick's oil reward and Umbra gate, and Continue. It runs at Low with
+the beetle accessibility setting on, checks 720p and 1080p bounds, and requires zero page/shader errors.
+`node scripts/duskhollow-performance.mjs --output <path>` owns port 8145. It records the three heroes, seeds 1/7 and
+village/night/spore-drift scenes at 1080p High on the Acer RTX 4050. The default is diagnostic; `--release` requires
+a clean committed released catalog and passing reference frame/count budgets before writing
+`docs/releases/duskhollow.json`. Run it alone, without suites or screenshot work competing for the GPU.
 
 `node scripts/tidewhisper-balance.mjs --check` checks all three heroes on seeds 1/7 (boss timings and roster median).
 `node scripts/tidewhisper-performance.mjs --output <path>` owns port 8115 and collects 18 hardware rows at 1080p High

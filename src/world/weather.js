@@ -14,7 +14,7 @@ import { WIND } from './scatter.js';
 import { rng } from '../utils/random.js';
 import { dayClock } from '../gameplay/dayClock.js';
 
-const NUM = ['wind', 'fog', 'light', 'overcast', 'rain', 'snow', 'embers', 'petals', 'whitecaps'];
+const NUM = ['wind', 'fog', 'light', 'overcast', 'rain', 'snow', 'embers', 'petals', 'whitecaps', 'spores', 'deepDark'];
 const mix = (a, b, k) => a + (b - a) * k;
 const rnd = (a, b) => a + rng() * (b - a);
 
@@ -74,7 +74,8 @@ export class Weather {
     this.group = new THREE.Group();
     const C = WEATHER.counts;
     this.layers = { rain: rainLayer(C.rain), snow: pointsLayer(C.snow, 1.6, 0.16, 0xffffff), embers: pointsLayer(C.embers, -1.2, 0.2, 0xff9a4a, 0.6),
-      petals: pointsLayer(C.petals, 0.9, 0.14, 0xffb8d8) };
+      petals: pointsLayer(C.petals, 0.9, 0.14, 0xffb8d8),
+      spores: pointsLayer(C.spores, 0.35, 0.17, 0xbfe8a0, 0.5) };   // Duskhollow's drifting spores (30c)
     for (const l of Object.values(this.layers)) this.group.add(l);
     add(this.group);
     this.materials = Object.values(this.layers).map(l => l.material);

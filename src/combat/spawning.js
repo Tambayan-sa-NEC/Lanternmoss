@@ -54,6 +54,22 @@ function spawnCoastal(world, g, more) {
   } else for (let i = 0; i < more(g.count); i++) { const d = coastSpot(world, g.near, random, 6); if (d) addEnemy(g.type, d, g.overrides); }
 }
 
+/** A mimic's spot (TODO 30e, roster `near: 'glowcaps'`): just beside a real glowcap, where a cluster of caps is the
+    last thing anyone looks twice at. Falls back to the open wilds when this world grows none. */
+function capSpot(world, caps) {
+  const { spawnDir, houses } = world;
+  for (let i = 0; i < 300; i++) {
+    const cap = caps[Math.floor(rand() * caps.length)]; if (!cap) break;
+    const d = offsetDir(cap.dir, rand() * 6.28, 1.4 + rand() * 1.8);
+    if (arcDist(d, spawnDir) < COMBAT.player.safeRadius + 11) continue;
+    if (houses.some(h => arcDist(d, h.dir) < 10) || !dryGround(d, 1.0) || slopeAt(d) > 0.6) continue;
+    if (world.lairDir && arcDist(d, world.lairDir) < WORLD.flats.lair[0]) continue;
+    if (!freeOfColliders(d, 0.9) || ctx.enemies.some(e => arcDist(d, e.home) < 5)) continue;
+    return d;
+  }
+  return enemySpot(world);
+}
+
 function enemySpot(world) {
   const { spawnDir, stoneCenter, houses } = world;
   for (let i = 0; i < 400; i++) {
@@ -76,6 +92,9 @@ export function spawnRoster(world, roster) {
     if (COAST[g.near]) spawnCoastal(world, g, more);
     else if (g.groups) {
       for (let c = 0; c < more(g.groups); c++) { const camp = enemySpot(world); for (let i = 0; i < g.size; i++) addLandEnemy(g.type, i ? spawnDrySpot(camp, 1.2, 3, 0.6, rand) : camp, g.overrides); }
+    } else if (g.near === 'glowcaps') {
+      const caps = (world.spots?.trees ?? []).filter(t => t.kind === 'glowcap');
+      for (let i = 0; i < more(g.count); i++) addLandEnemy(g.type, capSpot(world, caps), g.overrides);
     } else if (g.near === 'ponds') {
       for (let i = 0; i < more(g.count); i++) {
         const p = wildPonds[i % Math.max(1, wildPonds.length)];

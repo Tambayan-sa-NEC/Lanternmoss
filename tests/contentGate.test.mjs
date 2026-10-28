@@ -44,7 +44,9 @@ function fixture(id='newWorld') {
 
 test('a complete expansion fixture passes; published drafts remain blocked by generation/content checks',()=>{
   const f=fixture();assert.deepEqual(f.check(),[]);
-  assert.throws(()=>assertReleasedContent([...PLANETS,{...PLANET_CATALOG.find(p=>p.id==='duskhollow'),released:true}],f.r),/generation data/);
+  assert.throws(()=>assertReleasedContent([...PLANETS,{...PLANET_CATALOG.find(p=>p.id==='lanternMoon'),released:true}],f.r),/generation data/);
+  // Duskhollow has its generation data now (30e gave it a roster); the content gate is what still blocks it.
+  assert.throws(()=>assertReleasedContent([...PLANETS,{...PLANET_CATALOG.find(p=>p.id==='duskhollow'),released:true}],f.r),/duskhollow/);
   assert.doesNotThrow(()=>assertReleasedContent([f.p],f.r));
   assert.throws(()=>assertReleasedContent([{...f.p,released:false}],f.r),/starting world/);
 });

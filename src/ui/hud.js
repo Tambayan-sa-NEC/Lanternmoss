@@ -27,6 +27,7 @@ import { dom, flashEl } from './dom.js';
 import { icon } from './icons.js';
 import { Talents } from '../gameplay/Talents.js';
 import { itemIconHtml } from './itemTooltip.js';
+import { activeLantern } from '../world/mechanics/lantern.js';
 
 const HUD = {
   trailHold: 0.45,      // seconds a bar's damage trail waits before draining
@@ -50,7 +51,7 @@ function setBar(b, frac, text, dt) {
   }
   if (text !== b.text) { b.text = text; b.value.textContent = text; }
 }
-const bars = { hp: makeBar(dom.hpBar), mp: makeBar(dom.mpBar), xp: makeBar(dom.xpBar), en: makeBar(dom.enBar) };
+const bars = { hp: makeBar(dom.hpBar), mp: makeBar(dom.mpBar), xp: makeBar(dom.xpBar), en: makeBar(dom.enBar), oil: makeBar(dom.oilBar) };
 const boss = { el: dom.bossBar, fill: dom.bossFill, lag: dom.bossLag, value: dom.bossPct, k: 1, trail: 1, hold: 0, text: '', ref: null, phase: 0 };
 let shownLevel = 0, shownRes = '';
 
@@ -249,6 +250,17 @@ export function applyUiScale() {
 export function setUiScale(s) { setSetting('uiScale', s * 100); applyUiScale(); }
 applyUiScale();
 
+/** The Oil bar (TODO 30a): only shown on a world whose mechanic carries a lantern, and only while one is alight. */
+function updateOilBar(dt) {
+  const lamp = activeLantern(), on = !!lamp;
+  bars.oil.el.classList.toggle('show', on);
+  if (!on) return;
+  const s = lamp.status;
+  setBar(bars.oil, s.oil / s.max, `${Math.ceil(s.oil)}`, dt);
+  bars.oil.el.classList.toggle('low', s.low);
+  bars.oil.el.classList.toggle('out', !s.lit);
+}
+
 // ---------------------------------------------------------------- per frame
 export function updateCombatHud(dt, spellState, aimTarget) {
   const P = ctx.player, C = P.stats, hero = CHARACTERS[P.charId], abilities = Talents.kit();   // cooldowns and costs after talents
@@ -260,6 +272,7 @@ export function updateCombatHud(dt, spellState, aimTarget) {
   setBar(bars.xp, need ? P.xp / need : 1, need ? `${P.xp} / ${need}` : 'MAX', dt);
   setBar(bars.en, P.energy / NEEDS.max, `${Math.ceil(P.energy)}`, dt);
   bars.en.el.classList.toggle('low', P.energy / NEEDS.max < NEEDS.hungry.below);
+  updateOilBar(dt);
   updateHotbar();
   dom.combat.classList.toggle('talking', dom.dialog.classList.contains('show'));   // the dialogue box takes the bottom centre
   if (shownLevel !== P.level) { if (shownLevel) flashEl(dom.level.parentElement, 'pop'); shownLevel = P.level; dom.level.textContent = P.level; }

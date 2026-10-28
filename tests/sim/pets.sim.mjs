@@ -42,7 +42,8 @@ check(foe.hp < hp0 - 0.01, `follow: Fang bites what you're fighting (${(hp0 - fo
 // passive: never attacks
 press('KeyT'); press('KeyT'); press('KeyT');
 check(Pets.mode === 'passive', `T cycles commands (${Pets.mode})`);
-foe.hp = 1e4; hp0 = foe.hp; for (let i = 0; i < 60; i++) { foe.aggro(); targeting.lastHit = foe; targeting.lastHitT = ctx.time; step(0.1); }
+// The quiet has to be deliberate here too: a neighbour that wandered in would chew on the foe and read as a bite.
+foe.hp = 1e4; hp0 = foe.hp; for (let i = 0; i < 60; i++) { quiet(foe); foe.aggro(); targeting.lastHit = foe; targeting.lastHitT = ctx.time; step(0.1); }
 check(foe.hp > hp0 - 1, 'passive: no biting');
 // stay: holds its spot while you walk away
 Pets.command('stay'); const spot = ctx.companion.up.clone();

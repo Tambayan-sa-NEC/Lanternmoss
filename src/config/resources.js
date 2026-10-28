@@ -13,7 +13,8 @@
    SCENERY      the planet's own trees and rocks (src/world/scatter.js) can be worked too: trees give wood with an
                 axe (not crystal spires), rocks give stone with a pickaxe. They never vanish; they rest instead.
    FISHING      cast at a pond, wait for the bite, then stop the needle in the green (a small timing game)
-   CROPS        what seeds grow into; `days` = how many full days of watered growth (config/day.js DAY.length)
+   CROPS        what seeds grow into; `days` = how many full days of watered growth (config/day.js DAY.length);
+                shade = it only takes on a world whose mechanic says it lies in shade (Duskhollow, 30c)
    FARM         the plot by each village: tilled with a hoe, planted with seeds, watered with a can (or by rain)
    --------------------------------------------------------------------- */
 
@@ -52,6 +53,11 @@ export const NODE_KINDS = {
   amethystVein: { name: 'Amethyst vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xb070ff, glow: true, drops: [['amethyst', 1]], regrow: 450, r: 1.1, rare: true },
   opalVein: { name: 'Fire opal vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xff6a3a, glow: true, drops: [['fireOpal', 1]], regrow: 450, r: 1.1, rare: true },
   diamondVein: { name: 'Frost diamond vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xbff4ff, glow: true, drops: [['frostDiamond', 1]], regrow: 450, r: 1.1, rare: true },
+  // ---- Duskhollow (30c): lumen ore needs an iron pickaxe; the moonstone vein waits behind its mini boss
+  lumenVein: { name: 'Lumen vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 4, look: 'vein', color: 0xbfa8ff, glow: true,
+    drops: [['lumenOre', [1, 2]], ['lumenDust', [1, 2]]], regrow: 210, r: 1.0 },
+  moonstoneVein: { name: 'Moonstone vein', verb: 'Mine', tool: 'pick', tier: 2, hits: 5, look: 'vein', color: 0xdfe8ff, glow: true,
+    drops: [['moonstone', 1], ['lumenDust', 1]], regrow: 450, r: 1.1, rare: true, guardedBy: 'grandweaver' },
 };
 
 export const SCENERY = {
@@ -82,7 +88,11 @@ export const CROPS = {
     look: { leaf: 0x9acf62, fruit: 0xf0c860, kind: 'stalks' } },
   pumpkin: { name: 'Pumpkin', seed: 'pumpkinSeeds', harvest: [['pumpkin', [1, 2]], ['pumpkinSeeds', [0, 1]]], days: 1.0,
     look: { leaf: 0x5fa85a, fruit: 0xf08a2a, kind: 'gourd' } },
+  shade: { name: 'Shade Mushroom', seed: 'shadeSpores', harvest: [['shadeMushroom', [2, 3]], ['shadeSpores', [0, 1]]], days: 0.8, shade: true,
+    look: { leaf: 0x8f87b8, fruit: 0xc8bce0, kind: 'gourd' } },
 };
+
+export const SHADE_CROP_REFUSAL = 'These only take in deep shade, under the caps.';
 
 export const FARM = {
   grid: [3, 2],               // plots across, rows
@@ -90,4 +100,6 @@ export const FARM = {
   distance: [15, 24],         // from the village centre
   reach: 1.2,                 // metres from a plot's centre where E works on it
   rainWaters: ['rain', 'storm', 'snow', 'blizzard', 'squall'],   // weather that waters every planted plot (config/weather.js)
+  // A world's mechanic may water the plots itself instead (Duskhollow's dripping caps, 30c): the farm asks the live
+  // mechanic for `watersFarm`, so this stays a rule of that world rather than a hidden side effect of its weather.
 };

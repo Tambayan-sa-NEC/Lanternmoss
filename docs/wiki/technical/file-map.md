@@ -30,6 +30,8 @@ src/
 │   ├── photo.js           photo mode: camera limits, filters, frames, poses, emotes, the picture's file name
 │   ├── planets.js         ordered catalog, released campaign views and transition timings
 │   ├── planets/           one config per world: seeds, content, NPCs, house overrides and release metadata
+│   ├── lantern.js         Duskhollow's dusk, canopy cover, lantern oil and light, glowmoss trail and firefly swarms
+│   ├── duskResources.js   its materials, lantern oil, shade crop, Dusk set and their recipes (like coastalResources.js)
 │   ├── planetRules.js     release, secret-unlock, completion and population rules
 │   ├── items.js           item definitions (incl. gear), categories, rarities and their stat multipliers, gear slots and
 │   │                      stats, the hotbar, effects, bag size and pickup settings
@@ -85,7 +87,9 @@ src/
 │   │                      where each room's chest, veins and monster spawns stand, and the puzzle, warded door,
 │   │                      guardian and way home at the end of it (pure)
 │   ├── caves.js           a cave's rooms, corridors and lanterns, built far below the planet
+│   ├── duskFlora.js       Duskhollow's canopy, glowcaps, ghost ferns and moonflowers (the giant caps avoid the gaps)
 │   ├── mechanics/         pure registered mechanic descriptors and per-module save cleaning
+│   │                      (tides.js, lantern.js: Duskhollow's dusk and oil; lanternView.js draws them for the World)
 │   ├── physics.js         planet gravity, live pond/sea levels and declared maximum-water queries
 │   ├── terrain.js         each planet's shape (seeded hills / ridges / plateaus), flats, the baked height field, ponds,
 │   │                      slopes, water depth, ground-placement matrices
@@ -100,6 +104,9 @@ src/
 │   └── sky.js             sky dome, clouds, fireflies
 ├── models/                procedural character and item art (swap a builder to use real assets)
 │   ├── humanoid.js  heroes.js  creatures.js  villagers.js (incl. planet locals and outfits)  monsters.js
+│   ├── duskCreatures.js   Duskhollow's glow snail, lantern bat, cricket and Moonmoth
+│   ├── duskMonsters.js    Duskhollow's shadeling and mosslurk, and the spider/beetle pair its weavers wear
+│   │                      (showSpiderLook swaps them for the `roundBeetles` accessibility setting)
 │   ├── chest.js           treasure chest (hinged lid, padlock, light beam)
 │   ├── resources.js       resource nodes (bushes, herbs, branches, veins), the farm (fence, plots, scarecrow), crops, the float
 │   ├── stations.js        the four crafting stations (glowing coals, a bubbling pot, flasks on a stand)
@@ -160,6 +167,9 @@ src/
 │   ├── needsRules.js      energy levels, effects, drain and warnings (pure)
 │   ├── Gathering.js       resource nodes, chopping trees and mining rocks, tool jobs (swing, drops, regrow), tips
 │   ├── Fishing.js         casting, the bite, the reeling meter, catches
+│   ├── Fireflies.js       Duskhollow's firefly swarms: their drifting lights, catching one with E, saved timers
+│   ├── OldRoad.js         Duskhollow's Old Road: the village brazier, its waylamps and moonwells, carrying the flame,
+│   │                      and litAt() -- how brightly lit a spot is, which its shadelings live or die by
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
@@ -188,7 +198,8 @@ src/
 │   ├── itemUse.js         using items: effect handlers (heal, mana, energy, buff), tool / seed actions
 │   └── challenges/        challenge runtime, activity kinds (collect / race / defeat), rewards
 ├── fx/                    sparkles, emote bubbles, blob shadows, rings, damage numbers, hit-stop,
-│                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming)
+│                          groundDecals (terrain-hugging circles, wedges and lanes for warnings and aiming),
+│                          glowmoss (Duskhollow's bounded, instanced footprint trail)
 ├── ui/                    DOM side: element lookups, HUD (bars, status row, ability bar + tooltips, boss bar), icons (SVG),
 │                          waypoints (compass strip + off-screen arrows), PauseMenu (pause, settings, controls, quit),
 │                          MainMenu (title screen: play, settings, controls, credits, campaign strip),
@@ -226,6 +237,15 @@ Continue. `scripts/otter-smoke.mjs` checks the real pet menu and ability keys at
 `docs/screenshots/pets/otter.jpg`. The otter body is built in `src/models/coastalCreatures.js`.
 The historical `docs/tidewhisper-{balance-baseline,balance,performance}.json` reports remain separate from new runs.
 The [handoff](tidewhisper-release.md) owns candidate status and reproduction instructions.
+
+## Duskhollow release validation (30i in progress)
+
+`tests/sim/lib/duskhollowCandidate.mjs` substitutes the authored fifth world into the test catalog without changing
+its release flag. `tests/sim/pacing.sim.mjs` audits its XP, coin and minimum material route, while
+`tests/sim/balance.sim.mjs` drives all three heroes through its regular enemies and two bosses on seeds 1 and 7.
+`scripts/duskhollow-campaign-smoke.mjs` checks the candidate portal, Wick's Old Road quest and oil reward, Continue,
+Low quality and the beetle accessibility setting. `scripts/duskhollow-performance.mjs` collects the 18-row Acer
+matrix and only writes release evidence after all hardware budgets pass on clean, released source.
 
 `docs/tidewhisper-balance-20261017.json` is the clean-commit synchronization audit; the earlier balance JSON remains historical.
 `docs/tidewhisper-performance-acer-20261017.json` records the separate 18-case Acer Intel UHD diagnostic, not certification.

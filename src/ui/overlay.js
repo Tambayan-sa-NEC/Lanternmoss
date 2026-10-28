@@ -38,6 +38,10 @@ function updateChips(dt) {
   if ((chipsT -= dt) >= 0) return;
   chipsT = 0.25; let h = `<div class="chip" style="background:#e8eeff">Planet ${ctx.planet + 1}/${PLANETS.length} · ${PLANETS[ctx.planet].name}</div>`;
   const sky = world?.weather; h += `<div class="chip time ${dayClock.phase}">${dayClock.phase === 'night' ? '☾' : '☀'} ${dayClock.label} · Day ${dayClock.day}${sky && sky.kind !== 'clear' ? ` · ${sky.label}` : ''}</div>`;
+  if (world?.mechanics.id === 'lantern') {
+    const lamp = world.mechanics.active.instance.status;
+    h += `<div class="chip lantern">☾ ${lamp.label} · Lantern ${lamp.lit ? `${Math.ceil(lamp.oil)} oil` : 'ember'}${lamp.carrying ? ` · Flame ${Math.ceil(lamp.flame)}s` : ''}</div>`;
+  }
   if (world?.mechanics.id === 'tides') {
     const tide = world.mechanics.active.instance.status;
     h += `<div class="chip tide">≈ ${tide.label} · Causeway ${tide.causewayOpen ? 'open' : 'flooded'}${tide.lagoonDrained ? ' · Lagoon drained' : ''}</div>`;

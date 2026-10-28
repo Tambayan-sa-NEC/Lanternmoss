@@ -29,14 +29,15 @@ export const COMBAT = {
   spells: {                    // keys come from the skill keybinds (config/controls.js); mouse = left click too; repeat = hold to keep casting
     bolt:     { name: 'Arcane Bolt', mouse: true, repeat: true, color: 0xd49bff,
                 cost: 6, cooldown: 0.32, damage: 9, speed: 24, range: 22, radius: 0.3, homing: 5 },
-    fireball: { name: 'Fireball', color: 0xff9a4a,
+    // fire: this blow is a burst of flame. Duskhollow's Shadelings flee it (behaviors/lightbound.js); nothing else reads it yet
+    fireball: { name: 'Fireball', color: 0xff9a4a, fire: true,
                 cost: 22, cooldown: 3.5, damage: 26, speed: 14, range: 20, radius: 0.45, homing: 0, blastRadius: 2.8, blastFalloff: 0.5, knockback: 5 }, // homing: turn strength; 0 flies straight
     nova:     { name: 'Frost Nova', color: 0x9fe8ff,
                 cost: 28, cooldown: 8, damage: 12, radius: 4.5, slow: 0.55, slowTime: 3.5, knockback: 4 },
     blink:    { name: 'Blink', color: 0xbff4ff,
                 cost: 15, cooldown: 3, distance: 6.5, invuln: 0.35 },            // evasion: was 5 s
     // ultimate (src/combat/abilities/ultimates.js): aim a spot (target: 'ground'), the meteor lands `delay` s later
-    meteor:   { name: 'Meteor', color: 0xff7a3a, ult: true, target: 'ground',
+    meteor:   { name: 'Meteor', color: 0xff7a3a, ult: true, target: 'ground', fire: true,
                 cost: 40, cooldown: 30, damage: 110, range: 18, radius: 5.5, delay: 1.1, falloff: 0.35, knockback: 9,
                 burn: { duration: 3, tick: 0.5, damage: 5 } },                   // the crater keeps burning for a moment
   },
@@ -79,6 +80,43 @@ export const COMBAT = {
     surfSkipper:{ ai: 'amphibian', color: 0x7f9a5c, hp: 70, speed: 3.6, swimSpeed: 4.2, radius: 0.45, height: 0.8, aggro: 14, leash: 22,
                  turnRate: 8, ambushRange: 6.5, windup: 0.6, leapSpeed: 12, leapTime: 0.55, leapLift: 7, width: 1.1, damage: 11, knockback: 7,
                  exposed: 1.8, cooldown: 2.0, fenceDepth: 0.3, hideDepth: 0.9, respawn: 45, xp: 18 },
+    // ---- Duskhollow (TODO 30e): monsters the lantern decides the rules of (behaviours: lightbound, mimic)
+    // A Shadeling is only a shadow where the ground is dark: untargetable, and unable to attack, so an unreadable
+    // monster can never land a blow. bindAt = how brightly lit (gameplay/OldRoad.js litAt, 0..1) the ground must be
+    // for it to stand up solid. A light that actually comes on inside its reach drives it off (OldRoad 'lightflare'),
+    // and so does fire when fleeFire is set. boundColor tints its eyes and the wisps around its head.
+    shadeling: { ai: 'lightbound', color: 0x241c38, boundColor: 0xbfa8ff, hp: 70, speed: 3.9, radius: 0.42, height: 1.5,
+                 aggro: 15, leash: 22, turnRate: 7, range: 1.6, damage: 10, windup: 0.5, windupTurn: 6, recover: 0.5,
+                 cooldown: 1.5, knockback: 4, bindAt: 0.12, fleeFire: true, fleeTime: 3.2, fleeSpeed: 1.3,
+                 respawn: 45, xp: 20 },
+    // A Mosslurk is scenery until something reaches for it: triggerRange = walking this close springs it anyway;
+    // pickReach = how close the "Pick the glowcap patch" prompt appears. The wind-up and its warning circle are what
+    // keep the ambush fair.
+    mosslurk:  { ai: 'mimic', color: 0x6a4a7a, capColor: 0x9ff0ff, hp: 80, speed: 2.6, radius: 0.5, height: 1.1,
+                 aggro: 7, leash: 14, turnRate: 5, range: 1.8, damage: 13, windup: 0.6, windupTurn: 5, recover: 0.7,
+                 cooldown: 1.8, knockback: 6, triggerRange: 1.2, pickReach: 2.2, knockResist: 0.4, telegraph: true,
+                 respawn: 55, xp: 24 },
+    // ---- Duskhollow (TODO 30f): the spinners and the thieves
+    // A Gloomweaver strings sticky webs between the stalks and bites what walks into them. Its `web` block tunes the
+    // webs it spins: `max` live at once per weaver, `every` seconds between spinnings, `at` metres ahead of it,
+    // `type` the web object below. The accessibility toggle `roundBeetles` (config/settings.js) draws every spider
+    // on this world as a round beetle instead, the regular ones and the mini boss alike (models/duskMonsters.js).
+    gloomweaver:{ ai: 'weaver', color: 0x5a4a78, capColor: 0xd8c0ff, hp: 95, speed: 3.2, radius: 0.5, height: 1.0,
+                 aggro: 13, leash: 20, turnRate: 6, range: 1.7, damage: 11, windup: 0.45, windupTurn: 6, recover: 0.5,
+                 cooldown: 1.6, knockback: 5, web: { max: 3, every: 6, at: 4.5, type: 'gloomweb' },
+                 respawn: 50, xp: 22 },
+    // A sticky web: an object, not a monster. It slows whoever stands in it (`mire`, a share of walking speed) and is
+    // cut by a blade or burnt away by fire, leaving `silk`. `fire` = a hit carrying fire destroys it outright.
+    gloomweb:  { ai: 'web', object: true, static: true, name: 'Sticky web', color: 0xd8c0ff, hp: 8, speed: 0,
+                 radius: 1.5, height: 0.6, aggro: 0, leash: 99, respawn: 0, xp: 0,
+                 knockResist: 1, slowResist: 1, staggerImmune: true,
+                 mire: 0.45, silk: ['spiderSilk', [1, 2]], life: 240 },
+    // A Snuffer darts in, steals `oil` from the belt lantern and runs off with it. Catch it and the lantern gets it
+    // back with interest (`interest`); `escape` is how long it keeps running before it settles down again.
+    snuffer:   { ai: 'thief', color: 0x3b3356, capColor: 0xffc06a, hp: 55, speed: 4.6, radius: 0.35, height: 0.95,
+                 aggro: 16, leash: 24, turnRate: 9, range: 1.4, damage: 4, windup: 0.35, windupTurn: 9, recover: 0.4,
+                 cooldown: 2.6, knockback: 2, steal: { oil: 18, interest: 1.5, escape: 6, speedUp: 1.35 },
+                 respawn: 45, xp: 18 },
     // ---- mini bosses (TODO 15): out in the wilds, optional; the boss framework drives them (miniBoss: no beacon,
     //      no planet progression; their own loot). Where they live: PLANETS[i].miniBosses
     hydra:     { ai: 'boss', behavior: 'hydra', miniBoss: true, name: 'The Hydra, Terror of the Lake', color: 0x3f9a8a, capColor: 0x6fe0c8,
@@ -130,6 +168,34 @@ export const COMBAT = {
                      { below: 1.0, title: 'Stone and cinder', attacks: ['gaze', 'whip', 'lunge', 'cinders'], speedMul: 1.1, cooldownMul: 0.85 },
                      { below: 0.5, title: 'Enraged', enraged: true, attacks: ['gaze', 'whip', 'lunge', 'spit', 'cinders'], speedMul: 1.25, cooldownMul: 0.7 },
                    ] } },
+    // ---- Duskhollow (TODO 30g). Grandmother Gloomweaver hangs in a canopy of her own web on three anchor strands,
+    // where nothing can touch her: `anchors` is how many go up each time (`type` the object below, `at` metres out
+    // around her, `hang` metres she hangs above the ground, `drop` seconds she takes to fall once the last one burns,
+    // `dazed` seconds she lies open after landing). She re-anchors at every phase change but the last, so the fight
+    // is three rounds of burn-the-anchors and fight-her-down. She wears the same spider/beetle pair as her
+    // grandchildren (config/settings.js roundBeetles), and she guards the moonstone vein (config/resources.js).
+    grandweaver:{ ai: 'boss', behavior: 'grandweaver', miniBoss: true, name: 'Grandmother Gloomweaver, Keeper of the Moonstone',
+                 color: 0x4a3c68, capColor: 0xe8d0ff, hp: 1300, speed: 2.4, radius: 1.4, height: 2.2, aggro: 15, leash: 22, turnRate: 2.4,
+                 knockResist: 1, slowResist: 0.6, staggerImmune: true, stunResist: 0.5, stunnedDamageBonus: 0.3,
+                 telegraph: true, respawn: 0, xp: 175, cooldown: 1.2,
+                 anchors: { count: 3, type: 'gloomAnchor', at: 6.5, hang: 6, drop: 1.1, dazed: 2.4 },
+                 attacks: {
+                   weave: { windup: 1.0, reach: 9, damage: 0, recover: 0.7, cooldown: 1.0, reuse: 4 },      // drops a web where you stand
+                   spit:  { windup: 0.8, count: 3, spread: 46, speed: 10, homing: 0.4, damage: 10, slow: 0.45, slowTime: 2.5, recover: 0.6, cooldown: 1.0, reuse: 3 },
+                   bite:  { windup: 0.6, range: 4.0, arc: 80, damage: 15, knockback: 7, recover: 0.7, cooldown: 0.8 },
+                   sweep: { windup: 0.95, radius: 5.5, arc: 220, damage: 13, knockback: 10, recover: 0.9, cooldown: 1.0, reuse: 5 },
+                 },
+                 phases: [   // each threshold sends her back up the stalks to spin a fresh set of anchors
+                   { below: 1.0, attacks: ['weave', 'spit', 'bite'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.6, title: 'Second web', attacks: ['weave', 'spit', 'bite', 'sweep'], speedMul: 1.1, cooldownMul: 0.9 },
+                   { below: 0.3, title: 'Last web', attacks: ['weave', 'spit', 'bite', 'sweep'], speedMul: 1.2, cooldownMul: 0.78 },
+                 ] },
+    // An anchor strand: an object holding her up. A blade will not cut a cable of this thickness - it has to burn.
+    // Any lit belt lantern held within `reach` burns one down over `burnTime` seconds (so every hero can), and a hit
+    // that carries fire takes it in one (so the witch can do it from across the clearing).
+    gloomAnchor:{ ai: 'anchor', object: true, static: true, name: 'Anchor strand', color: 0xe8d0ff, hp: 1, speed: 0,
+                 radius: 0.6, height: 6, aggro: 0, leash: 99, respawn: 0, xp: 0,
+                 knockResist: 1, slowResist: 1, staggerImmune: true, reach: 2.6, burnTime: 2.6 },
     // Tidewhisper (TODO 27f). faceArc = half-angle (degrees) of the front that can be hurt; everywhere else is the bell,
     // which only rings (bellRing: a shockwave after `delay`, at most once per `cooldown`; stun = seconds dazed).
     // guarded = damage share while tucked in its shell; openBonus = extra while out of it (swap) or wedged in the sand
@@ -211,6 +277,37 @@ export const COMBAT = {
                      { below: 1.0, title: 'The false lights return', attacks: ['geyser', 'bite', 'thrash', 'roll', 'decoys', 'glare'], speedMul: 1.1, cooldownMul: 0.85 },
                      { below: 0.5, title: 'Beached, and bitter', attacks: ['geyser', 'bite', 'thrash', 'roll', 'decoys', 'glare'], speedMul: 1.25, cooldownMul: 0.7 },
                    ] } },
+    // ---- Duskhollow's boss (TODO 30h). Umbra dives at the brightest light there is, which is your own belt lantern
+    // unless something brighter is burning: `lanterns` are the tall arena lanterns you light as bait (`count` of
+    // them, `at` metres from the lair, `oil` oil it costs to light one, `relight` seconds before a snuffed one can
+    // be lit again). A dive into a lit lantern crashes her: `crash.stun` seconds on the ground, open to everything.
+    // A dive at the hero only hurts. `snuff` is the wingbeat that puts the lights out (`oil` taken from the belt
+    // lantern, `shades` shadelings that come out of the dark, up to `maxShades`). From 50% she drinks light:
+    // each `feed` drains one arena lantern for good and sheds scales that blind the hero (`fog`).
+    umbra:     { ai: 'boss', behavior: 'umbra', name: 'Umbra, the Moth of the Last Light', color: 0x2f2746, capColor: 0xe8e0ff,
+                 hp: 820, speed: 3.4, radius: 2.2, height: 3.0, hover: 5.5, aggro: 20, leash: 32, turnRate: 2.0,
+                 knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.4,
+                 telegraph: true, respawn: 0, xp: 240, cooldown: 1.3,
+                 lanterns: { count: 4, at: 11, oil: 8, relight: 4, type: 'arenaLantern' },
+                 crash: { stun: 4.5, radius: 3.2, damage: 10, knockback: 8 },
+                 snuff: { oil: 10, shades: 2, maxShades: 4, type: 'shadeling' },
+                 feed: { fog: 7, blind: 0.45, drains: 1 },
+                 attacks: {
+                   dive:   { windup: 1.3, speed: 22, width: 2.6, damage: 22, knockback: 11, recover: 0.9, cooldown: 1.2 },
+                   gust:   { windup: 1.0, radius: 9, damage: 9, knockback: 7, recover: 0.8, cooldown: 1.2, reuse: 6 },   // the wingbeat that snuffs
+                   scales: { windup: 0.9, count: 4, spread: 60, speed: 11, homing: 0.5, damage: 11, recover: 0.6, cooldown: 1.0, reuse: 3 },
+                   drink:  { windup: 1.4, recover: 1.2, cooldown: 1.4, reuse: 9 },                                      // only from 50%
+                 },
+                 phases: [
+                   { below: 1.0, title: 'Wings in the dark', attacks: ['dive', 'gust', 'scales'], speedMul: 1, cooldownMul: 1 },
+                   { below: 0.5, title: 'Drinking the light', attacks: ['dive', 'gust', 'scales', 'drink'], speedMul: 1.15, cooldownMul: 0.85 },
+                 ] },
+    // An arena lantern: bait, not a monster. Press E beside one with a lit belt lantern and it burns until she
+    // snuffs it. `drained` ones she has drunk never light again.
+    arenaLantern:{ ai: 'arenaLamp', object: true, static: true, name: 'Arena lantern', color: 0x6a608f, capColor: 0xffd36b,
+                 hp: 1, speed: 0, radius: 0.7, height: 3.4, aggro: 0, leash: 99, respawn: 0, xp: 0,
+                 knockResist: 1, slowResist: 1, staggerImmune: true, reach: 2.6,
+                 light: { radius: 13, intensity: 1.3 } },
     gloomcap:  { ai: 'boss', behavior: 'gloomcap', name: 'Gloomcap, the Moss King', color: 0xb48cff, capColor: 0x9b6ad6,   // planet 1: the introduction
                  look: { skin: 0x6a4a7a, armor: 0x2e2638, cape: 0x2a1838, horn: 0xe8dcc4, trim: 0xffd36b, eye: 0xffe066, motif: 'moss' },   // src/models/bosses.js
                  hp: 6700, speed: 2.6, radius: 1.3, height: 4.6,

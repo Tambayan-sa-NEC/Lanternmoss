@@ -15,13 +15,14 @@ import { fileURLToPath } from 'node:url';
 import { writeFileSync } from 'node:fs';
 import { BALANCE } from '../../src/config/balance.js';
 
-const HEROES = ['witch', 'knight', 'ranger'], PLANETS_N = 3;
-const TRIALS = 3, MONSTER_CAP = 60, FIGHT_CAP = 300;
+const HEROES = ['witch', 'knight', 'ranger'], PLANETS_N = 5;
+const TRIALS = 3, MONSTER_CAP = 60, FIGHT_CAP = Number(process.env.BALANCE_FIGHT_CAP ?? 300);
 const DEPTH = process.env.BALANCE_BUILD === 'depth';
 const DEPTH_ORDER = { witch: ['brightBolt', 'seekingFlame', 'brightBolt', 'quickFrost', 'quickFrost', 'deepFreeze', 'deepFreeze', 'lightStep'],
   knight: ['keenEdge', 'wideCleave', 'keenEdge', 'quickSpin', 'quickSpin', 'tempest', 'tempest', 'steadyGuard'],
   ranger: ['steadyAim', 'steadyAim', 'quickFan', 'wideFan', 'quickFan', 'brambleSnare', 'brambleSnare', 'lightFeet'] };
-const DEPTH_SETS = [['mossHood', 'mossCloak', 'wanderBoots'], ['emberHelm', 'emberMail', 'emberBoots'], ['frostCirclet', 'frostMantle', 'snowstepBoots']];
+const DEPTH_SETS = [['mossHood', 'mossCloak', 'wanderBoots'], ['emberHelm', 'emberMail', 'emberBoots'],
+  ['frostCirclet', 'frostMantle', 'snowstepBoots'], ['tideCirclet', 'tideMantle', 'tideBoots'], ['duskHood', 'duskMantle', 'duskBoots']];
 const TARGETS = Object.entries(BALANCE.seconds).map(([k, [min, max]]) => `${k} ${min}-${max} s`).join(' · ');
 
 if (process.argv[2]) await child(process.argv[2], Number(process.argv[3] ?? 0));
@@ -30,7 +31,7 @@ else await parent();
 async function parent() {
   const jobs = [], results = [];
   const onlyPlanet = process.env.BALANCE_PLANET == null ? null : Number(process.env.BALANCE_PLANET);
-  if (onlyPlanet != null && (!Number.isInteger(onlyPlanet) || onlyPlanet < 0 || onlyPlanet >= PLANETS_N)) throw new Error('BALANCE_PLANET must be 0, 1 or 2');
+  if (onlyPlanet != null && (!Number.isInteger(onlyPlanet) || onlyPlanet < 0 || onlyPlanet >= PLANETS_N)) throw new Error('BALANCE_PLANET must be 0 through 4');
   for (let p = 0; p < PLANETS_N; p++) if (onlyPlanet == null || p === onlyPlanet) for (const h of HEROES) jobs.push([h, p]);
   const runOne = ([h, p]) => new Promise(done => {
     let out = '';
@@ -82,8 +83,13 @@ async function parent() {
 }
 
 async function child(hero, planet) {
+  if (planet === 4) {
+    const { installDuskhollowCandidate } = await import('./lib/duskhollowCandidate.mjs');
+    installDuskhollowCandidate();
+  }
   const { boot, imp } = await import('./lib/boot.mjs');
   const { arcDist, offsetDir, tangentToward } = await imp('utils/sphere.js');
+  const { rng } = await imp('utils/random.js');
   const { tryCast, spellState, kit, resetCooldowns } = await imp('combat/casting.js');
   const { updateAim, targeting } = await imp('combat/targeting.js');
   const { aim, cancelAim, updateAiming } = await imp('combat/aiming.js');
@@ -95,6 +101,9 @@ async function child(hero, planet) {
   const { resetBuffs } = await imp('gameplay/buffs.js');
   const { Needs } = await imp('gameplay/Needs.js');
   const { clearHazards } = await imp('combat/hazards.js');
+  const { spring } = await imp('entities/enemies/behaviors/mimic.js');
+  const { arenaLampTarget } = await imp('entities/enemies/behaviors/arenaLamp.js');
+  const { activeLantern } = await imp('world/mechanics/lantern.js');
 
   // Sealed bosses (wake: false): an awake planet boss would roam during the monster and mini-boss trials and its arena
   // would pull the hero away mid-fight. It is woken just before its own fight.
@@ -121,6 +130,7 @@ async function child(hero, planet) {
   const clearKeys = () => { for (const k in keys) keys[k] = false; };
   const refill = () => {
     P.hp = P.stats.maxHp; P.mana = P.stats.maxMana; resetCooldowns(kit()); resetBuffs(); Needs.reset();
+    if (planet === 4) activeLantern()?.refill(100);
     for (const shot of ctx.projectiles) shot.dispose(); ctx.projectiles.length = 0;
     clearHazards(); P.clearTimers();
     ctx.companion.snapToHero(); ctx.companion.target = null; ctx.companion.cool = 2;
@@ -132,14 +142,77 @@ async function child(hero, planet) {
   step(0.5);
 
   let ultRetry = 0;   // after an ultimate aim the spot refused, wait this long before trying again
+  const duskActions = { springs: 0, anchorHoldFrames: 0, anchorSidesteps: 0, lamps: 0, oilFlasks: 0 };
+  const anchorPath = { target: null, best: Infinity, stalled: 0, sidestep: 0 };
   /** One frame of the bot against `e`: steer to its distance, face it, and attack (useUlt: the aimed ultimate too). */
   function bot(e, useUlt) {
     clearKeys();
     const d = arcDist(P.up, e.up), toward = tangentToward(P.up, e.up);
     H.cam.fwd.copy(toward);
-    if (d > reach + 1.5) keys.KeyW = true;                               // closes in; never backs off (that would face away)
+    // A disguised mosslurk cannot be harmed. Walk into its trigger as a player would before starting the duel.
+    if (e.disguised) {
+      P.fwd.copy(toward);
+      if (d > e.def.triggerRange * 0.8) keys.KeyW = true;
+      else if (spring(e)) duskActions.springs++;
+      return;
+    }
+    // Grandmother is invulnerable while hung. Hold the carried lantern against each strand until it burns.
+    if (e.type === 'grandweaver' && e.hung) {
+      const oil = activeLantern();
+      if (oil?.status.oil < 20 && P.inventory.count('lumenOil') > 0) {
+        P.inventory.remove('lumenOil'); oil.refill(100); duskActions.oilFlasks++;
+      }
+      const strands = (e.strands ?? []).filter(a => a.alive);
+      const anchor = strands.sort((a, b) => arcDist(P.up, a.up) - arcDist(P.up, b.up))[0];
+      if (anchor) {
+        const distance = arcDist(P.up, anchor.up);
+        if (anchorPath.target !== anchor) Object.assign(anchorPath, { target: anchor, best: Infinity, stalled: 0, sidestep: 0 });
+        if (distance < anchorPath.best - 0.05) { anchorPath.best = distance; anchorPath.stalled = 0; }
+        else anchorPath.stalled++;
+        if (anchorPath.stalled > 120) { anchorPath.sidestep = 90; anchorPath.stalled = 0; anchorPath.best = Infinity; duskActions.anchorSidesteps++; }
+        const towardAnchor = tangentToward(P.up, anchor.up);
+        H.cam.fwd.copy(towardAnchor); P.fwd.copy(towardAnchor);
+        if (distance > anchor.def.reach * 0.75) {
+          keys.KeyW = true;
+          if (anchorPath.sidestep > 0) { keys[duskActions.anchorSidesteps % 2 ? 'KeyD' : 'KeyA'] = true; anchorPath.sidestep--; }
+        }
+        else duskActions.anchorHoldFrames++;
+        return;
+      }
+    }
+    // Umbra's damage window needs a burning bait lantern. Walk to one and use its real interaction prompt.
+    if (e.type === 'umbra' && !e.dormant) {
+      const oil = activeLantern();
+      if (oil?.status.oil < 20 && P.inventory.count('lumenOil') > 0) {
+        P.inventory.remove('lumenOil'); oil.refill(100); duskActions.oilFlasks++;
+      }
+      const burning = (e.lamps ?? []).find(l => l.alive && l.lit);
+      const ready = (e.lamps ?? []).filter(l => l.alive && !l.lit && !l.drained && l.relightT <= 0);
+      if (!burning && ready.length && oil?.status.lit) {
+        const lamp = ready.sort((a, b) => arcDist(P.up, a.up) - arcDist(P.up, b.up))[0];
+        const towardLamp = tangentToward(P.up, lamp.up);
+        H.cam.fwd.copy(towardLamp); P.fwd.copy(towardLamp);
+        if (arcDist(P.up, lamp.up) > lamp.def.reach + lamp.def.radius - 0.3) keys.KeyW = true;
+        else {
+          const target = arenaLampTarget();
+          if (/Light the arena lantern/.test(target?.label ?? '')) { target.run(); duskActions.lamps++; }
+        }
+        return;
+      }
+      if (burning && !e.crashT) {
+        if (arcDist(P.up, burning.up) > 3) {
+          const towardLamp = tangentToward(P.up, burning.up);
+          H.cam.fwd.copy(towardLamp); P.fwd.copy(towardLamp); keys.KeyW = true;
+        }
+        return; // Save the damaging skills for the stun window instead of spending focus on an airborne target.
+      }
+    }
+    if (d > reach + 1.5 && !(e.type === 'umbra' && !e.crashT && (e.lamps ?? []).some(l => l.alive && l.lit))) keys.KeyW = true;
     P.fwd.copy(toward);
     updateAim();
+    // This is a target-throughput duel. Adds can distract the game's soft aim even while the bot faces the boss;
+    // keep the measured target selected as a deliberate player would when testing its damage windows.
+    if (e.type === 'umbra' && e.crashT > 0) targeting.aim = e;
     // A lethal hit restarts the encounter rather than measuring its duration. Walk away from the committed warning
     // and use the hero's normal evasion; ordinary damage remains visible through HP top-ups.
     if (e.attack === 'doom' && e.state === 'windup') {
@@ -171,11 +244,20 @@ async function child(hero, planet) {
   function fight(e, cap, { topUp = false, engage, useUlt = false } = {}) {
     let t = 0, taken = 0, last = P.hp, deaths = 0, topUps = 0, done = false, lastMove = '';
     const moves = {}, flyingDamage = { taken: 0, hits: 0, maxHit: 0 };
+    const duskWindow = { crashedFrames: 0, litFrames: 0, nearFrames: 0, damageCrashed: 0, damageOther: 0 };
+    let priorBossHp = e.hp;
     let transition = null, aimOpen = 0;
     for (let frame = 0; frame < cap * 60 && !done; frame++) {
       step(1 / 60);
       if (done) return;
       t += 1 / 60;
+      if (planet === 4 && e.type === 'umbra') {
+        if (e.crashT > 0) duskWindow.crashedFrames++;
+        if ((e.lamps ?? []).some(l => l.alive && l.lit)) duskWindow.litFrames++;
+        if (arcDist(P.up, e.up) <= reach + 1.5) duskWindow.nearFrames++;
+        if (e.hp < priorBossHp) duskWindow[e.crashT > 0 ? 'damageCrashed' : 'damageOther'] += priorBossHp - e.hp;
+        priorBossHp = e.hp;
+      }
       const move = `${e.state}:${e.attack}`;
       if (move !== lastMove && e.state === 'windup') (moves[e.attack] ??= []).push(+t.toFixed(2));
       lastMove = move;
@@ -196,7 +278,12 @@ async function child(hero, planet) {
     }
     clearKeys();
     return { time: !e.alive ? +t.toFixed(2) : null, cap, taken, deaths, topUps, left: e.alive ? +(e.hp / e.def.hp).toFixed(2) : 0,
-      ...(useUlt ? { moves, transition, flyingDamage } : {}) };
+      ...(useUlt ? { moves, transition, flyingDamage } : {}),
+      ...(planet === 4 && e.type === 'umbra' ? { duskWindow } : {}),
+      ...(planet === 4 && isFight(e) ? { endState: { hung: !!e.hung, crashT: e.crashT ?? 0,
+        strands: (e.strands ?? []).filter(a => a.alive).map(a => ({ char: a.char, distance: +arcDist(P.up, a.up).toFixed(1) })),
+        lamps: (e.lamps ?? []).filter(l => l.alive).map(l => ({ lit: !!l.lit, drained: !!l.drained })),
+        oil: activeLantern()?.status.oil, distance: +arcDist(P.up, e.up).toFixed(1) } } : {}) };
   }
 
   // Monsters never fight near the village (COMBAT.player.safeRadius), so the trials happen out in the wilds: flat, dry
@@ -229,16 +316,19 @@ async function child(hero, planet) {
     P.placeAt(offsetDir(home, 0.3, 8)); ctx.companion.snapToHero(); e.aggro(); step(0.2);
     let back = -9;
     const r = fight(e, FIGHT_CAP, { topUp: true, useUlt: true, engage: t => {
-      if (e.alive && !ENGAGED.has(e.state) && t - back > 3) { back = t; P.placeAt(offsetDir(home, Math.random() * 6.28, 6)); e.aggro(); }
+      if (e.alive && !ENGAGED.has(e.state) && t - back > 3) { back = t; P.placeAt(offsetDir(home, rng() * 6.28, 6)); e.aggro(); }
     } });
     return { ...r, name: e.def.name ?? e.type };
   }
+  if (planet === 4) P.inventory.add('lumenOil', 2);
   const mini = ctx.enemies.find(e => e.def.miniBoss && e.alive);
   const miniBoss = mini ? bigFight(mini) : null;
   if (ctx.boss) { H.wakeBoss(); step(0.2); }
+  if (planet === 4) { refill(); P.inventory.add('lumenOil', 8); }
   const boss = ctx.boss ? bigFight(ctx.boss) : null;
 
   console.log('RESULT ' + JSON.stringify({ hero, planet, planetName: PL.name, level, seed: Number(process.env.SIM_SEED ?? 1),
-    profile: `${build}; default pet; in-range affordable abilities; Doom evasion; 50% HP top-ups`, monsters, miniBoss, boss }));
+    profile: `${build}; default pet; in-range affordable abilities; Doom evasion; 50% HP top-ups`,
+    ...(planet === 4 ? { duskActions } : {}), monsters, miniBoss, boss }));
   process.exit(0);
 }

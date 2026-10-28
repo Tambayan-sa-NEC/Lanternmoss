@@ -7,6 +7,7 @@ import { buildDragon } from './dragon.js';
 import { buildBasilisk, buildHydra } from './miniBosses.js';
 import { buildHumanoid } from './humanoid.js';
 import { buildIronclaw, buildJellybell, buildMireLure, buildMirelure, buildShellback, buildSurfSkipper } from './tideMonsters.js';
+import { buildArenaLantern, buildGloomAnchor, buildGloomweaver, buildGloomweb, buildGrandweaver, buildMosslurk, buildShadeling, buildSnuffer, buildUmbra } from './duskMonsters.js';
 
 export function buildGoblin() {
   const h = buildHumanoid({ skin: 0x8fcf5a, top: 0x8a6a4a, hem: 0x6a5238, pants: 0x5a4a3a, shoes: 0x3a2a2a, belt: 0x3a2a2a, sleeve: 0x8fcf5a,
@@ -134,4 +135,8 @@ export const ENEMY_BUILDERS = { goblin: buildGoblin, ogre: buildOgre, wisp: buil
   puffcap: buildPuffcap, ramhorn: buildRamhorn, thornmole: buildThornmole, hexlantern: buildHexlantern,
   gloomcap: buildDemonLord, pyrrhax: buildDragon, malgrath: buildDemonLord, thornSeal: buildThornSeal,
   hydra: buildHydra, basilisk: buildBasilisk, shellback: buildShellback, jellybell: buildJellybell, surfSkipper: buildSurfSkipper,
-  ironclaw: buildIronclaw, mirelure: buildMirelure, mireLure: buildMireLure, falseLure: buildMireLure };
+  ironclaw: buildIronclaw, mirelure: buildMirelure, mireLure: buildMireLure,
+  shadeling: buildShadeling, mosslurk: buildMosslurk,
+  gloomweaver: buildGloomweaver, snuffer: buildSnuffer, gloomweb: buildGloomweb,
+  grandweaver: buildGrandweaver, gloomAnchor: buildGloomAnchor, umbra: buildUmbra, arenaLantern: buildArenaLantern,
+  falseLure: buildMireLure };

@@ -1,9 +1,12 @@
-// Development-only browser bootstrap. Activate the candidate BEFORE Game and save schemas are imported.
+// Development-only browser bootstrap for an unreleased world. Activate its test-only candidate or fixture BEFORE
+// Game and save schemas are imported: some owners derive their schemas at module initialization.
+// `bootstrap` is the module the entry point is replaced with; it defaults to the Tidewhisper candidate (27h).
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
+const TIDEWHISPER_CANDIDATE = "import {installTidewhisperCandidate} from '/tests/sim/lib/tidewhisperCandidate.mjs'; installTidewhisperCandidate();";
 export async function tidewhisperBrowser({ port = 8114, candidate = true, software = true, highPerformance = false,
-  viewport = { width: 1280, height: 720 }, quality = 'low', headless = true } = {}) {
+  viewport = { width: 1280, height: 720 }, quality = 'low', headless = true, bootstrap = TIDEWHISPER_CANDIDATE } = {}) {
   const root = fileURLToPath(new URL('../..', import.meta.url));
   const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: ['ignore','pipe','pipe'] });
   let browser, stderr = '';
@@ -33,13 +36,16 @@ export async function tidewhisperBrowser({ port = 8114, candidate = true, softwa
     page.setDefaultTimeout(90000); await page.setViewport({ ...viewport, deviceScaleFactor: 1 });
     page.on('pageerror', e => errors.push(String(e)));
     page.on('console', m => { if (m.type() === 'error' && /shader|WebGLProgram|VALIDATE_STATUS/i.test(m.text())) errors.push(m.text()); });
+    // candidate: false runs the shipped entry point untouched (Tidewhisper no longer needs a candidate now that it
+    // is released); otherwise `bootstrap` is the module the entry point is replaced with, which is how the still
+    // unreleased worlds put their own fixture in first.
     if (candidate) {
       await page.setRequestInterception(true);
       page.on('request', request => {
         const url = new URL(request.url());
         if (url.pathname === '/src/main.js' && !url.searchParams.has('candidate-entry')) {
-          return request.respond({ status: 200, contentType: 'application/javascript', body:
-            "import {installTidewhisperCandidate} from '/tests/sim/lib/tidewhisperCandidate.mjs'; installTidewhisperCandidate(); await import('/src/main.js?candidate-entry');" });
+          return request.respond({ status: 200, contentType: 'application/javascript',
+            body: `${bootstrap} await import('/src/main.js?candidate-entry');` });
         }
         return request.continue();
       });

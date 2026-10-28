@@ -15,6 +15,7 @@ import { CavePuzzles } from '../gameplay/CavePuzzles.js';
 import { dayClock } from '../gameplay/dayClock.js';
 import { Equipment, computeStats } from '../gameplay/equipment.js';
 import { Farm } from '../gameplay/Farm.js';
+import { Fireflies } from '../gameplay/Fireflies.js';
 import { Gathering } from '../gameplay/Gathering.js';
 import { Hotbar } from '../gameplay/hotbar.js';
 import { Houses, houseDef } from '../gameplay/Houses.js';
@@ -66,8 +67,7 @@ export class AdventureSave {
       pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook, talents: Talents,
       home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, caves: CaveRewards, cavePuzzles: CavePuzzles, bossGate: BossGate, pickups: Pickups, building: Building,
-      rematch: Rematch,
-      mechanics: game.world.mechanics })) this.registry.register(key, system);
+      rematch: Rematch, fireflies: Fireflies, mechanics: game.world.mechanics })) this.registry.register(key, system);
     this.registry.assertComplete();
     game.world.mechanics.snapshotForPlanet = id => this.registry.planets[id]?.mechanics;
     game.planets.beforeLoad = () => { if (!this.restoring && !this.suspended && ctx.started) { StoryMemory.toJSON(); this.registry.capturePlanet(ctx.planetId); } };

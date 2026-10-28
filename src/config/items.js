@@ -32,6 +32,7 @@ import { RUNES } from './magic.js';
 import { FURNISHINGS } from './home.js';
 import { BUILDING_ITEMS } from './placeables.js';
 import { COASTAL_ITEMS } from './coastalResources.js';
+import { DUSK_ITEMS } from './duskResources.js';
 
 export const ITEM_CATEGORIES = {
   consumable: 'Consumable',
@@ -98,6 +99,7 @@ export const ITEM_EFFECTS = {
   mana: 'Restores {amount} mana / stamina',
   energy: 'Fills {amount} energy',
   buff: '{buffName} for {seconds}s',
+  oil: 'Pours {amount} oil into your lantern',
 };
 
 /** Procedural icon / world-model shapes (CSS in styles/main.css, meshes in src/models/items.js). */
@@ -119,6 +121,7 @@ export const INVENTORY = {
 
 export const ITEM_DEFINITIONS = [
   ...COASTAL_ITEMS,
+  ...DUSK_ITEMS,
   ...Object.entries(BUILDING_ITEMS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'placeable', maxStack: 20, value: 0, icon: { shape: 'charm', color: f.color, art: f.art } })),
   ...Object.entries(FURNISHINGS).map(([id, f]) => ({ id, name: f.name, description: f.description, category: 'furniture', maxStack: 5, value: 0,
     icon: { shape: 'charm', color: f.color, art: f.art } })),
@@ -204,7 +207,8 @@ export const ITEM_DEFINITIONS = [
   { id: 'featherCharm', name: 'Feather-Step Charm', description: "Fern's sprite magic, folded into a leaf. Run like the wind for a while.", category: 'consumable',
     icon: { shape: 'charm', color: 0xb8ffe0, art: 'leafCharm' }, maxStack: 5, rarity: 'rare', value: 30, use: [{ effect: 'buff', kind: 'feather', seconds: 30 }] },
   // ---- materials (crafting: config/crafting.js) ----
-  { id: 'glowcap', name: 'Glowcap', description: 'A softly glowing mushroom cap from Lanternmoss. Crafts tonics and Lanternmoss gear.', category: 'material',
+  { id: 'glowcap', name: 'Glowcap', description: 'A softly glowing mushroom cap. Crafts tonics and Lanternmoss gear, and tips straight into a belt lantern.', category: 'material',
+    action: 'use', use: [{ effect: 'oil', amount: 10 }],
     icon: { shape: 'cap', color: 0x9ff0ff, art: 'mushroom' }, maxStack: 30, value: 3 },
   { id: 'emberShard', name: 'Ember Shard', description: 'Still warm. Found on the slopes of Emberfall. Crafts stews and Emberfall gear.', category: 'material',
     icon: { shape: 'gem', color: 0xff8a4a, art: 'shard' }, maxStack: 30, rarity: 'uncommon', value: 6 },
@@ -341,6 +345,13 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0xff6a3a, art: 'pendant' }, value: 90, equip: { slot: 'charm', tier: 2, stats: { damage: 0.07, armor: 0.04 } } },
   { id: 'auroraFeather', name: 'Aurora Feather', description: 'A shimmering feather left by an Aurora Hare. Your magic runs deep and returns fast.', category: 'equipment',
     icon: { shape: 'charm', color: 0x9ff3ff, art: 'moonCharm' }, value: 110, equip: { slot: 'charm', tier: 3, stats: { maxMana: 20, manaRegen: 1.5 } } },
+  // ---- Duskhollow (30b) ----
+  { id: 'fireflyJar', name: 'Firefly Jar', description: 'A jar of Duskhollow fireflies, still blinking. Tip them into your lantern and they burn gently for a while.',
+    category: 'consumable', icon: { shape: 'orb', color: 0xbff4a0, art: 'bottle' }, maxStack: 10, value: 14, tags: ['lantern'],
+    use: [{ effect: 'oil', amount: 25 }] },
+  { id: 'moonmothWing', name: 'Moonmoth Wing', description: 'A pale wing scale left by a befriended Moonmoth. Worn at your belt, your lantern reaches further into the dusk.',
+    category: 'equipment', icon: { shape: 'charm', color: 0xdfe8ff, art: 'moonCharm' }, value: 120, props: { giftOnly: true },
+    equip: { slot: 'charm', tier: 3, stats: { maxMana: 10, moveSpeed: 0.03 } } },
   // ---- keys ----
   { id: 'wayfarerKey', name: "Wayfarer's Key", description: 'Opens the next locked world for a one-way portal trip. Defeat its boss or spend another key to return home. Rarely found in Lantern chests; earned for a no-hit boss win.', category: 'misc',
     icon: { shape: 'key', color: 0x9fe9ff, art: 'key' }, maxStack: 5, rarity: 'rare', value: 0, tags: ['key'] },
@@ -358,6 +369,8 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'crown', color: 0xff7a4a, art: 'crown' }, rarity: 'legendary', value: 0 },
   { id: 'tideCrown', name: 'The Tide Crown', description: "Proof that you put out the Lantern Angler's false lights and freed Tidewhisper.", category: 'quest',
     icon: { shape: 'crown', color: 0x6fe0d8, art: 'crown' }, rarity: 'legendary', value: 0 },
+  { id: 'duskCrown', name: 'The Dusk Crown', description: 'Proof that you brought down the Moth of the Last Light and gave Duskhollow back its lamps.', category: 'quest',
+    icon: { shape: 'crown', color: 0xe8e0ff, art: 'crown' }, rarity: 'legendary', value: 0 },
   { id: 'frostCrown', name: "Malgrath's Crown", description: 'Proof that you cast down the Winged Demon Lord and freed Frostveil, the last planet.', category: 'quest',
     icon: { shape: 'crown', color: 0x8fd8ff, art: 'crown' }, rarity: 'legendary', value: 0 },
 ];

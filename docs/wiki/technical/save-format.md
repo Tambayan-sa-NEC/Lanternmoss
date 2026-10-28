@@ -85,6 +85,11 @@ TODO 27c adds optional `claimedCycle` integers to gathering node deltas for tida
 cooldowns expire, preventing another gather in the same high-tide batch after Continue. The adventure calendar
 derives the current batch; skips never grant items. Missing claims default to -1, and v1 remains compatible.
 
+TODO 30b adds the optional per-planet `fireflies: { away: [seconds] }` row: how long each caught firefly swarm
+still has to wait before another settles somewhere else. Only the timers are saved; where the swarms sit is rebuilt
+with the world. Without it, Continue would relight every swarm, so reloading could farm jars of oil. Missing or
+invalid rows default to no waiting, and v1 saves remain compatible.
+
 TODO 27d uses existing quest state for partial lens/fuel deliveries and lighthouse completion. The beacon
 is derived from that completion, never independently saved. Existing house indices, gift/lore memory and
 indoor coordinates persist the two coastal rooms; no save version or persistent owner was added.

@@ -94,6 +94,9 @@ import { rng } from '../utils/random.js';
 import { AdventureSave } from './AdventureSave.js';
 import { Tutorial } from '../gameplay/Tutorial.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
+import { Fireflies } from '../gameplay/Fireflies.js';
+import { OldRoad } from '../gameplay/OldRoad.js';
+import { clearMire } from '../entities/enemies/behaviors/web.js';
 import { DAY } from '../config/day.js';
 import { TutorialUI } from '../ui/TutorialUI.js';
 
@@ -175,11 +178,14 @@ export class Game {
     ctx.player.update(dt, { keys, viewFwd: cam.fwd, enabled: ctx.started && !ctx.transitioning && !ctx.cutscene });
     if (!ctx.room) {
       for (const c of ctx.critters) c.update(dt);
+      Fireflies.update(dt);                                          // Duskhollow's drifting swarms (30b)
+      OldRoad.update(dt);                                            // the carried village flame (30d)
       for (const b of ctx.birds) b.update(dt);
       updatePonds(dt,this.world);
       for (const n of ctx.npcs) n.update(dt);
       updateWorldItems(dt);
     }
+    clearMire(dt);                                                 // the webs press the hero's speed back down as they animate (30f)
     updateCombat(dt, this.world, keys);
     if (!ctx.room) {
       this.planets.update(dt);                                       // before challenges: a boss win calls off any active one
@@ -249,7 +255,7 @@ export class Game {
   /** Console handle for poking at a running game (window.LANTERNMOSS). */
   debugHandle() {
     const game = this;
-    return { Building, BuildingUI, Bounties, BountyUI, Talents, TalentUI, LocalLights, Dungeons, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, CaveRewards, CavePuzzles, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
+    return { Building, BuildingUI, Bounties, BountyUI, Talents, TalentUI, LocalLights, Dungeons, Fireflies, OldRoad, Home, HomeUI, Portals, PortalUI, RecipeBook, Tutorial, TutorialUI, Gathering, Fishing, Farm, Stations, Needs, Challenges, CHALLENGES, Chests, Hotbar, Pets, PetMenu, PhotoMode, Journal, JournalUI, BossGate, CaveRewards, CavePuzzles, wakeBoss: () => BossGate.wake(), Dialog, buffs, cam, keys, CharacterSelect, MainMenu, PauseMenu, CHARACTERS, LEVELING, levelEvents, gainXp, tryCast, colliders, ponds,
       get player() { return ctx.player; }, get npcs() { return ctx.npcs; }, get critters() { return ctx.critters; }, get birds() { return ctx.birds; },
       get enemies() { return ctx.enemies; }, get projectiles() { return ctx.projectiles; }, get companion() { return ctx.companion; },
       get inventory() { return ctx.player.inventory; }, get worldItems() { return ctx.worldItems; }, items: itemRegistry, InventoryUI,

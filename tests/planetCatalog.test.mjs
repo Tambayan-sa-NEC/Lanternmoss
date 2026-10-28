@@ -26,7 +26,11 @@ test('catalog distinguishes released Act I from incomplete Act II metadata', () 
   assert.throws(() => validatePlanetCatalog([...PLANET_CATALOG, PLANETS[0]]), /duplicate/);
   assert.throws(() => validatePlanetCatalog([{ ...PLANETS[0], released: 'yes' }]), /metadata/);
   assert.throws(() => validatePlanetCatalog([{ ...PLANETS[0], released: false }]), /starting world/);
-  assert.throws(() => validatePlanetCatalog([PLANETS[0], { ...PLANET_CATALOG.find(p => p.id === 'duskhollow'), released: true }]), /generation data/);
+  // A draft with no generation data at all (the Moon) is rejected outright. Duskhollow now has a seed, a palette,
+  // terrain, a scale, a roster (30e) and a boss type, so this early check passes it: what still holds it back is the
+  // content gate (tests/contentGate.test.mjs), not its metadata.
+  assert.throws(() => validatePlanetCatalog([PLANETS[0], { ...PLANET_CATALOG.find(p => p.id === 'lanternMoon'), released: true }]), /generation data/);
+  validatePlanetCatalog([PLANETS[0], { ...PLANET_CATALOG.find(p => p.id === 'duskhollow'), released: true }]);
 });
 
 test('keys and defeated ids cannot reach unreleased worlds or jump over a release gap', () => {

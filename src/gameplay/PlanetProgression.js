@@ -14,6 +14,7 @@ import { NPC } from '../entities/npc/NPC.js';
 import { createLocalDefs, createNpcDefs } from '../entities/npc/npcDefs.js';
 import { despawnWildlife, spawnWildlife } from '../entities/wildlife/wildlife.js';
 import { Rematch } from './Rematch.js';
+import { OldRoad } from './OldRoad.js';
 import { audio } from '../systems/AudioSystem.js';
 import { snapCamera } from '../systems/CameraSystem.js';
 import { releaseAllKeys } from '../systems/InputSystem.js';
@@ -85,6 +86,7 @@ export class PlanetProgression {
     Home.setup(this.world, [[Portals.gate.dir, 3], ...village, board].filter(Boolean));
     // the cave mouth's spot comes last, so no saved position moves for it (unreleased caves show no mouth)
     Dungeons.setup(this.world, ctx.planet, [...village, [Portals.gate.dir, 3], board, ...Gathering.nodes.map(n => [n.up, n.def.r + 0.5])].filter(Boolean));
+    OldRoad.setup(this.world, this.planet);                             // Duskhollow's waylamps and moonwells (30d)
     Building.setup(this.world);
   }
 
@@ -181,7 +183,7 @@ export class PlanetProgression {
     Dialog.close(); Challenges.cancel(); Houses.reset();
     for (const p of ctx.projectiles) p.dispose(); ctx.projectiles.length = 0;
     clearHazards();
-    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear(); Stations.clear(); Bounties.clear(); Dungeons.clear();
+    clearEnemies(); clearTargets(); despawnWildlife(); clearWorldItems(); Chests.clear(); Fishing.end(); Gathering.clear(); Farm.clear(); Stations.clear(); Bounties.clear(); Dungeons.clear(); OldRoad.clear();
     world.dispose(); world.generate(this.planet);
     audio.setTheme(this.planet.music);
     Object.assign(P, { dead: false, deadT: 0, vy: 0 }); P.clearTimers();

@@ -42,13 +42,14 @@ export const SAVE_SYSTEMS = {
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
   rematch: 'adventure',
-  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', cavePuzzles: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
+  building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', cavePuzzles: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet', fireflies: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
   'gameplay/Fishing.js': 'An unfinished cast is cancelled; fish are awarded only when reeled in.',
   'gameplay/Dungeons.js': 'The cave itself is rebuilt from the planet seed; which cave the hero is in and where they stand is saved with the player, and its chests, veins and rooms by CaveRewards.',
   'gameplay/Stations.js': 'Station models and proximity are rebuilt from the planet.',
   'gameplay/petAbilities.js': 'Visual scouting/fetch targets are transient; lasting buffs and cooldowns are saved.',
+  'gameplay/OldRoad.js': "The waylamps, moonwells and brazier are rebuilt from the planet's authored canopy gaps; which of them are alight, and the carried village flame, are saved per planet by the lantern mechanic.",
 };
 // The coverage test scans gameplay exports; every new state owner needs an explicit classification.
 export const SAVE_OWNERS = {
@@ -65,6 +66,7 @@ export const SAVE_OWNERS = {
   'gameplay/Farm.js:Farm': 'farm', 'gameplay/Gathering.js:Gathering': 'gathering',
   'gameplay/Chests.js:Chests': 'chests', 'gameplay/CaveRewards.js:CaveRewards': 'caves', 'gameplay/CavePuzzles.js:CavePuzzles': 'cavePuzzles', 'gameplay/BossGate.js:BossGate': 'bossGate', 'gameplay/pickups.js:Pickups': 'pickups',
   'gameplay/Tutorial.js:Tutorial': 'tutorial',
+  'gameplay/Fireflies.js:Fireflies': 'fireflies',
   'gameplay/RecipeBook.js:RecipeBook': 'crafting',
   'gameplay/Portals.js:Portals': 'portals',
   'gameplay/Home.js:Home': 'home',
@@ -237,6 +239,8 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
         regrowT: number(n?.regrowT, 0, 0, NODE_KINDS[n?.kind]?.regrow ?? 600), ...(n?.claimedCycle !== undefined ? {claimedCycle: integer(n.claimedCycle, -1, -1, 1000000000)} : {}) })).filter(n => n.kind && n.dir && n.id),
       rest: numericMap(s.rest, key => /^(tree|rock):\d+$/.test(key), Math.max(...Object.values(SCENERY).map(c => c.rest))),
       tipsShown: stringIds(s.tipsShown, k => ['wood', 'stone', 'seed', 'copperOre'].includes(k)) };
+    // Duskhollow's firefly swarms (30b): how long each caught swarm still has to wait, so Continue cannot relight them.
+    case 'fireflies': return { away: list(s.away, 16).map(v => number(v, 0, 0, 3600)) };
     case 'chests': return { ...(s.delta ? { delta: true } : {}), opened: stringIds(s.opened, chestId), sinceKey: integer(s.sinceKey, 0, 0, 100),
       list: list(s.list, 128).map(c => ({ id: c?.id, kind: choice(c?.kind, ['common', 'rare', 'boss'], null), dir: direction(c?.dir), fwd: direction(c?.fwd) }))
         .filter(c => chestId(c.id) && c.kind && c.dir && c.fwd) };

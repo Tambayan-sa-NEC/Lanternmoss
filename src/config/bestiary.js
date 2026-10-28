@@ -79,6 +79,39 @@ export const BESTIARY_ENTRIES = {
       'Stand well back from the water and it has to show itself in the shallows first.', 'Stagger it as it surfaces and it flounders in the shallows, open to everything.'],
     drops: 'Sometimes a silver sprat as well.',
   },
+  shadeling: {
+    name: 'Shadeling', blurb: 'A shape that is only a shadow until your light catches it. Out in the dusk it slides over the ground after you; it cannot be touched there, and it cannot touch you either.',
+    attacks: [['Clawing dark', 'Rears up and strikes - but only where it is standing in light.']],
+    counters: ['It is solid only in light. Keep it inside your lantern, or fight it where a waylamp or moonwell burns.',
+      'A sudden light drives it off: relight a lamp beside it, or pour oil into an empty lantern.',
+      'Fire sends it fleeing too, so a Fireball or a burning set clears a path.',
+      'If your lantern runs dry it cannot hurt you, but you cannot hurt it either: refill and try again.'],
+    drops: 'Often a pinch of lumen dust as well.',
+  },
+  mosslurk: {
+    name: 'Mosslurk', blurb: 'A cluster of glowcaps with teeth. It sits among the real ones, perfectly still, and waits for someone to reach for it.',
+    attacks: [['Ambush', 'Springs when you pick it, or when you walk right over it, rearing up over a warning circle before the first bite.']],
+    counters: ['It always shows its warning circle before biting: step back out of it.',
+      'Count the caps. A real patch does not blink.', 'It is slow once sprung, so back away and fight it at range.'],
+    drops: 'Often a few glowcaps as well - the ones it was wearing.',
+  },
+  gloomweaver: {
+    name: 'Gloomweaver', blurb: 'A round, fuzzy spider that strings sticky webs between the stalks and bites whatever gets caught in them.',
+    attacks: [['Bite', 'A short wind-up, then a snap of its fangs.'], ['Spin', 'Lays a sticky web a few paces ahead of itself, over and over, until the ground around you is fenced in.']],
+    counters: ['Cut the webs before you fight it: a blade takes one down, and fire burns it away in one.',
+      'Fight it on ground you have already cleared, or it will spin a new web behind you.',
+      'It is no tougher than a goblin once you can move freely.',
+      'If spiders are not for you, turn on "Draw spiders as beetles" in Settings: it and its grandmother both change.'],
+    drops: 'Often a thread or two of spider silk as well.',
+  },
+  snuffer: {
+    name: 'Snuffer', blurb: 'A little hooded thief with a stolen flask on its belt. It does not want to fight you; it wants what is in your lantern.',
+    attacks: [['Snatch', 'Darts in, takes a draught of lantern oil and runs off with it, faster than it came.']],
+    counters: ['Catch it and you get the oil back with interest: a flask bursts out of it when it goes down.',
+      'It can only steal what the tank still holds, so an empty lantern has nothing for it.',
+      'It runs in a straight line while it flees: cut it off, or hit it at range.'],
+    drops: 'Sometimes a flask of lumen oil as well.',
+  },
   hydra: {
     lore: 'Old Bramble swears the lake hydra was a single, harmless eel until somebody tried to chop it in half. '
       + 'Now it guards the deep water, and a warm, speckled egg it will not explain.',
@@ -95,6 +128,22 @@ export const BESTIARY_ENTRIES = {
       ['Tail whip', 'A spin through the marked circle around it.'], ['Lunge', 'It marks a lane and darts along it, jaws first.'], ['Venom', 'Once enraged: a fan of venom.']],
     counters: ['When its eyes blaze, turn your back: run away from it until they flare, then turn and strike.', 'Jump over the tail whip.', 'Sidestep the lunge, then punish it while it recovers.'],
   },
+  grandweaver: {
+    lore: 'Wick says she was spinning in the hollows before the waylamps went up, and that she is the reason they went up at all. '
+      + 'Every web in Duskhollow is a grandchild of hers, and she has never once come down from her own.',
+    blurb: 'A mini boss: an enormous spider hanging in a canopy of her own web over the moonstone vein. While she is up there, nothing you do can touch her.',
+    attacks: [['Weave', 'Marks the ground you are standing on and drops a sticky web on it.'],
+      ['Silk spit', 'A fan of thrown silk that hurts and leaves you wading.'],
+      ['Bite', 'On the ground: a wedge of fangs in front of her.'],
+      ['Leg sweep', 'From her second web on: a ring of legs sweeping the ground around her.']],
+    counters: ['Do not fight her in the air: burn the three anchor strands and she comes down.',
+      'A blade will not cut a strand. Hold a lit lantern against one, or hit it with fire.',
+      'Keep oil in the tank before you start: an empty lantern cannot burn anything.',
+      'She lies dazed for a moment where she lands: that is your best window.',
+      'She climbs back up and spins fresh strands at 60% and 30%, so expect to do it three times.',
+      'If spiders are not for you, turn on "Draw spiders as beetles" in Settings: she changes with her grandchildren.'],
+    drops: 'Spider silk and a moonstone, and the moonstone vein she guards is yours to mine.',
+  },
   ironclaw: {
     lore: 'The bell hung in the old lighthouse until the night the Lantern Angler drew a ship onto the rocks and both went down. '
       + 'Ironclaw found it on the sea bed, crawled in, and has been carrying it about ever since. It hates being rung.',
@@ -104,6 +153,21 @@ export const BESTIARY_ENTRIES = {
     counters: ['Jump over the shockwaves.', 'Hit its face, not the bell: tucked in its shell it only takes a little damage.',
       'At 66% and 33% it crawls out to swap shells: that\'s your window, from any side.', 'At low tide, bait a charge across the wet sand: it gets stuck, soft and open. It only falls for it once per shell.'],
     drops: 'Two black pearls, and the pearl beds it guards are yours to gather.',
+  },
+  umbra: {
+    lore: 'Wick keeps the Old Road lit because of her. She came the night the last moonwell went out, and every lamp in the '
+      + 'hollows has been a bargain with her since: light enough to walk by, never so much that she comes to drink it.',
+    blurb: "Duskhollow's boss: a vast pale-eyed moth that dives at the brightest light there is. On this world, that is usually the one on your belt.",
+    attacks: [['Dive', 'Marks a lane and falls along it at whatever is burning brightest - a lit arena lantern, or you.'],
+      ['Wingbeat', 'A ring of wind that puts every arena lantern out and takes the oil from your lantern. Shadelings come out of the dark it leaves.'],
+      ['Blinding scales', 'A fan of thrown scales that hurt.'],
+      ['Drinking the light', 'From half health: she drains an arena lantern for good and sheds a fog of scales that hangs on you and presses your own light in.']],
+    counters: ['Light an arena lantern in the ring: she dives at that instead of at you, and crashes into it.',
+      'A crashed moth is stunned and takes extra damage: that is the whole damage window.',
+      'Lighting one costs a little oil, so come with a full tank and something to refill it.',
+      'After a wingbeat everything is dark: relight a lantern before she picks you.',
+      'She drinks one lantern dry each time she feeds, so the ring gets darker: do not waste the ones you have left.'],
+    drops: 'The Dusk Crown.',
   },
   mirelure: {
     lore: "Ships once steered by the lighthouse at Tidewhisper. Then a second light began to glow in the lagoon, softer and nearer, "

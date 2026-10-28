@@ -12,6 +12,7 @@ import { makeShadow, updateShadow } from '../../fx/shadows.js';
 import { sparkles } from '../../fx/sparkles.js';
 import { buildQuad, buildToad } from '../../models/creatures.js';
 import { COASTAL_BUILDERS } from '../../models/coastalCreatures.js';
+import { DUSK_BUILDERS } from '../../models/duskCreatures.js';
 import { updateCoastalCritter } from './coastalBehavior.js';
 import { coastalSpot } from '../../world/coastPlacement.js';
 import { addDyn, removeDyn } from '../../physics/colliders.js';
@@ -28,15 +29,19 @@ import { groundHeight } from '../../world/terrain.js';
 
 const V3 = THREE.Vector3;
 const _tv = new V3(), _tv2 = new V3();
-const REACT = { deer: 9, bunny: 5, lizard: 4.5, frog: 3 };            // how close the hero comes before they react (default 4.2)
-const FLEE = { fox: 6.2, deer: 7.5, bunny: 5.2, lizard: 6, frog: 3, toad: 3 };   // running-away speed (default 4.2)
+const REACT = { deer: 9, bunny: 5, lizard: 4.5, frog: 3, snail: 2.2, bat: 5.5, cricket: 3 };   // how close the hero comes before they react (default 4.2)
+const FLEE = { fox: 6.2, deer: 7.5, bunny: 5.2, lizard: 6, frog: 3, toad: 3, snail: 0.4, bat: 5, cricket: 3.4 };   // running-away speed (default 4.2)
 let shyHint = false;
 
 export class Critter extends Walker {
   constructor(defKey, dir) {
     const def = CRITTER_DEFS[defKey]; super(dir, def.radius ?? (def.kind === 'dog' ? 0.38 : 0.32));
-    this.def = def; this.defKey = defKey; this.kind = def.kind; Object.assign(this, (COASTAL_BUILDERS[def.build] ?? (def.build === 'toad' ? buildToad : buildQuad))(def)); scene.add(this.root);
-    this.shadow = makeShadow(def.kind === 'deer' ? 0.7 : 0.45); this.height = { deer: 1.5, frog: 0.45, lizard: 0.5 }[def.kind] ?? 0.85; this.fwd.applyAxisAngle(this.up, rng() * 6.28);
+    this.def = def; this.defKey = defKey; this.kind = def.kind; Object.assign(this, (COASTAL_BUILDERS[def.build] ?? DUSK_BUILDERS[def.build] ?? (def.build === 'toad' ? buildToad : buildQuad))(def)); scene.add(this.root);
+    this.shadow = makeShadow(def.kind === 'deer' ? 0.7 : 0.45); this.height = { deer: 1.5, frog: 0.45, lizard: 0.5, snail: 0.4, cricket: 0.3, bat: 0.5, moth: 0.6 }[def.kind] ?? 0.85;
+    this.fwd.applyAxisAngle(this.up, rng() * 6.28);
+    // Duskhollow (30b): its bats and Moonmoth stay in the air under the caps, and winged bodies beat their wings
+    // instead of walking.
+    this.hover = def.hang ?? 0; this.wingbeat = def.wingbeat ?? 0;
     this.home = this.up.clone(); this.hopT = 0; this.rare = def.rare ?? null; this.away = 0;
     this.state = 'idle'; this.timer = mr(1, 3); this.speed = 0; this.phase = rng() * 10; this.cool = 0; this.turnRate = 0; this.sit = 0; this.trailT = 0;
     this.baseSpeed = def.speed ?? { cat: 1.4, dog: 1.9, fox: 2.3 }[this.kind] ?? 1.5;
@@ -47,6 +52,9 @@ export class Critter extends Walker {
   react() {
     this.cool = 9 + rng() * 4;
     if (this.kind === 'frog') { emote(this, '♪', '#6fc46a'); this.state = 'flee'; this.timer = 0.9; audio.plip(); return; }
+    if (this.kind === 'cricket') { emote(this, '♪', '#9fd8c0'); this.state = 'flee'; this.timer = 0.8; audio.chirp(); return; }
+    if (this.kind === 'snail') { this.state = 'sit'; this.timer = 4; emote(this, 'z', '#7cf0c0'); return; }   // it pulls into its shell
+    if (this.kind === 'bat') { emote(this, '!', '#ffd36b'); this.state = 'flee'; this.timer = 2.2; audio.chirp(); return; }
     if (this.kind === 'bunny' || this.kind === 'deer' || this.kind === 'lizard') {
       if (this.kind === 'deer' || rng() < 0.6) emote(this, '!', '#ff8a3d');
       this.state = 'flee'; this.timer = { deer: 3.5, bunny: 2.2, lizard: 1.6 }[this.kind]; this.cool = 4 + rng() * 3; return;
@@ -150,7 +158,10 @@ export class Critter extends Walker {
     const toP = this.toP, s = this.speed; this.phase += dt * (2 + s * 5.5);
     const sw = Math.min(1, s / 1.4) * 0.8, a = Math.sin(this.phase) * sw, [fl, fr, bl, br] = this.legs;
     const sitT = (this.state === 'sit' || this.state === 'nap') ? 1 : 0; this.sit += (sitT - this.sit) * damp(6, dt);
-    fl.rotation.x = a; br.rotation.x = a - this.sit * 1.2; fr.rotation.x = -a; bl.rotation.x = -a - this.sit * 1.2;
+    // Duskhollow's snail has no legs and its bats and moth have two wings, so every limb is optional (30b).
+    if (this.wingbeat) { const beat = Math.sin(ctx.time * this.wingbeat) * (0.5 + 0.5 * Math.min(1, s)); if (fl) fl.rotation.z = beat; if (fr) fr.rotation.z = -beat; }
+    else { if (fl) fl.rotation.x = a; if (fr) fr.rotation.x = -a; }
+    if (br) br.rotation.x = a - this.sit * 1.2; if (bl) bl.rotation.x = -a - this.sit * 1.2;
     this.body.position.y = Math.abs(Math.sin(this.phase)) * 0.04 * Math.min(1, s) - this.sit * (this.state === 'nap' ? 0.16 : 0.06);
     this.body.rotation.x = -this.sit * (this.state === 'nap' ? 0 : 0.3);
     const wag = this.state === 'follow' ? 18 : this.kind === 'cat' ? 2.5 : 6;

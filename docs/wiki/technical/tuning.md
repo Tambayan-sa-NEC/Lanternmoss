@@ -68,9 +68,36 @@
 | How many chests each planet has, its loot material | `src/config/planets/<id>.js` → `chests`, `material` |
 | Villager dialogue, schedules and places | `src/entities/npc/npcDefs.js` |
 | Fog, bloom, outlines | `src/config/render.js` |
-| Frame-time target and per-world count ceilings (including Tidewhisper's 550 calls / 230,000 triangles) | `src/config/render.js` → `PERFORMANCE_BUDGET`; calibrated frame limit: `src/config/contentGate.js` → `frameLimitMs` |
+| Frame-time target and per-world count ceilings (Tidewhisper and Duskhollow: 550 calls / 230,000 triangles each) | `src/config/render.js` → `PERFORMANCE_BUDGET`; calibrated frame limit: `src/config/contentGate.js` → `frameLimitMs` |
 | Default desktop validation machine, GPU, viewport, quality and hero/seed/scene matrix | `src/config/render.js` → `PERFORMANCE_REFERENCE`; actual GPU/profile helpers are shared by the collector and content gate |
 | Local light for dark places: light spots, real point lights, hero light, bands, minimum ambient, dimming | `src/config/render.js` → `RENDER.localLight` ([docs](lighting.md)) |
+| Duskhollow's endless dusk, canopy cover, lantern oil and light, and the glowmoss trail | `src/config/lantern.js` → `LANTERN` ([docs](../world/duskhollow.md)) |
+| Duskhollow's canopy height and its authored gaps of starlight | `src/config/planets/duskhollow.js` → `canopy` |
+| How many lumen caps, glowcaps, ghost ferns and moonflowers grow there | `src/config/planets/duskhollow.js` → `flora.canopy` |
+| Duskhollow's animals, their counts and where they live | `src/config/planets/duskhollow.js` → `wildlife`; looks in `src/config/critters.js` |
+| Firefly swarms: how many, how far they drift, catching reach, how long a caught one stays away, their glow | `src/config/lantern.js` → `FIREFLIES` |
+| The Moonmoth Wing charm and how much it widens the lantern | `src/config/lantern.js` → `LANTERN.charm` |
+| When the dripping caps water Duskhollow's farm, and how much the deep dark thickens its dusk | `src/config/lantern.js` → `LANTERN.drip`, `LANTERN.dusk.deepDark`, `LANTERN.light.deepDarkShrink` |
+| Duskhollow's materials, lantern oil, shade crop and Dusk set, and every recipe that makes them | `src/config/duskResources.js` → `DUSK_ITEMS`, `DUSK_RECIPES` |
+| The Old Road: how its branches leave the village, how long the carried village flame lasts, and how many lit waylamps pool light at once | `src/config/oldRoad.js` → `OLD_ROAD` ([docs](../world/duskhollow.md)) |
+| Wick, the travellers' arrival lines and what is inside Duskhollow's stalk houses | `src/config/duskVillage.js` → `DUSK_NPCS`, `DUSK_HOUSES` |
+| What wakes Umbra (level and Wick's quest) | `src/config/planets/duskhollow.js` → `boss.summon` |
+| How bright the ground must be for a shadeling to stand up solid, and what drives it off | `src/config/combat.js` → `COMBAT.enemies.shadeling` (`bindAt`, `fleeFire`, `fleeTime`) |
+| A mosslurk's ambush: how close springs it, how far the gather prompt reaches, its wind-up | `src/config/combat.js` → `COMBAT.enemies.mosslurk` |
+| Which hero spells count as fire | `src/config/combat.js` → `COMBAT.spells.*.fire` |
+| How many webs a gloomweaver holds, how often it spins and how far ahead | `src/config/combat.js` → `COMBAT.enemies.gloomweaver.web` |
+| How much a web slows, how long it lasts and what silk it leaves | `src/config/combat.js` → `COMBAT.enemies.gloomweb` (`mire`, `life`, `silk`) |
+| How much oil a snuffer takes, how much it gives back and how fast it runs | `src/config/combat.js` → `COMBAT.enemies.snuffer.steal` |
+| Drawing Duskhollow's spiders as beetles (the regular weavers and the mini boss alike) | `src/config/settings.js` → `roundBeetles` |
+| Grandmother Gloomweaver's strands: how many, how high she hangs, how long she falls and lies dazed | `src/config/combat.js` → `COMBAT.enemies.grandweaver.anchors` |
+| How long a lit lantern takes to burn through a strand, and from how far | `src/config/combat.js` → `COMBAT.enemies.gloomAnchor` (`burnTime`, `reach`) |
+| What she leaves behind | `src/config/chests.js` → `MINI_BOSS_LOOT.extra.grandweaver` |
+| Umbra's arena lanterns: how many, how far out, the oil one costs and how long a snuffed one waits | `src/config/combat.js` → `COMBAT.enemies.umbra.lanterns` |
+| How long her crash leaves her stunned, and how much her wingbeat takes | `src/config/combat.js` → `COMBAT.enemies.umbra` (`crash`, `snuff`) |
+| How much each feed drains and how long her fog blinds | `src/config/combat.js` → `COMBAT.enemies.umbra.feed` |
+| The look of her arena ring | `src/config/bossSummon.js` → `ARENA_WALLS.moonfire` |
+| Its veins and patches, the shade crop's growth, and which worlds water their own plots | `src/config/resources.js` → `NODE_KINDS`, `CROPS`, `FARM` |
+| Spore drift and deep dark | `src/config/weather.js` → `WEATHER_KINDS` (`spores`, `deepDark`) |
 | Caves: room kit, grid/corridors, darkness, lanterns, mouth, wall sweep step, route reach, per-planet caves | `src/config/dungeons.js` → `CAVE`, `ROOM_KIT`, `CAVES` ([docs](../world/caves.md)) |
 | Cave rewards: how near E offers a chest or vein, how far fixtures and monster spawns sit off the walls, how many monsters clear a room | `src/config/dungeons.js` → `CAVE.reward` |
 | Cave ore: the veins that grow only underground (tool, tier, swings, drops) and each cave's ore, vein count and chest kinds | `src/config/dungeons.js` → `CAVE_VEINS`, `CAVES` (`ore`, `veins`, `chest`, `endChest`) |
