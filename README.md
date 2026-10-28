@@ -204,4 +204,6 @@ The project README is your doorway to Lanternmoss; the **wiki holds the detailed
 
 <sub>Made of code, moss, and a little bit of magic.</sub>
 
+<sub>I don't freakin know how this works. This is all vibe coded🤣🤣.</sub>
+
 </div>
