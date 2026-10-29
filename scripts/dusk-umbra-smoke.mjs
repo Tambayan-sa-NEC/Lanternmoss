@@ -11,7 +11,8 @@ import { tidewhisperBrowser } from './lib/tidewhisper-browser.mjs';
 const { page, errors, close } = await tidewhisperBrowser({ port: 8136, quality: 'low',
   bootstrap: "import {installDuskUmbraFixture} from '/tests/sim/lib/duskUmbraFixture.mjs'; installDuskUmbraFixture();" });
 const frames = n => page.evaluate(n => { const { update } = window.LANTERNMOSS; for (let i = 0; i < n; i++) update(1 / 60); }, n);
-const CLUTTER = ['hud', 'ebars', 'bossbar', 'compass', 'prompt', 'markers', 'tip', 'challenge', 'cresult', 'toast', 'achv'];
+const CLUTTER = ['hud', 'combat', 'petcard', 'ebars', 'bossbar', 'compass', 'prompt', 'markers', 'tip',
+  'challenge', 'cresult', 'toast', 'achv', 'hint', 'save-notice'];
 const clean = () => page.evaluate(ids => { for (const id of ids) { const el = document.getElementById(id); if (el) el.style.visibility = 'hidden'; } }, CLUTTER);
 const restore = () => page.evaluate(ids => { for (const id of ids) { const el = document.getElementById(id); if (el) el.style.visibility = ''; } }, CLUTTER);
 /** Starts one of her moves through the kit's own path and lets it land. */
@@ -158,7 +159,7 @@ try {
       L.planets.world.mechanics.active.instance.refill(1e6);
       L.player.blindK = 1;
       if (L.companion) { L.companion.root.visible = false; L.companion.voiceT = 1e9; }   // its chirp bubble shows even when it does not
-      const stand = offsetDir(lamp.up, 2.6, 5.5);
+      const stand = offsetDir(lamp.up, 2.6, 8.5);
       const pin = () => {
         const d = offsetDir(lamp.up, 2.0, 3.0);
         b.up.copy(d); b.hover = b.def.hover; b.r = L.planets.world.physics ? b.r : b.r;
@@ -169,7 +170,7 @@ try {
       L.player.placeAt(stand); pin(); L.player.fwd.copy(tangentToward(L.player.up, lamp.up));
       for (let i = 0; i < 160; i++) { L.update(1 / 60); pin(); }       // the toasts, numbers and emotes fade
       L.player.placeAt(stand); L.player.fwd.copy(tangentToward(L.player.up, lamp.up));
-      window.__frame(lamp.up, { turn: 0.5, pitch: -0.28, dist: 7.5 }); // up at her, over the burning lantern
+      window.__frame(b.up, { turn: 0.2, pitch: 0.2, dist: 11 }); // show the whole moth and her bait
       for (let i = 0; i < 4; i++) { L.update(1 / 60); pin(); }
     });
     await frames(2); await clean();
@@ -194,7 +195,7 @@ try {
       L.player.placeAt(stand); pin(); L.player.fwd.copy(tangentToward(L.player.up, b.up));
       for (let i = 0; i < 160; i++) { L.update(1 / 60); pin(); }       // the damage numbers and toasts fade
       L.player.placeAt(stand); L.player.fwd.copy(tangentToward(L.player.up, b.up));
-      window.__frame(b.up, { turn: 0.55, pitch: 0.22, dist: 6.5 });
+      window.__frame(b.up, { turn: 0.45, pitch: 0.25, dist: 9 });
       for (let i = 0; i < 4; i++) { L.update(1 / 60); pin(); }
     });
     await frames(2); await clean();

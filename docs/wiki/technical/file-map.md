@@ -244,6 +244,8 @@ its release flag. `tests/sim/pacing.sim.mjs` audits its XP, coin and minimum mat
 `scripts/duskhollow-campaign-smoke.mjs` checks the candidate portal, Wick's Old Road quest and oil reward, Continue,
 Low quality and the beetle accessibility setting. `scripts/duskhollow-performance.mjs` collects the 18-row Acer
 matrix and only writes release evidence after all hardware budgets pass on clean, released source.
+The four `docs/*performance-20261030*.json` files retain the active-workspace and isolated-checkout Dusk and Tide
+diagnostics described in [Performance budget](performance.md#duskhollow-candidate-diagnostics-2026-10-30).
 
 `docs/tidewhisper-balance-20261017.json` is the clean-commit synchronization audit; the earlier balance JSON remains historical.
 `docs/tidewhisper-performance-acer-20261017.json` records the separate 18-case Acer Intel UHD diagnostic, not certification.

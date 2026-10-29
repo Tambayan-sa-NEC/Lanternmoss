@@ -23,7 +23,17 @@ raw results. Set `BALANCE_CHECK=1` to make out-of-target profiles fail the repor
 and forge fuel budget from the actual configuration. `src/config/balance.js` holds targets and the reproducible route.
 Set `BALANCE_PLANET` to 0 through 4 to rerun only the world being tuned; its JSON export contains only that world's rows.
 For Duskhollow, the bot springs mosslurks, burns Grandmother's anchors and lights Umbra's bait. It reserves damaging
-skills for Umbra's crash window. Duskhollow's two-seed boss timings are still being tuned and are not accepted yet.
+skills for Umbra's crash window. A lit bait now draws her next chosen dive before a random wingbeat can snuff it;
+her 2,300 HP makes the resulting, more reliable crash loop fit the unchanged 180-300 s boss target.
+
+| Hero | Umbra seed 1 before → after | Umbra seed 7 before → after | Grandmother seed 1 / 7 after |
+| --- | --- | --- | --- |
+| Witch | 209.68 → 214.25 s | 252.65 → 201.50 s | 108.77 / 111.72 s |
+| Knight | 173.83 → 244.43 s | 136.62 → 245.98 s | 115.88 / 113.42 s |
+| Ranger | 200.70 → 186.03 s | >300 → 196.33 s | 90.60 / 95.57 s |
+
+These are the base-kit, starting-gear, default-pet throughput probes with HP top-ups; they do not certify survival
+without healing. The Dusk campaign release still needs its separate Acer frame-time acceptance.
 
 Bounty boards (TODO 34, `src/config/bounties.js`) are optional, repeatable income outside these budgets, like selling.
 Three jobs a day pay about 23 / 30 / 35 coins a day on average on Lanternmoss / Emberfall / Frostveil (200 sampled days,

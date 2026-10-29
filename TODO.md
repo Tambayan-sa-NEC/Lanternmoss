@@ -1608,12 +1608,15 @@ regular behaviors into two pairs; the moth fight gets a dedicated session after 
 | [x] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
 
-**30i checkpoint (2026-10-29):** The first-visit XP, coin and minimum-material routes pass, and a candidate browser
+**30i checkpoint (2026-10-30):** The first-visit XP, coin and minimum-material routes pass, and a candidate browser
 run covers portal travel, the Old Road quest, its oil reward, Continue, Low quality and beetle accessibility at
-720p/1080p. Unit tests (318/318) and simulations (71/71) pass. Umbra's two-seed combat timing remains outside the
-180-300 second boss band for some heroes, and the idle Acer performance diagnostic has four of 18 rows over the
-16.67 ms frame limit (up to 21.3 ms). Retake the tour and get clean committed performance evidence only after these
-gates pass. Duskhollow remains unreleased; this stage has not merged into its parent.
+720p/1080p. The two-seed, three-hero Dusk pacing now passes: Umbra takes 186-246 seconds, Grandmother 91-116,
+and the regular-roster medians remain in their band. Unit tests (318/318) and simulations (71/71) pass; the
+candidate browser and Umbra checks pass with zero page/shader errors. The airborne Umbra shot was restaged to show
+her whole silhouette without HUD clutter. Acer frame-time acceptance is still open: a Dusk diagnostic from the
+isolated checkout passes 9/18 rows, while the active workspace passes 1/18; the same source is markedly faster in
+the isolated checkout. Retake the full tour and record clean performance evidence after the hardware gate passes.
+Duskhollow remains unreleased; this stage has not merged into its parent.
 
 **30h implemented (2026-10-26):** Duskhollow has its boss, and she is the world's rule taken to its conclusion:
 **she dives at the brightest light there is**, which on this world is usually the one on the hero's own belt.

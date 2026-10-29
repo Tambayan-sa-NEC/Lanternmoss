@@ -98,6 +98,7 @@ const MOVES = {
   /** The dive: at the nearest burning arena lantern, or at the hero when nothing is lit. */
     dive: {
       ready: e => !isCrashed(e),
+      // A lit bait is the player's deliberate counter: she answers it with the dive before snuffing it.
       weight: e => litLamps(e).length ? 3 : 1,
       begin(e) {
         const target = brightest(e);
@@ -130,7 +131,7 @@ const MOVES = {
     },
     /** The wingbeat: a ring of wind that puts every light out and calls shadelings from the dark. */
     gust: {
-      ready: e => !isCrashed(e),
+      ready: e => !isCrashed(e) && !litLamps(e).length,
       windup(e, dt, k) {
         e.tele.visible = true; e.tele.position.copy(e.up).multiplyScalar(groundHeight(e.up) + 0.06);
         e.tele.scale.setScalar(A(e, 'gust').radius * (0.4 + 0.6 * k)); e.tele.material.opacity = 0.2 + 0.5 * k;
@@ -146,7 +147,7 @@ const MOVES = {
     },
     /** A fan of blinding scales. */
     scales: {
-      ready: e => !isCrashed(e),
+      ready: e => !isCrashed(e) && !litLamps(e).length,
       fire(e) {
         const a = A(e, 'scales');
         for (let i = 0; i < a.count; i++) {

@@ -1,8 +1,8 @@
 # Performance budget
 
 Tidewhisper has a passing otter-inclusive Acer reference matrix in
-[release evidence](../../releases/tidewhisper.json), but production enablement checks remain open; see the
-[release handoff](tidewhisper-release.md). It remains `released: false`.
+[release evidence](../../releases/tidewhisper.json). Its later production enablement and public release are recorded
+in the [release handoff](tidewhisper-release.md); it is now `released: true`.
 Its real fourth-world village/night/squall collector uses visible fullscreen Edge, 1920x1080 High at DPR 1,
 30 warmup frames and 120 samples per scene, with a fresh adventure for each row.
 It passes a scene against max(16.67 ms, the p95 of a valid empty-page 60 Hz clock measured in the same run).
@@ -48,8 +48,23 @@ Recommended machine roles, recorded at the owner's request on 2026-10-17:
 | Other available machines, including Iris Xe if available | Additional hardware/browser coverage; an Iris Xe run is optional and no longer blocks 27h. |
 
 The Acer's RTX 4050 profile replaces the named validation hardware only. Existing frame-clock rules and render-count
-ceilings remain in force. Tidewhisper's native-mode profile passed on 2026-10-21; the destination remains unreleased
-until production enablement is separately checked before a confirmed `master` release.
+ceilings remain in force. Tidewhisper's native-mode profile passed on 2026-10-21; its later production checks and
+confirmed `master` release enabled that destination.
+
+## Duskhollow candidate diagnostics (2026-10-30)
+
+The 30i candidate has not passed desktop frame-time acceptance. On the Acer's original adapter, visible Edge and
+actual RTX 4050 at 1080p High, the active-workspace Dusk diagnostic passed 1/18 timing rows (p95 16.4-25.7 ms);
+the same source commit in an isolated temporary worktree passed 9/18 (14.4-26.7 ms). Draw-count budgets and page/shader
+error checks passed in both. The active-workspace Tidewhisper control passed 0/18 (18.4-26.6 ms), while the previously
+certified Tidewhisper commit in the isolated worktree passed 14/18 in this session (12.8-19.6 ms). An isolated night
+row of the **current** Tide source took 11.7 ms, versus 19.2 ms from the active workspace. These comparisons show
+substantial runtime variation tied to the checkout/session, but the isolated Dusk candidate still misses nine rows.
+No release evidence was written and the 16.67 ms target is unchanged. The raw diagnostics are
+[`workspace Dusk`](../../duskhollow-performance-20261030-workspace.json),
+[`isolated Dusk`](../../duskhollow-performance-20261030-isolated.json),
+[`workspace Tide control`](../../tidewhisper-performance-20261030-workspace-control.json), and
+[`certified-code Tide control`](../../tidewhisper-performance-20261030-certified-code-control.json).
 
 Earlier on 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
 8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.

@@ -385,7 +385,7 @@ Her trophy is the **Dusk Crown**.
 ## Not built yet
 
 The campaign release (30i) is in progress. The candidate portal, Old Road quest, oil reward and Continue pass a
-Low-preset browser run at both resolutions, and the minimum-yield XP, coin and material routes pass. The two-seed
-three-hero Umbra pacing and the Acer frame-time matrix still miss acceptance; the affected tour screenshots also
-remain to be retaken. Duskhollow stays `released: false` until those checks pass, so it cannot be selected,
+Low-preset browser run at both resolutions, and the minimum-yield XP, coin and material routes pass. The two-seed,
+three-hero Umbra pacing now meets its 180-300 s band. The Acer frame-time matrix still misses acceptance, and the
+full screenshot tour remains to be retaken. Duskhollow stays `released: false` until those checks pass, so it cannot be selected,
 generated or travelled to in normal play.

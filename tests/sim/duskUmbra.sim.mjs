@@ -86,6 +86,9 @@ try {
   assert.ok(lightLampAt(bait), 'a lit belt lantern lights an arena lantern');
   assert.ok(lamp().status.oil < oilBefore, `which costs a little oil (${oilBefore.toFixed(0)} -> ${lamp().status.oil.toFixed(0)})`);
   assert.equal(brightest(b).lamp, bait, 'and now that is the brightest thing in the ring');
+  b.state = 'chase'; b.cool = 0; b.moveCd = {}; b.lastAttack = null;
+  live(1 / 60);
+  assert.equal(b.attack, 'dive', 'a lit bait draws her next chosen move before she can randomly snuff it');
   P.placeAt(offsetDir(b.home, 3.1, 9)); live(0.2);                      // well clear of the lantern
   cast(b, 'dive');
   assert.ok(isCrashed(b), 'she dives into the lantern and crashes');

@@ -13,8 +13,8 @@ difficulty. Tidewhisper's measured release-candidate values and the planned late
 | Duskhollow | 10–13 | 12 | 3.4 | 2.25 |
 | Lantern Moon | 13–16 | 15 | 4 | 2.5 |
 
-Tidewhisper's two-seed, three-hero balance audit meets its acceptance bands; Duskhollow and Lantern Moon retain
-starting values for their later balance stages. The title shows Tidewhisper as released on `develop`,
+Tidewhisper and Duskhollow both meet their two-seed, three-hero balance bands; Duskhollow still waits on hardware
+frame-time acceptance. Lantern Moon retains starting values for its later balance stage. The title shows Tidewhisper as released on `develop`,
 Duskhollow as planned and the secret Moon masked as `?`. Planned entries are descriptive
 and cannot be selected. Generation, travel, Continue validation and keys still use only released worlds.
 Frostveil is the Act I finale; beating all currently released main worlds completes that playable campaign.

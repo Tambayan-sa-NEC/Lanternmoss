@@ -229,7 +229,7 @@ export const COMBAT = {
     // lantern, `shades` shadelings that come out of the dark, up to `maxShades`). From 50% she drinks light:
     // each `feed` drains one arena lantern for good and sheds scales that blind the hero (`fog`).
     umbra:     { ai: 'boss', behavior: 'umbra', name: 'Umbra, the Moth of the Last Light', color: 0x2f2746, capColor: 0xe8e0ff,
-                 hp: 820, speed: 3.4, radius: 2.2, height: 3.0, hover: 5.5, aggro: 20, leash: 32, turnRate: 2.0,
+                 hp: 2300, speed: 3.4, radius: 2.2, height: 3.0, hover: 5.5, aggro: 20, leash: 32, turnRate: 2.0,
                  knockResist: 1, slowResist: 0.8, staggerImmune: true, stunResist: 0.6, stunnedDamageBonus: 0.4,
                  telegraph: true, respawn: 0, xp: 240, cooldown: 1.3,
                  lanterns: { count: 4, at: 11, oil: 8, relight: 4, type: 'arenaLantern' },
