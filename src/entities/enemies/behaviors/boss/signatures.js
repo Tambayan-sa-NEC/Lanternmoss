@@ -56,7 +56,13 @@
    ground marks the first time it runs, and puts out any lamp still lit if the fight is cancelled.
 
      def.attacks[id]: { windup, recover, cooldown, reuse?, count, spread (metres from the centre to each lamp),
-                        radius (its burst), damage, knockback, around? (ring the boss, not the hero) } */
+                        radius (its burst), damage, knockback, around? (ring the boss, not the hero) }
+
+   THE MOTH-DIVE SIGNATURE (TODO 31f). A lane follows its target for the first part of the wind-up, then commits;
+   the moth lands where the lane said. Umbra supplies her brightest lit arena lantern as the target and crashes when
+   it is still burning. Her rematch can instead snuff one bait and mark a dive at the hero. Without a supplied target
+   or crash callback the same move is usable by Nyxra: it marks the hero and lands there, with no Dusk lamp dependency.
+     def.attacks[id]: { windup, recover, cooldown, reuse?, width, damage, knockback, commit? } */
 import * as THREE from 'three';
 import { ctx } from '../../../../core/context.js';
 import { playerInArea } from '../../../../combat/area.js';
@@ -71,7 +77,8 @@ import { toast } from '../../../../ui/toast.js';
 import { arcDist, dirAlong, offsetDir, tangentToward, turnToward } from '../../../../utils/sphere.js';
 import { damp } from '../../../../utils/math.js';
 import { mpick, rng } from '../../../../utils/random.js';
-import { dryGround, waterAt } from '../../../../world/terrain.js';
+import { dryGround, groundHeight, waterAt } from '../../../../world/terrain.js';
+import { layLane, makeDots } from '../telegraphs.js';
 import { bossDecal, keepInArena, predictHero, shortName } from './core.js';
 
 const THORN = 0x6a8a3a, TIP = 0xb48cff;
@@ -307,3 +314,42 @@ export function falseLureSignature(id) {
 
 /** The lamps lit right now, for the checks: where each is and how far its burst reaches. */
 export const lampsOf = (e, id) => (e.decoys ?? []).filter(l => l.alive).map(l => ({ lamp: l, at: l.up.clone(), radius: e.def.attacks[id].radius }));
+
+/** The lane and aim belong to this move, so another boss can borrow it without adding fields to its own kit. */
+function mothAim(e, id) {
+  return (e.mothAim ??= {})[id] ??= { lane: makeDots(e, 10, 0xe8e0ff), from: new THREE.Vector3(),
+    to: new THREE.Vector3(), dir: new THREE.Vector3(), lamp: null };
+}
+
+/** A marked dive at the brightest light (or the hero), with optional callbacks for an arena's bait and crash. */
+export function mothDiveSignature(id, { target = () => ({ at: ctx.player.up }), valid = () => false,
+  onBait = () => {}, onBegin = () => {}, onHit = () => {}, ready = () => true } = {}) {
+  return {
+    ready,
+    begin(e) {
+      const aim = mothAim(e, id), chosen = target(e);
+      aim.lamp = chosen.lamp ?? null; aim.to.copy(chosen.at); aim.from.copy(e.up);
+      onBegin(e);
+      emote(e, '!', aim.lamp ? '#ffd36b' : '#ff4d6d'); if (e.heard) audio.charge();
+    },
+    windup(e, dt, k) {
+      const aim = mothAim(e, id), a = e.def.attacks[id];
+      if (k < (a.commit ?? 0.65)) { aim.to.copy(aim.lamp?.up ?? ctx.player.up); aim.from.copy(e.up); }
+      aim.dir.copy(tangentToward(aim.from, aim.to));
+      layLane(aim.lane, aim.from, aim.dir, arcDist(aim.from, aim.to) + 2, a.width, 0.2 + 0.6 * k);
+    },
+    fire(e) {
+      const a = e.def.attacks[id], aim = mothAim(e, id);
+      e.hideTele(); e.up.copy(aim.to); e.r = groundHeight(e.up); e.pos.copy(e.up).multiplyScalar(e.r + e.hover);
+      shakeCamera(0.5); if (e.heard) audio.whoosh();
+      if (aim.lamp && valid(aim.lamp)) { onBait(e, aim.lamp); return; }
+      if (!ctx.player.dead && arcDist(e.up, ctx.player.up) < a.width + ctx.player.radius) {
+        const vulnerable = ctx.player.invuln <= 0;
+        hurtPlayer(a.damage, e.pos, a.knockback, { source: e });
+        if (vulnerable) onHit(e);
+      }
+      sparkles.emit(e.center(), { count: 22, color: 0xe8e0ff, speed: 3, up: e.up, upBias: 0.4, life: 0.7, size: 0.36 });
+    },
+    cancel(e) { const aim = e.mothAim?.[id]; if (aim) aim.lamp = null; },
+  };
+}

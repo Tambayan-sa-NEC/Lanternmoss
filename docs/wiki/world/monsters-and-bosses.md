@@ -141,4 +141,20 @@ lighthouse quest, and it never pays the Tide Crown again.
 Tidewhisper itself is still **unreleased**, so none of this can be met in normal play yet; it is exercised through the
 development fixtures, as the rematch lifecycle always is for unreleased worlds.
 
+### The Dusk rematches (TODO 31f checkpoint)
+
+Grandmother Gloomweaver and Umbra have new rematch kits on the 31f stage branch. Both retain their campaign moves and
+pay repeatable keepsakes on their own rematch ladders; neither pays the first-win trophy or advances the Old Road.
+
+| Encounter | New rematch move and keepsake |
+| --- | --- |
+| **Grandmother Gloomweaver** | **Silk Ring** marks three separated patches around the hero, then spins cuttable webs there while she hangs. The spaces between the patches remain open. The beetle accessibility setting still changes her appearance. Keepsake: three Spider Silk |
+| **Umbra** | **Eclipse** snuffs one lit bait lantern, then marks a moth-dive lane toward the hero. A hit leaves three seconds of scale fog. The dive is a reusable signature for Nyxra. Keepsake: three Lumen Dust |
+
+Calling off a rematch clears Grandmother's webs and anchors and puts Umbra's arena lanterns and fog back. The saved
+ladder, original quest and lit waylamps survive a Continue. Duskhollow is still `released: false`; the 30i campaign
+acceptance checks must pass before this stage can join its parent.
+
+![Umbra's marked Eclipse lane in the unreleased Dusk rematch](../../screenshots/bosses/duskhollow-rematch.jpg)
+
 ![The lantern gate marking a world with a rematch waiting](../../screenshots/huds/rematch-gate.jpg)

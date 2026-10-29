@@ -30,12 +30,20 @@ import { dryGround, groundHeight } from '../../../../world/terrain.js';
 import { freeOfColliders } from '../../../../physics/colliders.js';
 import { showSpiderLook } from '../../../../models/duskMonsters.js';
 import { showDisc } from '../telegraphs.js';
-import { defineBoss, inWedge, roar } from './core.js';
+import { bossDecal, defineBoss, inWedge, roar } from './core.js';
 
 const SILK = 0xe8d0ff, WARN = 0xff4d6d;
 const A = (e, id) => e.def.attacks[id];
 const _p = new THREE.Vector3(), _d = new THREE.Vector3(), _aim = new THREE.Vector3();
 let anchorHint = false;
+
+/** The rematch's warning marks: made once and owned by the boss like its other telegraphs. */
+function silkMarks(e, count) {
+  const marks = e.silkMarks ??= [];
+  while (marks.length < count) marks.push(bossDecal(e, 'ring', SILK, { k: 1.5, lift: 0.14 }));
+  return marks;
+}
+function clearWebs(e) { for (const w of e.webs ?? []) if (w.alive) w.vanish(); e.webs = []; }
 
 /** The strands still holding her up (a burnt one drops off the list by itself). */
 export const strandsOf = e => (e.strands = (e.strands ?? []).filter(a => a.alive));
@@ -79,7 +87,8 @@ export const grandweaver = defineBoss({
   },
   reset(e) {
     for (const a of e.strands ?? []) if (a.alive) a.die();
-    e.strands = []; e.hangK = 0; e.dropT = 0; e.hung = false; e.webs = [];
+    clearWebs(e);
+    e.strands = []; e.hangK = 0; e.dropT = 0; e.hung = false;
   },
   /** She is already up there when the fight starts. */
   intro(e) { anchorUp(e, false); e.cool = Math.max(e.cool, 1.5); },
@@ -94,6 +103,25 @@ export const grandweaver = defineBoss({
   fallback(e, dist) { return e.hung ? 'spit' : dist < A(e, 'bite').range ? 'bite' : 'spit'; },
 
   moves: {
+    /** Three marked webs around the hero: the centre and the lanes between them remain open. */
+    silkRing: {
+      ready: e => e.hung && e.rematch,
+      begin(e) {
+        const a = A(e, 'silkRing'), centre = ctx.player.up;
+        e.silkSpots = Array.from({ length: a.count }, (_, i) => offsetDir(centre, (i + 0.5) / a.count * Math.PI * 2, a.spread));
+      },
+      windup(e, dt, k) {
+        const a = A(e, 'silkRing');
+        silkMarks(e, a.count).forEach((mark, i) => {
+          mark.place(e.silkSpots[i], null, a.radius).opacity = 0.3 + 0.7 * k;
+        });
+      },
+      fire(e) {
+        e.hideTele();
+        for (const at of e.silkSpots ?? []) if (dryGround(at, 1)) (e.webs ??= []).push(addEnemy('gloomweb', at));
+        if (e.heard) audio.sparkle();
+      },
+    },
     /** A web dropped on the ground the hero is standing on: the same sticky web her grandchildren spin (30f). */
     weave: {
       ready: e => e.hung && !!ctx.player,
@@ -208,8 +236,9 @@ export const grandweaver = defineBoss({
   },
 
   onDie(e) {
+    clearWebs(e);
     for (const a of strandsOf(e)) a.die();
     e.strands = []; e.hung = false; e.hover = 0;
   },
-  dispose(e) { for (const a of e.strands ?? []) if (a.alive) a.die(); e.strands = []; },
+  dispose(e) { clearWebs(e); for (const a of e.strands ?? []) if (a.alive) a.die(); e.strands = []; },
 });

@@ -18,7 +18,7 @@ export const SHOT_FOLDERS = {
   mobs: ['combat', 'basilisk', 'hydra', 'tidewhisper-enemies', 'mob-brawl', 'duskhollow-shadeling', 'duskhollow-mosslurk', 'duskhollow-gloomweaver', 'duskhollow-beetles', 'duskhollow-snuffer'],
   bosses: ['boss-demon', 'boss-dragon', 'lair', 'summon', 'arena', 'balance-flight', 'tidewhisper-ironclaw',
     'tidewhisper-mirelure-beached', 'tidewhisper-mirelure-lures', 'tidewhisper-mirelure-decoys',
-    'duskhollow-grandweaver', 'duskhollow-umbra', 'duskhollow-umbra-crash'],
+    'duskhollow-grandweaver', 'duskhollow-umbra', 'duskhollow-umbra-crash', 'duskhollow-rematch'],
   npcs: ['dialogue', 'duskhollow-wick'],
   village: ['village', 'night', 'house', 'farm', 'stations', 'bounty-board', 'tidewhisper-village'],
   building: ['home-claim', 'home-furnishings', 'home-interior', 'building-preview', 'building-storage',

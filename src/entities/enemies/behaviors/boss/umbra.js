@@ -22,20 +22,19 @@ import { addEnemy } from '../../../../combat/spawning.js';
 import { hurtPlayer } from '../../../../combat/damage.js';
 import { Projectile } from '../../../Projectile.js';
 import { ringFX } from '../../../../fx/combatFx.js';
-import { emote } from '../../../../fx/emotes.js';
 import { sparkles } from '../../../../fx/sparkles.js';
 import { audio } from '../../../../systems/AudioSystem.js';
 import { shakeCamera } from '../../../../systems/CameraSystem.js';
 import { toast } from '../../../../ui/toast.js';
-import { clamp, damp } from '../../../../utils/math.js';
+import { damp } from '../../../../utils/math.js';
 import { mr, rng } from '../../../../utils/random.js';
-import { arcDist, dirAlong, offsetDir, projectTangent, tangentToward, turnToward } from '../../../../utils/sphere.js';
+import { arcDist, offsetDir, turnToward } from '../../../../utils/sphere.js';
 import { dryGround, groundHeight } from '../../../../world/terrain.js';
 import { freeOfColliders } from '../../../../physics/colliders.js';
 import { activeLantern } from '../../../../world/mechanics/lantern.js';
 import { drain, isLit, snuff } from '../arenaLamp.js';
-import { layLane, makeDots } from '../telegraphs.js';
-import { defineBoss, finish, keepInArena, roar } from './core.js';
+import { mothDiveSignature } from './signatures.js';
+import { defineBoss, roar } from './core.js';
 
 const MOTH = 0xe8e0ff, _p = new THREE.Vector3(), _d = new THREE.Vector3(), _aim = new THREE.Vector3();
 const A = (e, id) => e.def.attacks[id];
@@ -96,38 +95,12 @@ function snuffAll(e) {
 /** Her moveset, named so the checks can start one the way the framework does (startMove below). */
 const MOVES = {
   /** The dive: at the nearest burning arena lantern, or at the hero when nothing is lit. */
-    dive: {
-      ready: e => !isCrashed(e),
-      weight: e => litLamps(e).length ? 3 : 1,
-      begin(e) {
-        const target = brightest(e);
-        e.diveAt = target.lamp ?? null;
-        e.diveTo = target.at.clone();
-        e.diveFrom.copy(e.up);
-        emote(e, '!', target.lamp ? '#ffd36b' : '#ff4d6d');
-        if (e.heard) audio.charge();
-      },
-      windup(e, dt, k) {
-        const to = e.diveTo ?? ctx.player.up;
-        if (k < 0.65) { e.diveTo = (e.diveAt ? e.diveAt.up : ctx.player.up).clone(); e.diveFrom.copy(e.up); }
-        e.diveDir.copy(tangentToward(e.diveFrom, to));
-        layLane(e.lane, e.diveFrom, e.diveDir, arcDist(e.diveFrom, to) + 2, A(e, 'dive').width, 0.2 + 0.6 * k);
-      },
-      fire(e) {
-        const a = A(e, 'dive'), to = e.diveTo ?? ctx.player.up;
-        e.hideTele();
-        e.up.copy(to); e.r = groundHeight(e.up); e.pos.copy(e.up).multiplyScalar(e.r + e.hover);
-        shakeCamera(0.5); if (e.heard) audio.whoosh();
-        if (e.diveAt && isLit(e.diveAt)) {                               // into the lantern: she crashes
-          crash(e, e.diveAt);
-          return;
-        }
-        // nothing brighter than the hero: the dive comes at them, and only hurts
-        if (!ctx.player.dead && arcDist(e.up, ctx.player.up) < a.width + ctx.player.radius)
-          hurtPlayer(a.damage, e.pos, a.knockback, { source: e });
-        sparkles.emit(e.center(), { count: 22, color: MOTH, speed: 3, up: e.up, upBias: 0.4, life: 0.7, size: 0.36 });
-      },
-    },
+    dive: { ...mothDiveSignature('dive', { target: brightest, valid: isLit, onBait: crash,
+      ready: e => !isCrashed(e) }), weight: e => litLamps(e).length ? 3 : 1 },
+    /** She snuffs one bait, then marks a longer dive straight at the hero; the other lanterns still work. */
+    eclipse: mothDiveSignature('eclipse', { ready: e => !isCrashed(e) && e.rematch && litLamps(e).length > 0,
+      onBegin(e) { snuff(litLamps(e)[0]); toast('Umbra snuffs a lantern and dives for your light! Follow the marked lane.'); },
+      onHit(e) { e.fogT = Math.max(e.fogT, A(e, 'eclipse').fog); } }),
     /** The wingbeat: a ring of wind that puts every light out and calls shadelings from the dark. */
     gust: {
       ready: e => !isCrashed(e),
@@ -191,13 +164,12 @@ const MOVES = {
 export const umbra = defineBoss({
   init(e) {
     e.lamps = []; e.shades = []; e.crashT = 0; e.fogT = 0; e.drank = 0;
-    e.lane = makeDots(e, 10, MOTH);
-    e.diveFrom = new THREE.Vector3(); e.diveDir = new THREE.Vector3(); e.diveAt = null;
+    e.mothAim = {};
   },
   reset(e) {
     for (const l of e.lamps ?? []) l.vanish?.();
     for (const s of e.shades ?? []) if (s.alive) s.vanish();
-    e.lamps = []; e.shades = []; e.crashT = 0; e.fogT = 0; e.drank = 0; e.diveAt = null;
+    e.lamps = []; e.shades = []; e.crashT = 0; e.fogT = 0; e.drank = 0;
     if (ctx.player) ctx.player.blindK = 1;
   },
   intro(e) { toast('Light a lantern in the ring: she dives at the brightest light she can find.'); },

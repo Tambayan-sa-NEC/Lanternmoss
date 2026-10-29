@@ -297,3 +297,8 @@ before frustum gating (five timing passes, thirteen failures, zero page/shader e
 `docs/tidewhisper-performance-acer-rtx4050-step-3-frustum-20261018.json` retains the latest clean live 18-case
 acceptance attempt after frustum gating: all count budgets pass, only five timing cases pass, zero page/shader
 errors. It is a no-go result and no release evidence file was written.
+
+`src/entities/enemies/behaviors/boss/signatures.js` exports `mothDiveSignature` for the Dusk rematch and Nyxra.
+`tests/sim/duskRematch.sim.mjs` checks the unreleased pair through the Dusk fixture, including cleanup and saved
+campaign progress. `scripts/dusk-rematch-smoke.mjs` exercises real `E` interactions and captures
+`docs/screenshots/bosses/duskhollow-rematch.jpg` at 1080p.

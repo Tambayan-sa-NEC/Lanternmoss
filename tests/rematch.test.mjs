@@ -34,10 +34,17 @@ test('only an encounter with a finished kit is ever offered', () => {
   assert.equal(rematchReady({ rematch: true }), false, 'a bare flag is not a kit');
   assert.equal(rematchReady({ rematch: null }), false);
   assert.equal(rematchReady({ rematch: { kit: 'moss' } }), true);
-  // The kits land world by world (31b-31f). Only the ones written so far are exposed.
+  // The kits land world by world (31b-31f); an unreleased world still needs its own test fixture.
   const ready = Object.entries(COMBAT.enemies).filter(([, def]) => rematchReady(def)).map(([type]) => type).sort();
-  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'hydra', 'ironclaw', 'malgrath', 'mirelure', 'pyrrhax'],
-    'the Moss (31b), Ember (31c), Frost (31d) and Tide (31e) encounters have kits so far');
+  assert.deepEqual(ready, ['basilisk', 'gloomcap', 'grandweaver', 'hydra', 'ironclaw', 'malgrath', 'mirelure', 'pyrrhax', 'umbra'],
+    'all five worlds have their encounter kits, with Duskhollow still gated by its release flag');
+});
+
+test('Grandmother\'s marked silk ring leaves safe ground and gaps', () => {
+  const a = COMBAT.enemies.grandweaver.rematch.attacks.silkRing;
+  const neighbour = 2 * a.spread * Math.sin(Math.PI / a.count);
+  assert.ok(a.spread > a.radius + 0.6, 'a hero at the centre stands clear');
+  assert.ok(neighbour > 2 * (a.radius + 0.6), 'a hero fits between two web marks');
 });
 
 // The kits as authored data. That each named move is implemented is checked where a scene exists, in the

@@ -45,6 +45,8 @@
 | How far a thorn volley or a dragonfire wall reaches, and how long each holds the ground | `src/config/combat.js` → `enemies.<type>.rematch.attacks` (the shared moves are in `behaviors/boss/signatures.js`) |
 | How many decoy lamps a false lure ring lights, how far each is from the centre, and how wide its burst is (a hero must fit between two circles, and the middle must stay clear: `tests/rematch.test.mjs` checks both) | `src/config/combat.js` → `enemies.mirelure.rematch.attacks` (`count`, `spread`, `radius`, `around`) |
 | How many bell waves a carillon rings, and how far apart | `src/config/combat.js` → `enemies.ironclaw.rematch.attacks.carillon` (`rings`, `gap`) |
+| How many patches Grandmother's Silk Ring marks, their spacing and web size | `src/config/combat.js` → `enemies.grandweaver.rematch.attacks.silkRing` (`count`, `spread`, `radius`) |
+| How long Umbra's Eclipse warns and how long a hit fogs the hero | `src/config/combat.js` → `enemies.umbra.rematch.attacks.eclipse` (`windup`, `fog`) |
 | How long a Doom Blade circle is readable before it commits, and how wide it is | `src/config/combat.js` → `enemies.malgrath.attacks.doom` and `.rematch.attacks` (`windup`, `commit`, `radius`, `recover`) |
 | Giving up a chase: healing on the way home, the mini boss's delay before it heals | `src/config/combat.js` → `leashReturn` |
 | Monsters fighting each other: how hard they hit, how long a grudge lasts, how wide a swipe catches | `src/config/combat.js` → `mobFeud` |

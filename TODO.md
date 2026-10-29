@@ -1868,6 +1868,13 @@ reset/preservation lifecycle distinct from encounter retries.
 | [ ] **31f. Dusk rematches** | 31a, 30i | 2-4 h | Add Umbra/Grandmother rematch attacks and loot; export the moth-dive signature. Test light/anchor resets, accessibility and original quest/waylamp persistence. |
 | [ ] **31g. New Game+** | 31a-31f, 30i | 3-4.5 h | Add an explicit post-Act-II start-again action, preserve journal, unlocked pets and vanity, and reset campaign/quests/world deltas with tougher rosters/better loot. Define which equipped vanity is carried and reject unrelated inventory/state carryover. Test repeated NG+ starts, Continue/import, preservation and fresh-run tutorial/progression. Journal/pet retention must not accidentally satisfy adventure-specific Moon unlock conditions. |
 
+**31f checkpoint (2026-10-29):** The stage branch has Grandmother's marked Silk Ring, Umbra's marked Eclipse,
+repeatable Spider Silk and Lumen Dust, and an exported moth-dive signature. Its test fixture covers cancellation
+cleanup, beetle accessibility, rewards, Continue, and separation from the Old Road and lit waylamps. The real-browser
+check covers both `E` offers and the warnings at 720p/1080p. The checklist remains open because 30i's two-seed
+boss pacing and Acer frame-time acceptance are unfinished; Duskhollow remains unreleased and 31f is not merged to
+its parent.
+
 **31e implemented (2026-10-28):** Tidewhisper's two encounters get new attacks and, because they are the first to
 change the world around them, a rule about putting it back. **Mirelure** wears the new **false lure signature**
 (`src/entities/enemies/behaviors/boss/signatures.js`, beside the thorn, dragonfire and Doom Blade ones): a ring of

@@ -189,7 +189,17 @@ export const COMBAT = {
                    { below: 1.0, attacks: ['weave', 'spit', 'bite'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.6, title: 'Second web', attacks: ['weave', 'spit', 'bite', 'sweep'], speedMul: 1.1, cooldownMul: 0.9 },
                    { below: 0.3, title: 'Last web', attacks: ['weave', 'spit', 'bite', 'sweep'], speedMul: 1.2, cooldownMul: 0.78 },
-                 ] },
+                 ],
+                 // TODO 31f: a ring of marked webs while she hangs. The middle and spaces between the patches stay
+                 // clear; each web can still be cut or burnt. `spread` is the ring radius, `radius` the warning mark.
+                 rematch: { extra: [['spiderSilk', 3]],
+                   attacks: { silkRing: { windup: 1.4, count: 3, spread: 3.2, radius: 1.5,
+                     recover: 0.8, cooldown: 1.1, reuse: 7 } },
+                   phases: [
+                     { below: 1.0, title: 'Threads gathering', attacks: ['weave', 'spit', 'bite', 'silkRing'], speedMul: 1.08, cooldownMul: 0.9 },
+                     { below: 0.6, title: 'Second web', attacks: ['weave', 'spit', 'bite', 'sweep', 'silkRing'], speedMul: 1.18, cooldownMul: 0.8 },
+                     { below: 0.3, title: 'Last web', attacks: ['weave', 'spit', 'bite', 'sweep', 'silkRing'], speedMul: 1.28, cooldownMul: 0.7 },
+                   ] } },
     // An anchor strand: an object holding her up. A blade will not cut a cable of this thickness - it has to burn.
     // Any lit belt lantern held within `reach` burns one down over `burnTime` seconds (so every hero can), and a hit
     // that carries fire takes it in one (so the witch can do it from across the clearing).
@@ -301,7 +311,17 @@ export const COMBAT = {
                  phases: [
                    { below: 1.0, title: 'Wings in the dark', attacks: ['dive', 'gust', 'scales'], speedMul: 1, cooldownMul: 1 },
                    { below: 0.5, title: 'Drinking the light', attacks: ['dive', 'gust', 'scales', 'drink'], speedMul: 1.15, cooldownMul: 0.85 },
-                 ] },
+                 ],
+                 // TODO 31f: `eclipse` snuffs one burning bait, then aims the reusable moth-dive signature at the
+                 // hero rather than at a lamp. Its longer lane commits at 65% of the wind-up; a hit presses the
+                 // carried light in for `fog` seconds. The remaining bait lamps still offer the crash counter.
+                 rematch: { extra: [['lumenDust', 3]],
+                   attacks: { eclipse: { windup: 1.6, width: 2.6, damage: 24, knockback: 11, fog: 3,
+                     recover: 1.0, cooldown: 1.3, reuse: 7 } },
+                   phases: [
+                     { below: 1.0, title: 'Wings at the last light', attacks: ['dive', 'gust', 'scales', 'eclipse'], speedMul: 1.1, cooldownMul: 0.9 },
+                     { below: 0.5, title: 'Drinking the light', attacks: ['dive', 'gust', 'scales', 'drink', 'eclipse'], speedMul: 1.22, cooldownMul: 0.78 },
+                   ] } },
     // An arena lantern: bait, not a monster. Press E beside one with a lit belt lantern and it burns until she
     // snuffs it. `drained` ones she has drunk never light again.
     arenaLantern:{ ai: 'arenaLamp', object: true, static: true, name: 'Arena lantern', color: 0x6a608f, capColor: 0xffd36b,

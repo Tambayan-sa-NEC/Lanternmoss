@@ -70,6 +70,8 @@ npm run sim -- emberRematch        # the Ember kits: the dragonfire signature an
 npm run sim -- frostRematch        # the Frost kits: the Doom Blade signature, retries, and one ladder per encounter
 npm run sim -- tideRematch         # the Tide kits: the false lure signature, the carillon, and the lagoon put back when a rematch ends
 node scripts/tide-rematch-smoke.mjs # Tide rematches in a browser (port 8145): real E at Mirelure's lair, the decoy ring lit and marked, the carillon; retakes bosses/tidewhisper-mirelure-decoys
+npm run sim -- duskRematch         # unreleased Dusk kits, light/anchor resets, rewards and original progress
+node scripts/dusk-rematch-smoke.mjs # Dusk rematches (port 8149): real E, Silk Ring, Eclipse, beetle setting, 720p/1080p
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots

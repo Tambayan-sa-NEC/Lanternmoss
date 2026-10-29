@@ -354,6 +354,9 @@ the bait the same way, with the lantern they all carry - no spell required.
 
 Her trophy is the **Dusk Crown**.
 
+The [Dusk rematch kits](monsters-and-bosses.md#the-dusk-rematches-todo-31f-checkpoint) add Grandmother's Silk Ring
+and Umbra's Eclipse. They are staged behind the unfinished 30i campaign release; they do not change this first fight.
+
 ## What is checked
 
 | Check | What it proves |
@@ -379,6 +382,8 @@ Her trophy is the **Dusk Crown**.
 | `node scripts/dusk-boss-smoke.mjs` | In a real browser: she really hangs out of reach, real `W` walking up with a lit lantern really burns a strand through, an empty one does not, and the beetle toggle really swaps her and her grandchildren together |
 | `npm run sim -- duskUmbra` | The level-11 and quest gate, her lanterns standing dark, the dive at the hero when nothing is lit and into the lantern when something is, the crash window, the wingbeat's oil and shadelings, a drained lantern that never lights again, the fog and its clearing, all three heroes lighting the bait, an empty lantern never walling the fight off, and a faint and a Continue both putting the fight back |
 | `node scripts/dusk-umbra-smoke.mjs` | In a real browser: she wakes in the air inside her moonfire ring, real `E` lights an arena lantern for real oil, she really crashes into it, her wingbeat really empties the Oil bar, and her fog really presses the carried light in |
+| `npm run sim -- duskRematch` | Both rematches, their new warnings, light and anchor cleanup, beetle setting, repeatable keepsakes, and saved quest and waylamp separation |
+| `node scripts/dusk-rematch-smoke.mjs` | Real `E` starts both rematches; the Silk Ring and Eclipse warning render at 720p and 1080p with no overflow or page/shader errors |
 | `node scripts/duskhollow-campaign-smoke.mjs` | On the candidate catalog at Low and 720p/1080p: portal travel, three moonwells lit with real `E`, Wick's oil reward and gate, Continue, and zero page/shader errors |
 | `node scripts/duskhollow-performance.mjs --output <path>` | Diagnostic 18-row Acer matrix at 1080p High; `--release` requires the actual released catalog, a clean commit and every timing/count budget before saving release evidence |
 
