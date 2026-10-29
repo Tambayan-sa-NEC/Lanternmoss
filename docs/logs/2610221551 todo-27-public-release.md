@@ -1,0 +1,6 @@
+﻿| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-22 17:10 | TEST | TODO 27 | Run the public release gate | develop | Final commit 0d23d5c passed npm test 278/278, npm run sim 62/62, and all 37 browser smokes including production Tidewhisper. Initial sweep exposed coastal rear-bolt and Ironclaw face-bolt smoke failures; the test-only aim and seed fix was merged and both checks passed three repeated runs before the clean final sweep. Screenshot side effects restored. Existing clean Acer RTX 4050 report on ancestor e81e2ad passed 18/18 at 1080p High, worst frame p95 15.2 ms, zero errors; no gameplay source changed afterward. Duskhollow and Lantern Moon remain unreleased. | 1h 19m |
+| 2026-10-22 17:10 | MERGE | TODO 27 | Merge tested develop into master | master | Owner-approved --no-ff merge 698d6c5 contains develop 0d23d5c; no conflicts or post-test source edits. | 0h 01m |
+| 2026-10-22 17:10 | RELEASE | TODO 27 | Publish Tidewhisper v0.27.0 | master | Annotated tag v0.27.0 targets merge 698d6c5; origin/master and tag pushed and remote refs verified. | 0h 01m |
+| 2026-10-22 17:10 | TOTAL | TODO 27 | Complete public Tidewhisper release | master | TODO 27 is playable on public master; release checks passed and the tag is published. | 1h 19m |
