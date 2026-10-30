@@ -200,7 +200,8 @@ lighting the bait, an empty lantern never walling the fight off, and a faint and
 
 `node scripts/duskhollow-campaign-smoke.mjs` owns port 8147 and exercises the candidate's real fifth-world portal,
 the Old Road moonwells through real `E` input, Wick's oil reward and Umbra gate, and Continue. It runs at Low with
-the beetle accessibility setting on, checks 720p and 1080p bounds, and requires zero page/shader errors.
+the beetle accessibility setting on, checks 720p and 1080p bounds, and requires zero page/shader errors. After the
+release flag is enabled, pass `--release` to run the same path through the shipped entry point without a candidate fixture.
 `node scripts/duskhollow-performance.mjs --output <path>` owns port 8145. It records the three heroes, seeds 1/7 and
 village/night/spore-drift scenes at 1080p High on the Acer RTX 4050. The default is diagnostic; `--release` requires
 a clean committed released catalog and passing reference frame/count budgets before writing

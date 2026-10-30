@@ -1,9 +1,13 @@
-// TODO 30i: the candidate campaign path in a real browser, at Low and both desktop resolutions.
-// Uses the authored fifth-world data through a test-only catalog substitute until release acceptance passes.
+// TODO 30i: the campaign path in a real browser, at Low and both desktop resolutions.
+// Before release, use a test-only catalog substitute; --release checks the shipped entry point.
 import assert from 'node:assert/strict';
 import { tidewhisperBrowser } from './lib/tidewhisper-browser.mjs';
+import { PLANETS } from '../src/config/planets.js';
 
-const { page, errors, close } = await tidewhisperBrowser({ port: 8147, quality: 'low',
+const release = process.argv.includes('--release');
+assert.ok(!release || PLANETS.some(planet => planet.id === 'duskhollow' && planet.released),
+  '--release requires the shipped Duskhollow world');
+const { page, errors, close } = await tidewhisperBrowser({ port: 8147, quality: 'low', candidate: !release,
   bootstrap: "import {installDuskhollowCandidate} from '/tests/sim/lib/duskhollowCandidate.mjs'; installDuskhollowCandidate();" });
 const frames = n => page.evaluate(n => {
   const L = window.LANTERNMOSS;
@@ -58,7 +62,7 @@ try {
   await page.evaluate(async () => {
     const L = window.LANTERNMOSS, { Quests } = await import('/src/gameplay/quests/Quests.js');
     const wick = L.npcs.find(n => n.name === 'Wick');
-    if (!wick) throw new Error('Wick missing from candidate world');
+    if (!wick) throw new Error('Wick missing from Duskhollow');
     Quests.offerFor(wick).choice.onYes(); Quests.stepLineFor(wick);
   });
   await frames(10);
