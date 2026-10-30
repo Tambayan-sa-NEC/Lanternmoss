@@ -1615,7 +1615,8 @@ and the regular-roster medians remain in their band. Unit tests (318/318) and si
 candidate browser and Umbra checks pass with zero page/shader errors. The airborne Umbra shot was restaged to show
 her whole silhouette without HUD clutter. Acer frame-time acceptance is still open: a Dusk diagnostic from the
 isolated checkout passes 9/18 rows, while the active workspace passes 1/18; the same source is markedly faster in
-the isolated checkout. Retake the full tour and record clean performance evidence after the hardware gate passes.
+the isolated checkout. Closing VS Code still leaves only 4/18 rows passing. Retake the full tour and record clean
+performance evidence after the hardware gate passes.
 Duskhollow remains unreleased; this stage has not merged into its parent.
 
 **30h implemented (2026-10-26):** Duskhollow has its boss, and she is the world's rule taken to its conclusion:

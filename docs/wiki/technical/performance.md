@@ -60,9 +60,15 @@ error checks passed in both. The active-workspace Tidewhisper control passed 0/1
 certified Tidewhisper commit in the isolated worktree passed 14/18 in this session (12.8-19.6 ms). An isolated night
 row of the **current** Tide source took 11.7 ms, versus 19.2 ms from the active workspace. These comparisons show
 substantial runtime variation tied to the checkout/session, but the isolated Dusk candidate still misses nine rows.
-No release evidence was written and the 16.67 ms target is unchanged. The raw diagnostics are
+Further isolated diagnostics changed MSAA from 4 to 2 samples (6/18 rows passed) and turned bloom off (5/18); neither
+improved the matrix over the unchanged candidate. A CPU profile of a weather row found collision and Three.js render
+work spread across the frame, with no single postprocessing bottleneck. Closing VS Code normally to remove its
+background CPU load still yielded only 4/18 passing rows (p95 12.8-23.3 ms). The owner confirmed the original
+power adapter and an idle machine; the NitroSense mode is being checked. No release evidence was written and the
+16.67 ms target is unchanged. The raw diagnostics are
 [`workspace Dusk`](../../duskhollow-performance-20261030-workspace.json),
 [`isolated Dusk`](../../duskhollow-performance-20261030-isolated.json),
+[`clean-desktop Dusk`](../../duskhollow-performance-20261030-clean-desktop.json),
 [`workspace Tide control`](../../tidewhisper-performance-20261030-workspace-control.json), and
 [`certified-code Tide control`](../../tidewhisper-performance-20261030-certified-code-control.json).
 
