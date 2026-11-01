@@ -53,6 +53,13 @@ confirmed `master` release enabled that destination.
 
 ## Duskhollow candidate diagnostics (2026-10-30)
 
+On 2026-11-01 the Acer was found in NitroSense Balanced mode with heavy background load. A resumed candidate matrix
+stalled during setup, and single village rows ranged from 17.4 to 32.9 ms p95 across the active and isolated
+checkouts. NitroSense was switched to Performance mode, but a further village row still measured 31.0 ms p95 with
+only 0.54 GB of free RAM before browser startup. Outlook's WebView and several open development/browser apps were
+consuming substantial CPU and memory. These runs do not establish a source-code regression or release acceptance;
+repeat the clean 18-case matrix once the machine is idle, then investigate any consistent misses.
+
 The 30i candidate has not passed desktop frame-time acceptance. On the Acer's original adapter, visible Edge and
 actual RTX 4050 at 1080p High, the active-workspace Dusk diagnostic passed 1/18 timing rows (p95 16.4-25.7 ms);
 the same source commit in an isolated temporary worktree passed 9/18 (14.4-26.7 ms). Draw-count budgets and page/shader

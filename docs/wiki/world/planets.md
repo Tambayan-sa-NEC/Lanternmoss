@@ -11,10 +11,11 @@ exports three views:
 
 Each entry has a stable `id`, `name`, positive `act`, and explicit boolean `released` and `secret` fields. The starting
 world must be released and non-secret. Released entries also need generation data and pass the mandatory
-[content release gate](../technical/content-release.md). Keep a new world unreleased until its own release stage passes that checklist. Tidewhisper,
-Duskhollow has terrain, a palette and its lantern mechanic from stage 30a but no roster, people or economy yet; the
-Lantern Moon still contains only unfinished metadata. Neither can be selected, generated or travelled to in normal
-play. See [Duskhollow](duskhollow.md).
+[content release gate](../technical/content-release.md). Keep a new world unreleased until its own release stage passes
+that checklist. Tidewhisper is released. Duskhollow has its authored terrain, lantern mechanic, economy, villagers,
+roster and bosses, but remains unreleased while stage 30i finishes hardware performance acceptance. The Lantern Moon
+still contains only unfinished metadata. Neither Duskhollow nor the Moon can be selected, generated or travelled to
+in normal play. See [Duskhollow](duskhollow.md).
 
 The original runtime order remains Lanternmoss, Emberfall, Frostveil. Their seeds, placement lists and generated
 resource/chest/scenery/farm/house/portal/boss positions are unchanged. A simulation checks them against layout digests
@@ -30,7 +31,8 @@ Direct transition/load calls also refuse unreleased entries before changing worl
 A released entry may declare a registered `mechanic` id. Unknown modules disable that destination and direct
 loads refuse it before replacing the current world. Mechanic state loads before entry and population, is saved
 independently per planet, and receives separate frame/skip/away hooks. See [the mechanic contract](../technical/planet-mechanics.md).
-The original worlds declare no mechanic; actual expansion modules remain later-stage work.
+The original worlds declare no mechanic; Tidewhisper's tides module is released and Duskhollow's lantern module is
+tested through a development fixture while its world remains unreleased.
 
 Optional `physics` config supplies a gravity multiplier, sea level and pond offset with their maximum-water
 envelope. Generation and resource placement reserve that maximum; runtime mechanics change only live values
@@ -54,9 +56,8 @@ world cannot raise its goal or substitute a different boss. The cap is 16; new b
 activate only as their worlds release. Expected levels/scaling/challenge targets live in each config. See the
 [Act II progression and acceptance rules](../technical/content-release.md).
 
-Tidewhisper now declares its archipelago, palette, seed, water envelope and registered `tides` mechanic, but
-remains unreleased. A development-only fixture exercises its terrain/clock/lagoon controls in an original save
-slot without exposing unfinished content. See [Tidewhisper development terrain](tidewhisper.md).
+Tidewhisper declares its archipelago, palette, seed, water envelope and registered `tides` mechanic and is released.
+See [Tidewhisper](tidewhisper.md).
 
 Planet-specific villagers and interiors are also config:
 

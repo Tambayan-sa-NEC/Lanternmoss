@@ -1,0 +1,7 @@
+# TODO 30i: performance validation resume
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-01 23:10 | CHORE | TODO 30i | Resumed the campaign release stage | feat/todo-30i | Started from a clean branch at commit `327aeb5`; fetched `origin`, fast-forward checked `develop`, and confirmed both the TODO 30 parent and this stage already include it. Duskhollow remains unreleased. | 0h 01m |
+| 2026-11-01 23:24 | PERF | TODO 30i | Investigated unstable Acer frame timing | feat/todo-30i | On AC with the actual RTX 4050, a first full matrix timed out during the first row. A village-only diagnostic measured 23.6 ms p95, a repeat first row 17.4 ms, and an isolated-worktree first row 32.9 ms against the unchanged 16.67 ms target. The repeat's next row stalled and measured 39.4 ms. NitroSense revealed Balanced mode with roughly 95% CPU and RAM use; changed it to Performance, but a fresh single row still measured 31.0 ms p95 with only 0.54 GB free RAM before browser startup. These are failed diagnostics, not release evidence. The temporary isolated worktree was removed. | 0h 14m |
+| 2026-11-01 23:26 | DOCS | TODO 30i | Corrected planet status and recorded host diagnostics | feat/todo-30i | Updated the planet catalog's stale Tidewhisper/Duskhollow status and the performance wiki. `git diff --check` passes. A fresh 18-case matrix remains pending an idle machine; no release flag, content gate or acceptance target was changed. | 0h 02m |
