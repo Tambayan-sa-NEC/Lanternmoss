@@ -51,7 +51,7 @@ The Acer's RTX 4050 profile replaces the named validation hardware only. Existin
 ceilings remain in force. Tidewhisper's native-mode profile passed on 2026-10-21; its later production checks and
 confirmed `master` release enabled that destination.
 
-## Duskhollow candidate diagnostics (2026-10-30)
+## Duskhollow candidate diagnostics (2026-10-30 to 2026-11-01)
 
 On 2026-11-01 the Acer was found in NitroSense Balanced mode with heavy background load. A resumed candidate matrix
 stalled during setup, and single village rows ranged from 17.4 to 32.9 ms p95 across the active and isolated
