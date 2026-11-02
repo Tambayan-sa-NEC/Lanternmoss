@@ -83,7 +83,8 @@ On 2026-11-02, another visible Acer RTX 4050 diagnostic on the clean 30i checkpo
 (p95 20.7-43.5 ms against 16.67 ms), while all rows stayed within draw-call/triangle ceilings and reported zero
 page or shader errors. A single village row varied from 34.6 to 20.3 ms between immediate repeats as free memory
 rose from about 3.1 to 4.1 GB before the row. A Tidewhisper night control first missed at 28.3 ms p95, then
-measured 14.3 ms in a later repeat; a later Dusk village probe still missed at 19.1 ms. The machine
+measured 14.3 ms in a later repeat; a later Dusk village probe still missed at 19.1 ms, and the identical
+commit in a temporary isolated checkout measured 30.6 ms for that row. The machine
 was on AC with the Acer power plan; VS Code, browser and other background apps remained open. This is a loaded-host
 no-go, not release certification or proof of a Duskhollow-only regression. The full raw matrix is
 [`2026-11-02 loaded-host Dusk`](../../duskhollow-performance-20261102-loaded-host.json).
