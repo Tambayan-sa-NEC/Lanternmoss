@@ -1,0 +1,7 @@
+# TODO 30i: Acer validation recheck
+
+| DATETIME | TASK TYPE | TODO ID | ACTION | BRANCH | REMARK | DURATION |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 23:11 | PERF | TODO 30i | Rechecked the Acer release candidate | feat/todo-30i | Started at 22:57 on a clean, remote-current stage. Visible Edge used the actual RTX 4050 at 1080p High on AC with the Acer power plan. The full diagnostic passed 0/18 frame-time rows (20.7-43.5 ms p95 against 16.67), but all count rows and zero-error checks passed. A Tidewhisper night control varied from 28.3 to 14.3 ms p95; Dusk village singles varied from 34.6 to 19.1 ms. Background apps remained open. Saved the raw matrix; no release evidence or flag change. | 0h 05m |
+| 2026-11-02 23:11 | TEST | TODO 30i | Rechecked candidate behaviour | feat/todo-30i | `npm test` passed 318/318, `npm run sim` passed 71/71, and the candidate campaign smoke passed Low at 720p/1080p with real quest interaction, Continue, beetle accessibility, and zero page/shader errors. | 0h 04m |
+| 2026-11-02 23:11 | DOCS | TODO 30i | Recorded the no-go and unchanged release status | feat/todo-30i | Updated TODO, Duskhollow and performance wiki pages; kept the final tour and production enablement pending hardware acceptance. | 0h 01m |

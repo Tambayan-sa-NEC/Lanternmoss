@@ -1619,6 +1619,12 @@ the isolated checkout. Closing VS Code still leaves only 4/18 rows passing. Reta
 performance evidence after the hardware gate passes.
 Duskhollow remains unreleased; this stage has not merged into its parent.
 
+**30i validation checkpoint (2026-11-02):** The current candidate still passes 318 unit tests, all 71 simulations,
+and the Low-preset campaign browser path at 720p/1080p with zero page/shader errors. A new full Acer RTX 4050
+diagnostic passed all draw-count rows but 0/18 frame-time rows (20.7-43.5 ms p95); a Tidewhisper control was slow
+in the same loaded session. No release evidence was written, the authored flag remains off, and the final screenshot
+tour waits for hardware acceptance.
+
 **30h implemented (2026-10-26):** Duskhollow has its boss, and she is the world's rule taken to its conclusion:
 **she dives at the brightest light there is**, which on this world is usually the one on the hero's own belt.
 `src/entities/enemies/behaviors/boss/umbra.js` (on the shared boss framework) puts **Umbra** in the air over her

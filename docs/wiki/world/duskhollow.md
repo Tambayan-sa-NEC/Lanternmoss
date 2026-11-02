@@ -389,3 +389,7 @@ Low-preset browser run at both resolutions, and the minimum-yield XP, coin and m
 three-hero Umbra pacing now meets its 180-300 s band. The Acer frame-time matrix still misses acceptance, and the
 full screenshot tour remains to be retaken. Duskhollow stays `released: false` until those checks pass, so it cannot be selected,
 generated or travelled to in normal play.
+
+The 2026-11-02 candidate recheck passed 318 unit tests, 71 simulations and the campaign browser smoke with zero
+page/shader errors. A loaded-host Acer RTX 4050 diagnostic passed all render-count rows but 0/18 frame-time rows;
+the same session also slowed a Tidewhisper control. See the [raw matrix and conditions](../technical/performance.md).

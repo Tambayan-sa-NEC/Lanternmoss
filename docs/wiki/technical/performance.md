@@ -79,6 +79,15 @@ power adapter and an idle machine; the NitroSense mode is being checked. No rele
 [`workspace Tide control`](../../tidewhisper-performance-20261030-workspace-control.json), and
 [`certified-code Tide control`](../../tidewhisper-performance-20261030-certified-code-control.json).
 
+On 2026-11-02, another visible Acer RTX 4050 diagnostic on the clean 30i checkpoint passed 0/18 timing rows
+(p95 20.7-43.5 ms against 16.67 ms), while all rows stayed within draw-call/triangle ceilings and reported zero
+page or shader errors. A single village row varied from 34.6 to 20.3 ms between immediate repeats as free memory
+rose from about 3.1 to 4.1 GB before the row. A Tidewhisper night control first missed at 28.3 ms p95, then
+measured 14.3 ms in a later repeat; a later Dusk village probe still missed at 19.1 ms. The machine
+was on AC with the Acer power plan; VS Code, browser and other background apps remained open. This is a loaded-host
+no-go, not release certification or proof of a Duskhollow-only regression. The full raw matrix is
+[`2026-11-02 loaded-host Dusk`](../../duskhollow-performance-20261102-loaded-host.json).
+
 Earlier on 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
 8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
 That historical estimate is superseded as a release dependency by the owner's Acer decision. If tested later,
