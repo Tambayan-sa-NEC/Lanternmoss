@@ -23,7 +23,7 @@ unchanged 16.67 ms limit. The first passed 17/18 timing rows: seed 1 witch squal
 16/18: that row was 18.2 ms and seed 7 witch night was 17.1 ms. All 18 render-count rows passed in each run, with
 zero page/shader errors. These runs still used the historical candidate browser fixture, despite the authored
 release flag being enabled on the branch. The collector was then changed to use the ordinary production entry
-for `--release`. The latest full report is at [the performance report](../../tidewhisper-performance.json).
+for `--release`. The latest full report is at [the performance report](../../reports/tidewhisper-performance.json).
 The prior 18/18 report in `docs/releases/tidewhisper.json` belongs to commit `0d6b656` and does not certify the
 changed candidate. Free physical memory before the first squall row was about 3.4 GB in that earlier pass and
 about 1.9 GB in the second failed run; this is a correlation, not a proven cause. No target has been relaxed.
@@ -104,7 +104,7 @@ The low-tide villager hint is present and the Mirelure simulation now asserts th
 quest is complete but the tide is high. Mirelure's marked roll moved from 18 to 19 base damage, so its highest
 scaled single hit is 38 versus Malgrath's 36.75, with the existing timing and damage-progression rule intact.
 The two-seed, three-hero balance matrix remains 0/18 checked rows outside target; its six Mirelure duel times and
-top-up counts match the [October 19 reference](../../tidewhisper-balance-20261019.json).
+top-up counts match the [October 19 reference](../../reports/tidewhisper-balance-20261019.json).
 
 | Seed / hero | Before: time, HP top-ups | After: time, HP top-ups |
 | --- | --- | --- |
@@ -169,11 +169,11 @@ insufficient release evidence: those earlier fixtures inherited missing configur
 - Full checks: 211 unit tests and all 43 simulations passed, including terrain timing. The corrected coastal bot
   also passed affected reruns on both seeds. The dedicated Mirelure browser check passed on rerun after one earlier
   real-lure bolt assertion failure; that failure remains recorded in the work log.
-- [Available-hardware diagnostic](../../tidewhisper-performance.json): Intel UHD/ANGLE/D3D11, 120 samples per scene at
+- [Available-hardware diagnostic](../../reports/tidewhisper-performance.json): Intel UHD/ANGLE/D3D11, 120 samples per scene at
   1280x720 low. Latest village/night/squall p95: 24.8/27.5/31.0 ms. Latest peaks: 448 calls and 185,864 triangles.
   The earlier run peaked at 451 calls and 186,584 triangles; timing variation is retained in the work log. These are **not**
   Iris Xe results and do not meet the 16.67 ms timing target. Fixed-scene ceilings are 550 calls/230,000 triangles.
-- **Duel balance passes** ([report](../../tidewhisper-balance.json), `--check`: 0 of 18 checked rows outside target, both
+- **Duel balance passes** ([report](../../reports/tidewhisper-balance.json), `--check`: 0 of 18 checked rows outside target, both
   seeds, all heroes). The check follows `docs/wiki/game-design/balance.md`: each boss/mini-boss fight, and each hero's regular-roster
   median (2-6 s; measured 3.6-5.6 s). Single monsters are reported but not checked, as the contract allows armoured or
   evasive types to run longer: Shellback takes 4.5-7.7 s. Changes, with no targets loosened:
@@ -182,7 +182,7 @@ insufficient release evidence: those earlier fixtures inherited missing configur
     All fights: 156-174 s (target 90-180).
   - Mirelure's base HP is 3250 (was 3000), lifting the ranger from 171-176 s to 188-191 s. All fights: 188-289 s
     (target 180-300).
-- The [initial strict balance baseline](../../tidewhisper-balance-baseline.json) is kept as history: 12/30 rows outside
+- The [initial strict balance baseline](../../reports/tidewhisper-balance-baseline.json) is kept as history: 12/30 rows outside
   target, recorded before the melee-bot correction (the knight bot used 1.8 m reach and oscillated between shore and
   target, so its Jellybell times of 16.3/24.2 s were a bot defect, now 3.2/3.8 s).
 
@@ -209,7 +209,7 @@ node scripts/tidewhisper-balance.mjs --check
 
 The balance reporter runs all three heroes on seeds 1 and 7 using the existing level-8, starting-equipment bots,
 including approach/counter time and counted HP top-ups. Use `--output <path>` to preserve the historical report;
-by default it saves `docs/tidewhisper-balance.json` and exits nonzero
+by default it saves `docs/reports/tidewhisper-balance.json` and exits nonzero
 with `--check` if any row misses its target. Investigate the bot's approach, reach and counter behavior alongside
 damage tuning; a large timing spread is not solved by blindly scaling HP. Do not loosen the targets to publish.
 
@@ -315,13 +315,13 @@ journal checks and the final affected screenshot tour still belong to completion
 
 ### Fresh two-seed balance
 
-[October 17 report](../../tidewhisper-balance-20261017.json): clean commit `2c42fce`, all 36 rows present,
+[October 17 report](../../reports/tidewhisper-balance-20261017.json): clean commit `2c42fce`, all 36 rows present,
 all 18 required checks pass. Roster medians 3.58-5.55 s, Ironclaw 155.4-174.1 s, Mirelure 187.8-286.6 s.
 See [the six-profile before/after table](../game-design/balance.md#tidewhisper-27h-synchronization-2026-10-17).
 
 ### Acer UHD measurement and go/no-go
 
-[Fresh hardware report](../../tidewhisper-performance-acer-20261017.json), clean `1860d90`: all three heroes,
+[Fresh hardware report](../../reports/tidewhisper-performance-acer-20261017.json), clean `1860d90`: all three heroes,
 seeds 1/7, 18 cases / 2,160 frames, actual Intel UHD A7A8, 720p Low (896x503 buffer). 37.5-44.6 FPS,
 p95 26.4-32.8 ms; none meets the applicable fixed 16.67 ms budget. Empty-page median/p95 6.1/6.4 ms is near 165 Hz,
 so it cannot provide the 60 Hz calibration allowance. Eight cases exceed 550 calls (peak 636); triangles fit
@@ -334,7 +334,7 @@ The synchronized functional/balance checks pass; performance acceptance and rele
 
 ### Acer RTX 4050 reference baseline
 
-[Controlled reference baseline](../../tidewhisper-performance-acer-rtx4050-before-20261017.json): actual RTX 4050,
+[Controlled reference baseline](../../reports/tidewhisper-performance-acer-rtx4050-before-20261017.json): actual RTX 4050,
 1920x1080 High, all heroes/seeds/scenes, 2160 measured frames. 31.55-42.42 FPS, p95 28.0-37.6 ms, peak 1072 calls;
 all timing/count cases fail. Each row reloads a fresh adventure and seeds play before setup. Test-only source
 overrides replay the original model files from `b3074d5`; their paths and full commit are recorded in the JSON.
@@ -343,17 +343,17 @@ edits were not committed yet, so it is not release evidence. A per-root draw pro
 119 draws, three visible Shellbacks at 72 each, and scenery only 25. Rigid actor pieces are the first batching target.
 
 The original-mode report above used a hidden browser and GPU queries. The matched visible-browser comparison uses
-`docs/tidewhisper-performance-acer-rtx4050-headed-before-20261017.json`, with every changed runtime rendering file
+`docs/reports/tidewhisper-performance-acer-rtx4050-headed-before-20261017.json`, with every changed runtime rendering file
 replayed from `b3074d5`, plus the corrected collector/reference configuration. GPU queries are off in both final
 comparison runs. A visible-browser performance artifact is still required before enabling the destination.
 
 The first clean optimized run (`8a8e432`) is preserved as
-[the loaded-host report](../../tidewhisper-performance-acer-rtx4050-loaded-after-20261017.json).
+[the loaded-host report](../../reports/tidewhisper-performance-acer-rtx4050-loaded-after-20261017.json).
 All 18 render-count rows pass (peak 474 calls and 209111 triangles), but only one timing row passes;
 p95 spans 16.1–27.5 ms. Available RAM was approximately 1 GB with active paging during the run.
 The owner is closing unused apps for a repeat. This report failed acceptance and produced no release artifact.
 
-[The repeat after closing apps](../../tidewhisper-performance-acer-rtx4050-freed-memory-20261017.json)
+[The repeat after closing apps](../../reports/tidewhisper-performance-acer-rtx4050-freed-memory-20261017.json)
 started clean at `2e669a9` with 4.44 GiB free before browser launch. All 18 count rows pass (peak 483 calls,
 210141 triangles). Average rates improve to 63.14–110.45 FPS, but p95 spans 13.8–23.0 ms and only six timing
 rows pass. No release artifact was written. The unchanged rendering source and profile show that freeing memory
@@ -367,7 +367,7 @@ browser/tour review and a clean full-matrix repeat remain pending. Keep it on th
 
 ### Step 1: controlled render comparison
 
-[Raw ABBA comparison](../../tidewhisper-matrix-comparison-20261017.json): `actorCulling.js` from `2e669a9`
+[Raw ABBA comparison](../../reports/tidewhisper-matrix-comparison-20261017.json): `actorCulling.js` from `2e669a9`
 versus `253f859`, visible Edge on the RTX 4050, 1080p High, both seeds and every hero. Each profile ran before,
 after, after, before: 120 setup updates, then a fixed simulation pose for 120 warmup and 360 sampled real render
 intervals. Every row asserts identical setup positions and the exact call/triangle sequence against its control.
@@ -392,8 +392,8 @@ clock fixed initial poses, but wall-clock audio callbacks consume the play RNG a
 Even a test-only independent audio stream did not make every draw sequence identical. The final fixed-pose
 comparison leaves production audio intact. No diagnostic alters the authored release flag.
 
-Separate live knight/squall traces ([before](../../tidewhisper-frame-trace-before-20261017.json),
-[after](../../tidewhisper-frame-trace-after-20261017.json)) motivated a UI cleanup: prompt/chip HTML is cached,
+Separate live knight/squall traces ([before](../../reports/tidewhisper-frame-trace-before-20261017.json),
+[after](../../reports/tidewhisper-frame-trace-after-20261017.json)) motivated a UI cleanup: prompt/chip HTML is cached,
 and edge markers use the applied numeric UI scale rather than computed-style reads among DOM writes.
 The new regression sim fails against the old implementation (21 prompt replacements instead of one) and passes
 with the fix. Timeline HTML parses fall from 1022 to zero. Layout counts remain approximately one per frame
@@ -407,7 +407,7 @@ then tour/docs and stage/parent integration. Tidewhisper stays unreleased until 
 
 ### Step 2: full regression checks
 
-[Structured results](../../tidewhisper-step-2-regressions-20261017.json) retain every browser attempt, timestamps,
+[Structured results](../../reports/tidewhisper-step-2-regressions-20261017.json) retain every browser attempt, timestamps,
 durations, output, script hashes and style provenance. The candidate game JavaScript is unchanged from `3be9e00`.
 
 - `npm test`: 243 pass, zero failures/skips. Repeated after the check/layout corrections: 243 pass (7.1 seconds).
@@ -437,7 +437,7 @@ stage/parent integration. No destination flag, merge or public release was perfo
 
 ### Step 3: ordinary hardware acceptance attempt
 
-[Raw report](../../tidewhisper-performance-acer-rtx4050-step-3-20261017.json), clean candidate `da96f77`, collected
+[Raw report](../../reports/tidewhisper-performance-acer-rtx4050-step-3-20261017.json), clean candidate `da96f77`, collected
 on AC in visible Edge on the actual RTX 4050 Laptop GPU at 1920x1080 High/DPR1. Ordinary live gameplay/audio,
 fresh adventure per row, 120 setup updates, 30 warmup and 120 real render intervals: 18 unique cases / 2160 samples.
 No source overrides, fixed poses, GPU-query instrumentation or competing test/tour jobs were used.
@@ -472,7 +472,7 @@ for a full pass. The test run is finished; the acceptance milestone is not compl
 
 ### Step 3 continuation: immutable traversal and collector cleanup
 
-The [live Ranger/7 squall profile](../../tidewhisper-live-profile-20261017.json) samples scene projection,
+The [live Ranger/7 squall profile](../../reports/tidewhisper-live-profile-20261017.json) samples scene projection,
 world-matrix work and draw submission among the remaining costs. Global blob-shadow instancing was rejected:
 water shares its transparent render order, so combining shadows could change coastal blending.
 
@@ -482,7 +482,7 @@ child lists must stay immutable below this helper. Unit coverage demonstrates th
 becoming one, and checks moving parents, repeated freezing and world queries. Simulation coverage checks real
 scenery/grass on the three released planets.
 
-The [24-row render-only comparison](../../tidewhisper-static-comparison-20261017.json) preserves exact poses and
+The [24-row render-only comparison](../../reports/tidewhisper-static-comparison-20261017.json) preserves exact poses and
 per-frame draw sequences for both seeds/all heroes. Pooled p95 before/after milliseconds:
 
 | Hero / seed | Before | After |
@@ -503,13 +503,13 @@ and all measured frames, and records memory before each row. This avoids relying
 for discarded GPU allocations. Memory variation alone does not establish that retained contexts caused failures.
 The target, actual GPU/profile checks, ordinary live simulation and all timing/count rules remain unchanged.
 
-The [affected regression record](../../tidewhisper-step-3-regressions-20261017.json) is separate from the earlier
+The [affected regression record](../../reports/tidewhisper-step-3-regressions-20261017.json) is separate from the earlier
 complete step 2 suites. The new browser check uses keyboard movement and compares matrices/raw canvas pixels
 before and after forcing visible immutable branches on all four planets at 720p/1080p. Dormant objects are
 excluded from forcing because the baseline intentionally leaves some poses stale. Raw canvas capture excludes
 animated DOM overlays. Integration still requires the complete suites on the synchronized final candidate.
 
-The first recheck of clean `67888f9` is [invalid](../../tidewhisper-step-3-invalid-cleanup-attempt-20261017.json):
+The first recheck of clean `67888f9` is [invalid](../../reports/tidewhisper-step-3-invalid-cleanup-attempt-20261017.json):
 disposing before asynchronous context loss raced the old animation loop and produced repeated null-program
 page errors. All 18 rows ran, but the old error assertion preceded report persistence. The linked file is an
 explicitly rounded console summary, not reconstructed raw evidence or certification. The collector now waits for
@@ -518,7 +518,7 @@ The browser regression exercises captured and initial title contexts with live a
 
 ### Step 3 continuation: conservative view-frustum gates
 
-The corrected clean `65f6a00` [ordinary recheck](../../tidewhisper-performance-acer-rtx4050-step-3-final-20261017.json)
+The corrected clean `65f6a00` [ordinary recheck](../../reports/tidewhisper-performance-acer-rtx4050-step-3-final-20261017.json)
 completed all 18 cases with zero page/shader errors, but only five timing passes (p95 15.0-24.2 ms). It preserved
 all render-count budgets and correctly wrote no release evidence. That result prompted a second render change.
 
@@ -528,7 +528,7 @@ are used; hidden effects stay included and unsupported/unbounded or nested rigs 
 AI, collisions, populations and actor-owned visibility continue unchanged. On return, the existing gate refreshes
 the complete current pose. Unit properties and a negative simulation control cover this behavior.
 
-The [paired diagnostic](../../tidewhisper-frustum-comparison-20261017.json) uses 24 ABBA rows/8640 render samples,
+The [paired diagnostic](../../reports/tidewhisper-frustum-comparison-20261017.json) uses 24 ABBA rows/8640 render samples,
 both seeds and all heroes, matching setup poses and every sampled draw/triangle pair exactly. Pooled p95:
 
 | Hero / seed | Before interval | After interval | Before render callback | After render callback |
@@ -547,7 +547,7 @@ pixels at 720p/1080p; it restored 7-13 completely off-screen branches per fixtur
 
 ### Step 3: live recheck after frustum gating
 
-[Complete raw report](../../tidewhisper-performance-acer-rtx4050-step-3-frustum-20261018.json), clean `c3375f0`,
+[Complete raw report](../../reports/tidewhisper-performance-acer-rtx4050-step-3-frustum-20261018.json), clean `c3375f0`,
 actual RTX 4050 in visible Edge, High 1920x1080/DPR1, all heroes and seeds 1/7, all three scenes: 18 rows/2160 real
 render samples with ordinary live simulation/audio. No source overrides, paused poses or GPU-query instrumentation.
 Zero page/shader errors; every row verifies the renderer, drawing buffer, preset, started/unpaused/visible state.
@@ -572,7 +572,7 @@ Memory recorded before individual rows ranged from about 325 to 3303 MiB. That l
 it does not establish that browser context retention or memory pressure caused the timing failures. Counts pass
 and the paired render-only comparison improves, but neither substitutes for passing ordinary live frame times.
 
-[Final affected regressions](../../tidewhisper-step-3-frustum-regressions-20261018.json) pass 248 units, six simulations
+[Final affected regressions](../../reports/tidewhisper-step-3-frustum-regressions-20261018.json) pass 248 units, six simulations
 and three Edge browser scripts, with negative controls and pixel equivalence recorded above. The latest Tidewhisper
 720p/1080p captures were reopened: the hero and village remain readable, without clipped subjects or rendering defects.
 The old full step 2 results are historical; complete suites/tour still precede integration.
@@ -683,7 +683,7 @@ High. The empty-page clock was 16.7 ms median / 16.8 ms p95, so the unchanged fr
 All 18 hero/seed/scene rows completed with zero page or shader errors, no paused/hidden samples and no GPU timer
 instrumentation. Every frame p95 was **17.4–18.2 ms**; thus **0/18 timing rows passed**. Average cadence was
 59.04–60.03 FPS. All 18 render-count rows passed, peaking at 474/550 calls and 209,113/230,000 triangles.
-The complete [matrix](../../tidewhisper-performance.json) is a **no-go**, and no `docs/releases/tidewhisper.json`
+The complete [matrix](../../reports/tidewhisper-performance.json) is a **no-go**, and no `docs/releases/tidewhisper.json`
 certification was written. The original 165 Hz display mode was restored afterward. This removes the high-refresh
 measurement defect from the comparison, but the strict p95 interval gate still fails. The approved functional versus
 public-release performance split now applies; Tidewhisper stays unreleased.
@@ -691,7 +691,7 @@ public-release performance split now applies; Tidewhisper stays unreleased.
 ### Functional completion and next-work verdict (2026-10-19)
 
 The cave-synchronized candidate passes its non-performance content readiness checks: the readiness test reports
-only missing release performance evidence. [Fresh balance](../../tidewhisper-balance-20261019.json) passes all 18
+only missing release performance evidence. [Fresh balance](../../reports/tidewhisper-balance-20261019.json) passes all 18
 checked roster/duel bands on all three heroes and seeds 1/7, with the same values as October 17; the full pacing
 audit still reaches level 8, funds one Tide set from 281–360 coins, and yields lighthouse materials within one day
 and lighthouse plus gear materials within two. The campaign browser check passed portal travel, partial save and

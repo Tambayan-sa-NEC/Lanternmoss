@@ -7,7 +7,7 @@ import { BALANCE } from '../src/config/balance.js';
 const root=fileURLToPath(new URL('..',import.meta.url));
 const outputIndex=process.argv.indexOf('--output');
 if(outputIndex>=0&&!process.argv[outputIndex+1])throw new Error('--output requires a file path');
-const output=outputIndex<0?new URL('../docs/tidewhisper-balance.json',import.meta.url):process.argv[outputIndex+1];
+const output=outputIndex<0?new URL('../docs/reports/tidewhisper-balance.json',import.meta.url):process.argv[outputIndex+1];
 const jobs=[1,7].flatMap(seed=>['coastalDuels','ironclawDuels','mirelureDuels'].flatMap(sim=>['witch','knight','ranger'].map(hero=>({seed,sim,hero}))));
 const rows=[],queue=[...jobs];
 await Promise.all(Array.from({length:3},async()=>{

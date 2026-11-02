@@ -10,7 +10,7 @@ import { shotPath } from './shots.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url)), port = 8095;
 const args = new Set(process.argv.slice(2)), baseline = args.has('--baseline'), quick = args.has('--quick');
-const output = new URL(baseline ? '../docs/performance-baseline.json' : '../docs/performance-results.json', import.meta.url);
+const output = new URL(baseline ? '../docs/reports/performance-baseline.json' : '../docs/reports/performance-results.json', import.meta.url);
 const samples = quick ? 20 : 90, warmup = quick ? 12 : 30;
 const server = spawn(process.execPath, ['scripts/serve.mjs', String(port)], { cwd: root, stdio: 'ignore' });
 let browser;

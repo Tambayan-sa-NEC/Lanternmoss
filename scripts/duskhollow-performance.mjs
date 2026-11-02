@@ -18,7 +18,7 @@ assert.ok(!release || !gpuTiming, '--gpu-timing is diagnostic only; query readba
 assert.ok(!release || headed, '--headless is diagnostic only; desktop acceptance uses visible Edge');
 const outputArg = process.argv.indexOf('--output');
 assert.ok(outputArg < 0 || process.argv[outputArg + 1], '--output requires a file path');
-const output = outputArg < 0 ? new URL('../docs/duskhollow-performance.json', import.meta.url) : process.argv[outputArg + 1];
+const output = outputArg < 0 ? new URL('../docs/reports/duskhollow-performance.json', import.meta.url) : process.argv[outputArg + 1];
 const cwd = fileURLToPath(new URL('..', import.meta.url));
 const candidateCommit = execFileSync('git', ['rev-parse','HEAD'], { cwd, encoding:'utf8' }).trim();
 const dirty = !!execFileSync('git', ['status','--porcelain'], { cwd, encoding:'utf8' }).trim();

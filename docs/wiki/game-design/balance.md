@@ -311,9 +311,9 @@ Individual monster types retain tactical differences: the Frostveil warrior take
 and some opening wisps fall before 2 s. These are reported outliers, not silently averaged away within a type.
 The pacing contract uses the planet's roster median; each type's median of three trials remains in the raw data.
 
-[Final raw measurements](../../balance-after.json) include each monster trial summary, big-fight move timestamps,
+[Final raw measurements](../../reports/balance-after.json) include each monster trial summary, big-fight move timestamps,
 transition fractions and flying damage. The first six rows came from the full nine-profile report; the three
-Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](../../balance-before.json)
+Frostveil rows were remeasured after its final health/recovery adjustment. [Historical baseline](../../reports/balance-before.json)
 was captured during harness repair, before in-range skill selection, Doom evasion and complete fight isolation;
 its capped/reset boss runs are not comparable completed-fight times.
 
@@ -366,8 +366,8 @@ mechanics rerun and the real-WebGL boss/seed-shop checks passed. Boss phase and 
 
 ## Tidewhisper 27h synchronization (2026-10-17)
 
-The [fresh report](../../tidewhisper-balance-20261017.json) measures clean synchronized commit `2c42fce`
-against the [accepted October 15 checkpoint](../../tidewhisper-balance.json). Both use level 8, starting equipment,
+The [fresh report](../../reports/tidewhisper-balance-20261017.json) measures clean synchronized commit `2c42fce`
+against the [accepted October 15 checkpoint](../../reports/tidewhisper-balance.json). Both use level 8, starting equipment,
 default pets, counter bots and counted HP top-ups. No gameplay numbers were tuned in this synchronization.
 All 18 required checks pass: six regular-roster medians at 2-6 seconds, six Ironclaw fights at 90-180 seconds,
 and six Mirelure fights at 180-300 seconds. Individual armored/evasive monsters remain informational.
@@ -387,9 +387,9 @@ This route audit does not replace combat or target-device performance validation
 
 ### Tidewhisper after the 29a-29f cave merge (2026-10-19)
 
-The [new six-profile report](../../tidewhisper-balance-20261019.json) reruns the same level-8, starting-equipment
+The [new six-profile report](../../reports/tidewhisper-balance-20261019.json) reruns the same level-8, starting-equipment
 bot on the cave-synchronized 27h candidate. Every required timing is unchanged from the
-[October 17 report](../../tidewhisper-balance-20261017.json); **0/18 checked rows** miss a target. The individual
+[October 17 report](../../reports/tidewhisper-balance-20261017.json); **0/18 checked rows** miss a target. The individual
 Shellback bouts above six seconds are informational under the existing regular-roster median rule.
 
 | Hero / seed | Roster median before → after (s) | Ironclaw before → after (s) | Mirelure before → after (s) |

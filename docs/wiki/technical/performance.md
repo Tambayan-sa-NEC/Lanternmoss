@@ -73,11 +73,11 @@ work spread across the frame, with no single postprocessing bottleneck. Closing 
 background CPU load still yielded only 4/18 passing rows (p95 12.8-23.3 ms). The owner confirmed the original
 power adapter and an idle machine; the NitroSense mode is being checked. No release evidence was written and the
 16.67 ms target is unchanged. The raw diagnostics are
-[`workspace Dusk`](../../duskhollow-performance-20261030-workspace.json),
-[`isolated Dusk`](../../duskhollow-performance-20261030-isolated.json),
-[`clean-desktop Dusk`](../../duskhollow-performance-20261030-clean-desktop.json),
-[`workspace Tide control`](../../tidewhisper-performance-20261030-workspace-control.json), and
-[`certified-code Tide control`](../../tidewhisper-performance-20261030-certified-code-control.json).
+[`workspace Dusk`](../../reports/duskhollow-performance-20261030-workspace.json),
+[`isolated Dusk`](../../reports/duskhollow-performance-20261030-isolated.json),
+[`clean-desktop Dusk`](../../reports/duskhollow-performance-20261030-clean-desktop.json),
+[`workspace Tide control`](../../reports/tidewhisper-performance-20261030-workspace-control.json), and
+[`certified-code Tide control`](../../reports/tidewhisper-performance-20261030-certified-code-control.json).
 
 On 2026-11-02, another visible Acer RTX 4050 diagnostic on the clean 30i checkpoint passed 0/18 timing rows
 (p95 20.7-43.5 ms against 16.67 ms), while all rows stayed within draw-call/triangle ceilings and reported zero
@@ -87,7 +87,7 @@ measured 14.3 ms in a later repeat; a later Dusk village probe still missed at 1
 commit in a temporary isolated checkout measured 30.6 ms for that row. The machine
 was on AC with the Acer power plan; VS Code, browser and other background apps remained open. This is a loaded-host
 no-go, not release certification or proof of a Duskhollow-only regression. The full raw matrix is
-[`2026-11-02 loaded-host Dusk`](../../duskhollow-performance-20261102-loaded-host.json).
+[`2026-11-02 loaded-host Dusk`](../../reports/duskhollow-performance-20261102-loaded-host.json).
 
 Earlier on 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
 8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
@@ -148,8 +148,8 @@ DPR 1, bloom enabled. High and Medium render at 1920 × 1080 on this display; Lo
 warmup frames, collect 90 frames per planet/preset. Record mean cadence, p95 frame time and peak counts. NPC movement
 and weather animation can produce small variations, so count ceilings include headroom.
 
-The checked-in [original baseline](../../performance-baseline.json) was captured before optimization, using `--baseline
---quick` (12 warmup/20 measured frames, High only). [Current results](../../performance-results.json) record all three
+The checked-in [original baseline](../../reports/performance-baseline.json) was captured before optimization, using `--baseline
+--quick` (12 warmup/20 measured frames, High only). [Current results](../../reports/performance-results.json) record all three
 presets. `--quick` is useful for iteration; full sampling is used for final verification. Timing from short samples is
 indicative. Neither result is a universal worst case for every combat encounter or camera bearing.
 
@@ -257,7 +257,7 @@ claiming the default-quality target; these count ceilings are a regression guard
 
 ## UHD 620 laptop diagnostic (2026-10-17)
 
-[Separate diagnostic report](../../performance-uhd620-720p.json), recorded from game source `b188aa4`:
+[Separate diagnostic report](../../reports/performance-uhd620-720p.json), recorded from game source `b188aa4`:
 Lenovo 81MU, Core i3-8145U (2 cores / 4 threads), approximately 4 GB RAM, Windows 11 and Edge 154 headless.
 The active WebGL renderer is Intel UHD Graphics 620 through ANGLE/D3D11, with no software-rendering launch flags.
 The laptop was connected to AC on the Balanced power plan. Windows reported only about 375–535 MB available RAM
@@ -298,7 +298,7 @@ resolution and source differ from the historical 1080p measurements above; this 
 
 ## Acer Intel UHD Tidewhisper diagnostic (2026-10-17)
 
-[Separate report](../../tidewhisper-performance-acer-20261017.json), clean synchronized commit `1860d90`:
+[Separate report](../../reports/tidewhisper-performance-acer-20261017.json), clean synchronized commit `1860d90`:
 Acer Nitro ANV15-51, Core i5-13420H, 16 GB installed RAM, Windows 11 / Edge 155 headless. Every row confirms actual
 Intel UHD A7A8 through ANGLE/D3D11, driver 31.0.101.4146. The RTX 4050 is present as a secondary adapter and was not
 the WebGL renderer. AC connected, Acer power plan, approximately 3.5 GiB available before browser launch. Other
