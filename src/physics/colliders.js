@@ -11,6 +11,37 @@ import { groundHeight, waterAt } from '../world/terrain.js';
 
 const V3 = THREE.Vector3;
 export const colliders = [], dynColliders = [], camColliders = [], solids = [];
+// Static scenery is fixed until the world is rebuilt. Cache nearby candidates by a coarse cube around the planet;
+// a moving body's maximum contact distance below one cell guarantees that its own and adjacent cells contain every hit.
+const CELL_WIDTH = WORLD.collisionCellWidth, CELL_COUNT = Math.round(2 / CELL_WIDTH), CELL_PLANE = CELL_COUNT * CELL_COUNT;
+let staticIndex = null, staticIndexLength = -1, maxStaticRadius = 0;
+const cell = value => Math.max(0, Math.min(CELL_COUNT - 1, Math.floor((value + 1) / CELL_WIDTH)));
+const cellKey = (x, y, z) => x * CELL_PLANE + y * CELL_COUNT + z;
+function nearbyStatic(dir, radius) {
+  if (staticIndexLength !== colliders.length || !staticIndex) {
+    staticIndex = { bins: Array.from({ length: CELL_COUNT ** 3 }), nearby: Array.from({ length: CELL_COUNT ** 3 }) };
+    maxStaticRadius = 0;
+    for (const c of colliders) {
+      const key = cellKey(cell(c.dir.x), cell(c.dir.y), cell(c.dir.z));
+      (staticIndex.bins[key] ??= []).push(c);
+      maxStaticRadius = Math.max(maxStaticRadius, c.r);
+    }
+    staticIndexLength = colliders.length;
+  }
+  // Large custom bodies or structures use the full list so the coarse cells never change collision reach.
+  if (radius + maxStaticRadius >= R * CELL_WIDTH) return colliders;
+  const x = cell(dir.x), y = cell(dir.y), z = cell(dir.z), key = cellKey(x, y, z);
+  let nearby = staticIndex.nearby[key];
+  if (!nearby) {
+    nearby = [];
+    for (let i = Math.max(0, x - 1); i <= Math.min(CELL_COUNT - 1, x + 1); i++)
+      for (let j = Math.max(0, y - 1); j <= Math.min(CELL_COUNT - 1, y + 1); j++)
+        for (let k = Math.max(0, z - 1); k <= Math.min(CELL_COUNT - 1, z + 1); k++)
+          if (staticIndex.bins[cellKey(i, j, k)]) nearby.push(...staticIndex.bins[cellKey(i, j, k)]);
+    staticIndex.nearby[key] = nearby;
+  }
+  return nearby;
+}
 
 /** cam = { r, base, top } also blocks the camera; top = height you can stand on (a climbable solid). */
 export function addCollider(dir, r, cam = null, top = null) {
@@ -21,7 +52,7 @@ export function addCollider(dir, r, cam = null, top = null) {
     Object.assign(c, { camR: cam.r, camBase: cam.base ?? 0, camTop: cam.top,
       camCull: Math.cos(Math.min(Math.PI, (cam.r + 2) / R)) }); camColliders.push(c);
   }
-  colliders.push(c); return c;
+  colliders.push(c); staticIndex = null; return c;
 }
 /** A box in a foundation's shared local frame; optional floor support and camera blocking. */
 export function addBoxCollider(origin, up, fwd, width, depth, base, top, { movement = true, support: floor = false, camera = true, ceiling = false } = {}) {
@@ -31,12 +62,12 @@ export function addBoxCollider(origin, up, fwd, width, depth, base, top, { movem
 }
 /** Removes one static collider (a chest that's taken away). */
 export function removeCollider(c) {
-  let i = colliders.indexOf(c); if (i >= 0) colliders.splice(i, 1);
+  let i = colliders.indexOf(c); if (i >= 0) { colliders.splice(i, 1); staticIndex = null; }
   i = camColliders.indexOf(c); if (i >= 0) camColliders.splice(i, 1);
   i = solids.indexOf(c); if (i >= 0) solids.splice(i, 1);
 }
 /** Forgets all scenery colliders (the planet is being replaced). Moving bodies keep theirs. */
-export function clearStaticColliders() { colliders.length = 0; camColliders.length = 0; solids.length = 0; }
+export function clearStaticColliders() { colliders.length = 0; camColliders.length = 0; solids.length = 0; staticIndex = null; }
 /** A moving collider that tracks dirRef (the body's own `up` vector, shared by reference). */
 export function addDyn(dirRef, r) { const c = { dir: dirRef, r, cull: Math.cos((r + 2.0) / R), active: true }; dynColliders.push(c); return c; }
 export function removeDyn(c) { const i = dynColliders.indexOf(c); if (i >= 0) dynColliders.splice(i, 1); }
@@ -66,7 +97,7 @@ export function resolveCollisions(p, radius, self) {
   let hit = false; _cn.set(0, 0, 0);
   for (let it = 0; it < 2; it++) {
     const len = p.length(); _cu.copy(p).divideScalar(len);
-    if (pushOut(colliders, p, len, radius, self)) hit = true;
+    if (pushOut(nearbyStatic(_cu, radius), p, len, radius, self)) hit = true;
     if (pushOut(dynColliders, p, len, radius, self)) hit = true;
   }
   return hit && _cn.lengthSq() > 1e-8 ? _cn.normalize() : null;

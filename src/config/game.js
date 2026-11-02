@@ -12,6 +12,7 @@ export const WORLD = {
   flats: { village: [26, 14], stones: [10, 8], lair: [28, 12] },   // flattened areas: [radius, fade]
   maxSlope: 1.25,            // steepest ground a walker can walk up (rise per metre, ~51°); steeper = a cliff: jump or go round
   stepHeight: 0.4,           // ledges this low are stepped onto without jumping
+  collisionCellWidth: 0.2,  // side of each static-collider lookup cell in normalized planet coordinates; large bodies use the full list
   water: { wade: 0.72, swim: 0.55, swimDepth: 1.0, deep: 0.95 },   // speed in shallow / deep water; how low a swimmer floats; depth that counts as deep
 };
 

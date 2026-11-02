@@ -3,6 +3,7 @@
 | What | Where |
 |---|---|
 | Movement, jump, camera | `src/config/game.js` |
+| Static-collider lookup cell width (CPU broadphase; collision sizes are unchanged) | `src/config/game.js` → `WORLD.collisionCellWidth` |
 | Spells, enemy stats, XP per enemy | `src/config/combat.js` |
 | Boss health, attacks (damage, warning times, cooldowns, reuse), phases | `src/config/combat.js` → `enemies.gloomcap / pyrrhax / malgrath` |
 | Ultimates (Meteor, Leap Slam, Arrow Rain) and evasion cooldowns | `src/config/combat.js` (witch) and `src/config/characters.js` |

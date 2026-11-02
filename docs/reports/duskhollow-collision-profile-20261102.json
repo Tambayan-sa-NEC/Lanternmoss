@@ -1,0 +1,19 @@
+{
+  "diagnostic": true,
+  "scene": "Duskhollow village, seed 1, Witch, passive otter",
+  "profile": "Visible Edge on Acer RTX 4050, 1920x1080 High, CDP CPU sampling at 100 microseconds for about five seconds per capture",
+  "before": {
+    "commit": "12bab9f",
+    "durationMs": 5215.567,
+    "pushOutSelfMs": 299.435,
+    "pushOutSelfMsPerSecond": 57.41
+  },
+  "after": {
+    "baseCommit": "12bab9f",
+    "workingTreeModified": true,
+    "durationMs": 5512.421,
+    "pushOutSelfMs": 86.261,
+    "pushOutSelfMsPerSecond": 15.65
+  },
+  "interpretation": "The static-collider spatial lookup reduced samples in the collision scan by about 73 percent per second in these captures. Host load varied; this profile does not certify whole-frame timing or the Duskhollow release."
+}

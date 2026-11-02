@@ -89,6 +89,14 @@ was on AC with the Acer power plan; VS Code, browser and other background apps r
 no-go, not release certification or proof of a Duskhollow-only regression. The full raw matrix is
 [`2026-11-02 loaded-host Dusk`](../../reports/duskhollow-performance-20261102-loaded-host.json).
 
+The 30i follow-up replaced the full static-scenery scan in `resolveCollisions` with a cached nearby-cell lookup.
+On the Duskhollow seed-1 Witch village scene, matched five-second CDP CPU samples attributed 57.4 ms/s to
+`pushOut` before the change and 15.7 ms/s afterward (about 73% less sampled self time for that routine).
+The [profile summary](../../reports/duskhollow-collision-profile-20261102.json) is diagnostic: background load
+varied, and a later single-row frame measurement still missed the 16.67 ms release limit. The full 18-case
+hardware gate remains open. This optimization changes which distant colliders are inspected, not collision sizes,
+physics results or the acceptance target.
+
 Earlier on 2026-10-17 the owner reported that the Iris Xe laptop was at a repair shop, with the next possible test estimated
 8–9 days later (approximately October 25–26). This is an availability estimate, not a guaranteed repair/test date.
 That historical estimate is superseded as a release dependency by the owner's Acer decision. If tested later,

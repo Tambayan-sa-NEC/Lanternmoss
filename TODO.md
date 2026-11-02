@@ -1625,6 +1625,12 @@ diagnostic passed all draw-count rows but 0/18 frame-time rows (20.7-43.5 ms p95
 in the same loaded session. No release evidence was written, the authored flag remains off, and the final screenshot
 tour waits for hardware acceptance.
 
+**30i CPU checkpoint (2026-11-02):** A cached spatial lookup now narrows static scenery collision checks to nearby
+cells, with a full-list fallback for unusually large bodies. A visible-browser CPU profile of the Dusk village
+sampled 57.4 ms/s in `pushOut` before and 15.7 ms/s afterward; all 319 unit tests, 71 simulations and the candidate
+campaign smoke still pass. Browser frame time remains inconsistent on the loaded Acer and has not passed the release
+matrix, so Duskhollow stays hidden.
+
 **30h implemented (2026-10-26):** Duskhollow has its boss, and she is the world's rule taken to its conclusion:
 **she dives at the brightest light there is**, which on this world is usually the one on the hero's own belt.
 `src/entities/enemies/behaviors/boss/umbra.js` (on the shared boss framework) puts **Umbra** in the air over her

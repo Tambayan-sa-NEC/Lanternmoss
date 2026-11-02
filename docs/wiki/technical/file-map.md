@@ -10,6 +10,7 @@ scripts/save-smoke.mjs     checks real browser save/reload/export/import; retake
 docs/screenshots/          the README screenshots, one folder per subject (characters, mobs, huds...)
 docs/logs/                 timestamped decisions, tasks, actions and verification
 docs/reports/              balance and performance JSON diagnostics; release evidence stays in docs/releases/
+tests/colliders.test.mjs    near-cell static collision lookup, cross-cell contacts and large-body fallback
 docs/reports/performance-uhd620-720p.json  current-machine 720p Low diagnostic; hardware/method, scene samples and errors
 docs/wiki/technical/typography.md         the type brief, the pairings compared (type-specimen.html) and the choice
 tests/                     unit tests: XP / level math, inventory, planets + enemy scaling, combat + boss config, settings,
