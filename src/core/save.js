@@ -23,6 +23,7 @@ import { RECIPES } from '../config/crafting.js';
 import { RUNES } from '../config/magic.js';
 import { xpToNext } from '../progression/leveling.js';
 import { cleanBuildings } from '../gameplay/buildingRules.js';
+import { cleanFriendshipState } from '../gameplay/friendshipRules.js';
 import { cleanHomeState } from '../gameplay/homeRules.js';
 import { cleanBountyState } from '../gameplay/bountyRules.js';
 import { TALENTS } from '../config/talents.js';
@@ -41,6 +42,7 @@ export const SAVE_SYSTEMS = {
   pets: 'adventure', quests: 'adventure', challenges: 'adventure', story: 'adventure',
   dayClock: 'adventure', buffs: 'adventure', houses: 'adventure', rareGifts: 'adventure',
   progression: 'adventure', portals: 'adventure', combat: 'adventure', tutorial: 'adventure', crafting: 'adventure', talents: 'adventure',
+  friendship: 'adventure',
   building: 'planet', home: 'planet', farm: 'planet', bounties: 'planet', gathering: 'planet', chests: 'planet', caves: 'planet', cavePuzzles: 'planet', bossGate: 'planet', pickups: 'planet', mechanics: 'planet',
 };
 export const TRANSIENT_SYSTEMS = {
@@ -68,6 +70,7 @@ export const SAVE_OWNERS = {
   'gameplay/Home.js:Home': 'home',
   'gameplay/Building.js:Building': 'building',
   'gameplay/Bounties.js:Bounties': 'bounties',
+  'gameplay/Friendship.js:Friendship': 'friendship',
   'gameplay/Talents.js:Talents': 'talents',
   'gameplay/PlanetMechanics.js:PlanetMechanics': 'mechanics',
 };
@@ -116,6 +119,7 @@ export function cleanState(key, value, hero = 'witch', level = LEVELING.maxLevel
   const s = record(value);
   switch (key) {
     case 'mechanics': return cleanMechanicSnapshot(value);
+    case 'friendship': return cleanFriendshipState(value);
     case 'building': return cleanBuildings(value, cleanStack);
     case 'home': return cleanHomeState(value);
     case 'crafting': {

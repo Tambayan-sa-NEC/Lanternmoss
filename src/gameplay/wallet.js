@@ -6,6 +6,7 @@ import { ctx } from '../core/context.js';
 import { floatText } from '../fx/combatFx.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { audio } from '../systems/AudioSystem.js';
+import { Friendship } from './Friendship.js';
 
 const _tv = new THREE.Vector3();
 
@@ -21,8 +22,12 @@ export function spendCoins(n) { const P = ctx.player; if (P.coins < n) return fa
 /** Coins for defeating a monster (summoned helpers of a boss are worth nothing, so they can't be farmed). */
 export function coinsForKill(e) { return e.owner || e.def.object ? 0 : Math.max(1, Math.round(e.def.xp * COINS.perXp)); }
 
-/** Shop prices from an item's value: what it costs to buy (stock entry may override) and what selling one gives (0 = can't sell). */
-export function buyPrice(stockEntry) { return stockEntry.price ?? Math.max(1, Math.round(itemRegistry.get(stockEntry.item).value * SHOP.buyMarkup)); }
+/** Shop prices from an item's value: what it costs to buy (stock entry may override) and what selling one gives (0 = can't sell).
+    A keeper who counts you a friend takes their discount off the asking price (TODO 33, src/gameplay/Friendship.js). */
+export function buyPrice(stockEntry) {
+  const asked = stockEntry.price ?? Math.max(1, Math.round(itemRegistry.get(stockEntry.item).value * SHOP.buyMarkup));
+  return Math.max(1, Math.round(asked * (1 - Friendship.discount(SHOP.keeper))));
+}
 export function sellPrice(itemId) {
   const def = itemRegistry.get(itemId);
   return !def || def.category === 'quest' || !def.value ? 0 : Math.max(1, Math.floor(def.value * SHOP.sellRate));

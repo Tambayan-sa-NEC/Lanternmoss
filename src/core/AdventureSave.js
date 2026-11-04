@@ -15,6 +15,7 @@ import { CavePuzzles } from '../gameplay/CavePuzzles.js';
 import { dayClock } from '../gameplay/dayClock.js';
 import { Equipment, computeStats } from '../gameplay/equipment.js';
 import { Farm } from '../gameplay/Farm.js';
+import { Friendship } from '../gameplay/Friendship.js';
 import { Gathering } from '../gameplay/Gathering.js';
 import { Hotbar } from '../gameplay/hotbar.js';
 import { Houses, houseDef } from '../gameplay/Houses.js';
@@ -62,7 +63,7 @@ export class AdventureSave {
       load: data => ctx.player.load(data),
     };
     for (const [key, system] of Object.entries({ player, inventory: ctx.player.inventory, equipment: Equipment, hotbar: Hotbar,
-      pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, dayClock, buffs: BuffState,
+      pets: Pets, quests: Quests, challenges: Challenges, story: StoryMemory, friendship: Friendship, dayClock, buffs: BuffState,
       houses: Houses, rareGifts: RareGifts, progression: game.planets, portals: Portals, combat: CombatState, tutorial: Tutorial, crafting: RecipeBook, talents: Talents,
       home: Home, farm: Farm, bounties: Bounties, gathering: Gathering, chests: Chests, caves: CaveRewards, cavePuzzles: CavePuzzles, bossGate: BossGate, pickups: Pickups, building: Building,
       mechanics: game.world.mechanics })) this.registry.register(key, system);

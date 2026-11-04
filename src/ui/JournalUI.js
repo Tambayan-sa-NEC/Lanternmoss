@@ -21,6 +21,10 @@ import { Journal } from '../gameplay/Journal.js';
 import { RecipeBook } from '../gameplay/RecipeBook.js';
 import { RECIPES } from '../config/crafting.js';
 import { BESTIARY_ORDER, isBoss, pageName, progress, statValue } from '../gameplay/journalRules.js';
+import { FRIENDSHIP } from '../config/friendship.js';
+import { QUESTS } from '../config/quests.js';
+import { Friendship } from '../gameplay/Friendship.js';
+import { rewardLadder, tastesFor, VILLAGER_NAMES } from '../gameplay/friendshipRules.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { audio } from '../systems/AudioSystem.js';
 import { releaseAllKeys } from '../systems/InputSystem.js';
@@ -29,10 +33,21 @@ import { itemIconHtml } from './itemTooltip.js';
 import { monsterPortrait } from './monsterPortraits.js';
 import { helpHtml } from './help.js';
 
-const TABS = { achievements: 'Achievements', bestiary: 'Bestiary', collection: 'Collection', help: 'Help' };
+const TABS = { achievements: 'Achievements', bestiary: 'Bestiary', collection: 'Collection', friends: 'Friends', help: 'Help' };
 const GROUPS = ['Firsts', 'Counts', 'Challenges'];
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const when = t => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+
+const itemName = id => itemRegistry.get(id)?.name ?? id;
+/** One rung of a friendship's reward ladder, in words (config/friendship.js rewards). */
+function rewardText(r) {
+  if (r.kind === 'items') return r.items.map(([id, n]) => `${n}× ${itemName(id)}`).join(', ');
+  if (r.kind === 'keepsake') return `${itemName(r.item)}, made for you`;
+  if (r.kind === 'recipe') return `the recipe for ${itemName(RECIPES.find(x => x.id === r.recipe)?.result ?? r.recipe)}`;
+  if (r.kind === 'discount') return `${Math.round(FRIENDSHIP.shop.perHeart * 100)}% off the shop for every heart`;
+  if (r.kind === 'quest') return `${QUESTS[r.quest]?.title ?? 'a favour'}: a quest only a friend is asked`;
+  return r.kind;
+}
 
 /** Planets a monster lives on (by roster), as indices. */
 function homes(type) {
@@ -103,9 +118,10 @@ export const JournalUI = {
     for (const b of this.tabsEl.children) b.classList.toggle('on', b.dataset.tab === this.tab);
     const scroll = this.body.querySelector('.jscroll')?.scrollTop ?? 0, same = this.body.dataset.tab === this.tab;
     this.body.dataset.tab = this.tab;
-    this.body.innerHTML = this.tab === 'help' ? helpHtml() : this.tab === 'bestiary' ? this.bestiaryHtml() : this.tab === 'collection' ? this.collectionHtml() : this.achievementsHtml();
+    this.body.innerHTML = this.tab === 'help' ? helpHtml() : this.tab === 'bestiary' ? this.bestiaryHtml()
+      : this.tab === 'collection' ? this.collectionHtml() : this.tab === 'friends' ? this.friendsHtml() : this.achievementsHtml();
     if (same) { const s = this.body.querySelector('.jscroll'); if (s) s.scrollTop = scroll; }
-    this.foot.innerHTML = (this.tab === 'help' ? `<span>Guide progress and seen tips are saved with your adventure.</span>` : `<span>Kept on this device across adventures.</span>` +
+    this.foot.innerHTML = (this.tab === 'help' || this.tab === 'friends' ? `<span>${this.tab === 'friends' ? 'Friendships belong to this adventure.' : 'Guide progress and seen tips are saved with your adventure.'}</span>` : `<span>Kept on this device across adventures.</span>` +
       `<button type="button" class="quiet" data-clear>${this.clearArmed ? 'Click again to erase the whole journal' : 'Start the journal over'}</button>`) +
       `<span>← → tabs${this.tab === 'bestiary' ? ' · ↑ ↓ pages' : ''} · ${bindKbd('journal')} or <kbd>Esc</kbd> to close</span>`;
   },
@@ -153,6 +169,32 @@ export const JournalUI = {
       : '<p class="dim">Defeat one to note its stats and what it drops.</p>'}` +
       RECIPES.filter(r => r.discovery?.kind === 'bestiary' && r.discovery.enemy === type).map(r => `<h4>Recipe notes</h4><p>${itemRegistry.get(r.result).name}: ${RecipeBook.knows(r.id) ? 'learned for this adventure' : r.discovery.text}</p>` +
         (RecipeBook.knows(r.id) ? '' : `<button type="button" data-learn-recipe ${beaten && ctx.started && !ctx.player.dead ? '' : 'disabled'}>Learn recipe</button>`)).join('');
+  },
+
+  /* The Friends page (TODO 33): everyone you have got to know this adventure, their hearts, what they like once you
+     know them well enough to have noticed, and the reward each heart brings. */
+  friendsHtml() {
+    const names = Friendship.friends();
+    const head = `<div class="jscroll"><div class="jsum"><div class="big"><b>${names.length}</b> / ${VILLAGER_NAMES.length}<span>friends made</span></div>
+      <p class="dim">Hearts go up when you talk to someone for the first time each day, hand them a present out of your hand, and finish what they ask of you.</p></div>`;
+    if (!names.length) return `${head}<p class="dim">Nobody yet. Say hello to the villagers: everyone starts as a stranger.</p></div>`;
+    return head + `<div class="frnd-grid">${names.map(n => this.friendCard(n)).join('')}</div></div>`;
+  },
+  friendCard(name) {
+    const p = Friendship.progress(name), planet = Friendship.planetFor(name), t = tastesFor(name, planet);
+    const def = ctx.npcs?.find(n => n.name === name)?.def;
+    const hearts = `<span class="hrt">${'♥'.repeat(p.hearts)}${'♡'.repeat(FRIENDSHIP.hearts - p.hearts)}</span>`;
+    const names = ids => ids.map(id => esc(itemRegistry.get(id)?.name ?? id)).join(', ');
+    // their tastes come out as you get to know them: favourites first, then what else they like and what they don't
+    const taste = (label, ids, from) => (p.hearts >= from && ids.length ? `<div class="tst"><b>${label}</b> ${names(ids)}</div>`
+      : ids.length ? `<div class="tst dim"><b>${label}</b> not known yet (${from} heart${from === 1 ? '' : 's'})</div>` : '');
+    const ladder = rewardLadder(name, p.hearts, planet).map(r => `<li class="${r.earned ? 'got' : ''}">${'♥'.repeat(r.hearts)} ${esc(rewardText(r))}</li>`).join('');
+    return `<div class="frnd${p.hearts >= FRIENDSHIP.hearts ? ' best' : ''}" style="--fc:${def?.color ?? '#8a6ae0'}">
+      <div class="frnd-top"><b>${esc(name)}</b>${def?.title ? `<small>${esc(def.title)}</small>` : ''}${hearts}</div>
+      ${p.next ? `<div class="abar"><i style="width:${Math.round((p.have / p.need) * 100)}%"></i></div><span class="pr">${p.have} / ${p.need} to ${p.next} heart${p.next === 1 ? '' : 's'}</span>`
+        : '<span class="pr got">As close as friends get.</span>'}
+      ${taste('Loves', t.favourite, 1)}${taste('Likes', t.liked, 2)}${taste('Would rather not', t.disliked, 3)}
+      ${ladder ? `<ul class="frnd-rw">${ladder}</ul>` : ''}</div>`;
   },
 
   collectionHtml() {

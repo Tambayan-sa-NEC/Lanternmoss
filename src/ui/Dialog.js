@@ -13,6 +13,9 @@ export const Dialog = {
   open: false, npc: null, text: '', shown: 0, acc: 0, choice: null,
   /** Optional hook (npc) => line | null, consulted before the NPC's own chatter (challenges use it). */
   lineProvider: null,
+  /** Optional hook (npc) => choice | null, offered with a villager's first line when it carries no choice of its
+      own (friendship gifts use it: src/gameplay/Friendship.js). */
+  choiceProvider: null,
   init() {
     dom.yes.addEventListener('click', () => this.choose(true));
     dom.no.addEventListener('click', () => this.choose(false));
@@ -35,6 +38,9 @@ export const Dialog = {
   /** Show one line. A line may carry a choice { yes, no, onYes, onNo }; the handler may return a follow-up line. */
   say(line) {
     this.text = fillStory(line.t); this.shown = 0; this.acc = 0; this.choice = line.choice || null;
+    // a walking villager's line with nothing else to decide carries the gift offer, so the shopkeeper's "just
+    // chatting" branch and ordinary chatter both reach it (nextLine marks a real villager, not a note or a resident)
+    if (!this.choice && typeof this.npc?.nextLine === 'function') this.choice = this.choiceProvider?.(this.npc) ?? null;
     const kind = this.npc?.def.portrait;
     dom.dlgFace.style.display = kind ? 'block' : 'none';
     if (kind) { dom.dlgFace.innerHTML = portrait(kind, line.e ?? guessExpression(this.text), this.npc.def.color); dom.dialog.classList.add('face'); }

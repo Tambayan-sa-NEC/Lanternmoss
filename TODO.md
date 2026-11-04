@@ -1739,13 +1739,31 @@ is Pet care (35) after Cooking (22). Where one of them needs data for each world
 Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts, reward tiers), `src/ui/Dialog.js`
 (a gift option), the journal (a friends page). **Size:** M. **Needs:** 19.
 
-- [ ] **Friendship hearts** per villager, raised by talking each day, gifts and finishing their quests.
-- [ ] **Gifts:** each villager has favourite, liked and disliked things (food you cook, fish, gems, flowers), with a
+- [x] **Friendship hearts** per villager, raised by talking each day, gifts and finishing their quests.
+- [x] **Gifts:** each villager has favourite, liked and disliked things (food you cook, fish, gems, flowers), with a
       reaction line and an emote for each.
-- [ ] **Rewards by heart level:** recipes (ties into recipe discovery, 22), shop discounts, a unique trinket or vanity
+- [x] **Rewards by heart level:** recipes (ties into recipe discovery, 22), shop discounts, a unique trinket or vanity
       piece, new dialogue and a small personal quest.
-- [ ] Friends greet you by name, wave from across the square and sometimes leave a gift at your door.
-- [ ] The new worlds' locals (Marlo, Wick, the Lamplighter) join with their own tastes.
+- [x] Friends greet you by name, wave from across the square and sometimes leave a gift at your door.
+- [x] The new worlds' locals (Marlo, Wick, the Lamplighter) join with their own tastes.
+  - Marlo (released, Tidewhisper) has authored tastes. Wick and Duskhollow's/the Moon's locals are not yet released;
+    `DEFAULT_TASTES` (their planet's material and food, plain reactions) covers any local with no authored tastes, so
+    they will make friends from the day they arrive without further code.
+
+**33 implemented (2026-11-04):** `src/gameplay/Friendship.js` (runtime) and `src/gameplay/friendshipRules.js` (pure
+heart math), data and every villager's tastes in `src/config/friendship.js`, a gift offer on the dialogue line
+(`src/ui/Dialog.js` `choiceProvider`) and a new Friends tab in the journal (`src/ui/JournalUI.js`). Hearts come from
+the first chat of the day, a held gift (favourite/liked/neutral/disliked, one a day), and finishing a villager's
+quest; five hearts hand over a thank-you, a recipe, the shopkeeper's discount (`src/gameplay/wallet.js`), a keepsake
+made for you, and a personal quest only a friend is asked (`src/gameplay/quests/Quests.js` gates on
+`Friendship.questUnlocked`). Close friends greet you by name, wave across the square and sometimes leave a gift at
+the cottage door. Saved with the adventure (`SAVE_SYSTEMS.friendship`). Checked by `tests/friendship.test.mjs`,
+`tests/sim/friendship.sim.mjs` and the real-browser `scripts/friendship-smoke.mjs` (a real `E`, a held gift given by
+a real click, hearts on the talk prompt, the Friends tab at 720p/1080p, and a full reload/Continue), plus the full
+`npm test` (293 pass) and `npm run sim` (64 sims) suites. Docs: [friendship](docs/wiki/systems/friendship.md),
+feature tour, file map and tuning pages updated. The full screenshot tour (`node scripts/screenshots.mjs`) still
+needs a retake: it was started on this machine but killed for low memory, so it is handed off to another machine as
+a checkpoint (this branch is pushed, not yet merged to `develop`).
 
 ## 34. Bounty board **(suggested)**
 

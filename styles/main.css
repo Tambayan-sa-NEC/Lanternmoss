@@ -720,6 +720,21 @@ body.bossfight #toast { top:120px; }
 .ach .rw { flex:none; font-weight:800; font-size:12px; color:#a8641a; }
 .ach.done { background:linear-gradient(90deg,#fff6dc,#fffdf6); border:2.5px solid var(--ink); }
 .ach.done .ic { background:#ffd36b; color:var(--ink); border-color:var(--ink); }
+/* the Journal's Friends page (TODO 33) */
+.frnd-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:8px; margin-top:8px; }
+.frnd { padding:8px 11px; border-radius:14px; background:rgba(255,255,255,.6); border:2px dashed rgba(58,35,64,.3); border-left:6px solid var(--fc); font-size:12px; line-height:1.35; }
+.frnd.best { background:linear-gradient(90deg,#ffeef4,#fffdf6); border:2.5px solid var(--ink); border-left:6px solid var(--fc); }
+.frnd-top { display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; }
+.frnd-top b { font-family:var(--font-display); font-size:15px; }
+.frnd-top small { opacity:.65; font-weight:700; }
+.frnd .hrt { margin-left:auto; color:#e2557f; font-size:14px; letter-spacing:1px; }
+.frnd .abar { height:7px; margin:5px 0 2px; border:2px solid var(--ink); border-radius:999px; background:#fff; overflow:hidden; }
+.frnd .abar i { display:block; height:100%; background:var(--pink); }
+.frnd .pr { font-size:10.5px; font-weight:800; opacity:.7; } .frnd .pr.got { color:#3f9a5a; opacity:1; }
+.frnd .tst { margin-top:3px; } .frnd .tst b { font-weight:800; } .frnd .tst.dim { opacity:.5; }
+.frnd-rw { margin:6px 0 0; padding-left:16px; font-size:11px; } .frnd-rw li { opacity:.55; } .frnd-rw li.got { opacity:1; font-weight:700; }
+.ftag { color:#e2557f; font-size:12px; letter-spacing:1px; }
+
 .bst { display:flex; gap:14px; height:100%; }
 .bst-list { width:300px; flex:none; display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; align-content:start; }
 .bst-count { grid-column:1/-1; font-size:12px; font-weight:800; opacity:.7; }

@@ -46,6 +46,7 @@
 | Crafting recipes | `src/config/crafting.js` |
 | Coastal recipes and Tide gear forge fees (70/80/70/60 coins) | `src/config/coastalResources.js` → `COASTAL_RECIPES` |
 | Bounty board: kinds of job, counts, coins, material, rare-piece chance, board placement | `src/config/bounties.js` → `BOUNTIES` |
+| Villager friendship: hearts, thresholds, talk/gift/quest points, gift tiers, greet/wave/door thresholds, shop discount; each villager's tastes, reactions, chatter and reward ladder | `src/config/friendship.js` → `FRIENDSHIP`, `TASTES`, `DEFAULT_TASTES` |
 | Gear sets: pieces, two- and three-piece bonuses (burn, chill, healing, swimming, push), burn tick | `src/config/sets.js` → `SETS`, `BURN_TICK` |
 | Talents: points per level, the reset wizard, each hero's tree and its release flag | `src/config/talents.js` → `TALENTS` |
 | Pets: attacks, abilities and cooldowns, health, unlocks, growth per level, fainting, commands and keys; otter Pearl Dive radius, cooldown, daily cap and yield | `src/config/pets.js` |

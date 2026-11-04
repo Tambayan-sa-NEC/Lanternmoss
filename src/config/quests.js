@@ -2,6 +2,7 @@
    QUESTS: multi-step favours villagers ask for (runtime: src/gameplay/quests/Quests.js). Unlike challenges (one timed
    activity), a quest is a list of steps done at your own pace, possibly across planets.
      giver     NPC name (npcDefs.js)          planet  offered from this planet index on (default 0)
+     hearts    only offered once the giver's friendship reaches this many hearts (TODO 33; default 0 = anyone)
      steps     in order, each { kind, text (tracker), ... }:
                  collect  { item, count }              have this many in the bag
                  deliver  { to, item, count, say }     talk to `to` with them in the bag (they're handed over)
@@ -126,6 +127,117 @@ export const QUESTS = {
       accept: "Thank you! Feel the ground tremble, then jump. That's the thornmole dance.",
       decline: 'I understand. The cold makes everyone a little tired.',
       done: 'Two moonberry tarts. I traded a very confused bard for them.',
+    },
+  },
+
+  // ---- personal quests (TODO 33): a villager only asks these of a real friend, once the `hearts` they need are
+  //      earned (config/friendship.js; the gate is in src/gameplay/quests/Quests.js offerable) ----
+  brambleStarChart: {
+    giver: 'Old Bramble', title: 'The Star Chart', hearts: 5,
+    steps: [
+      { kind: 'collect', item: 'amethyst', count: 3, text: 'Mine 3 Amethysts for the chart' },
+      { kind: 'deliver', to: 'Old Bramble', item: 'amethyst', count: 3, text: 'Bring the amethysts to Old Bramble',
+        say: 'Set one here, one here, and the last one... there. Look up, {hero}. That is where I was born.' },
+    ],
+    reward: { coins: 120, xp: 150, items: [['amethystBand', 1]] },
+    text: {
+      offer: 'I have never shown anyone this. There is a chart I have been finishing for sixty years, and it wants three amethysts. Will you help me finish it?',
+      accept: 'Clear stones, mind. The copper veins on Lanternmoss give the best ones.',
+      decline: 'Of course. It has waited sixty years. It can wait for a Tuesday.',
+      done: 'Take the band. It was the first thing I ever enchanted, and I would rather it went travelling than sat in a drawer.',
+    },
+  },
+  pimsHarvestTable: {
+    giver: 'Pim', title: 'The Long Table', hearts: 5,
+    steps: [
+      { kind: 'collect', item: 'pumpkin', count: 3, text: 'Grow or gather 3 Pumpkins' },
+      { kind: 'collect', item: 'sunWheat', count: 4, text: 'Gather 4 Sun Wheat' },
+      { kind: 'deliver', to: 'Pim', item: 'pumpkin', count: 3, text: 'Bring the pumpkins to Pim',
+        say: 'Oh, they are beauties. Right. Everyone eats tonight, and nobody eats standing up.' },
+    ],
+    reward: { coins: 110, xp: 140, items: [['pumpkinPie', 2], ['honeyBun', 3]] },
+    text: {
+      offer: 'I want to put the long table out in the square and feed the whole village, like we used to. Three pumpkins and four sun wheat, and I will do the rest?',
+      accept: 'Bless you. I will start the ovens now, which is optimistic of me.',
+      decline: 'No rush, love. The table has been in the barn nine years. One more week will not hurt it.',
+      done: 'Look at them all out there. Take the pie home, {hero}. You have earned the first slice twice over.',
+    },
+  },
+  liosLostVerse: {
+    giver: 'Lio', title: 'The Lost Verse', hearts: 5,
+    steps: [
+      { kind: 'collect', item: 'moonberry', count: 4, text: 'Pick 4 Moonberries for the ink' },
+      { kind: 'deliver', to: 'Lio', item: 'moonberry', count: 4, text: 'Bring the moonberries to Lio',
+        say: 'Moonberry ink. The only thing that will hold the last verse. Watch. There. Finished at last.' },
+      { kind: 'talk', to: 'Fern', text: 'Ask Fern to come and hear the finished song',
+        say: 'He finished it? After all this time? Oh, tell him I am coming. Tell him I am running.' },
+    ],
+    reward: { coins: 100, xp: 130, items: [['moonberryTart', 2]] },
+    text: {
+      offer: 'There is a song I have never finished. One verse short, for eleven years. I think I could finish it now, if you brought me moonberries for the ink.',
+      accept: 'Four should do. They grow where the moss glows brightest.',
+      decline: 'Eleven years, {hero}. What is a few more days between friends?',
+      done: 'It is finished. It was always about this place, you know. It just took me eleven years to notice.',
+    },
+  },
+  fernsQuietGrove: {
+    giver: 'Fern', title: 'The Quiet Grove', hearts: 5,
+    steps: [
+      { kind: 'collect', item: 'sweetleaf', count: 5, text: 'Gather 5 Sweetleaf for the grove' },
+      { kind: 'deliver', to: 'Fern', item: 'sweetleaf', count: 5, text: 'Bring the sweetleaf to Fern',
+        say: 'Here, and here, and one by the water. There. Something will grow here now, and it will be ours.' },
+    ],
+    reward: { coins: 90, xp: 130, items: [['flowerCrown', 1], ['sweetleaf', 3]] },
+    text: {
+      offer: 'There is a bare patch past the pond that nobody visits. I would like to make it somewhere worth sitting. Will you help me plant it?',
+      accept: 'Five sweetleaf, picked gently. They remember being pulled.',
+      decline: 'The patch is patient. So am I. Mostly.',
+      done: 'Sit with me a moment. This is the first thing I have planted that somebody else helped with.',
+    },
+  },
+  cindersCommission: {
+    giver: 'Cinder', title: "The Smith's Own Work", hearts: 5, planet: 1,
+    steps: [
+      { kind: 'collect', item: 'fireOpal', count: 2, text: 'Find 2 Fire Opals' },
+      { kind: 'deliver', to: 'Cinder', item: 'fireOpal', count: 2, text: 'Bring the opals to Cinder',
+        say: 'Right. Out of my forge, you. Come back at dusk and do not knock.' },
+    ],
+    reward: { coins: 140, xp: 160, items: [['opalBrooch', 1]] },
+    text: {
+      offer: "Thirty years of other people's swords, {hero}. I want to make one thing for myself, and it needs two fire opals. Will you find them?",
+      accept: 'Deep veins, under the slopes. An iron pick, nothing softer.',
+      decline: 'Thirty years. I can wait a week without crying about it.',
+      done: 'I made two. One for the shelf, one for you. Do not argue with a smith about a gift.',
+    },
+  },
+  tuvasThaw: {
+    giver: 'Tuva', title: 'The Thaw Lanterns', hearts: 5, planet: 2,
+    steps: [
+      { kind: 'collect', item: 'frostDiamond', count: 2, text: 'Find 2 Frost Diamonds' },
+      { kind: 'deliver', to: 'Tuva', item: 'frostDiamond', count: 2, text: 'Bring the diamonds to Tuva',
+        say: 'Two lights for the pass. Nobody freezes between those posts now. Nobody else, I mean.' },
+    ],
+    reward: { coins: 130, xp: 160, items: [['diamondCharm', 1]] },
+    text: {
+      offer: 'I lost someone on the pass, a long time ago, between two posts with no light on them. I want to set lanterns there. Two frost diamonds, and it is done. Will you?',
+      accept: 'They sit deep, in the blue ice. Take your time and keep warm.',
+      decline: 'It has been dark a long while. A little longer will not change it.',
+      done: 'There. Lit, and they will stay lit. Thank you for not asking me anything about it.',
+    },
+  },
+  marlosCharts: {
+    giver: 'Marlo', title: "The Keeper's Charts", hearts: 5, planet: 'tidewhisper',
+    steps: [
+      { kind: 'collect', item: 'pearl', count: 3, text: 'Dive for 3 Pearls' },
+      { kind: 'deliver', to: 'Marlo', item: 'pearl', count: 3, text: 'Bring the pearls to Marlo',
+        say: 'Three pearls, three safe channels weighted down and marked. Any boat that reads this gets home. That is the whole job, really.' },
+    ],
+    reward: { coins: 150, xp: 170, items: [['tidePendant', 1]] },
+    text: {
+      offer: 'I have been charting the safe channels for twenty years and never finished it. Three pearls to weight the corners, and it goes on the wall for good. Help me finish?',
+      accept: 'Clams, in the shallows at low water. Mind the shellbacks.',
+      decline: 'Twenty years, {hero}. The sea is in no hurry and neither am I.',
+      done: 'It is done, and written down where it outlasts me. Take the pendant: the light goes with you now.',
     },
   },
 };

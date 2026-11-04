@@ -24,6 +24,7 @@ not confirmed design.
 | [Talents](systems/talents.md) | Talent points, the Witch, Warrior and Ranger trees, saves and the free reset |
 | [Pets](systems/pets.md) | Pets, their commands, abilities and growth |
 | [The journal](systems/journal.md) | Achievements, the bestiary and the collection |
+| [Villager friendship](systems/friendship.md) | Hearts, gifts and tastes, the reward ladder, greeting, waving, door gifts and the Friends tab |
 | [Saving an adventure](systems/saving.md) | Continue, autosave, export and import (the format is in [Adventure saves](technical/save-format.md)) |
 | [Your cottage](systems/home.md) | Claiming and furnishing the player home |
 | [Building your garden](systems/building.md) | Placing outdoor pieces, storage, sorting and pickup |

@@ -14,6 +14,7 @@ import { gainXp } from '../../progression/experience.js';
 import { audio } from '../../systems/AudioSystem.js';
 import { showBanner } from '../../ui/banner.js';
 import { toast } from '../../ui/toast.js';
+import { Friendship } from '../Friendship.js';
 import { grantItem } from '../pickups.js';
 import { planetSources } from '../resourceRules.js';
 import { gainCoins } from '../wallet.js';
@@ -31,11 +32,12 @@ export const Quests = {
   step(id) { return QUESTS[id].steps[this.st(id).step]; },
   active() { return Object.keys(QUESTS).filter(id => this.st(id).status === 'active'); },
   done() { return Object.keys(QUESTS).filter(id => this.st(id).status === 'done'); },
-  /** A quest this villager can offer right now, or null. */
+  /** A quest this villager can offer right now, or null. A personal quest (`hearts`) waits for the friendship. */
   offerable(npc) {
     return Object.keys(QUESTS).find(id => { const q = QUESTS[id], s = this.st(id);
       const from = typeof q.planet === 'string' ? PLANETS.findIndex(p => p.id === q.planet) : q.planet ?? 0;
-      return q.giver === npc.name && s.status === 'new' && from >= 0 && ctx.planet >= from && ctx.time >= s.readyAt; }) ?? null;
+      return q.giver === npc.name && s.status === 'new' && from >= 0 && ctx.planet >= from && ctx.time >= s.readyAt
+        && Friendship.questUnlocked(id); }) ?? null;
   },
   /** Dialog line: a quest step that needs this villager right now (hand-ins come before anything else), or null. */
   stepLineFor(npc) {

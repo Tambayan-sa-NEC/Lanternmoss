@@ -8,12 +8,13 @@ import { PLANETS, PLANET_CATALOG } from '../src/config/planets.js';
 const fixture = () => JSON.parse(readFileSync(new URL('fixtures/save-v1.json', import.meta.url), 'utf8'));
 test('v1 fixture remains readable, with independent planet snapshots and one explicit slot', () => {
   const raw = fixture(), clean = sanitizeSave(raw);
-  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, player: cleanState('player', raw.systems.player), pets: cleanState('pets', raw.systems.pets), portals: cleanState('portals', null), progression: cleanState('progression', raw.systems.progression), tutorial: cleanState('tutorial', null), crafting: cleanState('crafting', null), buffs: cleanState('buffs', raw.systems.buffs), talents: { ranks: {} } } });
+  assert.deepEqual(clean, { ...raw, systems: { ...raw.systems, player: cleanState('player', raw.systems.player), pets: cleanState('pets', raw.systems.pets), portals: cleanState('portals', null), progression: cleanState('progression', raw.systems.progression), tutorial: cleanState('tutorial', null), crafting: cleanState('crafting', null), buffs: cleanState('buffs', raw.systems.buffs), talents: { ranks: {} }, friendship: cleanState('friendship', null) } });
   // A save written before caves existed (29d) keeps its surface pose and simply starts outside, with no cave progress.
   assert.deepEqual([clean.systems.player.cave, clean.systems.player.caveX, clean.systems.player.caveZ], [null, 0, 0]);
   assert.equal(clean.planets.lanternmoss.caves, undefined, 'an old planet snapshot gains no cave rows');
   assert.deepEqual(cleanState('caves', null), { cave: null, opened: [], mined: [], cleared: [], visited: [] });
   assert.equal(clean.systems.tutorial.status, 'skipped', 'older adventures do not unexpectedly start a guide');
+  assert.deepEqual(clean.systems.friendship.points, {}, 'an adventure saved before friendships (33) simply has none');
   assert.equal(clean.slot, 0); assert.equal(clean.planetId, 'emberfall');
   assert.equal(clean.systems.player.level, 4);
   assert.equal(clean.planets.lanternmoss.chests.opened[0], 'lanternmoss:0');

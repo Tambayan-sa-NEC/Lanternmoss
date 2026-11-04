@@ -64,6 +64,8 @@ node scripts/structures-smoke.mjs  # structure controls, support/pickup, door mo
 node scripts/building-smoke.mjs    # placement controls, storage, 720p/1080p layout and reload Continue
 node scripts/tutorial-smoke.mjs    # guide/help/fainting UI, reload/replay and menu bounds; defaults to Edge
 node scripts/bounty-smoke.mjs      # bounty board: real E, claim click, 720p/1080p and reload Continue; retakes its two shots
+node scripts/friendship-smoke.mjs  # villager friendship: real E, a held gift offered and given, hearts on the talk
+                                    # prompt, the Friends tab at 720p/1080p and reload Continue; retakes its two shots
 node scripts/sets-smoke.mjs        # gear sets: real I and Equip clicks, set lines and tooltip, 720p/1080p; retakes its shot
 node scripts/talents-smoke.mjs     # talent foundation on a stable test-only tree: learning, Continue, free reset
 node scripts/witch-talents-smoke.mjs # real Witch tree, live HUD/Controls, keys, Continue/reset, 720p/1080p low; retakes its shots

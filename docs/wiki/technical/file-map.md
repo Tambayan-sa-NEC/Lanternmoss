@@ -48,6 +48,8 @@ src/
 │   ├── chests.js          treasure chests and drops: kinds, loot tables, gear rarity odds, monster drops, keys, boss chest
 │   ├── quests.js          multi-step villager quests (steps, rewards, dialogue)
 │   ├── bounties.js        the bounty board: kinds of job, counts, coins, rare-piece chance, where the board stands
+│   ├── friendship.js      villager friendship: hearts, thresholds, talk/gift/quest points, greet/wave/door rules,
+│   │                      shop discount, and each villager's tastes, reactions, chatter and reward ladder
 │   ├── sets.js            gear sets: each world's pieces and their two- and three-piece bonuses (burn, chill, healing...)
 │   ├── challenges.js      villager mini-challenges and their dialogue
 │   ├── leveling.js        XP curve, level cap, stat and damage growth
@@ -163,6 +165,9 @@ src/
 │   ├── Farm.js            the village farm: tilling, planting, watering (and rain), growing, harvesting
 │   ├── Stations.js        the village's crafting corner: placing it, which station you stand at, opening its recipes
 │   ├── Bounties.js        the village bounty board: placing it, counting jobs from game events, claiming, per-planet saves
+│   ├── Friendship.js      villager friendship: hearts from talking, gifts and quests, the reward ladder, greeting,
+│   │                      waving, door gifts; saved with the adventure
+│   ├── friendshipRules.js villager friendship's heart math, tastes lookup and saved shape (pure)
 │   ├── Dungeons.js        caves: mouth, entry/exit, combat frame and safe surface encounter restoration
 │   ├── Talents.js         the hero's learned talents: their kit for casting, saves, Old Bramble's free reset
 │   ├── bountyRules.js     the day's jobs generated from a planet's config, progress and the saved shape (pure)

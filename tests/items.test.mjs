@@ -11,6 +11,7 @@ import { HOTBAR_KEYS } from '../src/config/controls.js';
 import { EQUIP_SLOTS, GEAR_KINDS, HOTBAR, INVENTORY, ITEM_ART_KINDS, ITEM_DEFINITIONS, RARITIES, STATS } from '../src/config/items.js';
 import { LOOT_TABLES, MINI_BOSS_LOOT } from '../src/config/chests.js';
 import { QUESTS } from '../src/config/quests.js';
+import { TASTES } from '../src/config/friendship.js';
 import { hotbarFirst, Inventory } from '../src/inventory/Inventory.js';
 import { itemRegistry } from '../src/items/ItemRegistry.js';
 import { craft, craftProblem, recipesFor } from '../src/items/crafting.js';
@@ -103,7 +104,9 @@ test('recipes only use real items, and every material crafts something', () => {
   }
   for (const d of ITEM_DEFINITIONS.filter(d => d.category === 'material')) assert.ok(RECIPES.some(r => r.needs.some(([i]) => i === d.id)) || FUEL[d.id] || RUNES[d.id], `${d.id} is used by a recipe, fuel or enchantment`);
   const gifts = new Set(Object.values(CRITTER_DEFS).filter(c => c.rare).map(c => c.rare.gift));   // rare creatures' charms are gifts, not recipes
-  const given = new Set([...Object.values(QUESTS).flatMap(q => (q.reward?.items ?? []).map(([i]) => i)),                // quest rewards, loot keepsakes
+  // friendship rewards (33): the thank-yous and the keepsake a friend makes for you at four hearts
+  const befriended = Object.values(TASTES).flatMap(t => (t.rewards ?? []).flatMap(r => r.kind === 'keepsake' ? [r.item] : (r.items ?? []).map(([i]) => i)));
+  const given = new Set([...befriended, ...Object.values(QUESTS).flatMap(q => (q.reward?.items ?? []).map(([i]) => i)),                // quest rewards, loot keepsakes
     ...Object.values(MINI_BOSS_LOOT.extra ?? {}).flat().map(([i]) => i), ...Object.values(LOOT_TABLES).flatMap(t => [...(t.pool ?? []), ...(t.guaranteed ?? [])].map(e => e.item))]);
   for (const d of GEAR) assert.ok(gifts.has(d.id) || given.has(d.id) || RECIPES.some(r => r.result === d.id), `${d.id} can be crafted, found or given`);
   for (const g of gifts) assert.ok(ids.has(g) && get(g).equip, `rare gift ${g} is gear`);

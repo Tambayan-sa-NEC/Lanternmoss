@@ -61,6 +61,18 @@ Pim runs the bakery shop by day; each later planet has a local of its own.
   <img src="../../screenshots/activities/chest.jpg" width="49%" alt="Opening a Lantern chest">
 </p>
 
+**Friendship.** Talking to a villager for the first time each day, handing them a present out of your hand, and
+finishing what they ask of you all raise their hearts. Each one has favourite, liked and disliked things, with its
+own reaction line and emote; five hearts unlock a thank-you, a recipe, the shopkeeper's discount, a keepsake made just
+for you, and a personal quest only a real friend is asked. Close friends greet you by name, wave from across the
+square and sometimes leave a gift at your cottage door. The journal's **Friends** tab tracks everyone you have met,
+what you have learned about their tastes, and the ladder of rewards ahead. See [friendship](../systems/friendship.md).
+
+<p>
+  <img src="../../screenshots/npcs/friendship-gift.jpg" width="49%" alt="Offering Fern a present she is holding in hand">
+  <img src="../../screenshots/huds/friends-page.jpg" width="49%" alt="The journal's Friends tab, hearts and rewards for three villagers">
+</p>
+
 **Houses and treasure.** Walk into the village houses: furniture to use (a bed to nap or sleep till morning, chests,
 bookshelves with lore, a kettle, an oven), and the people who live there. Out in the wilds, Mossy chests, locked
 Lantern chests (find a Lantern Key) and a boss treasure chest after every boss.

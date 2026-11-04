@@ -324,6 +324,22 @@ export const ITEM_DEFINITIONS = [
     icon: { shape: 'gem', color: 0x6fcf6a, art: 'cape' }, value: 12, equip: { slot: 'back', tier: 1, stats: {} } },
   { id: 'starryCape', name: 'Starry Cape', description: 'Midnight blue, sprinkled with stars that glow. Found only in Lantern chests.', category: 'equipment', rarity: 'rare',
     icon: { shape: 'gem', color: 0x4a4aa8, art: 'cape' }, value: 40, equip: { slot: 'back', tier: 1, stats: {} } },
+  // ---- keepsakes (TODO 33): made for you by a friend at four hearts (config/friendship.js). props.keepsake marks
+  //      them so they can never be given away again, and they change your look only: no stats to re-balance.
+  { id: 'brambleHat', name: "Bramble's Spare Hat", description: 'Older than some planets, and it still smells faintly of chamomile and singed eyebrows.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0x8a6ae0, art: 'strawHat' }, value: 0, props: { keepsake: 'Old Bramble' }, equip: { slot: 'hat', tier: 1, stats: {} } },
+  { id: 'pimsApron', name: "Pim's Flour Apron", description: 'Patched, scorched at one corner, and washed a thousand times. She says it suits you.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0xf2915f, art: 'cape' }, value: 0, props: { keepsake: 'Pim' }, equip: { slot: 'back', tier: 1, stats: {} } },
+  { id: 'liosCape', name: "Lio's Travelling Cape", description: 'The cape he wore to every town that ever threw him out. He wants you to have it.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0x5fae55, art: 'cape' }, value: 0, props: { keepsake: 'Lio' }, equip: { slot: 'back', tier: 1, stats: {} } },
+  { id: 'fernsCrown', name: "Fern's Living Crown", description: 'Woven while you waited, out of whatever was flowering. It has not stopped flowering since.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0x4fc4a0, art: 'flowerCrown' }, value: 0, props: { keepsake: 'Fern' }, equip: { slot: 'hat', tier: 1, stats: {} } },
+  { id: 'cindersCape', name: "Cinder's Forge Mantle", description: 'Heavy leather, star-burned. The first thing she ever made that she did not sell.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0xe0682a, art: 'cape' }, value: 0, props: { keepsake: 'Cinder' }, equip: { slot: 'back', tier: 1, stats: {} } },
+  { id: 'tuvasHood', name: "Tuva's Fur Hood", description: 'Lined with something very warm and very quiet. She will not say what.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0x6fa8dc, art: 'frogHat' }, value: 0, props: { keepsake: 'Tuva' }, equip: { slot: 'hat', tier: 1, stats: {} } },
+  { id: 'marlosCape', name: "Marlo's Oilskin", description: 'Salt-stiff and storm-proof. It has kept one keeper dry for thirty years; now it is yours.', category: 'equipment', rarity: 'rare',
+    icon: { shape: 'gem', color: 0x6fbecb, art: 'cape' }, value: 0, props: { keepsake: 'Marlo' }, equip: { slot: 'back', tier: 1, stats: {} } },
   // ---- pet outfits (TODO 35): worn by a pet from the pet menu, drawn on its head (src/models/vanity.js dressPet).
   //      props.petOutfit = where it sits: 'top' (hats, bows) or 'neck' (scarves); config/pets.js PET_OUTFIT_FIT
   { id: 'petBow', name: 'Ribbon Bow', description: 'A big satin bow for your pet. Wear it from the pet menu.', category: 'misc', rarity: 'uncommon',
