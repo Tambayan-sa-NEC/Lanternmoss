@@ -45,6 +45,7 @@ Recommended machine roles, recorded at the owner's request on 2026-10-17:
 | --- | --- |
 | Acer Nitro ANV15-51, Core i5-13420H, 16 GB RAM, Intel UHD and RTX 4050 Laptop GPU (inventory recorded October 17) | Default development and validation machine: coding, complete unit/simulation suites, browser/visual checks and desktop acceptance on the actual RTX 4050 at 1080p High. Its Intel UHD can also supply integrated-graphics diagnostics. |
 | Lenovo 81MU, Core i3-8145U, Intel UHD Graphics 620, approximately 4 GB RAM | Additional functional/compatibility checks and controlled low-end performance diagnostics. Record the actual adapter and memory pressure with results. |
+| HP EliteOne 800 G1 AiO, Core i7-4770S, Intel HD Graphics 4600, 16 GB RAM (recorded 2026-11-06) | Coding, unit/simulation suites, single browser checks and CPU-side diagnostics. The full screenshot tour ran out of memory here on 2026-11-04. Its GPU-bound frame times certify nothing. |
 | Other available machines, including Iris Xe if available | Additional hardware/browser coverage; an Iris Xe run is optional and no longer blocks 27h. |
 
 The Acer's RTX 4050 profile replaces the named validation hardware only. Existing frame-clock rules and render-count
@@ -216,6 +217,24 @@ its steering when models are optimized.
 The remaining 60 FPS work is measurable: animated multi-part actors and near-field props still contribute many calls,
 while bloom, MSAA and full-resolution post-processing cost fill rate. Validate on the actual Acer RTX 4050 before
 claiming the default-quality target; these count ceilings are a regression guard, not a substitute for that validation.
+
+## Effect sprites no longer recompile shaders (2026-11-06)
+
+A CPU profile of steady play on the HP EliteOne showed shader-compile work during play. A program probe traced it to
+emote bubbles and floating damage numbers. Each one made a new `SpriteMaterial` and disposed it when it faded out.
+When the last one went, three.js freed the shared sprite program, so the next bubble or number compiled it again
+mid-play, causing a one-frame hitch. A Duskhollow village scene relinked it twice in 8 s, and a Tidewhisper scene once.
+Both modules now return spent sprites to a pool instead of disposing them; a damage number still disposes its
+one-off canvas texture. Ground rings and swing arcs were checked the same way and do not churn programs.
+`scripts/fx-programs-smoke.mjs` plays all four effects out repeatedly and asserts zero new compiles after first use.
+Before the fix it saw 4 compiles in 4 cycles.
+
+On the same machine and the unreleased `feat/todo-30i` checkpoint, before this fix, the 18-row Duskhollow and
+Tidewhisper diagnostic matrices (1080p High, HD 4600, GPU-bound at
+about 100 ms per frame) gave median per-row CPU p95 of 29.4 ms and 27.4 ms. Duskhollow costs about 7% more CPU per
+frame than the world that passed Acer acceptance, with no Duskhollow-only hot spot in a function-level profile. This
+is a diagnostic, not certification. It is consistent with the loaded-host explanation of the 30i Acer misses, but
+does not replace a clean idle 18-case Acer run.
 
 ## UHD 620 laptop diagnostic (2026-10-17)
 

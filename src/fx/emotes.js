@@ -21,10 +21,13 @@ function emoteTexture(sym, color) {
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; emoteCache[key] = t; return t;
 }
 
-const emotes = [];
+// Spent bubbles are pooled, never disposed: disposing the last sprite material frees its shader program, and the next
+// bubble then recompiles it mid-play (a frame hitch).
+const emotes = [], pool = [];
 /** ent needs pos, up and optionally height / hover (any Walker, the owl, a fish...). */
 export function emote(ent, sym, color = '#ff6b9a') {
-  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: emoteTexture(sym, color), transparent: true, depthWrite: false, fog: false }));
+  const s = pool.pop() ?? new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false, fog: false }));
+  s.material.map = emoteTexture(sym, color); s.material.opacity = 1; s.scale.setScalar(0);
   s.renderOrder = 5; scene.add(s); emotes.push({ s, ent, t: 0 });
 }
 export function updateEmotes(dt) {
@@ -33,6 +36,6 @@ export function updateEmotes(dt) {
     e.s.position.copy(e.ent.pos).addScaledVector(e.ent.up, (e.ent.height || 1) + 0.35 + (e.ent.hover || 0) + e.t * 0.35);
     const pop = Math.min(1, e.t / 0.22), back = 1 + 2.7 * Math.pow(pop - 1, 3) + 1.7 * Math.pow(pop - 1, 2);
     e.s.scale.setScalar(0.85 * back); e.s.material.opacity = 1 - smoothstep(0.7, 1, k);
-    if (k >= 1) { scene.remove(e.s); e.s.material.dispose(); emotes.splice(i, 1); }
+    if (k >= 1) { scene.remove(e.s); pool.push(e.s); emotes.splice(i, 1); }
   }
 }
