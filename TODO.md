@@ -1381,7 +1381,8 @@ See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 Code: `src/config/items.js` (sets), `src/items/gear.js`, `src/config/characters.js` (talents), `src/ui/` (a talent
 page). **Size:** L, in five stages. **Needs:** 26d (the level cap rises to 16).
 **Why here:** after 26, levels 11–16 add only small stat bumps; talents give them something to spend points on.
-**Machine:** no work left of its own. The open checklist closes with the Dusk (30c) and Star (32b) sets, on their machines.
+**Machine:** no work left of its own. The open checklist closes with the Dusk set, already built in 30c on
+`feat/todo-30`, which lands when 30 merges, and the Star set (32b).
 
 **Five-hour assessment:** the M label understated combat effects, UI, save validation and three different skill kits.
 Keep trees small: each hero gets a bounded, documented set of ability upgrades/alternatives, not a new class system.
@@ -1606,23 +1607,26 @@ models, a boss in `src/entities/enemies/behaviors/boss/moth.js`. New in Round 3.
 **Needs:** 27h (including its go/no-go check), 28a-28e, 29a; does not require 29g.
 **Risk:** a dark world can be hard to read, and frustrating on cheap screens. **Recommendation:** keep a minimum light
 level and the outlines, never let an empty lantern hurt you, and test it on the lowest quality preset.
-**Machine:** 30a-30h on the HP EliteOne. They stay unreleased behind test fixtures, and their smokes use software
-rendering. 30i on the Acer Nitro, for the world release, performance and the full tour.
-The HD 4600 is also a useful cheap-screen check for readability, but not for certification.
+**Machine:** 30a-30h are already built and merged into the `feat/todo-30` parent, which stays out of `develop` until
+30i passes. Their boxes are ticked here (2026-11-06); their implemented notes and the world checklist's ticks are on
+that branch. What is left is 30i,
+checkpointed on `feat/todo-30i`, on the Acer Nitro. As of 2026-11-02 its unit, simulation and campaign checks pass,
+but 0/18 Acer frame-time rows pass. CPU profiling and optimization for it can be done on the HP EliteOne as diagnostics.
+The 18-case acceptance run and the full tour still need the Acer.
 
 **Five-hour assessment:** light-bound combat and readable darkness are separate from ecology and story. Split the four
 regular behaviors into two pairs; the moth fight gets a dedicated session after its lantern/quest systems are proven.
 
 | Stage | Needs | Session estimate | Scope and acceptance |
 | --- | --- | --- | --- |
-| [ ] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
-| [ ] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
-| [ ] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
-| [ ] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
-| [ ] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
-| [ ] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
-| [ ] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
-| [ ] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
+| [x] **30a. Twilight terrain and lantern** | 27h, 28a-28e, 29a | 3-4.5 h | Build valleys/canopy gaps, endless dusk, bounded glowing footprints, belt lantern, Oil HUD and safe empty-lantern fallback. Test drain/refill queries, light radii, pause/time skips, per-planet saves and lowest-preset readability in the unreleased world. |
+| [x] **30b. Flora and wildlife** | 30a | 2-4 h | Add every listed plant and creature, firefly catching/jars, blind fish, Moonmoth/charm and canopy models. Test schedules, capture, charm radius and rare-gift restoration, with scenery/particle budgets. |
+| [x] **30c. Resources, weather and music** | 30b, 28a | 2-4 h | Add lumen ore/ingots/dust, silk, moonstone, oil recipes, shade crops and Dusk gear/set acquisition. Add spore drift, deep-dark light modifier, cap-drip farm watering and the procedural music-box theme. Verify farming/lighting are mechanic rules, not hidden weather side effects. Web-cut silk production connects in 30f. |
+| [x] **30d. Wick and the Old Road** | 30a-30c | 2-4 h | Add stalk-house interiors, traveler lines, Wick, persistently relit waylamps and the three-moonwell flame quest. Verify village safe light, flame exhaustion restarting at the last lamp, portal/Continue restoration and the level-11 quest gate for Umbra. |
+| [x] **30e. Shadelings and Mosslurks** | 30a-30c | 2-4 h | Add lightbound/mimic modules, models, drops and bestiary. Test shadow-to-solid targeting, flare/fire fleeing, gather ambushes and save/revisit behavior without making unreadable enemies deal unavoidable damage. |
+| [x] **30f. Gloomweavers and Snuffers** | 30a-30c | 2-4 h | Add weaver/thief modules, models, webs/slow/cutting/silk, oil theft and recovery. Include the beetle accessibility setting and matching regular/mini-boss visuals. Verify fire/blade interactions, repeated theft/reload and accessible silhouettes. |
+| [x] **30g. Grandmother Gloomweaver** | 30e-30f | 2-4 h | Add the mini boss, three burnable anchors, drop/fight/re-anchor cycle and guarded moonstone reward. Test every phase, accessible beetle presentation and saved defeat/rewards. |
+| [x] **30h. Umbra encounter** | 30d-30g | 3-4.5 h | Add brightest-light dives, stun bait, wingbeat snuffing, shade adds, 50% light drinking/following fog, moonfire ring and Dusk Crown. Simulate clear damage windows and safe darkness for every hero; verify gate, death/retry and Continue. |
 | [ ] **30i. Campaign release** | 30a-30h | 2-4 h | Finish the content gate, three-hero pacing, oil/quest end-to-end browser run, lowest-preset/accessibility checks, performance and affected tour/screenshots. Enable Duskhollow only after acceptance; 29g can now add its cave. |
 
 - [ ] **Shape and look:** deep valleys under a canopy of giant lumen caps about 25 m up, with gaps of starlight. An
@@ -1703,7 +1707,8 @@ Code: `src/config/planets/lanternMoon.js`, `src/world/mechanics/lowGravity.js`, 
 small: radius 40 (the old planet size, so you can see the curve, like a moon), one building, and no farm or cave. Its boss
 reuses moves from the other five.
 **Machine:** 32a-32f on the HP EliteOne, as unreleased fixture work. 32g on the Acer Nitro, for the release,
-performance and the full tour. All of it waits on 30i.
+performance and the full tour. None of it can start yet: 32a waits on 30i, which is blocked on Acer frame-time
+acceptance.
 
 **Five-hour assessment:** radius 40 reduces scenery, not physics or boss integration. Split the borrowed moves from
 Nyxra's own gravity/eclipse/rekindling rules. Keep one observatory, no farm/cave and no separate mini boss.
