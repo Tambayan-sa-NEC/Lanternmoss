@@ -9,6 +9,17 @@ Legend: `[ ]` to do · `[~]` in progress · `[x]` done. Tags: **(core)** must-ha
 explained in Round 3), **Needs** (items that must land first), and where it applies, a **Risk** and a
 **Recommendation**.
 
+**Machine** labels on open items (added 2026-11-06) say where the work can be finished:
+- **HP EliteOne**: the HP EliteOne 800 G1 (i7-4770S, Intel HD Graphics 4600, 16 GB). Coding, `npm test`, `npm run sim`,
+  single browser smokes and feature shots all run here. It cannot finish the full screenshot tour
+  (`node scripts/screenshots.mjs`): on 2026-11-04 the tour was killed for low memory. It also cannot certify performance.
+- **HP EliteOne, then Acer Nitro**: build and check it here, then push a checkpoint. The full tour retake, and any
+  performance run, happen on the Acer before the merge. Most player-facing features need this, because finishing one
+  includes the full tour retake.
+- **Acer Nitro**: the [Acer Nitro ANV15-51 / RTX 4050](docs/wiki/technical/performance.md#development-and-validation-machines).
+  Release performance acceptance, world releases, a full-tour-heavy restyle, or a full suite sweep.
+These labels change if the tour can be made to finish here, for example by restarting the page between scenes.
+
 ---
 
 ## 1. Better HUD **(core)** ✓
@@ -1362,6 +1373,7 @@ See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 - [x] An otter pet that dives for pearls (27i; public unlock requires a passing release budget).
 - [ ] **Go / no-go check** once it plays end to end: how long it took, what the groundwork (26) got wrong, and whether
       the checklist was too much. Fix 26 before starting 30, or cut Duskhollow down to fit.
+      **Machine:** HP EliteOne. This is a written review of the 27 logs and handoff; any fix to 26 it finds is labelled separately.
 
 ## 28. Gear sets and hero depth **(suggested)**
 
@@ -1369,6 +1381,8 @@ See [Mirelure](docs/wiki/world/tidewhisper.md#mirelure-the-lantern-angler-27g).
 Code: `src/config/items.js` (sets), `src/items/gear.js`, `src/config/characters.js` (talents), `src/ui/` (a talent
 page). **Size:** L, in five stages. **Needs:** 26d (the level cap rises to 16).
 **Why here:** after 26, levels 11–16 add only small stat bumps; talents give them something to spend points on.
+**Machine:** no work left of its own. The open checklist closes with the Dusk set, already built in 30c on
+`feat/todo-30`, which lands when 30 merges, and the Star set (32b).
 
 **Five-hour assessment:** the M label understated combat effects, UI, save validation and three different skill kits.
 Keep trees small: each hero gets a bounded, documented set of ability upgrades/alternatives, not a new class system.
@@ -1454,6 +1468,7 @@ Code: new `src/world/caves.js` (interiors like the houses', away from the planet
 `src/config/dungeons.js`, new `src/render/lighting.js`. **Size:** XL, in seven stages. **Needs:** 19, 20; stage dependencies below.
 **Why here:** 29a builds the darkness and light that Duskhollow (30) needs, in a small test space first; the full cave
 system need not block that world.
+**Machine:** 29g on the Acer Nitro. It releases caves into two worlds, so it needs performance checks and the full tour; it also waits on 30i.
 **Risk:** one hand-made cave per main planet means five caves (the Moon has none). **Recommendation:** build caves
 from a kit of room pieces put together from a seed, so each planet's cave is config (palette, monsters, veins), not hand-built.
 
@@ -1592,6 +1607,12 @@ models, a boss in `src/entities/enemies/behaviors/boss/moth.js`. New in Round 3.
 **Needs:** 27h (including its go/no-go check), 28a-28e, 29a; does not require 29g.
 **Risk:** a dark world can be hard to read, and frustrating on cheap screens. **Recommendation:** keep a minimum light
 level and the outlines, never let an empty lantern hurt you, and test it on the lowest quality preset.
+**Machine:** 30a-30h are already built and merged into the `feat/todo-30` parent, which stays out of `develop` until
+30i passes. Their boxes are ticked here (2026-11-06); their implemented notes and the world checklist's ticks are on
+that branch. What is left is 30i,
+checkpointed on `feat/todo-30i`, on the Acer Nitro. As of 2026-11-02 its unit, simulation and campaign checks pass,
+but 0/18 Acer frame-time rows pass. CPU profiling and optimization for it can be done on the HP EliteOne as diagnostics.
+The 18-case acceptance run and the full tour still need the Acer.
 
 **Five-hour assessment:** light-bound combat and readable darkness are separate from ecology and story. Split the four
 regular behaviors into two pairs; the moth fight gets a dedicated session after its lantern/quest systems are proven.
@@ -1869,6 +1890,8 @@ music, Wick's waylamps, every monster and the release (30b-30i).
 Code: `src/gameplay/PlanetProgression.js`, `src/config/planets/`, `src/config/combat.js`, `src/core/AdventureSave.js`.
 **Size:** XL across seven stages (was M). **Needs:** 24 for the base; 27h/30i for expansion rematches.
 31b-31f precede Nyxra because she reuses the rematch signatures of the five main bosses. New Game+ (31g) is not a Moon prerequisite.
+**Machine:** HP EliteOne, then Acer Nitro, for every stage. Rematches and New Game+ change released worlds, so each
+merge needs the full tour retake. 31a-31e can start now; 31f and 31g wait on 30i.
 
 **Five-hour assessment:** harder stats alone do not meet the requested new attacks. There are five main bosses and
 five mini-boss encounters (four AI kits, including the Frost Hydra variant) across the main worlds, plus a
@@ -1901,6 +1924,9 @@ Code: `src/config/planets/lanternMoon.js`, `src/world/mechanics/lowGravity.js`, 
 **Risk:** this is a reward for completionists, and it could easily grow as big as a main world. **Recommendation:** keep it
 small: radius 40 (the old planet size, so you can see the curve, like a moon), one building, and no farm or cave. Its boss
 reuses moves from the other five.
+**Machine:** 32a-32f on the HP EliteOne, as unreleased fixture work. 32g on the Acer Nitro, for the release,
+performance and the full tour. None of it can start yet: 32a waits on 30i, which is blocked on Acer frame-time
+acceptance.
 
 **Five-hour assessment:** radius 40 reduces scenery, not physics or boss integration. Split the borrowed moves from
 Nyxra's own gravity/eclipse/rekindling rules. Keep one observatory, no farm/cave and no separate mini boss.
@@ -1956,6 +1982,8 @@ is Pet care (35) after Cooking (22). Where one of them needs data for each world
 **Goal:** the villagers become friends you care about, not only quest givers and a shop.
 Code: new `src/gameplay/Friendship.js`, `src/config/npcs` data (favourite gifts, reward tiers), `src/ui/Dialog.js`
 (a gift option), the journal (a friends page). **Size:** M. **Needs:** 19.
+**Machine:** Acer Nitro for what is left. The feature is built and checked on `feat/todo-33-villager-friendship`;
+only the full tour retake remains, and that ran out of memory here.
 
 - [ ] **Friendship hearts** per villager, raised by talking each day, gifts and finishing their quests.
 - [ ] **Gifts:** each villager has favourite, liked and disliked things (food you cook, fish, gems, flowers), with a
@@ -2036,6 +2064,7 @@ the cottage one.
 **Goal:** the villagers use the same world you do, so the village feels busy.
 Code: `src/entities/npc/NPC.js`, `src/entities/npc/npcDefs.js` (schedules), `src/gameplay/Stations.js`,
 `src/gameplay/Farm.js`. **Size:** M.
+**Machine:** HP EliteOne, then Acer Nitro (the full tour retake).
 
 - [ ] Villagers' schedules include the new places: Cinder at the forge, Pim at the cooking pot, someone fishing at
       the pond in the evening, someone tending a farm plot.
@@ -2048,6 +2077,7 @@ Code: `src/entities/npc/NPC.js`, `src/entities/npc/npcDefs.js` (schedules), `src
 **Goal:** collecting has a place to show off, and fishing, mining and foraging lead somewhere.
 Code: new `src/gameplay/Museum.js`, `src/world/interiors.js` (a museum room), the journal's Collection tab.
 **Size:** M. **Needs:** 19.
+**Machine:** HP EliteOne, then Acer Nitro (the full tour retake).
 
 - [ ] **Donate** fish, gems, rare forage and monster trophies to Old Bramble's museum. Each donation fills a display
       in a museum room you can walk through.
@@ -2062,6 +2092,7 @@ Code: `src/config/day.js` (a calendar), new `src/gameplay/Festivals.js`, `src/wo
 `src/config/shop.js` (festival stock). **Size:** M.
 **Risk:** a hand-made festival per planet means six festivals. **Recommendation:** one festival system whose decorations
 take the planet's colours; give the first three worlds their own versions only if time allows.
+**Machine:** HP EliteOne, then Acer Nitro (the full tour retake).
 
 - [ ] **A lantern festival** every few days: paper lanterns over the square, villagers gathered at night, a special
       shop, and small mini-games (lantern lighting, a race).
@@ -2099,6 +2130,8 @@ Code: `src/systems/InputSystem.js`, `src/core/controls.js`, new `src/ui/touchCon
 **Risk:** every screen built until then becomes a screen to convert, and there are about twenty actions on keys today.
 **Recommendation:** follow the no-hover rule from today (*Rules from here on*). Build touch and gamepad on one input
 layer (actions, not keys) so Gamepad support comes almost for free.
+**Machine:** Acer Nitro, plus a real phone or tablet. Touch input can be emulated anywhere, but the mobile performance
+check needs a real device, and every screen change needs the full tour.
 
 - [ ] **Detect a touch device** (`pointer: coarse`, touch events) and switch the touch layout on; keep a setting to
       turn it on or off by hand.
@@ -2126,6 +2159,8 @@ Code: new `src/net/` (connection, messages, state sync), `src/core/Game.js` (loc
 separate service), `src/ui/` (lobby, player list, chat). **Size:** XL+. **Needs:** 19, 24.
 **Risk:** this is the item most likely to cause trouble (risk 1). **Recommendation:** a decision gate at the end of phase A, and a
 three-day spike right after 19. If it stays, it stays last.
+**Machine:** Acer Nitro. It needs several game clients running at once, a whole-game regression sweep and the full
+tour. The networking model is an owner decision to make first.
 
 - [ ] **Decide the model:** peer-to-peer with one host (WebRTC) or a small authoritative server (WebSocket). The host
       or server runs the world (monsters, bosses, loot, chests, the day clock, weather); clients send their input and
@@ -2163,6 +2198,9 @@ Code: new `wiki/` (website and written guides), a wiki build script under `scrip
 mobile or multiplayer. It can be built alongside the remaining gameplay work and expanded as content lands.
 **Risk:** copied stats and recipes become outdated as the game changes. **Recommendation:** generate factual entries
 from the game's configuration, keep explanatory guides alongside them, and distinguish released content from plans.
+**Machine:** HP EliteOne. It is a separate generated site and leaves the game's tour alone. Only the final "link it
+from the game's menus" step touches the game, and that step needs the full tour retake on the Acer Nitro. Hosting it is
+an owner decision.
 
 - [ ] **Characters and people:** every playable character's profile, stats, abilities, resource costs, cooldowns,
       strengths, playstyle and starter companion; villagers, their locations, schedules, shops, dialogue and quests.
@@ -2209,6 +2247,9 @@ scope from the current track. No dependency on implementing the [visual upgrade 
 Three.js/fonts from CDNs is not a self-contained backup. **Recommendation:** use the same repository, an immutable
 named release tag and a verified runnable archive. Use a second working folder when both editions are needed.
 
+**Machine:** 43a on the Acer Nitro, for the full suites, browser checks and performance evidence. 43b-43d on the
+HP EliteOne, for packaging, the restore test and tagging. Choosing the milestone is an owner decision.
+
 **Execution status:** this entry schedules future preservation work only. Adding it does not create a tag,
 release archive, maintenance branch, worktree or new project, and does not activate the visual plan.
 
@@ -2253,6 +2294,7 @@ that breaks layouts at 720p. **Recommendation:** restyle shared parts first (pan
 value and key hint visible, and recheck each screen with its existing smoke at 720p and 1080p. If the
 [visual upgrade plan](docs/wiki/plans/visual-upgrade.md) is ever activated, its V13 (interface) replaces this item rather
 than running alongside it.
+**Machine:** Acer Nitro. Every smoke and the full tour are rerun, and every screen is reviewed by eye.
 
 - [ ] **Shared look:** one set of panel surfaces, spacing, borders, buttons, slots and text sizes for every window.
 - [ ] **HUD:** vitals, skills, hotbar, pet and boss cards, compass, prompts, quest and tutorial panels, toasts.
@@ -2360,9 +2402,11 @@ Smaller ideas, and where the promoted ones went.
 - [~] **Death / respawn screen (suggested, promoted to item 21):** "You fainted" with a short recap and a respawn countdown, instead of only a toast.
 - [ ] **Gamepad support (suggested):** movement, camera and abilities on a controller, with aiming for ground-targeted ultimates.
       Build it on the input layer from 40 (actions, not keys).
+      **Machine:** HP EliteOne, then Acer Nitro (the full tour retake); a controller is needed for a real-input check.
 - [ ] **Accessibility (suggested):** colour-blind-friendly telegraph colours, reduced motion (less shake and flashing), adjustable text size.
       Cheap: do it alongside 21. The screen shake slider and UI scale (2a) are a start; add the beetle option for the
       spiders (30).
+      **Machine:** HP EliteOne, then Acer Nitro (the full tour retake).
 - [ ] **Real audio (suggested):** replace the procedural placeholder sounds and music with real samples (`src/systems/AudioSystem.js`).
       Music per planet and per situation: calm village themes, exploring, night, and a stronger boss theme.
       Assumption (Round 3): the audio stays procedural to keep "no asset files"; the themes per world and situation
@@ -2375,6 +2419,8 @@ Smaller ideas, and where the promoted ones went.
 - [~] **Performance budget (suggested):** promoted to item 20.
 - [~] **Mob pursuit and faction combat (suggested):** promoted to item 45; ordinary mobs pursue without a leash, phased mini bosses lose theirs on entering their final form/state, and mobs can damage and provoke one another into fights.
 - [ ] **Small fixes (suggested):** add a project skill for launching and screenshotting the game in a browser (`/run-skill-generator`). (The `favicon.ico` was done in 18.)
+      **Machine:** HP EliteOne.
 - [ ] **A fourth new world, Windward (suggested, parked):** tall mesas above a sea of clouds, with updrafts and a leaf
       glider. Parked because gliding needs new movement, a new camera and falling rules, and the clouds below need a
       soft respawn. Only consider it after 32, if the three new worlds went smoothly.
+      **Machine:** Acer Nitro (a world release), if it is ever unparked.
